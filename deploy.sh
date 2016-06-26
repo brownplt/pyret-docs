@@ -37,4 +37,4 @@ git add -A "${TRAVIS_BRANCH}"
 git commit -m "Deploy ${TRAVIS_BRANCH} build to Github Pages"
 
 # Push the new build
-git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" gh-pages > /dev/null 2>&1
+git push --quiet "https://${GH_TOKEN}@${GH_REF}" gh-pages > /dev/null 2>&1
