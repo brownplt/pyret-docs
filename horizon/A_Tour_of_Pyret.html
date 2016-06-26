@@ -1,0 +1,326 @@
+<!doctype HTML>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="codemirror.js"></script>
+<script src="runmode.js"></script>
+<script src="pyret.js"></script>
+<script src="hilite.js"></script>
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"/><title>1.1&nbsp;A Tour of Pyret</title><link rel="stylesheet" type="text/css" href="scribble.css" title="default"/><link rel="stylesheet" type="text/css" href="footnote.css" title="default"/><link rel="stylesheet" type="text/css" href="manual-style.css" title="default"/><link rel="stylesheet" type="text/css" href="manual-racket.css" title="default"/><link rel="stylesheet" type="text/css" href="codemirror.css" title="default"/><link rel="stylesheet" type="text/css" href="pyret.css" title="default"/><link rel="stylesheet" type="text/css" href="styles.css" title="default"/><script type="text/javascript" src="scribble-common.js"></script><script type="text/javascript" src="manual-racket.js"></script><!--[if IE 6]><style type="text/css">.SIEHidden { overflow: hidden; }</style><![endif]--></head><body id="scribble-racket-lang-org"><div class="tocset"><div class="tocview"><div class="tocviewlist tocviewlisttopspace"><div class="tocviewtitle"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_0&quot;);">&#9658;</a></td><td></td><td><a href="index.html" class="tocviewlink" data-pltdoc="x">Pyret</a></td></tr></table></div><div class="tocviewsublisttop" style="display: none;" id="tocview_0"><table cellspacing="0" cellpadding="0"><tr><td align="right">1&nbsp;</td><td><a href="Getting_Started.html" class="tocviewselflink" data-pltdoc="x">Getting Started</a></td></tr><tr><td align="right">2&nbsp;</td><td><a href="Language_Concepts.html" class="tocviewlink" data-pltdoc="x">Language Concepts</a></td></tr><tr><td align="right">3&nbsp;</td><td><a href="Builtins.html" class="tocviewlink" data-pltdoc="x">Builtins</a></td></tr><tr><td align="right">4&nbsp;</td><td><a href="Libraries.html" class="tocviewlink" data-pltdoc="x">Libraries</a></td></tr></table></div></div><div class="tocviewlist"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_1&quot;);">&#9660;</a></td><td>1&nbsp;</td><td><a href="Getting_Started.html" class="tocviewlink" data-pltdoc="x">Getting Started</a></td></tr></table><div class="tocviewsublist" style="display: block;" id="tocview_1"><table cellspacing="0" cellpadding="0"><tr><td align="right">1.1&nbsp;</td><td><a href="" class="tocviewselflink" data-pltdoc="x">A Tour of Pyret</a></td></tr><tr><td align="right">1.2&nbsp;</td><td><a href="Tutorial__A_Flight_Lander_Game.html" class="tocviewlink" data-pltdoc="x">Tutorial:<span class="mywbr"> &nbsp;</span> A Flight Lander Game</a></td></tr></table></div></div><div class="tocviewlist"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_2&quot;);">&#9658;</a></td><td>1.1&nbsp;</td><td><a href="" class="tocviewselflink" data-pltdoc="x">A Tour of Pyret</a></td></tr></table><div class="tocviewsublistbottom" style="display: none;" id="tocview_2"><table cellspacing="0" cellpadding="0"><tr><td align="right">1.1.1&nbsp;</td><td><a href="#%28part._.Testing_and_.Assertions%29" class="tocviewlink" data-pltdoc="x">Testing and Assertions</a></td></tr><tr><td align="right">1.1.2&nbsp;</td><td><a href="#%28part._.Primitive_.Values_and_.Operators%29" class="tocviewlink" data-pltdoc="x">Primitive Values and Operators</a></td></tr><tr><td align="right">1.1.3&nbsp;</td><td><a href="#%28part._.Booleans%29" class="tocviewlink" data-pltdoc="x">Booleans</a></td></tr><tr><td align="right">1.1.4&nbsp;</td><td><a href="#%28part._.Strings%29" class="tocviewlink" data-pltdoc="x">Strings</a></td></tr><tr><td align="right">1.1.5&nbsp;</td><td><a href="#%28part._.Lists%29" class="tocviewlink" data-pltdoc="x">Lists</a></td></tr><tr><td align="right">1.1.6&nbsp;</td><td><a href="#%28part._.Identifiers_and_.Binding%29" class="tocviewlink" data-pltdoc="x">Identifiers and Binding</a></td></tr><tr><td align="right">1.1.7&nbsp;</td><td><a href="#%28part._.Variables%29" class="tocviewlink" data-pltdoc="x">Variables</a></td></tr><tr><td align="right">1.1.8&nbsp;</td><td><a href="#%28part._.Functions%29" class="tocviewlink" data-pltdoc="x">Functions</a></td></tr><tr><td align="right">1.1.9&nbsp;</td><td><a href="#%28part._.Data%29" class="tocviewlink" data-pltdoc="x">Data</a></td></tr><tr><td align="right">1.1.10&nbsp;</td><td><a href="#%28part._.Cases%29" class="tocviewlink" data-pltdoc="x">Cases</a></td></tr><tr><td align="right">1.1.11&nbsp;</td><td><a href="#%28part._.Annotations%29" class="tocviewlink" data-pltdoc="x">Annotations</a></td></tr><tr><td align="right">1.1.12&nbsp;</td><td><a href="#%28part._.Control%29" class="tocviewlink" data-pltdoc="x">Control</a></td></tr><tr><td align="right">1.1.13&nbsp;</td><td><a href="#%28part._.If%29" class="tocviewlink" data-pltdoc="x">If</a></td></tr><tr><td align="right">1.1.14&nbsp;</td><td><a href="#%28part._.And_more___%29" class="tocviewlink" data-pltdoc="x">And more...</a></td></tr></table></div></div></div><div class="tocsub"><div class="tocsubtitle">On this page:</div><table class="tocsublist" cellspacing="0"><tr><td><span class="tocsublinknumber">1.1.1<tt>&nbsp;</tt></span><a href="#%28part._.Testing_and_.Assertions%29" class="tocsubseclink" data-pltdoc="x">Testing and Assertions</a></td></tr><tr><td><span class="tocsublinknumber">1.1.2<tt>&nbsp;</tt></span><a href="#%28part._.Primitive_.Values_and_.Operators%29" class="tocsubseclink" data-pltdoc="x">Primitive Values and Operators</a></td></tr><tr><td><span class="tocsublinknumber">1.1.2.1<tt>&nbsp;</tt></span><a href="#%28part._.Numbers%29" class="tocsubseclink" data-pltdoc="x">Numbers</a></td></tr><tr><td><span class="tocsublinknumber">1.1.3<tt>&nbsp;</tt></span><a href="#%28part._.Booleans%29" class="tocsubseclink" data-pltdoc="x">Booleans</a></td></tr><tr><td><span class="tocsublinknumber">1.1.4<tt>&nbsp;</tt></span><a href="#%28part._.Strings%29" class="tocsubseclink" data-pltdoc="x">Strings</a></td></tr><tr><td><span class="tocsublinknumber">1.1.5<tt>&nbsp;</tt></span><a href="#%28part._.Lists%29" class="tocsubseclink" data-pltdoc="x">Lists</a></td></tr><tr><td><span class="tocsublinknumber">1.1.6<tt>&nbsp;</tt></span><a href="#%28part._.Identifiers_and_.Binding%29" class="tocsubseclink" data-pltdoc="x">Identifiers and Binding</a></td></tr><tr><td><span class="tocsublinknumber">1.1.6.1<tt>&nbsp;</tt></span><a href="#%28part._.Identifiers%29" class="tocsubseclink" data-pltdoc="x">Identifiers</a></td></tr><tr><td><span class="tocsublinknumber">1.1.7<tt>&nbsp;</tt></span><a href="#%28part._.Variables%29" class="tocsubseclink" data-pltdoc="x">Variables</a></td></tr><tr><td><span class="tocsublinknumber">1.1.8<tt>&nbsp;</tt></span><a href="#%28part._.Functions%29" class="tocsubseclink" data-pltdoc="x">Functions</a></td></tr><tr><td><span class="tocsublinknumber">1.1.9<tt>&nbsp;</tt></span><a href="#%28part._.Data%29" class="tocsubseclink" data-pltdoc="x">Data</a></td></tr><tr><td><span class="tocsublinknumber">1.1.9.1<tt>&nbsp;</tt></span><a href="#%28part._.Definitions%29" class="tocsubseclink" data-pltdoc="x">Definitions</a></td></tr><tr><td><span class="tocsublinknumber">1.1.10<tt>&nbsp;</tt></span><a href="#%28part._.Cases%29" class="tocsubseclink" data-pltdoc="x">Cases</a></td></tr><tr><td><span class="tocsublinknumber">1.1.11<tt>&nbsp;</tt></span><a href="#%28part._.Annotations%29" class="tocsubseclink" data-pltdoc="x">Annotations</a></td></tr><tr><td><span class="tocsublinknumber">1.1.12<tt>&nbsp;</tt></span><a href="#%28part._.Control%29" class="tocsubseclink" data-pltdoc="x">Control</a></td></tr><tr><td><span class="tocsublinknumber">1.1.12.1<tt>&nbsp;</tt></span><a href="#%28part._.For_loops%29" class="tocsubseclink" data-pltdoc="x">For loops</a></td></tr><tr><td><span class="tocsublinknumber">1.1.13<tt>&nbsp;</tt></span><a href="#%28part._.If%29" class="tocsubseclink" data-pltdoc="x">If</a></td></tr><tr><td><span class="tocsublinknumber">1.1.13.1<tt>&nbsp;</tt></span><a href="#%28part._.When_blocks%29" class="tocsubseclink" data-pltdoc="x">When blocks</a></td></tr><tr><td><span class="tocsublinknumber">1.1.14<tt>&nbsp;</tt></span><a href="#%28part._.And_more___%29" class="tocsubseclink" data-pltdoc="x">And more...</a></td></tr></table></div></div><div class="maincolumn"><div class="main"><div class="navsettop"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="Getting_Started.html" title="backward to &quot;1 Getting Started&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="Getting_Started.html" title="up to &quot;1 Getting Started&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Tutorial__A_Flight_Lander_Game.html" title="forward to &quot;1.2 Tutorial: A Flight Lander Game&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div><h4>1.1<tt>&nbsp;</tt><a name="(part._.A_.Tour_of_.Pyret)"></a>A Tour of Pyret</h4><p>You can start playing with Pyret right away at
+<a href="https://code.pyret.org/editor"><span class="url">https://code.pyret.org/editor</span></a>.  You can copy the examples below, run
+them, and play with them to get a feel for the language.</p><h5>1.1.1<tt>&nbsp;</tt><a name="(part._.Testing_and_.Assertions)"></a>Testing and Assertions</h5><p>The simplest way to add a test to a Pyret program is to use a <span class="pyret-highlight"><span class="stt">check:</span></span>
+block and a testing assertion.  Try running the following:</p><pre class="pyret-highlight"><p>check:
+  "Ahoy " + "world!" is "Ahoy world!"
+end</p></pre><p>Upon running this program, Pyret reports:</p><p><table cellspacing="0" cellpadding="0"><tr><td><p><span class="stt">Looks shipshape, your 1 test passed, mate!</span></p></td></tr></table></p><p>This program uses a <span class="pyret-highlight"><span class="stt">check:</span></span> block to register a set of tests to be run.
+The special <span class="pyret-highlight"><span class="stt">is</span></span> statement inside the check block compares the
+expressions on the left and right for equality.  It reports the result to the
+built-in testing framework, which produces a report when all the tests have
+been run.</p><p>If we break the test slightly, we can see that Pyret reports the
+error for us:</p><pre class="pyret-highlight"><p>check:
+  "Ahoy" + "world!" is "Ahoy world!"
+end</p></pre><p><table cellspacing="0" cellpadding="0"><tr><td><p><span class="stt">Check block: check-block-1</span></p></td></tr><tr><td><p><span class="stt"></span><span class="hspace">&nbsp;&nbsp;</span><span class="stt">test ("Ahoy" + "world!" is "Ahoy world!"): failed, reason:</span></p></td></tr><tr><td><p><span class="stt"></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt">Values not equal:</span></p></td></tr><tr><td><p><span class="stt">"Ahoyworld!"</span></p></td></tr><tr><td><p><span class="stt">"Ahoy world!"</span></p></td></tr><tr><td><p><span class="stt"></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt"></span><span class="hspace">&nbsp;&nbsp;</span><span class="stt">The test failed.</span></p></td></tr></table></p><p>The usual flow of writing a Pyret program involves writing tests along with
+your code, running your code to check the test output, and repeating until
+you&rsquo;re satisfied with the functionality of your program.  The more tests you
+write, the more useful feedback you get.</p><p>The examples in this tour will all be presented in testing blocks
+(you&rsquo;ll see one kind other than <span class="pyret-highlight"><span class="stt">check:</span></span> later).  Unless we&rsquo;re
+explicitly pointing out a failure, you can assume that the tests
+all pass, and we&rsquo;re showing correct behavior.</p><h5>1.1.2<tt>&nbsp;</tt><a name="(part._.Primitive_.Values_and_.Operators)"></a>Primitive Values and Operators</h5><p>Primitives values are the basic building blocks of the language;
+structured data exists to organize computation over a small set of
+primitive values.  We describe Pyret&rsquo;s primitives here.</p><h5>1.1.2.1<tt>&nbsp;</tt><a name="(part._.Numbers)"></a>Numbers</h5><p>Numbers can be written with or without decimals.  For example:</p><pre class="pyret-highlight"><p>check:
+  5.0 is 5
+end</p></pre><p>Pyret defines a number of binary operators over numbers (the full list is
+available in <a href="Expressions.html#%28part._s~3abinop-expr%29" data-pltdoc="x">the documentation for binary
+operators</a>):</p><pre class="pyret-highlight"><p>check:
+  4 + 5 is 9
+  1 / 3 is 2 / 6
+  9 - 3 is 6
+  5 &gt; 4 is true
+end</p></pre><p>Once we have binary operators, it is natural to ask what operator
+precedence Pyret has chosen.  In order to avoid ambiguity and
+confusing updates to precedence tables when new operators are
+added, chains of operators in Pyret simply disallows mixing
+operators without disambiguating parentheses.  For example:</p><pre class="pyret-highlight"><p>check:
+  5 - 4 + 1 is 2
+end</p></pre><p><table cellspacing="0" cellpadding="0"><tr><td><p><span class="stt">well-formedness: Cannot mix binary operators of different</span></p></td></tr><tr><td><p><span class="stt">types: `+` and `-`. Use parentheses to disambiguate.</span></p></td></tr></table></p><p>This holds not just for numeric operations, but for all binary
+operators in the language.  To give this program the meaning
+intended by the test, we should write:</p><pre class="pyret-highlight"><p>check:
+  (5 - 4) + 1 is 2
+end</p></pre><p>You can see more utilities on numbers at
+<a href="numbers.html" data-pltdoc="x">Numbers</a>.</p><h5>1.1.3<tt>&nbsp;</tt><a name="(part._.Booleans)"></a>Booleans</h5><p>Pyret has two distinguished boolean values, <span class="pyret-highlight"><span class="stt">true</span></span> and <span class="pyret-highlight"><span class="stt">false</span></span>.  Neither is a
+number or string or nullary or any other kind of value; both are booleans and
+they are the only two booleans.  The comparison operators on numbers evaluate
+to them, for instance:</p><pre class="pyret-highlight"><p>check:
+  3 &lt; 4 is true
+  (2 + 2) == 5 is false
+end</p></pre><h5>1.1.4<tt>&nbsp;</tt><a name="(part._.Strings)"></a>Strings</h5><p>Strings can be written single- or double- quoted. Character escapes like <span class="pyret-highlight"><span class="stt">\n</span></span>
+work, and the enclosing quote character can be included if escaped like <span class="pyret-highlight"><span class="stt">\"</span></span>.</p><pre class="pyret-highlight"><p>"hello world"
+
+"\"yields falsehood when...\" yields falsehood when"
+
+"an example\n\nwith explicit newline\ncharacters"</p></pre><p>Multi-line strings can be written with three backtick characters:</p><pre class="pyret-highlight"><p>check:
+  s = ```
+    a
+    multi
+    line
+    string
+    ```
+  s is "a\n    multi\n    line\n    string"
+end</p></pre><h5>1.1.5<tt>&nbsp;</tt><a name="(part._.Lists)"></a>Lists</h5><p>Lists aren&rsquo;t primitive values, but they come up a lot in Pyret programs.
+Pyret&rsquo;s list are of the head-and-tail variety found in many functional
+languages.  They are most easily written as a comma-separated list of values
+enclosed in square brackets and using the <a href="lists.html#%28part._lists_list%29" data-pltdoc="x"><span class="stt">list</span></a>
+constructor.  The elements of a list can be accessed through the dot lookup
+expression, via the members called &lsquo;first&lsquo; and &lsquo;rest&lsquo;:</p><pre class="pyret-highlight"><p>check:
+  [list: 1,2,3].first is 1
+  [list: 1,2,3].rest  is [list: 2,3]
+end</p></pre><p>It is an error to access a field that isn&rsquo;t there; for example trying to access
+<span class="pyret-highlight"><span class="stt">first</span></span> on a list with no elements.  We can use the <a href="testing.html#%28part._testing_raises%29" data-pltdoc="x"><span class="stt">raises</span></a> test assertion to check the error that&rsquo;s signalled:</p><pre class="pyret-highlight"><p>check:
+  [list:].first raises "first"
+end</p></pre><p>The <a href="testing.html#%28part._testing_raises%29" data-pltdoc="x"><span class="stt">raises</span></a> form is useful for checking explicit error
+conditions.  It succeeds if the expression on the left signals an error with a
+message that contains the string on the right.</p><p>The <span class="pyret-highlight"><span class="stt">[list:]</span></span> notation is a convenience form for a more verbose form that
+creates the same lists.  The special <a href="lists.html#%28part._lists_empty%29" data-pltdoc="x"><span class="stt">empty</span></a> value is
+equivalent to <span class="pyret-highlight"><span class="stt">[list:]</span></span>, and the <a href="lists.html#%28part._lists_link%29" data-pltdoc="x"><span class="stt">link</span></a> function
+attaches a value to the front of an existing list.  These constructors can be
+freely mixed with bracket notation:</p><pre class="pyret-highlight"><p>check:
+  empty is [list:]
+  link(1, empty) is [list: 1]
+  link(1, link(2, empty)) is [list: 1,2]
+  link(empty, link(empty, [list: ])) is [list: [list:],[list:]]
+end</p></pre><h5>1.1.6<tt>&nbsp;</tt><a name="(part._.Identifiers_and_.Binding)"></a>Identifiers and Binding</h5><h5>1.1.6.1<tt>&nbsp;</tt><a name="(part._.Identifiers)"></a>Identifiers</h5><p>It&rsquo;s often useful to name intermediate results of a computation.  Pyret uses
+<span class="pyret-highlight"><span class="stt">=</span></span> to bind identifiers to values:</p><pre class="pyret-highlight"><p>check:
+  list1 = [list: 2,3]
+  list2 = link(1, list1)
+  list2 is [list: 1,2,3]
+end</p></pre><p>Identifiers bound with <span class="pyret-highlight"><span class="stt">=</span></span> are <span style="font-style: italic">not</span> variables.  They cannot be updated, and
+they cannot even be re-bound.  So, for example, using <span class="pyret-highlight"><span class="stt">list1</span></span> twice gives an
+error:</p><pre class="pyret-highlight"><p>check:
+  list1 = [list: 2,3]
+  list1 = link(1, list1)
+  list1 is [list: 1,2,3]
+end</p></pre><p><table cellspacing="0" cellpadding="0"><tr><td><p><span class="stt">It looks like you defined the name list1 twice, at</span></p></td></tr></table></p><p>Pyret takes a strong stance on the integrity of the <span class="pyret-highlight"><span class="stt">=</span></span> statement.  If the
+program says the name is equal to the value, then it had better continue to be!
+This has a very real correlation to something every high school algebra class
+teaches: the substitutability of names for expressions.  Defining names that,
+by default, can later be changed conflicts with basic notions of reasoning
+about expressions and programs.</p><h5>1.1.7<tt>&nbsp;</tt><a name="(part._.Variables)"></a>Variables</h5><p>For names that can be updated, Pyret provides variables, which are distinct
+from identifiers at their declaration site, using <span class="pyret-highlight"><span class="stt">var</span></span>.  Such declarations
+must always give an initial value for the name, which can be later updated with
+<span class="pyret-highlight"><span class="stt">:=</span></span>:</p><pre class="pyret-highlight"><p>check:
+  var x = 10
+  x is 10
+  x := 15
+  x is 15
+end</p></pre><p>Mixing variables and identifiers of the same name is disallowed, and all of the
+following programs are errors:</p><pre class="pyret-highlight"><p>x = 10
+x := 15
+
+var x = 10
+x = 15
+
+x = 10
+var x = 15</p></pre><h5>1.1.8<tt>&nbsp;</tt><a name="(part._.Functions)"></a>Functions</h5><p>In Pyret, most functions are defined with a function declaration.
+A function declaration looks like:</p><pre class="pyret-highlight"><p>fun square(n):
+  n * n
+end</p></pre><p>This binds the name <span class="pyret-highlight"><span class="stt">square</span></span> to a function.  Note that Pyret has no
+explicit <span class="pyret-highlight"><span class="stt">return</span></span> keyword, and the function body &#8220;returns&#8221; whatever it
+evaluates to.  We can call <span class="pyret-highlight"><span class="stt">square</span></span> by passing arguments in parentheses:</p><pre class="pyret-highlight"><p>check:
+  square(4) is 16
+  square(2) is 4
+end</p></pre><p>Since there are often tests that go along with a function
+declaration, a declaration can directly attach a testing block
+using <span class="pyret-highlight"><span class="stt">where:</span></span>.  So we could write the above as:</p><pre class="pyret-highlight"><p>fun square(n):
+  n * n
+where:
+  square(4) is 16
+  square(2) is 4
+end</p></pre><p>This runs the same tests as the <span class="pyret-highlight"><span class="stt">check:</span></span> block, but it is now obvious to
+the reader (and to the programming environment!) that these tests go with the
+<span class="pyret-highlight"><span class="stt">square</span></span> function.</p><p>Functions are first-class values in Pyret, which means they can be passed
+as arguments to other functions or returned from them:</p><pre class="pyret-highlight"><p>fun apply-twice(f, x):
+  f(f(x))
+where:
+  apply-twice(square, 2) is 16
+  apply-twice(square, 3) is 81
+end</p></pre><p>Functions don&rsquo;t need to have names.  An anonymous function can be
+written by using <span class="pyret-highlight"><span class="stt">lam</span></span> rather than <span class="pyret-highlight"><span class="stt">fun</span></span>:</p><pre class="pyret-highlight"><p>check:
+  apply-twice(lam(x): x + 1 end, 10) is 12
+end</p></pre><h5>1.1.9<tt>&nbsp;</tt><a name="(part._.Data)"></a>Data</h5><p>Pyret has a builtin form for declaring and manipulating structured data.</p><h5>1.1.9.1<tt>&nbsp;</tt><a name="(part._.Definitions)"></a>Definitions</h5><p>One example that you&rsquo;ve already seen is <a href="lists.html#%28part._lists_.List%29" data-pltdoc="x"><span class="stt">List</span></a>. A
+<a href="lists.html#%28part._lists_.List%29" data-pltdoc="x"><span class="stt">List</span></a> list is either <span class="pyret-highlight"><span class="stt">empty</span></span> or it is a <span class="pyret-highlight"><span class="stt">link</span></span>
+of an element and another list.  While very important to the code that we
+write, <span class="pyret-highlight"><span class="stt">List</span></span>s are not a special internal value, they are just defined
+with the <span class="pyret-highlight"><span class="stt">data</span></span> form. A simplified version of what appears in the
+standard library of Pyret:</p><pre class="pyret-highlight"><p>data List:
+  | empty
+  | link(first, rest)
+end</p></pre><p>Though this won&rsquo;t actually run, because Pyret will complain that you&rsquo;re trying
+to re-define <span class="pyret-highlight"><span class="stt">List</span></span>.  This is the general syntax of a <span class="pyret-highlight"><span class="stt">data</span></span>
+definition: the name of the datatype, then a list of one or more variants,
+which may have members (like <span class="pyret-highlight"><span class="stt">link</span></span> does), or may not. The values of the
+datatype are constructed by calling the constructor with initial members, if
+any were defined:</p><pre class="pyret-highlight"><p>y = link(10, empty)</p></pre><p>Or by simply writing the name, if the variant doesn&rsquo;t have members defined on
+it, in which case it is a singleton value.</p><pre class="pyret-highlight"><p>x = empty</p></pre><p>This is the basic form. In addition to the functions to construct the values,
+you also get functions to check whether values are of the type. In this case,
+there are two functions: <a href="lists.html#%28part._lists_is-empty%29" data-pltdoc="x"><span class="stt">is-empty</span></a> checks if a value is the
+<span class="pyret-highlight"><span class="stt">empty</span></span> value, and <a href="lists.html#%28part._lists_is-link%29" data-pltdoc="x"><span class="stt">is-link</span></a> checks if a value is a
+<span class="pyret-highlight"><span class="stt">link</span></span> value:</p><pre class="pyret-highlight"><p>check:
+  is-empty(empty) is true
+  is-link(link(1, empty)) is true
+end</p></pre><p><span style="font-weight: bold">An aside on testing:</span> There&rsquo;s actually a more natural way to write the
+above test.  Along with <a href="testing.html#%28part._testing_is%29" data-pltdoc="x"><span class="stt">is</span></a> and <a href="testing.html#%28part._testing_raises%29" data-pltdoc="x"><span class="stt">raises</span></a>, Pyret defines a test assertion called <a href="testing.html#%28part._testing_satisfies%29" data-pltdoc="x"><span class="stt">satisfies</span></a> that checks if a predicate returns <span class="pyret-highlight"><span class="stt">true</span></span> on a test value.  We
+could instead write the above as:</p><pre class="pyret-highlight"><p>check:
+  empty satisfies is-empty
+  link(1, empty) satisfies is-link
+end</p></pre><p>The <span class="pyret-highlight"><span class="stt">satisfies</span></span> form is quite handy for testing properties of a value,
+rather than just that a value is equal to another.  The second form also gives
+better error reporting than the first (what happens if you swap <span class="pyret-highlight"><span class="stt">is-link</span></span>
+and <span class="pyret-highlight"><span class="stt">is-empty</span></span> in either approach?).</p><p><span class="NoteBox"><span class="NoteContent">Check out <a href="testing.html" data-pltdoc="x">the documentation on testing</a> to see all
+the testing forms.</span></span></p><h5>1.1.10<tt>&nbsp;</tt><a name="(part._.Cases)"></a>Cases</h5><p>A common pattern is to do different things based on the variant of a
+<span class="pyret-highlight"><span class="stt">data</span></span> definition.  The <span class="pyret-highlight"><span class="stt">cases</span></span> expression allows you to write
+branches that split computation along the boundaries defined by your data
+definition.  For example:</p><pre class="pyret-highlight"><p>fun length(l):
+  cases(List) l:
+    | empty =&gt; 0
+    | link(f, r) =&gt; 1 + length(r)
+  end
+end</p></pre><p>If you don&rsquo;t care about a specific attribute, you can replace it with an
+underscore. Since we did not use <span class="pyret-highlight"><span class="stt">f</span></span> in the <span class="pyret-highlight"><span class="stt">link</span></span> case in the
+previous example, we could write it instead as:</p><pre class="pyret-highlight"><p>fun length(l):
+  cases(List) l:
+    | empty =&gt; 0
+    | link(_, r) =&gt; 1 + length(r)
+  end
+end</p></pre><p>This makes it clearer to the reader, especially if the blocks become large,
+what the program does and does not use.</p><p>Finally, it is an error, caught at runtime, to pass a value that isn&rsquo;t of the
+type inside the <span class="pyret-highlight"><span class="stt">cases</span></span>, or if a branch isn&rsquo;t defined for the variant
+that&rsquo;s passed to <span class="pyret-highlight"><span class="stt">cases</span></span>. If you want to have a catch-all, you can use
+<span class="pyret-highlight"><span class="stt">else</span></span> to create a branch that will run if no others match. For example:</p><pre class="pyret-highlight"><p>check:
+  result =  cases(List) empty:
+    | link(first, _) =&gt; first
+    | else =&gt; 0
+  end
+  result is 0
+end</p></pre><h5>1.1.11<tt>&nbsp;</tt><a name="(part._.Annotations)"></a>Annotations</h5><p>Pyret is not currently a typed language (a static checker is an ongoing
+project), but it allows type-like annotations, both to document the type
+structure of programs, and for some run-time checking.  Annotations can be
+added to function arguments, to variable bindings, and to the members in data
+variants.  For example:</p><pre class="pyret-highlight"><p>data BinTree:
+  | leaf
+  | node(value :: Number, left :: BinTree, right :: BinTree)
+end</p></pre><p>Note that <span class="pyret-highlight"><span class="stt">BinTree</span></span>, the name of a datatype, can be used as an
+annotation.  Any data type that you define can also be used in an annotation.
+These annotations will stop the program from creating a <span class="pyret-highlight"><span class="stt">BinTree</span></span> with
+fields that don&rsquo;t match the annotations:</p><pre class="pyret-highlight"><p>check:
+  node("not-a-num", leaf, leaf) raises "Number"
+  node(37, leaf, "not-a-bin-tree") raises "BinTree"
+end</p></pre><p>You can also define arbitrary predicates for use in annotations to *refine* the
+annotation with additional checks. For example:</p><pre class="pyret-highlight"><p>fun non-negative(n :: Number) -&gt; Boolean:
+  n &gt;= 0
+end
+
+fun replicate(n :: Number%(non-negative), e) -&gt; List:
+  if n == 0:
+    [list:]
+  else:
+    link(e, replicate(n - 1, e))
+  end
+end</p></pre><p>And if you were to call &lsquo;replicate&lsquo; with a negative number, it would
+not run (instead of running forever):</p><pre class="pyret-highlight"><p>check:
+  replicate(-1, "val") raises "predicate failure"
+end</p></pre><p>Some kinds of annotations only get limited checks:</p><ul><li><p>Arrow annotations, like <span class="pyret-highlight"><span class="stt">(Number, String -&gt; String)</span></span> will only
+check that the value is a function, and not wrap the function to check its
+arguments.</p></li><li><p>Parameterized annotations, like <span class="pyret-highlight"><span class="stt">List&lt;Number&gt;</span></span>, will only check
+the annotation before the <span class="pyret-highlight"><span class="stt">&lt;&gt;</span></span>, the contents the <span class="pyret-highlight"><span class="stt">&lt;&gt;</span></span> will be ignored.</p></li><li><p>Type variables, like the <span class="pyret-highlight"><span class="stt">a</span></span> in <span class="pyret-highlight"><span class="stt">lam &lt;a&gt; (x :: a) -&gt; a: x
+end</span></span>, accept values of any type</p></li></ul><p>These are features that we plan to check statically rather than at runtime.</p><h5>1.1.12<tt>&nbsp;</tt><a name="(part._.Control)"></a>Control</h5><h5>1.1.12.1<tt>&nbsp;</tt><a name="(part._.For_loops)"></a>For loops</h5><p>Pyret provides syntactic support for common patterns of iteration. For example,
+to <a href="lists.html#%28part._lists_map%29" data-pltdoc="x"><span class="stt">map</span></a> over a list, running some block of code to produce a
+new value for each existing value, we can write:</p><pre class="pyret-highlight"><p>x = for map(elem from [list: 1,2,3,4]):
+  elem + 2
+end
+check:
+  x is [list: 3,4,5,6]
+end</p></pre><p>Note a few things:</p><ul><li><p><span class="pyret-highlight"><span class="stt">for</span></span> is an expression, and is legal to write on the right hand
+side of a binding</p></li><li><p>The whole <span class="pyret-highlight"><span class="stt">for</span></span> expression evaluates to a value (in this case, a
+new list)</p></li></ul><p>The <span class="pyret-highlight"><span class="stt">for</span></span> syntax is designed to create patterns for functional iteration.
+Indeed, there are several other built in functions that work with <span class="pyret-highlight"><span class="stt">for</span></span>:</p><pre class="pyret-highlight"><p>z = for filter(elem from [list: 1,2,3,4]):
+  elem &lt; 3
+end
+check:
+  z is [list: 1,2]
+end
+
+y = for fold(sum from 0, elem from [list: 1,2,3]):
+  sum + elem
+end
+check:
+  y is 6
+end</p></pre><p>And you are free to define your own <span class="pyret-highlight"><span class="stt">for</span></span> operators.  A <span class="pyret-highlight"><span class="stt">for</span></span>
+operator is a function that takes a function as its first argument, and a
+number of other values as the rest of its arguments.  The function argument is
+expected to have the same arity as the number of initial values.  To use the
+operator in a <span class="pyret-highlight"><span class="stt">for</span></span> expression, the <span class="pyret-highlight"><span class="stt">for</span></span> header should have a
+number of <span class="pyret-highlight"><span class="stt">from</span></span> bindings equal to this arity.  For example:</p><pre class="pyret-highlight"><p>fun keep-every-other(body-fun, l):
+  fun iter(flip, lst):
+    cases(List) lst:
+      | empty =&gt; empty
+      | link(first, rst) =&gt;
+        if flip:
+          link(body-fun(first), iter(not(flip), rst))
+        else:
+          iter(not(flip), rst)
+        end
+    end
+  end
+  iter(true, l)
+end
+w = for keep-every-other(elt from range(0,10)):
+  elt + 1
+end
+check:
+  w is [list: 1, 3, 5, 7, 9]
+end</p></pre><p>What the <span class="pyret-highlight"><span class="stt">for</span></span> expression does is create a new function from the names on
+the left-hand sides of the <span class="pyret-highlight"><span class="stt">from</span></span> clauses and the body, and pass that new
+function along with the values on the right of <span class="pyret-highlight"><span class="stt">from</span></span> to the operator
+(<span class="pyret-highlight"><span class="stt">keep-every-other</span></span>, in this case).</p><h5>1.1.13<tt>&nbsp;</tt><a name="(part._.If)"></a>If</h5><p>Branching on conditionals is an <span class="pyret-highlight"><span class="stt">if</span></span> branch followed by zero or more
+<span class="pyret-highlight"><span class="stt">else if</span></span> branches and an optional <span class="pyret-highlight"><span class="stt">else</span></span> branch. It is a runtime
+error to not match one of the branches - if you are writing code to purely
+cause side effects, write a <span class="pyret-highlight"><span class="stt">when</span></span> block instead. A few examples:</p><pre class="pyret-highlight"><p>if x &lt; 10:
+  print("Small")
+else if x &gt; 20:
+  print("Large")
+else:
+  print("Medium")
+end</p></pre><pre class="pyret-highlight"><p>if false:
+  print("Can't happen")
+else if false:
+  print("Can't happen either")
+  # this is a runtime error, Pyret requires an else branch
+end</p></pre><pre class="pyret-highlight"><p>if true and false:
+  #...
+else:
+  #...
+end</p></pre><p>Pyret expects that <span class="pyret-highlight"><span class="stt">if</span></span> expressions take some branch, and signals an
+error if control falls off the end:</p><pre class="pyret-highlight"><p>check:
+  fun if-falls-off():
+    if false:
+      ""
+    else if false:
+      ""
+    end
+  end
+  if-falls-off() raises "no-branches-matched"
+end</p></pre><p>For this reason, Pyret syntactically rules out single-branch if expressions,
+which make little sense given this rule.</p><h5>1.1.13.1<tt>&nbsp;</tt><a name="(part._.When_blocks)"></a>When blocks</h5><p>Sometimes there is certain code that should only be run when something is true.
+This is code that exists solely to <span style="font-style: italic">do</span> something; often, for example, to
+report an error. For example:</p><pre class="pyret-highlight"><p>fun get-second&lt;a&gt;(l :: List&lt;a&gt;) -&gt; a:
+  when l.length() &lt; 2:
+    raise("List too short")
+  end
+  l.rest.first
+where:
+  get-second([list: 1]) raises "too short"
+  get-second([list: 1, 2, 3]) is 2
+end</p></pre><p>This covers the cases that single-branch if expressions are usually used for,
+but makes it explicit that the body is used for its side effects.</p><h5>1.1.14<tt>&nbsp;</tt><a name="(part._.And_more___)"></a>And more...</h5><p>This introduction should get you to the point where you can write non-trivial
+Pyret programs.  From here, you can check out the rest of the documentation to
+learn more about the language and for reference.  If your interest is piqued by
+the tour, or if you have suggestions or questions, you should sign up for the
+<a href="https://groups.google.com/forum/#!forum/pyret-discuss">Pyret discussion
+list</a>.</p><div class="navsetbottom"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="Getting_Started.html" title="backward to &quot;1 Getting Started&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="Getting_Started.html" title="up to &quot;1 Getting Started&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Tutorial__A_Flight_Lander_Game.html" title="forward to &quot;1.2 Tutorial: A Flight Lander Game&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
