@@ -1,0 +1,18 @@
+language: python
+python:
+- '3.4'
+branches:
+  only:
+  - horizon
+  - sql
+env:
+  global:
+  - GH_REF: github.com/brownplt/pyret-docs.git
+  - RACKET_DIR: ~/racket
+  - RACKET_VERSION: '6.5'
+  - secure: H5K8RszG02jJnvhZm+oQ+NFIyYte29mnk3soZ0Ya9Oq+ECxBU34C5WBJOBEyVldgQy6sKGWFxvXR2+6opZFUS1nzSy2e4t9Fvo0GxiCvJUWVyG9arfe2HNSCB93nOZYJNA3ApVfNOOt/tfKdaBAKSqbIznUBgn1Cr+PTLQtULaRV8cIf3SGC3493zhWyu6yO5zPvTpE6PijmnPPvLriOmLXNoSQ8jkULrhyVu8cORPCxM+3tCL3gIHK1kDfzSF19eSKuEfq/qOWvQcDLWDZsoBW8LrwljJyMIZVGWT2ns9Ig5aoND82qaie6KUjFPQOamLFPysaiT2Flp7tlz7cag+Cyi0oaZIcFEtc5YEl2BC1AGBBaNYT8OVprL9PQmptDL9cukkdUXOxjAazu8uixDZ0czA3FYVPOsE4Yr/86dz/oD1YLgSkj9sN6j8eJFdIBszUd0KNuDZWS+oiD0xbxcJVhZPOwujSUYn5Dkuo7u821V/oPQefpmZnG+w6SdU0t+yFIW3mZqWSYyH0uY2MiczXnu8bEaCFTTxj5x79ZWEPKFmmmrBG9FG3pd6SSGUvKL8ddbfFQagLseCeYAlSdUbij7zdnHgEg6aMYhccCtrJpwB9+b+Frj30KTB3aRyAVv1HboZboTVrHuWMQudDU+9Ws/xYpXzdOFvi0vOYDDAo=
+before_install:
+- git clone https://github.com/greghendershott/travis-racket.git
+- cat travis-racket/install-racket.sh | bash
+- export PATH="${RACKET_DIR}/bin:${PATH}"
+script: bash ./deploy.sh
