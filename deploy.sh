@@ -7,6 +7,12 @@ if [ -d "gh-pages" ]; then
     >&2 echo "Naming conflict. Either rename the folder 'gh-pages' or update the deploy script."
 fi
 
+if [ "${TRAVIS_BRANCH}" -eq "master" ]; then
+    export IS_DEVELOPMENT=false
+else
+    export IS_DEVELOPMENT=true
+fi
+
 BUILD_DIR=build/docs
 
 set -ev # exit with nonzero exit code if anything fails
