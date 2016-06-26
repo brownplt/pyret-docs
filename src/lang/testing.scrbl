@@ -168,7 +168,7 @@ check:
 end
 
 check:
-  fun<a> equal-any-order(l1 :: List<a>, l2 :: List<a>):
+  fun equal-any-order<a>(l1 :: List<a>, l2 :: List<a>):
     same-length = (l1.length() == l2.length())
     all-present = for lists.all(elt from l1):
       lists.member(l2, elt)

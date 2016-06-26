@@ -364,7 +364,7 @@ end
     | mempty
   end
   mlist = {
-    make: fun(arr):
+    make: lam(arr):
       # fold mlink over arr
     end
   }
@@ -467,7 +467,7 @@ end
     | mempty
   end
   mlist = {
-    make: fun(arr):
+    make: lam(arr):
       # fold mlink over arr
     end
   }
@@ -606,7 +606,7 @@ Finally, @pyret-id{within} accepts @emph{any} two values, not just numbers.
 On non-numeric arguments, @pyret-id{within} traverses the structures just as
 in @pyret-id{equal-always}, but deferring to the bounds-checking equality when
 a pair of numbers is encountered.  All other values are compared with
-@pyret-id{equal-always}. 
+@pyret-id{equal-always}.
 
 @examples{
 check:
@@ -1060,7 +1060,7 @@ choose to implement it as a function that creates an object closing over the
 implementation of the set itself:
 
 @pyret-block{
-fun<a> make-empty-set():
+fun make-empty-set<a>():
   {
     add(self, element :: a): ... end,
     member(self, element :: a) -> Boolean: ... end,
