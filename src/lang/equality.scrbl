@@ -582,7 +582,7 @@ Put yet another way, aside from some slight differences in bounds checking for
 errors, we could implement the numeric comparison of @pyret-id{within} as:
 
 @pyret-block{
-fun within(tol):
+fun my-within(tol):
   lam(left, right):
     (((num-exact(left) + num-exact(right)) / 2) * num-exact(tol))
       < num-abs(num-exact(left) - num-exact(right))
@@ -629,7 +629,7 @@ Like @pyret-id{within-rel}, but compares with @emph{absolute} tolerance rather
 than relative.  The definition is equivalent to:
 
 @pyret-block{
-fun within-abs(tol):
+fun my-within-abs(tol):
   lam(left, right):
     num-abs(num-exact(left) - num-exact(right)) <= tol
   end
