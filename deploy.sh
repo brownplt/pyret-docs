@@ -19,7 +19,7 @@ npm install
 make
 
 # Fetch gh-pages branch
-git checkout --quiet -b gh-pages "https://${GH_TOKEN}@${GH_REF}" gh-pages > /dev/null 2>&1
+git clone --quiet -b gh-pages "https://${GH_TOKEN}@${GH_REF}" gh-pages > /dev/null 2>&1
 
 # Remove any previous build and add the new one
 rm -rf "gh-pages/${TRAVIS_BRANCH}" || exit 0;
