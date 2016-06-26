@@ -1,0 +1,423 @@
+<!doctype HTML>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="codemirror.js"></script>
+<script src="runmode.js"></script>
+<script src="pyret.js"></script>
+<script src="hilite.js"></script>
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"/><title>2.3&nbsp;equality</title><link rel="stylesheet" type="text/css" href="scribble.css" title="default"/><link rel="stylesheet" type="text/css" href="footnote.css" title="default"/><link rel="stylesheet" type="text/css" href="manual-style.css" title="default"/><link rel="stylesheet" type="text/css" href="manual-racket.css" title="default"/><link rel="stylesheet" type="text/css" href="codemirror.css" title="default"/><link rel="stylesheet" type="text/css" href="pyret.css" title="default"/><link rel="stylesheet" type="text/css" href="styles.css" title="default"/><script type="text/javascript" src="scribble-common.js"></script><script type="text/javascript" src="manual-racket.js"></script><!--[if IE 6]><style type="text/css">.SIEHidden { overflow: hidden; }</style><![endif]--></head><body id="scribble-racket-lang-org"><div class="tocset"><div class="tocview"><div class="tocviewlist tocviewlisttopspace"><div class="tocviewtitle"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_0&quot;);">&#9658;</a></td><td></td><td><a href="index.html" class="tocviewlink" data-pltdoc="x">Pyret</a></td></tr></table></div><div class="tocviewsublisttop" style="display: none;" id="tocview_0"><table cellspacing="0" cellpadding="0"><tr><td align="right">1&nbsp;</td><td><a href="Getting_Started.html" class="tocviewlink" data-pltdoc="x">Getting Started</a></td></tr><tr><td align="right">2&nbsp;</td><td><a href="Language_Concepts.html" class="tocviewselflink" data-pltdoc="x">Language Concepts</a></td></tr><tr><td align="right">3&nbsp;</td><td><a href="Builtins.html" class="tocviewlink" data-pltdoc="x">Builtins</a></td></tr><tr><td align="right">4&nbsp;</td><td><a href="Libraries.html" class="tocviewlink" data-pltdoc="x">Libraries</a></td></tr><tr><td align="right">5&nbsp;</td><td><a href="Internals.html" class="tocviewlink" data-pltdoc="x">Internals</a></td></tr></table></div></div><div class="tocviewlist"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_1&quot;);">&#9660;</a></td><td>2&nbsp;</td><td><a href="Language_Concepts.html" class="tocviewlink" data-pltdoc="x">Language Concepts</a></td></tr></table><div class="tocviewsublist" style="display: block;" id="tocview_1"><table cellspacing="0" cellpadding="0"><tr><td align="right">2.1&nbsp;</td><td><a href="s_forms.html" class="tocviewlink" data-pltdoc="x">Language Constructs</a></td></tr><tr><td align="right">2.2&nbsp;</td><td><a href="testing.html" class="tocviewlink" data-pltdoc="x">Testing</a></td></tr><tr><td align="right">2.3&nbsp;</td><td><a href="" class="tocviewselflink" data-pltdoc="x">equality</a></td></tr><tr><td align="right">2.4&nbsp;</td><td><a href="brands.html" class="tocviewlink" data-pltdoc="x">Brands</a></td></tr></table></div></div><div class="tocviewlist"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_2&quot;);">&#9658;</a></td><td>2.3&nbsp;</td><td><a href="" class="tocviewselflink" data-pltdoc="x">equality</a></td></tr></table><div class="tocviewsublistbottom" style="display: none;" id="tocview_2"><table cellspacing="0" cellpadding="0"><tr><td align="right">2.3.1&nbsp;</td><td><a href="#%28part._.Types_of_.Equality%29" class="tocviewlink" data-pltdoc="x">Types of Equality</a></td></tr><tr><td align="right">2.3.2&nbsp;</td><td><a href="#%28part._.Equal_.Now%29" class="tocviewlink" data-pltdoc="x">Equal Now</a></td></tr><tr><td align="right">2.3.3&nbsp;</td><td><a href="#%28part._.Identical%29" class="tocviewlink" data-pltdoc="x">Identical</a></td></tr><tr><td align="right">2.3.4&nbsp;</td><td><a href="#%28part._.Always_.Equal%29" class="tocviewlink" data-pltdoc="x">Always Equal</a></td></tr><tr><td align="right">2.3.5&nbsp;</td><td><a href="#%28part._.Properties_of_.Equality_.Functions%29" class="tocviewlink" data-pltdoc="x">Properties of Equality Functions</a></td></tr><tr><td align="right">2.3.6&nbsp;</td><td><a href="#%28part._s~3abounded-equalities%29" class="tocviewlink" data-pltdoc="x">Bounded Equalities</a></td></tr><tr><td align="right">2.3.7&nbsp;</td><td><a href="#%28part._s~3aundefined-equalities%29" class="tocviewlink" data-pltdoc="x">Undefined Equalities</a></td></tr><tr><td align="right">2.3.8&nbsp;</td><td><a href="#%28part._s~3atotal-equality-predicates%29" class="tocviewlink" data-pltdoc="x">Total Equality Functions (Avoiding Incomparability Errors)</a></td></tr><tr><td align="right">2.3.9&nbsp;</td><td><a href="#%28part._s~3adatatype-defined-equality%29" class="tocviewlink" data-pltdoc="x">Datatype-<wbr></wbr>defined Equality</a></td></tr></table></div></div></div><div class="tocsub"><div class="tocsubtitle">On this page:</div><table class="tocsublist" cellspacing="0"><tr><td><span class="tocsublinknumber">2.3.1<tt>&nbsp;</tt></span><a href="#%28part._.Types_of_.Equality%29" class="tocsubseclink" data-pltdoc="x">Types of Equality</a></td></tr><tr><td><span class="tocsublinknumber">2.3.2<tt>&nbsp;</tt></span><a href="#%28part._.Equal_.Now%29" class="tocsubseclink" data-pltdoc="x">Equal Now</a></td></tr><tr><td><a href="#%28part._equality_equal-now%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">equal-<wbr></wbr>now</span></a></td></tr><tr><td><span class="tocsublinknumber">2.3.2.1<tt>&nbsp;</tt></span><a href="#%28part._s~3aequal-now-primitives%29" class="tocsubseclink" data-pltdoc="x">Equal Now and Primitives</a></td></tr><tr><td><span class="tocsublinknumber">2.3.2.2<tt>&nbsp;</tt></span><a href="#%28part._s~3aequal-now-structural%29" class="tocsubseclink" data-pltdoc="x">Equal Now and Structured Data</a></td></tr><tr><td><span class="tocsublinknumber">2.3.2.3<tt>&nbsp;</tt></span><a href="#%28part._s~3aequal-now-mutable%29" class="tocsubseclink" data-pltdoc="x">Equal Now and References</a></td></tr><tr><td><span class="tocsublinknumber">2.3.3<tt>&nbsp;</tt></span><a href="#%28part._.Identical%29" class="tocsubseclink" data-pltdoc="x">Identical</a></td></tr><tr><td><a href="#%28part._equality_identical%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">identical</span></a></td></tr><tr><td><span class="tocsublinknumber">2.3.3.1<tt>&nbsp;</tt></span><a href="#%28part._s~3aidentical-primitives%29" class="tocsubseclink" data-pltdoc="x">Identical and Primitives</a></td></tr><tr><td><span class="tocsublinknumber">2.3.3.2<tt>&nbsp;</tt></span><a href="#%28part._s~3aidentical-structural%29" class="tocsubseclink" data-pltdoc="x">Identical and Structural Equality</a></td></tr><tr><td><span class="tocsublinknumber">2.3.3.3<tt>&nbsp;</tt></span><a href="#%28part._s~3aidentical-mutable%29" class="tocsubseclink" data-pltdoc="x">Identical and Mutable Data</a></td></tr><tr><td><span class="tocsublinknumber">2.3.4<tt>&nbsp;</tt></span><a href="#%28part._.Always_.Equal%29" class="tocsubseclink" data-pltdoc="x">Always Equal</a></td></tr><tr><td><a href="#%28part._equality_equal-always%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">equal-<wbr></wbr>always</span></a></td></tr><tr><td><span class="tocsublinknumber">2.3.4.1<tt>&nbsp;</tt></span><a href="#%28part._s~3aalways-equal-mutable%29" class="tocsubseclink" data-pltdoc="x">Always Equal and Mutable Data</a></td></tr><tr><td><span class="tocsublinknumber">2.3.5<tt>&nbsp;</tt></span><a href="#%28part._.Properties_of_.Equality_.Functions%29" class="tocsubseclink" data-pltdoc="x">Properties of Equality Functions</a></td></tr><tr><td><span class="tocsublinknumber">2.3.6<tt>&nbsp;</tt></span><a href="#%28part._s~3abounded-equalities%29" class="tocsubseclink" data-pltdoc="x">Bounded Equalities</a></td></tr><tr><td><a href="#%28part._equality_within%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within</span></a></td></tr><tr><td><a href="#%28part._equality_within-rel%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within-<wbr></wbr>rel</span></a></td></tr><tr><td><a href="#%28part._equality_within-abs%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within-<wbr></wbr>abs</span></a></td></tr><tr><td><a href="#%28part._equality_within-rel-now%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within-<wbr></wbr>rel-<wbr></wbr>now</span></a></td></tr><tr><td><a href="#%28part._equality_within-abs-now%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within-<wbr></wbr>abs-<wbr></wbr>now</span></a></td></tr><tr><td><span class="tocsublinknumber">2.3.7<tt>&nbsp;</tt></span><a href="#%28part._s~3aundefined-equalities%29" class="tocsubseclink" data-pltdoc="x">Undefined Equalities</a></td></tr><tr><td><span class="tocsublinknumber">2.3.7.1<tt>&nbsp;</tt></span><a href="#%28part._s~3aroughnum-equality%29" class="tocsubseclink" data-pltdoc="x">Roughnums and Equality</a></td></tr><tr><td><span class="tocsublinknumber">2.3.7.2<tt>&nbsp;</tt></span><a href="#%28part._s~3afunction-equality%29" class="tocsubseclink" data-pltdoc="x">Functions and Equality</a></td></tr><tr><td><span class="tocsublinknumber">2.3.8<tt>&nbsp;</tt></span><a href="#%28part._s~3atotal-equality-predicates%29" class="tocsubseclink" data-pltdoc="x">Total Equality Functions (Avoiding Incomparability Errors)</a></td></tr><tr><td><a href="#%28part._equality_.Equality.Result%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">Equality<span class="mywbr"> &nbsp;</span>Result</span></a></td></tr><tr><td><a href="#%28part._equality_.Equal%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">Equal</span></a></td></tr><tr><td><a href="#%28part._equality_.Not.Equal%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">Not<span class="mywbr"> &nbsp;</span>Equal</span></a></td></tr><tr><td><a href="#%28part._equality_.Unknown%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">Unknown</span></a></td></tr><tr><td><a href="#%28part._equality_is-.Equal%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">is-<wbr></wbr>Equal</span></a></td></tr><tr><td><a href="#%28part._equality_is-.Not.Equal%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">is-<wbr></wbr>Not<span class="mywbr"> &nbsp;</span>Equal</span></a></td></tr><tr><td><a href="#%28part._equality_is-.Unknown%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">is-<wbr></wbr>Unknown</span></a></td></tr><tr><td><a href="#%28part._equality_equal-always3%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">equal-<wbr></wbr>always3</span></a></td></tr><tr><td><a href="#%28part._equality_equal-now3%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">equal-<wbr></wbr>now3</span></a></td></tr><tr><td><a href="#%28part._equality_identical3%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">identical3</span></a></td></tr><tr><td><a href="#%28part._equality_within3%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within3</span></a></td></tr><tr><td><a href="#%28part._equality_within-rel3%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within-<wbr></wbr>rel3</span></a></td></tr><tr><td><a href="#%28part._equality_within-rel-now3%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within-<wbr></wbr>rel-<wbr></wbr>now3</span></a></td></tr><tr><td><a href="#%28part._equality_within-abs3%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within-<wbr></wbr>abs3</span></a></td></tr><tr><td><a href="#%28part._equality_within-abs-now3%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">within-<wbr></wbr>abs-<wbr></wbr>now3</span></a></td></tr><tr><td><span class="tocsublinknumber">2.3.9<tt>&nbsp;</tt></span><a href="#%28part._s~3adatatype-defined-equality%29" class="tocsubseclink" data-pltdoc="x">Datatype-<wbr></wbr>defined Equality</a></td></tr><tr><td><a href="#%28part._equality__equal%29" class="tocsubnonseclink" data-pltdoc="x"><span class="stt">._<span class="mywbr"> &nbsp;</span>equals</span></a></td></tr></table></div></div><div class="maincolumn"><div class="main"><div class="navsettop"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="testing.html" title="backward to &quot;2.2 Testing&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="Language_Concepts.html" title="up to &quot;2 Language Concepts&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="brands.html" title="forward to &quot;2.4 Brands&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div><h4>2.3<tt>&nbsp;</tt><a name="(part._equality)"></a>equality</h4><p><div class="SIntrapara">Usage:</div><div class="SIntrapara"><pre class="code"><p>import equality as ...</p></pre></div></p><h5>2.3.1<tt>&nbsp;</tt><a name="(part._.Types_of_.Equality)"></a>Types of Equality</h5><p>Pyret has three notions of equality.  Two values can be <span style="font-style: italic">equal now</span>,
+<span style="font-style: italic">always equal</span>, and/or <span style="font-style: italic">identical</span>.  The following table summarizes
+the functions and operators that test for these relationships, and how they
+compare to some other languages&rsquo; operators:</p><p><table cellspacing="0" cellpadding="0" style="border-collapse: collapse;"><tr><td style="border: 1px solid black; padding: 5px;"><p><span style="font-weight: bold">Name</span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span style="font-weight: bold">Operator</span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span style="font-weight: bold">Partial Predicate</span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span style="font-weight: bold">Total Predicate</span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span style="font-weight: bold">Similar To</span></p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span style="font-style: italic">Equal Now</span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">=~</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-now</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-now3</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal?</span></span> (Racket) <span class="pyret-highlight"><span class="stt">==</span></span> (Python, Ruby)</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span style="font-style: italic">Always Equal</span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">==</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-always</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-always3</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">=</span></span> (Ocaml)</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span style="font-style: italic">Identical</span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">&lt;=&gt;</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">identical</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">identical3</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">eq?</span></span> (Scheme)
+<span class="pyret-highlight"><span class="stt">==</span></span> (Ocaml)
+<span class="pyret-highlight"><span class="stt">===</span></span> (JavaScript)
+<span class="pyret-highlight"><span class="stt">is</span></span> (Python)
+<span class="pyret-highlight"><span class="stt">==</span></span> (Java)</p></td></tr></table></p><p>In most programs, you should use <span style="font-style: italic">always equal</span>, or <span class="pyret-highlight"><span class="stt">==</span></span>, to compare
+values that you want to check for same-ness.  If you are working with mutable
+data, you may want to consider the special behavior of <span style="font-style: italic">equal now</span>.  For
+some optimizations, defensive code, and capability patterns, you may have a
+reason to use <span style="font-style: italic">identical</span>.</p><h5>2.3.2<tt>&nbsp;</tt><a name="(part._.Equal_.Now)"></a>Equal Now</h5><div class="function"><div class="boxed pyret-header"><a name="(part._equality_equal-now)" class="pyret-code"></a><a href="#%28part._equality_equal-now%29" data-pltdoc="x"><span class="stt">equal-now</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">val1</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a>, <span class="stt">val2</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a></div><div class="description"></div><div class="examples"></div></div><p>Checks if the two values are equal <span style="font-style: italic">now</span> (they may not be later).
+Corresponds to the <span class="pyret-highlight"><span class="stt">=~</span></span> operator.</p><h5>2.3.2.1<tt>&nbsp;</tt><a name="(part._s~3aequal-now-primitives)"></a>Equal Now and Primitives</h5><p><span class="pyret-highlight"><span class="stt">equal-now</span></span> checks primitive equality on numbers, strings, and
+booleans:</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>check:
+  5 is%(equal-now) 5
+  5 is-not%(equal-now) 6
+  "abc" is%(equal-now) "abc"
+  "a" is-not%(equal-now) "b"
+  "a" is-not%(equal-now) 5
+end</p></pre></div></p></div><h5>2.3.2.2<tt>&nbsp;</tt><a name="(part._s~3aequal-now-structural)"></a>Equal Now and Structured Data</h5><p>For instances of <span class="pyret-highlight"><span class="stt">data</span></span> (including, for example, instances of
+<a href="lists.html#%28part._lists_.List%29" data-pltdoc="x"><span class="stt">List</span></a>), and objects, <a href="#%28part._equality_equal-now%29" data-pltdoc="x"><span class="stt">equal-now</span></a> traverses their
+members and checks for pairwise equality.  So, for example, lists will
+recursively check that their contents are the same, including the case where
+their contents are objects:</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>check:
+  l1 = [list: 1, 2, 3]
+  l2 = [list: 1, 2, 3]
+
+  l1 is%(equal-now) l2
+  link(1, l1) is-not%(equal-now) l2
+
+  l3 = [list: {x: 5}]
+  l4 = [list: {x: 5}]
+  l5 = [list: {x: 6}]
+  l3 is%(equal-now) l4
+  l3 is-not%(equal-now) l5
+end</p></pre></div></p></div><h5>2.3.2.3<tt>&nbsp;</tt><a name="(part._s~3aequal-now-mutable)"></a>Equal Now and References</h5><p>Equal Now checks the contents of mutable data it reaches.  This gives it its
+name: since it only checks the <span style="font-style: italic">current</span> values, and those fields might
+change, it is not true that if <span class="pyret-highlight"><span class="stt">e1 =~ e2</span></span>, then later <span class="pyret-highlight"><span class="stt">e1 =~ e2</span></span> will
+hold again.  For example:</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>data MyBox:
+  | my-box(ref x)
+end
+
+check:
+  b1 = my-box(1)
+  b2 = my-box(1)
+
+  b1 is%(equal-now) b2
+  b1!{x : 2}
+
+  b1 is-not%(equal-now) b2
+end</p></pre></div></p></div><p>Equal Now will recognize when references form a cycle, and cycles of the same
+shape are recognized as equal (even though the references might change their
+contents later):</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>data InfiniteList:
+  | i-link(first, ref rest)
+  | i-empty
+end
+
+check:
+  l1 = i-link(1, i-empty)
+  l2 = i-link(1, i-empty)
+  l3 = i-link(1, i-link(2, i-empty))
+  l1!{rest : l1}
+  l2!{rest : l2}
+  l3!rest!{rest : l3}
+
+  l1 is%(equal-now) l2
+  l1 is-not%(equal-now) l3
+end</p></pre></div></p></div><h5>2.3.3<tt>&nbsp;</tt><a name="(part._.Identical)"></a>Identical</h5><div class="function"><div class="boxed pyret-header"><a name="(part._equality_identical)" class="pyret-code"></a><a href="#%28part._equality_identical%29" data-pltdoc="x"><span class="stt">identical</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">val1</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a>, <span class="stt">val2</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a></div><div class="description"></div><div class="examples"></div></div><h5>2.3.3.1<tt>&nbsp;</tt><a name="(part._s~3aidentical-primitives)"></a>Identical and Primitives</h5><p>Identical has the same behavior on primitives as Equal Now
+(<a href="#%28part._s~3aequal-now-primitives%29" data-pltdoc="x">Equal Now and Primitives</a>).</p><h5>2.3.3.2<tt>&nbsp;</tt><a name="(part._s~3aidentical-structural)"></a>Identical and Structural Equality</h5><p>Identical does not visit members of objects or data instances.  Instead, it
+checks if the values are actually the same exact value (the operator is meant
+to indicate that the values are interchangable).  So objects with the same
+fields are not identical to anything but themselves:</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>check:
+  o = { x: 5 }
+  o2 = { x: 5 }
+  o is-not%(identical) o2
+  o is%(identical) o
+  o2 is%(identical) o2
+end</p></pre></div></p></div><h5>2.3.3.3<tt>&nbsp;</tt><a name="(part._s~3aidentical-mutable)"></a>Identical and Mutable Data</h5><p>Identical does not inspect the contents of mutable data, either.  It can be
+used to tell if two references are <span style="font-style: italic">aliases</span> for the same underlying
+state, or if they are in fact different (even though they may be equal right
+now).</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>data InfiniteList:
+  | i-link(first, ref rest)
+  | i-empty
+end
+
+check:
+  l1 = i-link(1, i-empty)
+  l2 = i-link(1, i-empty)
+  l1!{rest : l1}
+  l2!{rest : l2}
+
+  l1 is%(identical) l1
+  l1!rest is%(identical) l1
+  l1 is-not%(identical) l2
+  l1!rest is-not%(identical) l2
+
+  l2 is%(identical) l2
+  l2!rest is%(identical) l2
+  l2 is-not%(identical) l1
+  l2!rest is-not%(identical) l1
+end</p></pre></div></p></div><h5>2.3.4<tt>&nbsp;</tt><a name="(part._.Always_.Equal)"></a>Always Equal</h5><div class="function"><div class="boxed pyret-header"><a name="(part._equality_equal-always)" class="pyret-code"></a><a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">val1</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a>, <span class="stt">val2</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a></div><div class="description"></div><div class="examples"></div></div><p>Checks if the two values will always be equal, and corresponds to the
+<span class="pyret-highlight"><span class="stt">==</span></span> operator.</p><p><span class="pyret-highlight"><span class="stt">equal-always</span></span> checks for primitive and structural equality like
+<a href="#%28part._equality_equal-now%29" data-pltdoc="x"><span class="stt">equal-now</span></a>, with the exception that it stops at mutable data and only
+checks that the mutable values are <a href="#%28part._equality_identical%29" data-pltdoc="x"><span class="stt">identical</span></a>.  Stopping at mutable
+boundaries ensures that if two values were <a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a> at any
+point, they will still be <a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a> later.</p><h5>2.3.4.1<tt>&nbsp;</tt><a name="(part._s~3aalways-equal-mutable)"></a>Always Equal and Mutable Data</h5><p>Here are some examples of <a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a> stopping at mutable data, but
+checking immutable data, contrasted with <a href="#%28part._equality_equal-now%29" data-pltdoc="x"><span class="stt">equal-now</span></a></p><pre class="pyret-highlight"><p>data MyBox:
+  | my-box(ref x)
+end
+
+check:
+  b1 = my-box(1)
+  b2 = my-box(1)
+
+  b1 is-not%(equal-always) b2
+  b1 is%(equal-now) b2
+  b2!{x : 2}
+
+  b1 is-not%(equal-always) b2
+  b1 is-not%(equal-now) b2
+
+  b3 = my-box(2)
+
+  # remember that b2 currently contains 2
+  l1 = [list: b1, b2]
+  l2 = [list: b1, b2]
+  l3 = [list: b1, b3]
+
+  l1 is%(equal-now) l2
+  l1 is%(equal-always) l2
+  l1 is-not%(identical) l2
+
+  l1 is%(equal-now) l3
+  l1 is-not%(equal-always) l3
+  l1 is-not%(identical) l3
+
+  b2!{x: 5}
+
+  l1 is%(equal-now) l2
+  l1 is%(equal-always) l2
+  l1 is-not%(identical) l2
+
+  l1 is-not%(equal-now) l3
+  l1 is-not%(equal-always) l3
+  l1 is-not%(identical) l3
+end</p></pre><h5>2.3.5<tt>&nbsp;</tt><a name="(part._.Properties_of_.Equality_.Functions)"></a>Properties of Equality Functions</h5><p>The discussion above hints at a relationship between the three functions.  In
+particular, if two values are Identical, they ought to be Always Equal, and if
+they are Always Equal, they ought to be Equal Now.  The following table
+summarizes this relationship, which in fact does hold:</p><p><table cellspacing="0" cellpadding="0" style="border-collapse: collapse;"><tr><td style="border: 1px solid black; padding: 5px;"><p>If &#8595;, then &#8594;</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">v1 &lt;=&gt; v2</span></span> could be...</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">v1 == v2</span></span> could be...</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">v1 =~ v2</span></span> could be...</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">v1 &lt;=&gt; v2 is true</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">true</span></span> only</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">true</span></span> only</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">v1 == v2 is true</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">true</span></span> or <span class="pyret-highlight"><span class="stt">false</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">true</span></span> only</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">v1 =~ v2 is true</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">true</span></span> or <span class="pyret-highlight"><span class="stt">false</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">true</span></span> or <span class="pyret-highlight"><span class="stt">false</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td></tr></table></p><p>This table doesn&rsquo;t have all the <span class="pyret-highlight"><span class="stt">false</span></span> cases in it, because we need to
+complete the story for a few values that haven&rsquo;t been discussed before we can
+give the whole picture.</p><h5>2.3.6<tt>&nbsp;</tt><a name="(part._s~3abounded-equalities)"></a>Bounded Equalities</h5><p>When comparing numbers, it&rsquo;s often useful to be able to compare within a
+range.  For example, if we write an algorithm that computes an answer to
+within a given tolerance, we may want to check if the answer is within that
+tolerance.</p><pre class="pyret-highlight"><p>check:
+  sqrt-5 = num-sqrt(5)
+  (sqrt-5 &lt; 2.23) is true
+  (sqrt-5 &gt; 2.22) is true
+end</p></pre><p>Pyret has a family of built-in functions for cases like this, and the default
+is <span class="pyret-highlight"><span class="stt">within</span></span>:</p><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within)" class="pyret-code"></a><a href="#%28part._equality_within%29" data-pltdoc="x"><span class="stt">within</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><p>It takes an argument representing the <span style="font-style: italic">relative error</span>, and returns a
+function that can be used to check equality up to that relative error.  For
+example, we can check if an answer is within 10% of a desired result:</p><pre class="pyret-highlight"><p>check:
+  within-10-percent = within(0.1)
+  within-10-percent(9.5, 10.5)
+end</p></pre><p>Relative difference is defined by multiplying the <span style="font-style: italic">mean</span> of the two
+numbers by <span class="pyret-highlight"><span class="stt">tol</span></span>, and checking that the result is less than the
+difference between them.  That is, in the expression above, <a href="#%28part._equality_within%29" data-pltdoc="x"><span class="stt">within</span></a>
+checks:</p><pre class="pyret-highlight"><p>(((9.5 + 10.5) / 2) * 0.1) &lt; (10.5 - 9.5)</p></pre><p><span class="NoteBox"><span class="NoteContent">Converting to exact numbers first avoids overflows on computing the
+mean.</span></span>
+Put yet another way, aside from some slight differences in bounds checking for
+errors, we could implement the numeric comparison of <a href="#%28part._equality_within%29" data-pltdoc="x"><span class="stt">within</span></a> as:</p><pre class="pyret-highlight"><p>fun within(tol):
+  lam(left, right):
+    (((num-exact(left) + num-exact(right)) / 2) * num-exact(tol))
+      &lt; num-abs(num-exact(left) - num-exact(right))
+  end
+end</p></pre><p>The <span class="pyret-highlight"><span class="stt">tol</span></span> argument must be between <span class="pyret-highlight"><span class="stt">0</span></span> and <span class="pyret-highlight"><span class="stt">1</span></span>.</p><p>It&rsquo;s common to use <span class="pyret-highlight"><span class="stt">within</span></span> along with <a href="testing.html#%28part._testing_is~25%29" data-pltdoc="x"><span class="stt">is%</span></a> to
+define the binary predicate inline with the test:</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>check:
+  num-sqrt(10) is%(within(0.1)) 3.2
+  num-sqrt(10) is-not%(within(0.1)) 5
+end</p></pre></div></p></div><p>Finally, <a href="#%28part._equality_within%29" data-pltdoc="x"><span class="stt">within</span></a> accepts <span style="font-style: italic">any</span> two values, not just numbers.
+On non-numeric arguments, <a href="#%28part._equality_within%29" data-pltdoc="x"><span class="stt">within</span></a> traverses the structures just as
+in <a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a>, but deferring to the bounds-checking equality when
+a pair of numbers is encountered.  All other values are compared with
+<a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a>.</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>check:
+  l7 = [list: 1]
+  l8 = [list: ~1.2]
+  l7 is%(within-rel(0.5))  l8
+  l7 is-not%(within-rel(0.1)) l8
+  l7 is%(within-rel(~0.5))  l8
+  l7 is-not%(within-rel(~0.1)) l8
+end</p></pre></div></p></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within-rel)" class="pyret-code"></a><a href="#%28part._equality_within-rel%29" data-pltdoc="x"><span class="stt">within-rel</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><p>An alias for <a href="#%28part._equality_within%29" data-pltdoc="x"><span class="stt">within</span></a>.</p><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within-abs)" class="pyret-code"></a><a href="#%28part._equality_within-abs%29" data-pltdoc="x"><span class="stt">within-abs</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><p>Like <a href="#%28part._equality_within-rel%29" data-pltdoc="x"><span class="stt">within-rel</span></a>, but compares with <span style="font-style: italic">absolute</span> tolerance rather
+than relative.  The definition is equivalent to:</p><pre class="pyret-highlight"><p>fun within-abs(tol):
+  lam(left, right):
+    num-abs(num-exact(left) - num-exact(right)) &lt;= tol
+  end
+end</p></pre><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>check:
+  la = [list: 10]
+  lb = [list: ~12]
+  la is%(within-abs(2))  lb
+  la is-not%(within-abs(1))  lb
+  la is%(within-abs(~5.5))  lb
+  la is-not%(within-abs(~1.9999)) lb
+end</p></pre></div></p></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within-rel-now)" class="pyret-code"></a><a href="#%28part._equality_within-rel-now%29" data-pltdoc="x"><span class="stt">within-rel-now</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within-abs-now)" class="pyret-code"></a><a href="#%28part._equality_within-abs-now%29" data-pltdoc="x"><span class="stt">within-abs-now</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><p>Like <a href="#%28part._equality_within-rel%29" data-pltdoc="x"><span class="stt">within-rel</span></a> and <a href="#%28part._equality_within-abs%29" data-pltdoc="x"><span class="stt">within-abs</span></a>, but they traverse
+mutable structures as in <span class="pyret-highlight"><span class="stt">equal-now</span></span>.</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>check:
+  aa = [array: 10]
+  ab = [array: ~12]
+  aa is%(within-rel-now(~0.2))  ab
+  aa is-not%(within-rel(~0.2)) ab
+  aa is%(within-abs-now(2))  ab
+  aa is-not%(within-abs(2))  ab
+end</p></pre></div></p></div><h5>2.3.7<tt>&nbsp;</tt><a name="(part._s~3aundefined-equalities)"></a>Undefined Equalities</h5><p>For some values, Pyret refuses to report <span class="pyret-highlight"><span class="stt">true</span></span> or <span class="pyret-highlight"><span class="stt">false</span></span> for any
+equality predicate, and raises an error instead.  For example:</p><pre class="pyret-highlight"><p>check:
+  (~3 == ~3) raises "equality-failure"
+
+  (1 == ~1) raises "equality-failure"
+
+  (lam(x): x end == lam(y): y end) raises "equality-failure"
+end</p></pre><p>This section discusses why this is the case.</p><h5>2.3.7.1<tt>&nbsp;</tt><a name="(part._s~3aroughnum-equality)"></a>Roughnums and Equality</h5><p><span class="NoteBox"><span class="NoteContent"><a href="http://htdp.org/2003-09-26/Book/curriculum-Z-H-41.html#node_chap_33">How
+to Design Programs</a> describes this design space well.</span></span> Numbers&rsquo;
+representations in programs reflect a number of tradeoffs, but the upshot is
+that numbers have finite, approximate representations for performance reasons.
+Numbers like <span class="pyret-highlight"><span class="stt">e</span></span>, <span class="pyret-highlight"><span class="stt">&#960;</span></span>, and <span class="pyret-highlight"><span class="stt">&#8730;2</span></span> are only represented up to
+some approximation of their true (irrational) value.  When such a result is
+used in a computation, it represents a <span style="font-style: italic">rough approximation</span> of the true
+value.</p><p>Pyret calls these numbers <a href="numbers.html#%28part._numbers_.Roughnum%29" data-pltdoc="x"><span class="stt">Roughnum</span></a>s, and they have
+special rules related to equality.  In particular, they <span style="font-style: italic">cannot</span> be
+directly compared for equality, even if it seems like they ought to be equal:</p><pre class="pyret-highlight"><p>check:
+  (~3 == ~3) raises "equality-failure"
+end</p></pre><p>In addition, <a href="numbers.html#%28part._numbers_.Roughnum%29" data-pltdoc="x"><span class="stt">Roughnum</span></a>s cannot be compared for equality
+with <a href="numbers.html#%28part._numbers_.Exactnum%29" data-pltdoc="x"><span class="stt">Exactnum</span></a>s, either.</p><pre class="pyret-highlight"><p>check:
+  (~0.1 == 0.1) raises "equality-failure"
+end</p></pre><p><span class="NoteBox"><span class="NoteContent">This example is not Pyret-specific, but matches the behavior of
+<a href="https://en.wikipedia.org/wiki/IEEE_floating_point">IEEE
+floating point</a>.</span></span>
+Returning either <span class="pyret-highlight"><span class="stt">true</span></span> or <span class="pyret-highlight"><span class="stt">false</span></span> in this case would be
+misleading, as because of unavoidable inaccuracies,
+both of the following expressions evaluate to <span class="pyret-highlight"><span class="stt">~0.1</span></span>:</p><pre class="pyret-highlight"><p>(~1 - ~0.9) + 0.00000000000000003
+~0.2 - ~0.1</p></pre><p>So in the following check block, if we chose either <span class="pyret-highlight"><span class="stt">true</span></span> or <span class="pyret-highlight"><span class="stt">false</span></span> for
+the result of <span class="pyret-highlight"><span class="stt">~0.1 == 0.1</span></span>, one of the tests would have a misleading failure:</p><pre class="pyret-highlight"><p>check:
+  ((~1 - ~0.9) + 0.00000000000000003) is 0.1
+  (~0.2 - ~0.1) is 0.1
+end</p></pre><p>For example, if Pyret answered <span class="pyret-highlight"><span class="stt">true</span></span> for the rough equivalent,
+<span class="pyret-highlight"><span class="stt">~0.1 == ~0.1</span></span>, then this test would pass:</p><pre class="pyret-highlight"><p>check:
+  ((~1 - ~0.9) + 0.00000000000000003) is (~0.2 - ~0.1)
+end</p></pre><p>To avoid giving misleading answers in cases like these, Pyret triggers an
+error on any number-to-number comparison that involves a <a href="numbers.html#%28part._numbers_.Roughnum%29" data-pltdoc="x"><span class="stt">Roughnum</span></a>, which looks like:</p><p><table cellspacing="0" cellpadding="0"><tr><td><p><span class="stt">These two values cannot be compared for direct equality:</span></p></td></tr><tr><td><p><span class="stt"></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt">~0.1</span></p></td></tr><tr><td><p><span class="stt">~0.1</span></p></td></tr><tr><td><p><span class="stt"></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt">Approximations of numbers (Roughnums) cannot be compared for equality. The</span></p></td></tr><tr><td><p><span class="stt">program may need to use within().</span></p></td></tr></table></p><p>If you see this erorr, it&rsquo;s a hint that the program should be using an
+equality from the <a href="#%28part._equality_within%29" data-pltdoc="x"><span class="stt">within</span></a> family of functions to do a relative
+comparison, rather than a direct equality comparison.  So in this case, we
+could check that the answer is equal up to an relative error of <span class="pyret-highlight"><span class="stt">0.001</span></span>:</p><pre class="pyret-highlight"><p>check:
+  ((~1 - ~0.9) + 0.00000000000000003) is%(within(0.001)) (~0.2 - ~0.1)
+end</p></pre><p>It can be useful to check that two <a href="numbers.html#%28part._numbers_.Roughnum%29" data-pltdoc="x"><span class="stt">Roughnum</span></a>s are
+actually indistinguishable, even though they may be approximating different
+values.  This can be expressed by checking that the numbers are within a
+tolerance of <span class="pyret-highlight"><span class="stt">~0</span></span>:</p><pre class="pyret-highlight"><p>check:
+  ((~1 - ~0.9) + 0.00000000000000003) is%(within(~0)) (~0.2 - ~0.1)
+end</p></pre><p>Note that the same won&rsquo;t work for a tolerance of <span class="pyret-highlight"><span class="stt">0</span></span>, the exact zero,
+which will give an error if used to compare two <a href="numbers.html#%28part._numbers_.Roughnum%29" data-pltdoc="x"><span class="stt">Roughnum</span></a>s.</p><h5>2.3.7.2<tt>&nbsp;</tt><a name="(part._s~3afunction-equality)"></a>Functions and Equality</h5><p>When comparing two functions or two methods, all the equality operators raise
+an exception.  Why?  Well, the traditional way to compare functions for
+equality (short of solving the halting problem), is to use reference equality
+(or <a href="#%28part._equality_identical%29" data-pltdoc="x"><span class="stt">identical</span></a>) on the functions&rsquo; representations, the same way as
+mutable data works.  For a hint of why this can be a misleading definition of
+equality, consider this data definition:</p><pre class="pyret-highlight"><p>data Stream&lt;a&gt;:
+  | stream(first :: a, rest :: (-&gt; Stream&lt;a&gt;))
+end
+check:
+  fun mk-ones(): stream(1, mk-ones) end
+  ones = mk-ones()
+  ones is ones # Should this succeed?
+  ones is mk-ones() # What about this?
+  ones.rest() is mk-ones() # Or this...?
+end</p></pre><p>All of these values (<span class="pyret-highlight"><span class="stt">ones</span></span>, <span class="pyret-highlight"><span class="stt">mk-ones()</span></span>, etc.) have the same
+behavior, so we could argue that <span class="pyret-highlight"><span class="stt">is</span></span> (which uses <span class="pyret-highlight"><span class="stt">==</span></span> behind the
+scenes) ought to succeed on these.  And indeed, if we used reference equality,
+it would succeed.  But consider this small tweak to the program:</p><pre class="pyret-highlight"><p>check:
+  fun mk-ones():
+    stream(1, lam(): mk-ones() end)  # &lt;-- changed this line
+  end
+  ones = mk-ones()
+  ones is ones # Should this succeed?
+  ones is mk-ones() # What about this?
+  ones.rest() is mk-ones() # Or this...?
+end</p></pre><p>If we used reference equality on these functions, all of these tests would
+now fail, and <span class="pyret-highlight"><span class="stt">ones</span></span> <span style="font-style: italic">has the exact same behavior</span>.  Here&rsquo;s the
+situation:</p><p><span class="NoteBox"><span class="NoteContent">In fact, a <a href="http://en.wikipedia.org/wiki/Rice's_theorem">famous
+result in theoretical computer science</a> is that it is impossible to figure out
+out if two functions do the same thing in general, even if it is possible in
+certain special cases (like reference equality).</span></span></p><p>When reference equality returns <span class="pyret-highlight"><span class="stt">true</span></span>, we know that the two functions
+must have the same behavior.  But when it returns <span class="pyret-highlight"><span class="stt">false</span></span>, we know
+nothing.  The functions may behave exactly the same, or they might be
+completely different, and the equality predicate can&rsquo;t tell us either way.</p><p>Pyret takes the following stance: You probably should rethink your program if
+it relies on comparing functions for equality, since Pyret cannot give reliable
+answers (no language can).  So, all the examples above (with one notable
+exception) actually raise errors:</p><pre class="pyret-highlight"><p>check:
+  fun mk-ones():
+    stream(1, lam(): mk-ones() end)  # &lt;-- changed this line
+  end
+  ones = mk-ones()
+  ones == ones is true
+  ones == mk-ones() raises "Attempted to compare functions"
+  ones.rest() == mk-ones() raises "Attempted to compare functions"
+end</p></pre><p>The first test is true because two <a href="#%28part._equality_identical%29" data-pltdoc="x"><span class="stt">identical</span></a> values are considered
+<a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a>.  This is an interesting point in this design space
+that Pyret may explore more in the future &ndash; it isn&rsquo;t clear if the benefits of
+this relationship between <a href="#%28part._equality_identical%29" data-pltdoc="x"><span class="stt">identical</span></a> and <a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a> are
+worth the slight brittleness in the above example.</p><p><span style="font-weight: bold">Note 1</span>: Functions can be compared with non-function values and return
+<span class="pyret-highlight"><span class="stt">false</span></span>.  That is, the equality operators only throw the error if actual
+function values need to be compared to one another, not if a function value is
+compared to another type of value:</p><pre class="pyret-highlight"><p>check:
+  f = lam(): "no-op" end
+  g = lam(): "also no-op" end
+
+  f == f raises "Attempted to compare functions"
+  f == g raises "Attempted to compare functions"
+  g == f raises "Attempted to compare functions"
+
+  5 is-not%(equal-always) f
+
+  { x: 5 } is-not%(equal-always) { x: f }
+end</p></pre><p><span style="font-weight: bold">Note 2</span>: This rule about functions interacts with structural equality.
+When comparing two values, it seems at first unclear whether the result
+should be <span class="pyret-highlight"><span class="stt">false</span></span> or an error for this test:</p><pre class="pyret-highlight"><p>check:
+  { x: 5, f: lam(): "no-op" end } is%(equal-always)
+    { x: 6, f: lam(): "no-op" end }
+end</p></pre><p>This comparison will return <span class="pyret-highlight"><span class="stt">false</span></span>.  The rule is that if the equality
+algorithm can find values that differ without comparing functions, it will
+report the difference and return <span class="pyret-highlight"><span class="stt">false</span></span>.  However, if all of the
+non-function comparisons are <span class="pyret-highlight"><span class="stt">true</span></span>, and some functions were compared,
+then an error is raised.  A few more examples:</p><pre class="pyret-highlight"><p>
+check:
+  o = { x: 5, y: { z: 6 }, lam(): "no-op" end }
+  o2 = { x: 5, y: { z: 7 }, lam(): "no-op" end }
+
+  (o == o) raises "Attempted to compare functions"
+  o is-not%(equal-always) o2  # Test succeeds, because z fields differ
+end
+</p></pre><h5>2.3.8<tt>&nbsp;</tt><a name="(part._s~3atotal-equality-predicates)"></a>Total Equality Functions (Avoiding Incomparability Errors)</h5><p>Most Pyret programs should be written using <span class="pyret-highlight"><span class="stt">equal-always</span></span>,
+<span class="pyret-highlight"><span class="stt">equal-now</span></span>, and <span class="pyret-highlight"><span class="stt">identical</span></span>, which guarantee that an error will be
+raised if functions are compared.  Some programs, however, need to be able to
+compare arbitrary values, and it&rsquo;s convenient to have the ability to compare
+values without raising an exception.  Since the equality of functions is
+unknown, we define the result of a total equality check with a new datatype:</p><div class="boxed"><p><div class="SIntrapara"><span class="stt">data </span><a name="(part._equality_.Equality.Result)" class="pyret-code"></a><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a><span class="stt"></span><span class="stt">:</span></div><div class="SIntrapara"><dl class="multiline-args"><dt class="indent-arg"><span class="stt">| </span><a href="#%28part._equality_.Equal%29" data-pltdoc="x"><span class="stt">Equal</span></a></dt><dt class="indent-arg"><span class="stt">| </span><a href="#%28part._equality_.Not.Equal%29" data-pltdoc="x"><span class="stt">NotEqual</span></a><span class="stt">(</span><span class="stt">reason</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.String%29" data-pltdoc="x"><span class="stt">String</span></a><span class="stt">)</span></dt><dt class="indent-arg"><span class="stt">| </span><a href="#%28part._equality_.Unknown%29" data-pltdoc="x"><span class="stt">Unknown</span></a></dt></dl></div><div class="SIntrapara"><span class="stt">end</span></div></p></div><blockquote><div class="boxed"><a name="(part._equality_.Equal)" class="pyret-code"></a><a href="#%28part._equality_.Equal%29" data-pltdoc="x"><span class="stt">Equal</span></a><span class="stt"> :: </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_.Not.Equal)" class="pyret-code"></a><a href="#%28part._equality_.Not.Equal%29" data-pltdoc="x"><span class="stt">NotEqual</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">reason</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.String%29" data-pltdoc="x"><span class="stt">String</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a></div><div class="description"></div><div class="examples"></div></div><div class="boxed"><a name="(part._equality_.Unknown)" class="pyret-code"></a><a href="#%28part._equality_.Unknown%29" data-pltdoc="x"><span class="stt">Unknown</span></a><span class="stt"> :: </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_is-.Equal)" class="pyret-code"></a><a href="#%28part._equality_is-.Equal%29" data-pltdoc="x"><span class="stt">is-Equal</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">val :: Any</span><span class="stt">)</span><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a></div><div class="description"></div><div class="examples"></div></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_is-.Not.Equal)" class="pyret-code"></a><a href="#%28part._equality_is-.Not.Equal%29" data-pltdoc="x"><span class="stt">is-NotEqual</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">val :: Any</span><span class="stt">)</span><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a></div><div class="description"></div><div class="examples"></div></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_is-.Unknown)" class="pyret-code"></a><a href="#%28part._equality_is-.Unknown%29" data-pltdoc="x"><span class="stt">is-Unknown</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">val :: Any</span><span class="stt">)</span><span class="stt"> -&gt; </span><a href="_global_.html#%28part._~3cglobal~3e_.Boolean%29" data-pltdoc="x"><span class="stt">Boolean</span></a></div><div class="description"></div><div class="examples"></div></div></blockquote><p>We define three parallel functions to the equality predicates that return
+<a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a> values.  They return <a href="#%28part._equality_.Equal%29" data-pltdoc="x"><span class="stt">Equal</span></a> and
+<a href="#%28part._equality_.Not.Equal%29" data-pltdoc="x"><span class="stt">NotEqual</span></a> whenever the corresponding function would, and
+<a href="#%28part._equality_.Unknown%29" data-pltdoc="x"><span class="stt">Unknown</span></a> whenever the corresponding function would throw an error:</p><div class="function"><div class="boxed pyret-header"><a name="(part._equality_equal-always3)" class="pyret-code"></a><a href="#%28part._equality_equal-always3%29" data-pltdoc="x"><span class="stt">equal-always3</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">val1</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a>, <span class="stt">val2</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a></div><div class="description"></div><div class="examples"></div></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_equal-now3)" class="pyret-code"></a><a href="#%28part._equality_equal-now3%29" data-pltdoc="x"><span class="stt">equal-now3</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">val1</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a>, <span class="stt">val2</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a></div><div class="description"></div><div class="examples"></div></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_identical3)" class="pyret-code"></a><a href="#%28part._equality_identical3%29" data-pltdoc="x"><span class="stt">identical3</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">val1</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a>, <span class="stt">val2</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a></div><div class="description"></div><div class="examples"></div></div><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-highlight"><p>check:
+  f = lam(): 5 end
+  equal-always3(f, f) is Unknown
+  equal-always3(f, 5) satisfies is-NotEqual
+  equal-now3(f, f) is Unknown
+  equal-now3("a", f) satisfies is-NotEqual
+  identical3("a", f) satisfies is-NotEqual
+  identical3(f, f) is Unknown
+  identical3("a", f) satisfies is-NotEqual
+end</p></pre></div></p></div><p>We can now modify our table from above to be more complete:</p><p><table cellspacing="0" cellpadding="0" style="border-collapse: collapse;"><tr><td style="border: 1px solid black; padding: 5px;"><p>If &#8595;, then &#8594;</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">identical(v1, v2)</span></span> could be...</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-always(v1, v2)</span></span> could be...</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-now(v1, v2)</span></span> could be...</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">identical(v1, v2) is Equal</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Equal</span></span> only</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Equal</span></span> only</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-always(v1, v2) is Equal</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Equal</span></span> or <span class="pyret-highlight"><span class="stt">NotEqual</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Equal</span></span> only</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-now(v1, v2) is Equal</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Equal</span></span> or <span class="pyret-highlight"><span class="stt">NotEqual</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Equal</span></span> or <span class="pyret-highlight"><span class="stt">NotEqual</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p></p></td><td style="border: 1px solid black; padding: 5px;"><p></p></td><td style="border: 1px solid black; padding: 5px;"><p></p></td><td style="border: 1px solid black; padding: 5px;"><p></p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">identical(v1, v2) is NotEqual</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Equal</span></span> or <span class="pyret-highlight"><span class="stt">NotEqual</span></span> or <span class="pyret-highlight"><span class="stt">Unknown</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Equal</span></span> or <span class="pyret-highlight"><span class="stt">NotEqual</span></span> or <span class="pyret-highlight"><span class="stt">Unknown</span></span></p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-always(v1, v2) is NotEqual</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">NotEqual</span></span> only</p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Equal</span></span> or <span class="pyret-highlight"><span class="stt">NotEqual</span></span> or <span class="pyret-highlight"><span class="stt">Unknown</span></span></p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-now(v1, v2) is NotEqual</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">NotEqual</span></span> only</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">NotEqual</span></span> only</p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p></p></td><td style="border: 1px solid black; padding: 5px;"><p></p></td><td style="border: 1px solid black; padding: 5px;"><p></p></td><td style="border: 1px solid black; padding: 5px;"><p></p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">identical(v1, v2) is Unknown</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Unknown</span></span> only</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Unknown</span></span> only</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-always(v1, v2) is Unknown</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Unknown</span></span> or <span class="pyret-highlight"><span class="stt">NotEqual</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Unknown</span></span> only</p></td></tr><tr><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">equal-now(v1, v2) is Unknown</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Unknown</span></span> or <span class="pyret-highlight"><span class="stt">NotEqual</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p><span class="pyret-highlight"><span class="stt">Unknown</span></span> or <span class="pyret-highlight"><span class="stt">NotEqual</span></span></p></td><td style="border: 1px solid black; padding: 5px;"><p>-</p></td></tr></table></p><p>There are corresponding total functions defined for <a href="#%28part._equality_within%29" data-pltdoc="x"><span class="stt">within</span></a> as well:</p><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within3)" class="pyret-code"></a><a href="#%28part._equality_within3%29" data-pltdoc="x"><span class="stt">within3</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within-rel3)" class="pyret-code"></a><a href="#%28part._equality_within-rel3%29" data-pltdoc="x"><span class="stt">within-rel3</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within-rel-now3)" class="pyret-code"></a><a href="#%28part._equality_within-rel-now3%29" data-pltdoc="x"><span class="stt">within-rel-now3</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within-abs3)" class="pyret-code"></a><a href="#%28part._equality_within-abs3%29" data-pltdoc="x"><span class="stt">within-abs3</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><div class="function"><div class="boxed pyret-header"><a name="(part._equality_within-abs-now3)" class="pyret-code"></a><a href="#%28part._equality_within-abs-now3%29" data-pltdoc="x"><span class="stt">within-abs-now3</span></a><span class="stt"> :: </span><span class="stt">(</span><span class="stt">tol</span><span class="stt"> :: </span><a href="_global_.html#%28part._~3cglobal~3e_.Number%29" data-pltdoc="x"><span class="stt">Number</span></a><span class="stt">)</span><span class="stt"> -&gt; </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a><span class="stt">)</span></div><div class="description"></div><div class="examples"></div></div><h5>2.3.9<tt>&nbsp;</tt><a name="(part._s~3adatatype-defined-equality)"></a>Datatype-defined Equality</h5><p>The functions <a href="#%28part._equality_equal-now%29" data-pltdoc="x"><span class="stt">equal-now</span></a> and <a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a> are defined to
+work over values created with <span class="pyret-highlight"><span class="stt">data</span></span> by comparing fields in the same
+position.  However, sometimes user-defined values need a more sophisticated
+notion of equality than this simple definition provides.</p><p>For consider implementing an unordered <span style="font-style: italic">set</span> of values in Pyret.  We might
+choose to implement it as a function that creates an object closing over the
+implementation of the set itself:</p><pre class="pyret-highlight"><p>fun&lt;a&gt; make-empty-set():
+  {
+    add(self, element :: a): ... end,
+    member(self, element :: a) -&gt; Boolean: ... end,
+    equal-to-other-set(self, other) -&gt; Boolean: ... end
+  }
+end</p></pre><p>We could fill in the bodies of the methods to have this implementation let
+clients create sets and add elements to them, but it won&rsquo;t work well with
+testing:</p><pre class="pyret-highlight"><p>check:
+  s = make-empty-set().add(5)
+  s2 = make-empty-set().add(5)
+
+  s.member(5) is true
+  s2.member(5) is true
+
+  s.equal-to-other-set(s2) is true
+
+  s == s2 raises "Attempted to compare functions"
+end</p></pre><p>The final test raises an exception because it traverses the structure of the
+object, and the only visible values are the three methods, which cannot be
+compared.  We might just say that users of custom datatypes have to use custom
+predicates for testing, for example they could write:</p><pre class="pyret-highlight"><p>check:
+  # as before ...
+  fun equal-sets(set1, set2): set1.equal-to-other-set(set2) end
+  s is%(equal-sets) s2
+end</p></pre><p>This works for sets on their own, but the built-in testing and equality
+operators will not work with nested user-defined data structures.  For example,
+since lists are a dataype that checks built-in equality on their members, a
+list of sets as defined above will not use the equal-to-other-set method when
+comparing elements, and give an <span class="pyret-highlight"><span class="stt">"Attempted to compare functions"</span></span> error:</p><pre class="pyret-highlight"><p>check:
+  # as before ...
+  ([list: s] == [list: s2]) raises "Attempted to compare functions"
+end</p></pre><p>To help make this use case more pleasant, Pyret picks a method name to call, if
+it is present, on user-defined objects when checking equality.  The method name
+is <span class="pyret-highlight"><span class="stt">_equals</span></span>, and it has the following signature:</p><div class="function"><div class="boxed"><dl class="multiline-args"><dt class=""><a name="(part._equality__equal)" class="pyret-code"></a><span class="stt">._equals</span> :: (</dt><dt class="indent-arg"><span class="stt">other :: a</span></dt><dd class=""></dd><dt class="indent-arg"><span class="stt">equal-rec</span><span class="stt"> :: </span><span class="stt">(</span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt">, </span><a href="_global_.html#%28part._~3cglobal~3e_.Any%29" data-pltdoc="x"><span class="stt">Any</span></a><span class="stt"> -&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a><span class="stt">)</span></dt><dd class=""></dd><dt class=""><span class="stt">)</span></dt><dt class=""><span class="stt">-&gt; </span><a href="#%28part._equality_.Equality.Result%29" data-pltdoc="x"><span class="stt">EqualityResult</span></a></dt></dl></div><div class="description"></div><div class="examples"></div></div><p>Where <span class="pyret-highlight"><span class="stt">a</span></span> is the type of the object itself (so for sets, <span class="pyret-highlight"><span class="stt">other</span></span>
+would be annotated with <span class="pyret-highlight"><span class="stt">Set&lt;a&gt;</span></span>).</p><p>The <span class="pyret-highlight"><span class="stt">_equals</span></span> method is called in the equality algorithm when:</p><ul><li><p>The two values are either both data values or both objects, AND</p></li><li><p>If they are data values, the two values are of the same data type and
+variant, AND</p></li><li><p>If they are objects not created by data, they have the same set of
+<a href="brands.html" data-pltdoc="x">Brands</a></p></li></ul><p>So, for example, an object with an <span class="pyret-highlight"><span class="stt">_equals</span></span> method that always returns
+<a href="#%28part._equality_.Equal%29" data-pltdoc="x"><span class="stt">Equal</span></a> is not considered equal to values that aren&rsquo;t also objects:</p><pre class="pyret-highlight"><p>import Equal from equality
+check:
+  eq-all = { _equals(self, other, eq): Equal end }
+  eq-all is-not== f
+  eq-all is-not== m
+  eq-all is-not== 0
+  eq-all is-not== "a"
+  eq-all is== {}
+end</p></pre><p>The last argument to <span class="pyret-highlight"><span class="stt">_equals</span></span> is the recursive equality callback to use
+for checking equality of any members.  When checking for equality of members
+(say in our set implementation above), we would use this callback rather than
+one of <a href="#%28part._equality_equal-always3%29" data-pltdoc="x"><span class="stt">equal-always3</span></a> or <a href="#%28part._equality_equal-now3%29" data-pltdoc="x"><span class="stt">equal-now3</span></a>.  The reasons for this
+are threefold:</p><ul><li><p>In order to check for equality of cyclic values, Pyret needs to do
+internal bookkeeping of visited references.  This information is stored
+within the callback, and calling e.g. <a href="#%28part._equality_equal-now3%29" data-pltdoc="x"><span class="stt">equal-now3</span></a> directly would not
+take previously visted references into account.</p></li><li><p>To avoid requiring datatypes to implement two equality methods, the
+callback also knows whether this equality call was started by
+<a href="#%28part._equality_equal-now%29" data-pltdoc="x"><span class="stt">equal-now</span></a> or by <a href="#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a>.  Any recursive calls
+should use the original semantics for comparing references, so using the
+callback ensures that equality checks on elements have the right semantics
+(even in deeply nested data structures).</p></li><li><p>The recursive equality predicate closes over and remembers the
+<span style="font-style: italic">tolerance</span> for <a href="#%28part._equality_within%29" data-pltdoc="x"><span class="stt">within</span></a>-family functions, and whether or
+not the tolerance is absolute or relative.</p></li></ul><div class="navsetbottom"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="testing.html" title="backward to &quot;2.2 Testing&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="Language_Concepts.html" title="up to &quot;2 Language Concepts&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="brands.html" title="forward to &quot;2.4 Brands&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
