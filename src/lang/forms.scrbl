@@ -543,7 +543,7 @@ desugars to
 
 @justcode{
 lam(z):
-  (fun (x, y): x + y end) + z
+  (lam(x, y): x + y end) + z
 end
 }
 
