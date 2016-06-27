@@ -157,6 +157,7 @@ x = 10
 x = 5
 fun f():
   x = 10
+  x
 end
 # Error: can't use the name x in two nested scopes
 
@@ -165,9 +166,11 @@ end
 @justcode{
 fun f():
   x = 10
+  x
 end
 fun g():
   x = 22
+  x
 end
 # Not an error: x is used in two scopes that are not nested
 }
@@ -177,8 +180,8 @@ end
 Function declarations have a number of pieces:
 
 @justcode{
-fun-expr: "fun" fun-header ":" doc-string block where-clause "end"
-fun-header: ty-params NAME args return-ann
+fun-expr: "fun" NAME fun-header ":" doc-string block where-clause "end"
+fun-header: ty-params args return-ann
 ty-params:
   ["<" list-ty-param* NAME ">"]
 list-ty-param: NAME ","
@@ -190,20 +193,20 @@ where-clause: ["where:" block]
 }
 
 A function expression is syntactic sugar for a let and an anonymous function
-expression.  The statement:
+expression for non-recursive case. The statement:
 
 @justcode{
-"fun" ty-params NAME args return-ann ":"
+"fun" NAME ty-params args return-ann ":"
   doc-string
   block
   where-clause
 "end"
 }
 
-Is equivalent to
+is equivalent to
 
 @justcode{
-NAME "=" "fun" ty-params args return-ann ":"
+NAME "=" "lam" ty-params args return-ann ":"
   doc-string
   block
 "end"
@@ -239,14 +242,15 @@ data-expr: "data" NAME ty-params data-mixins ":"
     data-sharing
     where-clause
   "end"
-data-mixins: ["deriving" mixins]
 data-variant: "|" NAME variant-members data-with | "|" NAME data-with
 variant-members: (PARENSPACE|PARENNOSPACE) [list-variant-member* variant-member] ")"
 list-variant-member: variant-member ","
-variant-member: ["mutable"|"cyclic"] binding
+variant-member: ["ref] binding
 data-with: ["with:" fields]
 data-sharing: ["sharing:" fields]
 }
+
+@; data-mixins: ["deriving" mixins] ;; we don't have mixins yet
 
 A @tt{data-expr} causes a number of new names to be bound in the scope of the
 block it is defined in:
@@ -330,12 +334,12 @@ example:
 @justcode{
 data BTree:
   | node(value :: Number, left :: BTree, right :: BTree) with:
-    size(self): 1 + self.left.size() + self.right.size() end
+    method size(self): 1 + self.left.size() + self.right.size() end
   | leaf(value :: Number) with:
-    size(self): 1 end,
-    increment(self): leaf(self.value + 1) end
+    method size(self): 1 end,
+    method increment(self): leaf(self.value + 1) end
 sharing:
-  values-equal(self, other):
+  method values-equal(self, other):
     self.value == other.value
   end
 where:
@@ -412,12 +416,11 @@ variable @tt{NAME} to the result of the right-hand side expression.
 The grammar for a lambda expression is:
 
 @justcode{
-lambda-expr: "lam" ty-params [args] return-ann ":"
+lambda-expr: "lam" fun-header ":"
     doc-string
     block
     where-clause
   "end"
-fun-header: ty-params NAME args return-ann
 ty-params:
   ["<" list-ty-param* NAME ">"]
 list-ty-param: NAME ","
@@ -616,10 +619,11 @@ t = empty-tree
 @subsection[#:tag "s:binop-expr"]{Binary Operators}
 
 There are a number of binary operators in Pyret.  A binary operator expression
-is written by putting an operator between two other expressions, as in:
+is a series of expressions joined by binary operators. An expression itself
+is also a binary operator expression.
 
 @justcode{
-binop-expr: binop-expr BINOP binop-expr
+binop-expr: expr (BINOP expr)*
 }
 
 Each binary operator is syntactic sugar for a particular method or function
@@ -653,7 +657,7 @@ obj-expr: "{" fields "}" | "{" "}"
 fields: list-field* field [","]
 list-field: field ","
 field: key ":" binop-expr
-     | key args return-ann ":" doc-string block where-clause "end"
+     | method" key fun-header ":" doc-string block where-clause "end"
 key: NAME
 }
 
@@ -661,16 +665,16 @@ A comma-separated sequence of fields enclosed in @tt{{}} creates an object; we
 refer to the expression as an @emph{object literal}.  There are two types of
 fields: @emph{data} fields and @emph{method} fields.  A data field in an object
 literal simply creates a field with that name on the resulting object, with its
-value equal to the right-hand side of the field.  A method field
+value equal to the right-hand side of the field. A method field
 
 @justcode{
-key args return-ann ":" doc-string block where-clause "end"
+"method" key fun-header ":" doc-string block where-clause "end"
 }
 
 is syntactic sugar for:
 
 @justcode{
-key ":" "method" args return-ann ":" doc-string block where-clause "end"
+key ":" "method" fun-header ":" doc-string block where-clause "end"
 }
 
 That is, it's just special syntax for a data field that contains a method
@@ -722,7 +726,7 @@ of five things:
     For example:
 
     @justcode{
-      o = { m(self, x): self.y + x end, y: 22 }
+      o = { method m(self, x): self.y + x end, y: 22 }
       check:
         the-m-method-closed-over-o = o.m
         the-m-method-closed-over-o(5) is 27
