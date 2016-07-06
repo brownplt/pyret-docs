@@ -989,12 +989,24 @@ fun list-sum(l :: List<Number>) -> Number:
 end
 check:
   list-sum(empty) is 0
-  list-sum(link(1, empty)) raises "unfinished-template"
+  list-sum(link(1, empty)) raises "template-not-finished"
 end
 }
 
 This is handy for starting a function (especially one with many cases) with
 some tests written and others to be completed.
+
+@margin-note{These other positions for @tt{...} may be included in the future.}
+The @tt{...} expression can only appear where @emph{expressions} can appear.
+So it is not allowed in binding positions or annotation positions.  These are
+not allowed:
+
+@examples{
+fun f(...): # parse error
+  "todo"
+end
+x :: ... = 5 # parse error
+}
 
 
 @section[#:tag "s:annotations"]{Annotations}
