@@ -415,9 +415,7 @@ The grammar for a lambda expression is:
 lambda-expr: "lam" ty-params [args] return-ann ":"
     doc-string
     block
-    where-clause
   "end"
-fun-header: ty-params NAME args return-ann
 ty-params:
   ["<" list-ty-param* NAME ">"]
 list-ty-param: NAME ","
@@ -427,30 +425,83 @@ return-ann: ["->" ann]
 doc-string: ["doc:" STRING]
 }
 
-@margin-note{
-The @tt{ty-params} and @tt{where-clause} of lambda expressions are currently not
-interpreted by Pyret.  The @tt{ty-params} will be used when Pyret has more
-complete support for checking polymorphic functions.  The @tt{where-clause} is
-included for homogeneity with @seclink["s:fun-expr" "function statements"].
-}
-
 A lambda expression creates a function value that can be applied with
 @seclink["s:app-expr" "application expressions"].  The arguments in @tt{args}
 are bound to their arguments as immutable identifiers as in a
-@seclink["s:let-expr" "let expression"].  These identifiers follow the same
-rules of no shadowing and no assignment.
+@seclink["s:let-expr" "let expression"].
+
+@examples{
+check:
+  f = lam(x, y): x - y end
+  f(5, 3) is 2
+end
+}
+
+These identifiers follow the same rules of no shadowing and no assignment.
+
+@examples{
+x = 12
+f = lam(x): x end  # ERROR: x shadows a previous definition
+g = lam(y):
+  y := 10   # ERROR: y is not a variable and cannot be assigned
+  y + 1
+end
+}
 
 If the arguments have @seclink["s:annotations" "annotations"] associated with
 them, they are checked before the body of the function starts evaluating, in
 order from left to right.  If an annotation fails, an exception is thrown.
 
-@justcode{
+@examples{
 add1 = lam(x :: Number):
   x + 1
 end
 add1("not-a-number")
 # Error: expected a Number and got "not-a-number"
 }
+
+A lambda expression can have a @emph{return} annotation as well, which is
+checked before evaluating to the final value:
+
+
+@examples{
+add1 = lam(x) -> Number:
+  tostring(x) + "1"
+end
+add1(5)
+# Error: expected a Number and got "51"
+}
+
+Lambda expressions remember, or close over, the values of other identifiers
+that are in scope when they are defined.  So, for example:
+
+@examples{
+check:
+  x = 10
+  f = lam(y): y + x end
+  f(5) is 15
+end
+}
+
+@subsection[#:tag "s:curly-lam-expr"]{Curly-Brace Lambda Shorthand}
+
+Lambda expressions can also be written with a curly-brace shorthand:
+
+@justcode{
+curly-lambda-expr: "{" ty-params [args] return-ann ":"
+    doc-string
+    block
+  "}"
+}
+
+@examples{
+check:
+  x = 10
+  f = {(y :: Number) -> Number: x + y}
+  f(5) is 15
+end
+}
+
 
 @subsection[#:tag "s:app-expr"]{Application Expressions}
 
@@ -462,13 +513,13 @@ app-args: PARENNOSPACE [app-arg-elt* binop-expr] ")"
 app-arg-elt: binop-expr ","
 }
 
-An application expression is an expression (usually expected to evaluate to a
-function), followed by a comma-separated list of arguments enclosed in
-parentheses.  It first evaluates the arguments in left-to-right order, then
-evaluates the function position.  If the function position is a function value,
-the number of provided arguments is checked against the number of arguments
-that the function expects.  If they match, the arguments names are bound to the
-provided values.  If they don't, an exception is thrown.
+An application expression is an expression followed by a comma-separated list
+of arguments enclosed in parentheses.  It first evaluates the arguments in
+left-to-right order, then evaluates the function position.  If the function
+position is a function value, the number of provided arguments is checked
+against the number of arguments that the function expects.  If they match, the
+arguments names are bound to the provided values.  If they don't, an exception
+is thrown.
 
 Note that there is @emph{no space} allowed before the opening parenthesis of
 the application.  If you make a mistake, Pyret will complain:
@@ -499,11 +550,11 @@ Pyret provides syntactic sugar to make writing such helper functions
 easier:
 
 @justcode{
-call-f-with-123 = f(1, 2, 3, _, _) # same as the fun expression above
+call-f-with-123 = f(1, 2, 3, _, _) # same as the lam expression above
 }
 
 Specifically, when Pyret code contains a function application some of
-whose arguments are underscores, it constructs an anonymous function
+whose arguments are underscores, it constructs an lambda expression
 with the same number of arguments as there were underscores in the
 original expression, whose body is simply the original function
 application, with the underscores replaced by the names of the
@@ -664,7 +715,7 @@ literal simply creates a field with that name on the resulting object, with its
 value equal to the right-hand side of the field.  A method field
 
 @justcode{
-key args return-ann ":" doc-string block where-clause "end"
+method key args return-ann ":" doc-string block where-clause "end"
 }
 
 is syntactic sugar for:
@@ -676,12 +727,8 @@ key ":" "method" args return-ann ":" doc-string block where-clause "end"
 That is, it's just special syntax for a data field that contains a method
 value.
 
-@margin-note{The overriding of later fields is expected to be deprecated and
-replaced with an error.}
-
-The fields are evaluated in order.  If the same field appears more than once,
-the later use overrides the earlier use, but both field expressions are still
-evaluated.
+The fields are evaluated in the order they appear.  If the same field appears
+more than once, it is a compile-time error.
 
 @subsection[#:tag "s:dot-expr"]{Dot Expressions}
 
@@ -692,7 +739,7 @@ dot-expr: expr "." NAME
 }
 
 A dot expression evaluates the @tt{expr} to a value @tt{val}, and then does one
-of five things:
+of three things:
 
 @itemlist[
   @item{Raises an exception, if @tt{NAME} is not a field of @tt{expr}}
@@ -842,9 +889,10 @@ cases-expr: "cases" (PARENSPACE|PARENNOSPACE) check-ann ")" expr-target ":"
 cases-branch: "|" NAME [args] "=>" block
 }
 
-The @pyret{check-ann} must be a type, like @pyret-id["List" "lists"].  Then
-@pyret{expr-target} is evaluated and checked against the given annotation.  If
-it has the right type, the cases are then checked.
+The @pyret{check-ann} must be an annotation that refers to a @tt{data}
+declaration, like @pyret-id["List" "lists"].  Then @pyret{expr-target} is
+evaluated and checked against the given annotation.  If it has the right type,
+the cases are then checked.
 
 Cases should use the names of the variants of the given data type as the
 @tt{NAME}s of each branch.  In the branch that matches, the fields of the
@@ -853,12 +901,11 @@ of the @tt{=>} is evaluated in that extended environment.  An exception results
 if the wrong number of arguments are given.
 
 An optional @tt{else} clause can be provided, which is evaluated if no cases
-match.  If no @tt{else} clause is provided, a default is used that raises an
-exception.
+match.  If no @tt{else} clause is provided, a runtime error results.
 
 For example, some cases expression on lists looks like:
 
-@justcode{
+@examples{
 check:
   result = cases(List) [list: 1,2,3]:
     | empty => "empty"
@@ -913,7 +960,7 @@ iteration functions because it puts the identifier of the function and the
 value it draws from closer to one another.  Use of @tt{for-expr} is a matter of
 style; here is an example that compares @tt{fold} with and without @tt{for}:
 
-@justcode{
+@examples{
 for fold(sum from 0, number from [list: 1,2,3,4]):
   sum + number
 end
@@ -972,3 +1019,32 @@ arrow-ann-elt: ann ","
 
 When an arrow annotation appears in a binding, that binding position simply
 checks that the value is a function.
+
+@subsection[#:tag "s:template-expr"]{Template (...) Expressions}
+
+A template expression is three dots in a row:
+
+@justcode{
+template-expr: "..."
+}
+
+It is useful for a placeholder for other expressions in code-in-progress.  When
+it is evaluated, it raises a runtime exception that indicates the expression it
+is standing in for isn't yet implemented:
+
+@examples{
+fun list-sum(l :: List<Number>) -> Number:
+  cases(List<Number>) l:
+    | empty => 0
+    | link(first, rest) => first + ...
+  end
+end
+check:
+  list-sum(empty) is 0
+  list-sum(link(1, empty)) raises "unfinished-template"
+end
+}
+
+This is handy for starting a function (especially one with many cases) with
+some tests written and others to be completed.
+

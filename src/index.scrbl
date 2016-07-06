@@ -26,8 +26,6 @@ examples in Pyret.}
 
 @include-section["language-concepts.scrbl"]
 
-@include-section["builtins.scrbl"]
-
 @include-section["libraries.scrbl"]
 
-
+@include-section["internal.scrbl"]

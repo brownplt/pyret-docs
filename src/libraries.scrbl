@@ -1,11 +1,16 @@
 #lang scribble/base
 
-@title[#:style '(toc)]{Libraries}
+@title[#:style '(toc)]{Builtins and Libraries}
 
 This section contains information on libraries that come with Pyret.
 
 @(table-of-contents)
 
+@include-section["trove/globals.scrbl"]
+@include-section["builtin/numbers.scrbl"]
+@include-section["builtin/strings.scrbl"]
+@include-section["builtin/booleans.scrbl"]
+@include-section["builtin/raw-arrays.scrbl"]
 
 @include-section["trove/lists.scrbl"]
 @include-section["trove/sets.scrbl"]
