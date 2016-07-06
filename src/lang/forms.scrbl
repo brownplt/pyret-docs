@@ -968,6 +968,35 @@ end
 fold(lam(sum, number): sum + number end, 0, [list: 1,2,3,4])
 }
 
+@subsection[#:tag "s:template-expr"]{Template (...) Expressions}
+
+A template expression is three dots in a row:
+
+@justcode{
+template-expr: "..."
+}
+
+It is useful for a placeholder for other expressions in code-in-progress.  When
+it is evaluated, it raises a runtime exception that indicates the expression it
+is standing in for isn't yet implemented:
+
+@examples{
+fun list-sum(l :: List<Number>) -> Number:
+  cases(List<Number>) l:
+    | empty => 0
+    | link(first, rest) => first + ...
+  end
+end
+check:
+  list-sum(empty) is 0
+  list-sum(link(1, empty)) raises "unfinished-template"
+end
+}
+
+This is handy for starting a function (especially one with many cases) with
+some tests written and others to be completed.
+
+
 @section[#:tag "s:annotations"]{Annotations}
 
 Annotations in Pyret express intended types values will have at runtime.
@@ -1019,32 +1048,4 @@ arrow-ann-elt: ann ","
 
 When an arrow annotation appears in a binding, that binding position simply
 checks that the value is a function.
-
-@subsection[#:tag "s:template-expr"]{Template (...) Expressions}
-
-A template expression is three dots in a row:
-
-@justcode{
-template-expr: "..."
-}
-
-It is useful for a placeholder for other expressions in code-in-progress.  When
-it is evaluated, it raises a runtime exception that indicates the expression it
-is standing in for isn't yet implemented:
-
-@examples{
-fun list-sum(l :: List<Number>) -> Number:
-  cases(List<Number>) l:
-    | empty => 0
-    | link(first, rest) => first + ...
-  end
-end
-check:
-  list-sum(empty) is 0
-  list-sum(link(1, empty)) raises "unfinished-template"
-end
-}
-
-This is handy for starting a function (especially one with many cases) with
-some tests written and others to be completed.
 
