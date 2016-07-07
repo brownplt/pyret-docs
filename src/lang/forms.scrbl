@@ -107,8 +107,6 @@ END: "end"
 PROVIDE-TYPES: "provide-types"
 program: prelude block
 prelude: [provide-stmt] [provide-types-stmt] import-stmt*
-
-provide-stmt: PROVIDE stmt END | PROVIDE STAR
 provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
 }
 
@@ -124,7 +122,7 @@ COMMA: ","
 RPAREN: ")"
 FROM: "from"
 import-stmt: IMPORT import-source AS NAME
-import-stmt: IMPORT NAME (COMMA NAME)* FROM import-source
+           | IMPORT NAME (COMMA NAME)* FROM import-source
 import-source: import-special | import-name | import-string
 import-special: NAME PARENNOSPACE STRING (COMMA STRING)* RPAREN
 import-name: NAME
@@ -575,18 +573,11 @@ lambda-expr: LAM fun-header COLON
   END
 LANGLE: "<"
 RANGLE: ">"
-ty-params:
-  [LANGLE list-ty-param* NAME RANGLE]
-list-ty-param: NAME COMMA
 COMMA: ","
 LAPREN: "("
 RPAREN: ")"
-args: LPAREN [list-arg-elt* binding] RPAREN
-list-arg-elt: binding COMMA
 THINARROW: "->"
 DOC: "doc:"
-return-ann: [THINARROW ann]
-doc-string: [DOC STRING]
 }
 
 @margin-note{
