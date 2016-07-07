@@ -53,7 +53,7 @@
         (define translated
           (map (λ(c)
                  (list (if (member c breaks)
-                           (string-append "\n" (make-string (string-length (rule-name)) #\space))
+                           (string-append "\n" (make-string (* 2 (string-length (rule-name))) #\space))
                            "")
                        (meta " | ")
                        (render-help c))) choices))
@@ -172,7 +172,7 @@ provide {
 } end
 }
 
-Where the @justcode{id}s are all the toplevel names in the file defined with
+Where the @pyret{id}s are all the toplevel names in the file defined with
 @pyret{fun}, @pyret{data}, or @pyret{x = e}.
 
 @section{Blocks}
@@ -181,6 +181,9 @@ A block's syntax is a list of statements:
 
 @bnf['Pyret]{
 block: stmt*
+user-block-expr: BLOCK block END
+BLOCK: "block:"
+END: "end"
 }
 
 Blocks serve two roles in Pyret:
@@ -190,12 +193,24 @@ Blocks serve two roles in Pyret:
   @item{Units of lexical scope}
 ]
 
-The @prod-link['Pyret]{let-expr}, @tt{fun-expr}, @tt{data-expr}, and @tt{var-expr} forms are
+The @prod-link['Pyret]{let-expr}, @prod-link['Pyret]{fun-expr}, @prod-link['Pyret]{data-expr}, and @prod-link['Pyret]{var-expr} forms are
 handled specially and non-locally within blocks.  A detailed description of
 scope will appear here soon.
 
 Blocks evaluate each of their statements in order, and evaluate to the value of
 the final statement in the block.
+
+The @prod-link['Pyret]{user-block-expr} form @emph{additionally} creates a scope for any names bound inside it:
+definitions within such a block are visible only within that block:
+
+@pyret-block{
+x = 10
+ans = block:
+  y = 5 + x # x is visible here
+  42 # value result of the block
+end
+z = y + ans # y is not in scope here
+}
 
 @section{Statements}
 
