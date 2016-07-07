@@ -1,0 +1,61 @@
+<!doctype HTML>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="codemirror.js"></script>
+<script src="runmode.js"></script>
+<script src="pyret.js"></script>
+<script src="hilite.js"></script>
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"/><title>2.5&nbsp;Type Checking</title><link rel="stylesheet" type="text/css" href="scribble.css" title="default"/><link rel="stylesheet" type="text/css" href="manual-style.css" title="default"/><link rel="stylesheet" type="text/css" href="manual-racket.css" title="default"/><link rel="stylesheet" type="text/css" href="codemirror.css" title="default"/><link rel="stylesheet" type="text/css" href="pyret.css" title="default"/><link rel="stylesheet" type="text/css" href="styles.css" title="default"/><script type="text/javascript" src="scribble-common.js"></script><script type="text/javascript" src="manual-racket.js"></script><!--[if IE 6]><style type="text/css">.SIEHidden { overflow: hidden; }</style><![endif]--></head><body id="scribble-racket-lang-org"><div class="tocset"><div class="tocview"><div class="tocviewlist tocviewlisttopspace"><div class="tocviewtitle"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_0&quot;);">&#9658;</a></td><td></td><td><a href="index.html" class="tocviewlink" data-pltdoc="x">Pyret</a></td></tr></table></div><div class="tocviewsublisttop" style="display: none;" id="tocview_0"><table cellspacing="0" cellpadding="0"><tr><td align="right">1&nbsp;</td><td><a href="Getting_Started.html" class="tocviewlink" data-pltdoc="x">Getting Started</a></td></tr><tr><td align="right">2&nbsp;</td><td><a href="Language_Concepts.html" class="tocviewselflink" data-pltdoc="x">Language Concepts</a></td></tr><tr><td align="right">3&nbsp;</td><td><a href="Builtins_and_Libraries.html" class="tocviewlink" data-pltdoc="x">Builtins and Libraries</a></td></tr><tr><td align="right">4&nbsp;</td><td><a href="Internals.html" class="tocviewlink" data-pltdoc="x">Internals</a></td></tr></table></div></div><div class="tocviewlist"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_1&quot;);">&#9660;</a></td><td>2&nbsp;</td><td><a href="Language_Concepts.html" class="tocviewlink" data-pltdoc="x">Language Concepts</a></td></tr></table><div class="tocviewsublist" style="display: block;" id="tocview_1"><table cellspacing="0" cellpadding="0"><tr><td align="right">2.1&nbsp;</td><td><a href="s_forms.html" class="tocviewlink" data-pltdoc="x">Language Constructs</a></td></tr><tr><td align="right">2.2&nbsp;</td><td><a href="testing.html" class="tocviewlink" data-pltdoc="x">Testing</a></td></tr><tr><td align="right">2.3&nbsp;</td><td><a href="equality.html" class="tocviewlink" data-pltdoc="x">equality</a></td></tr><tr><td align="right">2.4&nbsp;</td><td><a href="brands.html" class="tocviewlink" data-pltdoc="x">Brands</a></td></tr><tr><td align="right">2.5&nbsp;</td><td><a href="" class="tocviewselflink" data-pltdoc="x">Type Checking</a></td></tr></table></div></div><div class="tocviewlist"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_2&quot;);">&#9658;</a></td><td>2.5&nbsp;</td><td><a href="" class="tocviewselflink" data-pltdoc="x">Type Checking</a></td></tr></table><div class="tocviewsublistbottom" style="display: none;" id="tocview_2"><table cellspacing="0" cellpadding="0"><tr><td align="right">2.5.1&nbsp;</td><td><a href="#%28part._required-annotations%29" class="tocviewlink" data-pltdoc="x">Required Annotations</a></td></tr><tr><td align="right">2.5.2&nbsp;</td><td><a href="#%28part._working-with-data-types%29" class="tocviewlink" data-pltdoc="x">Working with Data Types</a></td></tr><tr><td align="right">2.5.3&nbsp;</td><td><a href="#%28part._record-types%29" class="tocviewlink" data-pltdoc="x">Record Types</a></td></tr></table></div></div></div><div class="tocsub"><div class="tocsubtitle">On this page:</div><table class="tocsublist" cellspacing="0"><tr><td><span class="tocsublinknumber">2.5.1<tt>&nbsp;</tt></span><a href="#%28part._required-annotations%29" class="tocsubseclink" data-pltdoc="x">Required Annotations</a></td></tr><tr><td><span class="tocsublinknumber">2.5.2<tt>&nbsp;</tt></span><a href="#%28part._working-with-data-types%29" class="tocsubseclink" data-pltdoc="x">Working with Data Types</a></td></tr><tr><td><span class="tocsublinknumber">2.5.3<tt>&nbsp;</tt></span><a href="#%28part._record-types%29" class="tocsubseclink" data-pltdoc="x">Record Types</a></td></tr></table></div></div><div class="maincolumn"><div class="main"><div class="navsettop"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="brands.html" title="backward to &quot;2.4 Brands&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="Language_Concepts.html" title="up to &quot;2 Language Concepts&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Builtins_and_Libraries.html" title="forward to &quot;3 Builtins and Libraries&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div><h4>2.5<tt>&nbsp;</tt><a name="(part._type-check)"></a>Type Checking</h4><p>Pyret has an optional static type checker. On
+<a href="https://code.pyret.org"><span class="url">https://code.pyret.org</span></a> it can be accessed as a drop down option
+under the Run button, and from the command line it can be run by adding
+the flag <span class="stt">-type-check</span>.</p><p>The type checker is built around the
+<a href="s_annotations.html" data-pltdoc="x">annotation</a> system, providing a static
+check that all annotations are correct and that all uses of annotated
+functions have the proper types passed to them.</p><h5>2.5.1<tt>&nbsp;</tt><a name="(part._required-annotations)"></a>Required Annotations</h5><p>When using the type checker annotations are required in two locations.
+Everywhere else they are optional (barring certain caveats). The first of
+the required locations is the arguments of top level functions.</p><p>The function <span class="pyret-highlight"><span class="stt">foo</span></span> type checks as an annotation is provided on the
+argument <span class="pyret-highlight"><span class="stt">x</span></span>. The return annotation is not necessary so the function
+<span class="pyret-highlight"><span class="stt">bar</span></span> also type checks. However, the function <span class="pyret-highlight"><span class="stt">baz</span></span> will fail
+to type check with an error requiring an annotation on the argument
+<span class="pyret-highlight"><span class="stt">x</span></span>.</p><pre class="pyret-highlight"><p># Type checks
+fun foo(x :: Number) -&gt; Number:
+  x
+end
+
+# Type checks
+fun bar(x :: Number):
+  x
+end
+
+# Fails
+fun baz(x):
+  x
+end</p></pre><p>The other place that annotations are required is on
+<a href="Statements.html#%28part._s~3adata-expr%29" data-pltdoc="x">data declarations</a>. Each field must be annotated
+with its type.</p><pre class="pyret-highlight"><p># Type checks
+data BTree:
+  | node(value :: Number, left :: BTree, right :: BTree)
+  | leaf(value :: Number)
+end</p></pre><h5>2.5.2<tt>&nbsp;</tt><a name="(part._working-with-data-types)"></a>Working with Data Types</h5><p>There are a couple important notes when working with polymorphic data
+types such as <span class="pyret-highlight"><span class="stt">Option</span></span> (defined below).</p><pre class="pyret-highlight"><p>data Option&lt;A&gt;:
+  | none
+  | some(value :: A)
+end</p></pre><p>Whenever a value is being annotated with a polymorphic type, the type
+instantiation must be written. So <span class="pyret-highlight"><span class="stt">x :: Option&lt;Number&gt; = some(1)</span></span>
+is okay, but <span class="pyret-highlight"><span class="stt">x :: Option = some(1)</span></span> is not. The caveat to this is
+when writing <span class="pyret-highlight"><span class="stt">cases</span></span> statements. On these the instantiating type is
+not needed and you can simply write <span class="pyret-highlight"><span class="stt">cases(Option) x:</span></span>.</p><h5>2.5.3<tt>&nbsp;</tt><a name="(part._record-types)"></a>Record Types</h5><p>Record types such as <span class="pyret-highlight"><span class="stt">{x :: Number, y :: String}</span></span> have two meanings.
+The first one is that they are the type of records (<span class="pyret-highlight"><span class="stt">{x: 1, y: "a"}</span></span>
+has the type shown above). In addition, any data type where all
+variants have the fields <span class="pyret-highlight"><span class="stt">x :: Number</span></span> and <span class="pyret-highlight"><span class="stt">y :: String</span></span> would
+satisfy that type. For example, if we have the code shown below, the type
+checker will accept the program.</p><pre class="pyret-highlight"><p>data Side:
+  | left(x :: Number)
+  | right(x :: Number)
+end
+
+fun f(thing :: {x :: Number}) -&gt; Number:
+  thing.x
+end
+
+side-thing :: Side = left(1)
+x :: Number = f(side-thing) # Type checks</p></pre><div class="navsetbottom"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="brands.html" title="backward to &quot;2.4 Brands&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="Language_Concepts.html" title="up to &quot;2 Language Concepts&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Builtins_and_Libraries.html" title="forward to &quot;3 Builtins and Libraries&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
