@@ -134,7 +134,7 @@ built-in libraries of Pyret, and it is an error if there is no such library.
 
 Example:
 
-@pyret{
+@pyret-block{
   import equality as EQ
   check:
     f = lam(): "" end
