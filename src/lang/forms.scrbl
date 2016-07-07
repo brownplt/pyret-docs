@@ -103,11 +103,12 @@ block:
 @bnf['Pyret]{
 PROVIDE: "provide"
 STAR: "*"
+END: "end"
 PROVIDE-TYPES: "provide-types"
 program: prelude block
 prelude: [provide-stmt] [provide-types-stmt] import-stmt*
 
-provide-stmt: PROVIDE stmt end | PROVIDE STAR
+provide-stmt: PROVIDE stmt END | PROVIDE STAR
 provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
 }
 
