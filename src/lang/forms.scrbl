@@ -1017,7 +1017,9 @@ grammar, and if an annotation is present adjacent to an identifier, the program
 is compiled to raise an error if the value bound to that identifier would
 behave in a way that violates the annotation.  The annotation provides a
 @emph{guarantee} that either the value will behave in a particular way, or the
-program will raise an exception.
+program will raise an exception. In addition, annotations can be checked
+by Pyret's @seclink["type-check"]{type checker} to ensure that all values
+have the expected types and are used correctly.
 
 @subsection[#:tag "s:name-ann"]{Name Annotations}
 
