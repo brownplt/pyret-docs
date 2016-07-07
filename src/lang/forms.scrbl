@@ -33,7 +33,7 @@
      (elem s #:style (make-style #f (list (attributes '((class . "bnf-lit")))))))
    (define (unknown-lit s)
      (elem s #:style (make-style #f (list (attributes '((class . "bnf-lit bnf-unknown")))))))
-     
+   (define rule-name (make-parameter #f))
    (define (render-help p)
      (cond
        [(pattern-seq? p)
@@ -44,7 +44,20 @@
         (list (meta "(") (render-help (pattern-repeat-val p)) (meta ")")
               (if (= 0 (pattern-repeat-min p)) (meta "*") (meta "+")))]
        [(pattern-choice? p)
-        (add-between (map render-help (pattern-choice-vals p)) (meta " | "))]
+        (define choices (pattern-choice-vals p))
+        (define breaks
+          (filter (λ(i) i)
+                  (for/list
+                   ([c1 choices] [c2 (rest choices)])
+                   (if (> (pos-line (pattern-start c2)) (pos-line (pattern-start c1))) c2 #f))))
+        (define translated
+          (map (λ(c)
+                 (list (if (member c breaks)
+                           (string-append "\n" (make-string (string-length (rule-name)) #\space))
+                           "")
+                       (meta " | ")
+                       (render-help c))) choices))
+        (drop (flatten translated) 2)]
        [(pattern-token? p)
         (define tok (assoc (pattern-token-val p) names))
         (cond
@@ -59,15 +72,17 @@
    
    (nested #:style (make-style 'code-inset (list (attributes '((style . "white-space: pre;")))))
            (add-between (for/list [(p prods)]
-                                  (define rule-name (lhs-id-val (rule-lhs p)))
-                                  (list (elemtag (prod-tag grammar rule-name) (prod-ref rule-name)) (meta ":") " " (render-help (rule-pattern p)))
+                                  (parameterize ([rule-name (lhs-id-val (rule-lhs p))])
+                                    (list (elemtag (prod-tag grammar (rule-name)) (prod-ref (rule-name))) (meta ":") " " (render-help (rule-pattern p))))
                                   ) "\n")
            )
    )
 
 @(define (bnf grammar . stx)
    (define text (string-join stx ""))
-   (define parsed (grammar-parser (tokenize (open-input-string text))))
+   (define text-port (open-input-string text))
+   (port-count-lines! text-port)
+   (define parsed (grammar-parser (tokenize text-port)))
    (render grammar parsed)
    )
 
@@ -504,6 +519,30 @@ At runtime, an assignment expression changes the value of the assignable
 variable @tt{NAME} to the result of the right-hand side expression.
 
 @section{Expressions}
+
+The following are all the expression forms of Pyret:
+
+@bnf['Pyret]{
+expr: paren-expr | id-expr | prim-expr
+    | lambda-expr | method-expr | app-expr
+    | obj-expr | tuple-expr | tuple-get
+    | dot-expr
+    | template-expr
+#    | bracket-expr NOTE(joe): commented out until it has semantics
+    | get-bang-expr | update-expr
+    | extend-expr
+    | if-expr | ask-expr | cases-expr
+    | for-expr
+    | user-block-expr | inst-expr
+    | multi-let-expr | letrec-expr
+    | type-let-expr
+    | construct-expr
+paren-expr: LPAREN expr RPAREN
+id-expr: NAME
+prim-expr: NUMBER | RATIONAL | BOOLEAN | STRING
+LPAREN: "("
+RPAREN: ")"
+}
 
 @subsection[#:tag "s:lam-expr"]{Lambda Expressions}
 
