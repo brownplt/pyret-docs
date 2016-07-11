@@ -383,6 +383,21 @@ end
 # Not an error: x is used in two scopes that are not nested
 }
 
+A binding also has a case with tuples, where several names can be given in a binding which can then be assigned to values in a tuple.
+
+@justcode{
+{x;y;z} = {"he" + "llo"; true; 42}
+x = "hi"
+#Error: x is not assignable
+
+}
+
+@justcode{
+{x;y;z} = {10; 12}
+#Error: The number of names must match the length of the tuple
+
+}
+
 @subsection[#:tag "s:fun-expr"]{Function Declaration Expressions}
 
 Function declarations have a number of pieces:
@@ -720,6 +735,11 @@ check:
   f = lam(x, y): x - y end
   f(5, 3) is 2
 end
+
+check: 
+  f = lam({x;y}): x - y end
+  f({5;3}) is 2
+end
 }
 
 These identifiers follow the same rules of no shadowing and no assignment.
@@ -769,6 +789,8 @@ end
 }
 
 @subsection[#:tag "s:curly-lam-expr"]{Curly-Brace Lambda Shorthand}
+
+NOTE: SHOULD THIS GO AWAY?
 
 Lambda expressions can also be written with a curly-brace shorthand:
 
@@ -1026,6 +1048,38 @@ value.
 The fields are evaluated in the order they appear.  If the same field appears
 more than once, it is a compile-time error.
 
+@subsection[#:tag "s:tuple-expr"]{Tuple Expressions}
+
+Tuples are an immutable, fixed-length collection of expressions indexed by non-negative integers:
+
+@justcode{
+tuple-expr: "{" tuple-fields "}"
+tuple-fields: binop-expr (";" binop-expr)* [";"]
+}
+
+A semicolom-separated sequence of fields enclosed in @tt{{}} creates a tuple. 
+
+Tuple indexing:
+
+@justcode{
+tuple-get: expr "." "{" NUMBER "}"
+}
+
+An expression that evlautes to a tuple, followed by a dot, followed by and index enclosed in @tt{{}} indexes into a tuple.  
+
+A tuple-get expression evaluates the @tt{expr} to a value @tt{val}, and then does one
+of four things:
+
+@itemlist[
+  @item{Raises a well-formedness error, if @tt{NUMBER} is negative}
+  @item{Raises an exception, if @tt{expr} is not a tuple}
+
+  @item{Raises an exception, if @tt{NUMBER} is equal to or greater than the length of the given tuple}
+
+  @item{Evaluates the expression, returning the @tt{val} at the given index}
+]
+
+
 @subsection[#:tag "s:dot-expr"]{Dot Expressions}
 
 A dot expression is any expression, followed by a dot and name:
@@ -1245,6 +1299,22 @@ check:
     | else => "else"
   end
   result3 is "empty"
+end
+}
+
+If a field of the variant is a tuple, it can also be bound using a tuple binding.
+
+For example, a cases expression on a list with tuples looks like:
+
+@examples{
+check:
+  result4 = cases(List) [list: {"a"; 1}, {"b"; 2}, {"c"; 3}]:
+    | empty => "empty"
+    | link({x;y}, r) => x
+    | else => "else"
+  end
+  
+  result4 is "a"
 end
 }
 
