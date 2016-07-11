@@ -69,7 +69,7 @@
         (prod-link grammar (pattern-id-val p))]
        [else
         (printf "Unknown prod: ~a" p)]))
-   
+
    (nested #:style (make-style 'code-inset (list (attributes '((style . "white-space: pre;")))))
            (add-between (for/list [(p prods)]
                                   (parameterize ([rule-name (lhs-id-val (rule-lhs p))])
@@ -199,8 +199,8 @@ scope will appear here soon.
 Blocks evaluate each of their statements in order, and evaluate to the value of
 the final statement in the block.
 
-The @prod-link['Pyret]{user-block-expr} form @emph{additionally} creates a scope for any names bound inside it:
-definitions within such a block are visible only within that block:
+The @prod-link['Pyret]{user-block-expr} form @emph{additionally} creates a scope for any names bound inside it.
+That is, definitions within such a block are visible only within that block:
 
 @pyret-block{
 x = 10
@@ -208,7 +208,7 @@ ans = block:
   y = 5 + x # x is visible here
   42 # value result of the block
 end
-z = y + ans # y is not in scope here
+z = y + ans # error: y is not in scope here
 }
 
 @section{Statements}
