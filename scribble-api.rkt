@@ -646,7 +646,7 @@
                       (list (tt ")" " -> " return))
                       (list (tt ")")))))]
                 [else
-                 (nested #:style (div-style "boxed")
+                 (nested #:style (div-style "boxed pyret-header")
                  (apply para #:style (dl-style "multiline-args")
                    (append
                     (list (dt name-elt " :: " "("))
