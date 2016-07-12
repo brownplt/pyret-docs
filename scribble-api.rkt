@@ -562,24 +562,24 @@
 
 
 @(define (render-multiline-args names types descrs)
-  (define len (length names))
-    (map (lambda (name type descr i)
-           (define (add-comma lst)
-             (if (< i len)
-                 (append lst (list ","))
-                 lst))
-           (cond
-             [(and name type descr)
-              (list (dt-indent (apply tt (add-comma (list name " :: " type))))
-                    (dd descr))]
-             [(and name type)
-              (list (dt-indent (apply tt (add-comma (list name " :: " type))))
-                    (dd ""))]
-             [(and name descr)
-              (list (dt-indent (apply tt (add-comma (list name))))
-                    (dd descr))]
-             [else (list (dt-indent (tt name)) (dd ""))]))
-         names types descrs (range 1 (add1 len))))
+   (define len (length names))
+   (map (lambda (name type descr i)
+          (define (add-comma lst)
+            (if (< i len)
+                (append lst (list ","))
+                lst))
+          (cond
+            [(and name type descr)
+             (list (dt-indent (apply tt (add-comma (list name " :: " type))))
+                   (dd descr))]
+            [(and name type)
+             (list (dt-indent (apply tt (add-comma (list name " :: " type))))
+                   (dd ""))]
+            [(and name descr)
+             (list (dt-indent (apply tt (add-comma (list name))))
+                   (dd descr))]
+            [else (list (dt-indent (tt name)) (dd ""))]))
+        names types descrs (range 1 (add1 len))))
 
 @(define (render-singleline-args names types)
   (define args
