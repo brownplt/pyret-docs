@@ -32,13 +32,19 @@
   @section[#:tag "image_DataTypes"]{Data Types}
 
   @type-spec["WorldConfig" (list "a")]
+
+  This type includes the values that can be passed to @pyret-id{big-bang} as
+  event handlers (e.g. @pyret-id{on-tick} and @pyret-id{on-key}), renderers
+  (e.g. @pyret-id{to-draw}), and other configuration options (e.g.
+  @pyret-id{stop-when}).
     
   @section{Functions}
   @function["big-bang"
             #:contract (a-arrow "a"
                                 (a-app L
-                                       WC)
+                                       (a-app WC "a"))
                                 "a")
+            #:return "a"
             #:args (list '("init" "")
                          '("handlers" ""))]{
     This function starts a world program in the initial state specified
@@ -55,6 +61,7 @@
             #:contract (a-arrow (a-arrow "a"
                                          (a-id "Scene" (xref "image" "Scene")))
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("drawer" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will inform the world program
@@ -64,6 +71,7 @@
             #:contract (a-arrow (a-arrow "a"
                                          "a")
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("handler" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called each program tick
@@ -74,6 +82,7 @@
                                          "a")
                                 N
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("handler" "")
                          '("n" ""))]{
     Consumes a function and returns a handler that, when passed to
@@ -85,6 +94,7 @@
                                          S
                                          "a")
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("onKey" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called every time a
@@ -94,14 +104,16 @@
     examples of single character strings that you may receive are @pyret{"a"},
     @pyret{"b"}, @pyret{"c"}, @pyret{" "}, @pyret{"\r"} (return/enter key),
     @pyret{"\t"} (tab key), @pyret{"\b"} (backspace). In some cases, you
-    may receive multiple characters. For a full enumeration of these, you
-    should reference the Racket world documentation on @hyperlink["http://docs.racket-lang.org/teachpack/2htdpuniverse.html#%28tech._world._keyevent%29"]{key events}.
+    may receive multiple characters.
+
+
   }
   @function["on-mouse"
             #:contract (a-arrow (a-arrow "a"
                                          N N S
                                          "a")
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("onMouse" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called on every sampled
@@ -127,6 +139,7 @@
   @function["stop-when"
             #:contract (a-arrow (a-arrow "a" B)
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("stopper" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called to determine if
@@ -136,6 +149,7 @@
   }
   @function["is-world-config"
             #:contract (a-arrow "Any" B)
+            #:return (a-app WC "a")
             #:args (list '("v" ""))]{
     Tests if the input is of type @secref[(tag-name "world" "WorldConfig")].
   }
@@ -143,6 +157,7 @@
             #:contract (a-arrow S
                                 S
                                 B)
+            #:return (a-app WC "a")
             #:args (list '("key1" "")
                          '("key2" ""))]{
     Tests if two key events are equals to each other.
