@@ -214,7 +214,7 @@ end
 z = y + ans # error: y is not in scope here
 }
 
-@subsection{Block shorthand}
+@subsection[#:tag "s:blocky-blocks"]{Block shorthand}
 
 Many expressions in Pyret include one or more blocks within them.  For
 example, the body of a function is defined as a block.  Technically,
@@ -669,6 +669,23 @@ prim-expr: NUMBER | RATIONAL | BOOLEAN | STRING
 LPAREN: "("
 RPAREN: ")"
 }
+
+@subsection[#:tag "s:template-expr"]{Template Expressions}
+@bnf['Pyret]{
+DOTS: "..."
+template-expr: DOTS
+}
+Template expressions are placeholders.  They indicate portions of the
+code that are unfinished, and are particularly useful when expanding
+the template step of the Design Recipe (hence the name).
+
+A template expression will evaluate to a runtime error, if it ever
+gets evaluated.
+
+Because templates are by definition unfinished, the presence of a
+template expression in a block exempts that block from
+@seclink["s:well-formedness"]{well-formedness checking}, or from
+@seclink["s:blocky-blocks"]{explicit-blockiness checking}.
 
 @subsection[#:tag "s:lam-expr"]{Lambda Expressions}
 
