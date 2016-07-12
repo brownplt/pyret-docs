@@ -19,6 +19,7 @@
   (fun-spec (name "open-image-url") (arity 1))
   (fun-spec (name "image-url") (arity 1))
   (fun-spec (name "images-equal") (arity 2))
+  (fun-spec (name "images-difference") (arity 2))
   (fun-spec (name "text") (arity 3))
   (fun-spec (name "text-font") (arity 8))
   (fun-spec (name "overlay") (arity 2))
@@ -82,8 +83,8 @@
 @(define FontFamily (a-id "FontFamily" (xref "image" "FontFamily")))
 @(define FontStyle (a-id "FontStyle" (xref "image" "FontStyle")))
 @(define FontWeight (a-id "FontWeight" (xref "image" "FontWeight")))
-@(define XPlace (a-pred S (a-id "is-x-place" (xref "image" "is-x-place"))))
-@(define YPlace (a-pred S (a-id "is-y-place" (xref "image" "is-y-place"))))
+@(define XPlace (a-id "XPlace" (xref "image" "XPlace")))
+@(define YPlace (a-id "YPlace" (xref "image" "YPlace")))
 @docmodule["image"]{
 
   The functions in this module are used for creating, combining, and displaying
@@ -201,9 +202,9 @@
     Constructs an image of @pyret["string"], using the given font size
     and color.
   }
-  @margin-note{@pyret{font-face} is system-dependent
-    (different computers and operating systems have different fonts installed),
-    so you can try different options for the names of fonts on your machine,
+  @margin-note{@pyret{font-face} is system-dependent because
+    different computers and operating systems have different fonts installed.
+    You can try different options for the names of fonts on your machine,
     and @pyret-id{text-font} will fall back to a default in the given family if
     it can't find the one provided.}
   @function[
@@ -251,7 +252,7 @@
   @section{Polygons}
   @function[
     "triangle"
-            #:contract (a-arrow N S ImageColor Image)
+            #:contract (a-arrow N Mode ImageColor Image)
             #:return Image
             #:args (list '("side-length" "") 
                          '("mode" "") 
@@ -261,11 +262,7 @@
   }
   @function[
     "right-triangle"
-            #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "Color"  (xref "image-structs" "Color"))
-                                Image)
+            #:contract (a-arrow N N Mode ImageColor Image)
             #:return Image
             #:args (list '("side-length1" "") 
                          '("side-length2" "") 
@@ -277,11 +274,8 @@
   }
   @function[
     "isosceles-triangle"
-            #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "Color"  (xref "image-structs" "Color"))
-                                Image)
+            #:contract (a-arrow N N Mode ImageColor Image)
+            #:return Image
             #:args (list '("side-length" "") 
                          '("angle-c" "") 
                          '("mode" "") 
@@ -293,31 +287,21 @@
   }
   @function[
     "triangle-sss"
-            #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "Color"  (xref "image-structs" "Color"))
-                                Image)
+            #:contract (a-arrow N N N Mode ImageColor Image)
+            #:return Image
             #:args (list '("side-a" "") 
                          '("side-b" "") 
                          '("side-c" "") 
                          '("mode" "") 
                          '("color" ""))]{
-    Constructs an image of a triangle using the three given sides. This function 
-    corresponds to @racket[(triangle/sss ...)] in HtDP.
+    Constructs an image of a triangle using the three given sides.
   }
   @function[
     "triangle-ass"
-            #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "Color"  (xref "image-structs" "Color"))
-                                Image)
+            #:contract (a-arrow N N N Mode ImageColor Image)
+            #:return Image
             #:args (list '("angle-a" "") '("side-b" "") '("side-c" "") '("mode" "") '("color" ""))]{
-    Constructs an image of a triangle using the given angle and two sides. This
-    function corresponds to @racket[(triangle/ass ...)] in HtDP.
+    Constructs an image of a triangle using the given angle and two sides.
   }
   @function[
     "triangle-sas"
@@ -327,13 +311,13 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("side-a" "") 
                          '("angle-b" "") 
                          '("side-c" "") 
                          '("mode" "") 
                          '("color" ""))]{
-    Constructs an image of a triangle using the given angle and two sides. This
-    function corresponds to @racket[(triangle/sas ...)] in HtDP.
+    Constructs an image of a triangle using the given angle and two sides.
   }
   @function[
     "triangle-ssa"
@@ -343,13 +327,13 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("side-a" "") 
                          '("side-b" "") 
                          '("angle-c" "") 
                          '("mode" "") 
                          '("color" ""))]{
-    Constructs an image of a triangle using the given angle and two sides. This
-    function corresponds to @racket[(triangle/ssa ...)] in HtDP.
+    Constructs an image of a triangle using the given angle and two sides.
   }
   @function[
     "triangle-aas"
@@ -359,13 +343,14 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("angle-a" "") 
                          '("angle-b" "") 
                          '("side-c" "") 
                          '("mode" "") 
                          '("color" ""))]{
     Constructs an image of a triangle using the two given angles and
-    side. This function corresponds to @racket[(triangle/aas ...)] in HtDP.
+    side.
   }
   @function[
     "triangle-asa"
@@ -375,13 +360,14 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("angle-a" "") 
                          '("side-b" "") 
                          '("angle-c" "") 
                          '("mode" "") 
                          '("color" ""))]{
     Constructs an image of a triangle using the two given angles and
-    side. This function corresponds to @racket[(triangle/asa ...)] in HtDP.
+    side.
   }
   @function[
     "triangle-saa"
@@ -391,13 +377,14 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("side-a" "") 
                          '("angle-b" "") 
                          '("angle-c" "") 
                          '("mode" "") 
                          '("color" ""))]{
     Constructs an image of a triangle using the two given angles and
-    sides. This function corresponds to @racket[(triangle/saa ...)] in HtDP.
+    sides.
   }
   @function[
     "square"
@@ -405,6 +392,7 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("side-length" "") 
                          '("mode" "") 
                          '("color" ""))]{
@@ -417,6 +405,7 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("width" "") 
                          '("height" "") 
                          '("mode" "") 
@@ -431,6 +420,7 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("side-length" "") 
                          '("angle" "") 
                          '("mode" "") 
@@ -446,6 +436,7 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("side-length" "") 
                          '("mode" "") 
                          '("color" ""))]{
@@ -460,6 +451,7 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("point-count" "") '("outer" "") '("inner" "") '("mode" "") '("color" ""))]{
     Constructs a star with @pyret["point-count"] points. The outer points will
     lie a distance of @pyret["outer"] from the center of the star, while the
@@ -473,6 +465,7 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("point-count" "") 
                          '("outer" "") 
                          '("inner" "") 
@@ -488,6 +481,7 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("side-length" "") 
                          '("point-count" "") 
                          '("step" "") 
@@ -507,6 +501,7 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("length" "") 
                          '("count" "") 
                          '("mode" "") 
@@ -514,11 +509,13 @@
     Constructs an image of a regular polygon with @pyret["side-count"] sides.
   }
   @section{Overlaying Images}
+
   @function[
     "overlay"
             #:contract (a-arrow Image
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("img1" "") 
                          '("img2" ""))]{
     Constructs a new image where @pyret["img1"] overlays @pyret["img2"]. 
@@ -530,6 +527,7 @@
                                 Image
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("place-x" "") 
                          '("place-y" "") 
                          '("img1" "") 
@@ -538,6 +536,25 @@
     @secref[(tag-name "image" "overlay")], but uses @pyret["place-x"] and
     @pyret["place-y"] to determine where the images should line up.
   }
+  @type-spec["XPlace" (list)]
+
+    A @pyret-id["String" "<global>"] that represents a place to align an image
+    on the x-axis.  One of
+    @pyret{"left"}, 
+    @pyret{"center"}, 
+    @pyret{"middle"}, or
+    @pyret{"right"}.
+
+  @type-spec["YPlace" (list)]
+
+    A @pyret-id["String" "<global>"] that represents a place to align an image
+    on the y-axis.  One of
+    @pyret{"top"}, 
+    @pyret{"bottom"}, 
+    @pyret{"baseline"},
+    @pyret{"center"}, or
+    @pyret{"middle"}.
+
   @function[
     "overlay-xy"
             #:contract (a-arrow Image
@@ -545,6 +562,7 @@
                                 (a-id "Number" (xref "<global>" "Number"))
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("img1" "") 
                          '("dx" "") 
                          '("dy" "") 
@@ -559,6 +577,7 @@
             #:contract (a-arrow Image
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("img1" "") 
                          '("img2" ""))]{
     Constructs a new image by placing @pyret["img1"] under @pyret["img2"].
@@ -570,6 +589,7 @@
                                 Image
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("place-x" "") 
                          '("place-y" "") 
                          '("img1" "") 
@@ -585,6 +605,7 @@
                                 (a-id "Number" (xref "<global>" "Number"))
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("img1" "") 
                          '("dx" "") 
                          '("dy" "") 
@@ -599,6 +620,7 @@
             #:contract (a-arrow Image
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("img1" "") 
                          '("img2" ""))]{
     Constructs an image by placing @pyret["img1"] to the left of
@@ -610,6 +632,7 @@
                                 Image
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("place-y" "") 
                          '("img1" "") 
                          '("img2" ""))]{
@@ -622,6 +645,7 @@
             #:contract (a-arrow Image
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("img1" "") '("img2" ""))]{
     Constructs an image by placing @pyret["img1"] above @pyret["img2"].
   }
@@ -631,6 +655,7 @@
                                 Image
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("place-x" "") 
                          '("img1" "") 
                          '("img2" ""))]{
@@ -643,6 +668,7 @@
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Scene" (xref "image" "Scene")))
+            #:return Scene
             #:args (list '("width" "") 
                          '("height" ""))]{
     Construct an empty scene of given width and height.
@@ -654,6 +680,7 @@
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Scene"  (xref "image" "Scene"))
                                 (a-id "Scene"  (xref "image" "Scene")))
+            #:return Image
             #:args (list '("picture" "") 
                          '("x" "") 
                          '("y" "") 
@@ -670,6 +697,7 @@
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Scene"  (xref "image" "Scene"))
                                 (a-id "Scene"  (xref "image" "Scene")))
+            #:return Image
             #:args (list '("img" "") 
                          '("x" "") 
                          '("y" "") 
@@ -688,6 +716,7 @@
                                 YPlace
                                 (a-id "Scene"  (xref "image" "Scene"))
                                 (a-id "Scene"  (xref "image" "Scene")))
+            #:return Image
             #:args (list '("img" "") 
                          '("x" "") 
                          '("y" "") 
@@ -696,8 +725,7 @@
                          '("background" ""))]{
     Functions like @secref[(tag-name "image" "place-image")], but uses
     @pyret["place-x"] and @pyret["place-y"] to determine where to anchor
-    @pyret["img"], instead of using the center. This function corresponds
-    to @racket[(place-image/align ...)] in HtDP.
+    @pyret["img"], instead of using the center.
   }
   @function[
     "scene-line"
@@ -707,6 +735,7 @@
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Scene"  (xref "image" "Scene")))
+            #:return Scene
             #:args (list '("img" "") 
                          '("x1" "") 
                          '("y1" "") 
@@ -724,6 +753,7 @@
             #:contract (a-arrow (a-id "Number"  (xref "<global>" "Number"))
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("angle" "") 
                          '("img" ""))]{
     Rotates @pyret["img"] counter-clockwise by @pyret["angle"] degrees.
@@ -733,6 +763,7 @@
             #:contract (a-arrow (a-id "Number"  (xref "<global>" "Number"))
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("factor" "") 
                          '("img" ""))]{
     Scales @pyret["img"] by @pyret["factor"].
@@ -743,6 +774,7 @@
                                 (a-id "Number"  (xref "<global>" "Number"))
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("x-factor" "") 
                          '("y-factor" "") 
                          '("img" ""))]{
@@ -753,6 +785,7 @@
     "flip-horizontal"
             #:contract (a-arrow Image
                                 Image)
+            #:return Image
             #:args (list '("img" ""))]{
     Flips @pyret["img"] left to right.
   }
@@ -760,6 +793,7 @@
     "flip-vertical"
             #:contract (a-arrow Image
                                 Image)
+            #:return Image
             #:args (list '("img" ""))]{
     Flips @pyret["img"] top to bottom.
   }
@@ -771,6 +805,7 @@
                                 (a-id "Number"  (xref "<global>" "Number"))
                                 Image
                                 Image)
+            #:return Image
             #:args (list '("x" "") 
                          '("y" "") 
                          '("width" "") 
@@ -783,6 +818,7 @@
     "frame"
             #:contract (a-arrow Image
                                 Image)
+            #:return Image
             #:args (list '("img" ""))]{
     Construct an image similar to @pyret["img"], but with a black, single
     pixel frame draw around the bounding box of the image.
@@ -792,6 +828,7 @@
     "open-image-url"
             #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
                                 Image)
+            #:return Image
             #:args (list '("url" ""))]{
     Loads the image specified by @pyret["url"].
   }
@@ -799,6 +836,7 @@
     "image-url"
             #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
                                 Image)
+            #:return Image
             #:args (list '("url" ""))]{
     Loads the image specified by @pyret["url"].
   }
@@ -806,6 +844,7 @@
     "bitmap-url"
             #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
                                 Image)
+            #:return Image
             #:args (list '("url" ""))]{
     Loads the image specified by @pyret["url"].
   }
@@ -814,10 +853,10 @@
             #:contract (a-arrow Image
                                 (a-app (a-id "List" (xref "lists" "List"))
                                        (a-id "Color" (xref "image-structs" "Color"))))
+            #:return (L-of Color)
             #:args (list '("image" ""))]{
     Returns a list of colors that correspond to the colors in the image,
-    reading from left to right, top to bottom. This function corresponds to
-    @racket[(image->color-list ...)] in HtDP.
+    reading from left to right, top to bottom.
   }
   @function[
     "color-list-to-image"
@@ -828,14 +867,14 @@
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Number" (xref "<global>" "Number"))
                                 Image)
+            #:return Image
             #:args (list '("list" "") 
                          '("width" "") 
                          '("height" "") 
                          '("pinhole-x" "") 
                          '("pinhole-y" ""))]{
     Given a list of colors, creates an image with the given width
-    @pyret["width"] and height @pyret["height"]. This function corresponds
-    to @racket[(color-list->bitmap ...)] in HtDP.
+    @pyret["width"] and height @pyret["height"].
   }
   @function[
     "color-list-to-bitmap"
@@ -844,18 +883,19 @@
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Number" (xref "<global>" "Number"))
                                 Image)
+            #:return Image
             #:args (list '("list" "") 
                          '("width" "") 
                          '("height" ""))]{
     Given a list of colors, creates an image with the given width
-    @pyret["width"] and height @pyret["height"]. This function corresponds
-    to @racket[(color-list->bitmap ...)] in HtDP.
+    @pyret["width"] and height @pyret["height"].
   }
   @section{Image Properties}
   @function[
     "image-width"
             #:contract (a-arrow Image
                                 (a-id "Number" (xref "<global>" "Number")))
+            #:return N
             #:args (list '("img" ""))]{
     Returns the width of @pyret["img"].
   }
@@ -863,6 +903,7 @@
     "image-height"
             #:contract (a-arrow Image
                                 (a-id "Number" (xref "<global>" "Number")))
+            #:return N
             #:args (list '("img" ""))]{
     Returns the height of @pyret["img"].
   }
@@ -870,6 +911,7 @@
     "image-baseline"
             #:contract (a-arrow Image
                                 (a-id "Number" (xref "<global>" "Number")))
+            #:return N
             #:args (list '("img" ""))]{
     Returns the distance from the top of @pyret["img"] to its baseline. The
     baseline of an image is the place where the bottoms of letters line up,
@@ -880,6 +922,7 @@
     "is-image"
             #:contract (a-arrow "Any"
                                 (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return B
             #:args (list '("maybe-image" ""))]{
     Checks if @pyret["maybe-image"] is an image.
   }
@@ -887,6 +930,7 @@
     "is-mode"
             #:contract (a-arrow "Any"
                                 (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return B
             #:args (list '("maybe-mode" ""))]{
     Checks if @pyret["maybe-mode"] is a mode.
   }
@@ -894,6 +938,7 @@
     "is-image-color"
             #:contract (a-arrow "Any"
                                 (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return B
             #:args (list '("maybe-color" ""))]{
     Checks if @pyret["maybe-color"] can be used as a color. Strings, if names of colors (e.g. "red" or "green") can also be used, if they exist in the color database.
   }
@@ -901,6 +946,7 @@
     "is-y-place"
             #:contract (a-arrow "Any"
                                 (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return B
             #:args (list '("maybe-y-place" ""))]{
     Checks if @pyret["maybe-y-place"] can be used as y-place in appropriate
     functions. Valid strings are @pyret["top"], @pyret["bottom"],
@@ -911,6 +957,7 @@
     "is-x-place"
             #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
                                 (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return B
             #:args (list '("maybe-x-place" ""))]{
     Checks if @pyret["maybe-x-place"] can be used as x-place in appropriate
     functions. Valid strings are @pyret["left"], @pyret["right"],
@@ -920,6 +967,7 @@
     "is-angle"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return B
             #:args (list '("maybe-angle" ""))]{
     Checks if @pyret["maybe-angle"] is an angle, namely a real number. All
     angles in the library are in degrees.
@@ -928,6 +976,7 @@
     "is-side-count"
             #:contract (a-arrow "Any"
                                 (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return B
             #:args (list '("side-count" ""))]{
     Checks if @pyret["maybe-side-count"] is an integer greater than or equal
     to 3.
@@ -936,6 +985,7 @@
     "is-step-count"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return B
             #:args (list '("step-count" ""))]{
     Checks if @pyret["maybe-step-count"] is an integer greater than or equal
     to 1.
@@ -946,8 +996,28 @@
             #:contract (a-arrow Image
                                 Image
                                 (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return B
             #:args (list '("image1" "") 
                          '("image2" ""))]{
     Compares two images for equality.
+  }
+  @function[
+    "images-difference"
+            #:contract (a-arrow Image
+                                Image
+                                (a-id "Boolean" (xref "<global>" "Boolean")))
+            #:return (E-of S N)
+            #:args (list '("image1" "") 
+                         '("image2" ""))]{
+
+    Compares two images for approximate equality.  Returns @pyret-id["left"
+    "either"] if they aren't the same size (and are this incomparable).
+    Returns @pyret-id["right" "either"] otherwise, with a number representing
+    how far off they are.
+
+    Numbers range from 0-255, where around 255 indicates completely different
+    images, and numbers below 20 or so are very difficult to distinguish at a
+    glance. Useful for testing against reference images (especially
+    cross-browser).
   }
 }
