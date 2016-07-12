@@ -38,3 +38,21 @@ pre.pyret-highlight {
 
 
 
+.bnf-meta {
+  font-style: italic;
+  color: gray;
+  font-size: 115%;
+}
+
+.bnf-lit {
+  font-family: monospace;
+  background-color: rgb(230, 247, 255);
+  border-radius: 5px;
+  border: 1px solid gray;
+}
+
+.bnf-lit.bnf-unknown {
+  background-color: unset;
+  border: unset;
+  font-style: italic;
+}                      

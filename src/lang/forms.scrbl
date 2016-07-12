@@ -4,7 +4,10 @@
   racket/list
   racket/file
   (only-in racket/string string-join)
-  "../../scribble-api.rkt")
+  (only-in scribble/core make-style)
+  (only-in scribble/html-properties attributes)
+  "../../scribble-api.rkt"
+  "../../ragged.rkt")
 
 @(define (prod . word)
  (apply tt word))
@@ -15,6 +18,58 @@
 @(define (justcode . stx)
  (nested #:style 'code-inset
   (verbatim (string-join stx ""))))
+
+@(define (prod-tag grammar prod-name) (list 'bnf-prod (list grammar prod-name)))
+@(define (prod-ref name) (list "‹" name "›"))
+@(define (prod-link grammar name)
+   (elemref (prod-tag grammar name) (prod-ref name)))
+
+@(define (render grammar parsed)
+   (define-values (constants prods) (partition constant? parsed))
+   (define names (map (λ(c) (list (lhs-id-val (constant-lhs c)) (pattern-lit-val (constant-val c)))) constants))
+   (define (meta s)
+     (elem s #:style (make-style #f (list (attributes '((class . "bnf-meta")))))))
+   (define (lit s)
+     (elem s #:style (make-style #f (list (attributes '((class . "bnf-lit")))))))
+   (define (unknown-lit s)
+     (elem s #:style (make-style #f (list (attributes '((class . "bnf-lit bnf-unknown")))))))
+     
+   (define (render-help p)
+     (cond
+       [(pattern-seq? p)
+        (add-between (map render-help (pattern-seq-vals p)) " ")]
+       [(pattern-maybe? p)
+        (list (meta "[") (render-help (pattern-maybe-val p)) (meta "]"))]
+       [(pattern-repeat? p)
+        (list (meta "(") (render-help (pattern-repeat-val p)) (meta ")")
+              (if (= 0 (pattern-repeat-min p)) (meta "*") (meta "+")))]
+       [(pattern-choice? p)
+        (add-between (map render-help (pattern-choice-vals p)) (meta " | "))]
+       [(pattern-token? p)
+        (define tok (assoc (pattern-token-val p) names))
+        (cond
+          [tok (lit (second tok))]
+          [else (unknown-lit (pattern-token-val p))])]
+       [(pattern-lit? p)
+        (lit (pattern-lit-val p))]
+       [(pattern-id? p)
+        (prod-link grammar (pattern-id-val p))]
+       [else
+        (printf "Unknown prod: ~a" p)]))
+   
+   (nested #:style (make-style 'code-inset (list (attributes '((style . "white-space: pre;")))))
+           (add-between (for/list [(p prods)]
+                                  (define rule-name (lhs-id-val (rule-lhs p)))
+                                  (list (elemtag (prod-tag grammar rule-name) (prod-ref rule-name)) (meta ":") " " (render-help (rule-pattern p)))
+                                  ) "\n")
+           )
+   )
+
+@(define (bnf grammar . stx)
+   (define text (string-join stx ""))
+   (define parsed (grammar-parser (tokenize (open-input-string text))))
+   (render grammar parsed)
+   )
 
 @title[#:tag "s:forms" #:style '(toc)]{Language Constructs}
 
@@ -30,7 +85,10 @@ rather than to
 Programs consist of a sequence of import or provide statements, followed by a
 block:
 
-@justcode{
+@bnf['Pyret]{
+PROVIDE: "provide"
+STAR: "*"
+PROVIDE-TYPES: "provide-types"
 program: prelude block
 prelude: [provide-stmt] [provide-types-stmt] import-stmt*
 
@@ -42,7 +100,13 @@ provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
 
 Import statements come in a few forms:
 
-@justcode{
+@bnf['Pyret]{
+IMPORT: "import"
+AS: "as"
+PARENNOSPACE: "("
+COMMA: ","
+RPAREN: ")"
+FROM: "from"
 import-stmt: IMPORT import-source AS NAME
 import-stmt: IMPORT NAME (COMMA NAME)* FROM import-source
 import-source: import-special | import-name | import-string
@@ -51,7 +115,7 @@ import-name: NAME
 import-string: STRING
 }
 
-The form with @justcode{import-name} looks for a file with that name in the
+The form with @prod-link['Pyret]{import-name} looks for a file with that name in the
 built-in libraries of Pyret, and it is an error if there is no such library.
 
 Example:
@@ -68,8 +132,11 @@ Example:
 
 A provide statement comes in one of two forms:
 
-@justcode{
-provide-stmt: "provide" stmt "end" | "provide" "*"
+@bnf['Pyret]{
+PROVIDE: "provide"
+END: "end"
+STAR: "*"
+provide-stmt: PROVIDE stmt END | PROVIDE STAR
 }
 
 Both forms have no effect when the program is run as the top-level program.
@@ -83,7 +150,7 @@ resulting value is provided.
 
 The second form is syntactic sugar for:
 
-@justcode{
+@pyret-block{
 provide {
   id: id,
   ...
@@ -97,7 +164,7 @@ Where the @justcode{id}s are all the toplevel names in the file defined with
 
 A block's syntax is a list of statements:
 
-@justcode{
+@bnf['Pyret]{
 block: stmt*
 }
 
@@ -108,7 +175,7 @@ Blocks serve two roles in Pyret:
   @item{Units of lexical scope}
 ]
 
-The @tt{let-expr}, @tt{fun-expr}, @tt{data-expr}, and @tt{var-expr} forms are
+The @prod-link['Pyret]{let-expr}, @tt{fun-expr}, @tt{data-expr}, and @tt{var-expr} forms are
 handled specially and non-locally within blocks.  A detailed description of
 scope will appear here soon.
 
@@ -120,7 +187,7 @@ the final statement in the block.
 There are a number of forms that can only appear as statements in @tt{block}s
 and @tt{provide} expressions:
 
-@justcode{
+@bnf['Pyret]{
 stmt: let-expr | fun-expr | data-expr | when-expr
     | var-expr | assign-expr | binop-expr
 }
@@ -129,8 +196,9 @@ stmt: let-expr | fun-expr | data-expr | when-expr
 
 Let expressions are written with an equals sign:
 
-@justcode{
-let-expr: binding "=" binop-expr
+@bnf['Pyret]{
+EQUALS: "="
+let-expr: binding EQUALS binop-expr
 }
 
 A let statement causes the name in the @tt{binding} to be put in scope in the
@@ -139,35 +207,38 @@ evaluating the @tt{binop-expr}.  The resulting binding cannot be changed via an
 @tt{assign-expr}, and cannot be shadowed by other bindings within the same or
 nested scopes:
 
-@justcode{
+@pyret-block{
 x = 5
 x := 10
 # Error: x is not assignable
 
 }
 
-@justcode{
+@pyret-block{
 x = 5
 x = 10
 # Error: x defined twice
 
 }
 
-@justcode{
+@pyret-block{
 x = 5
 fun f():
   x = 10
+  x
 end
 # Error: can't use the name x in two nested scopes
 
 }
 
-@justcode{
+@pyret-block{
 fun f():
   x = 10
+  x
 end
 fun g():
   x = 22
+  x
 end
 # Not an error: x is used in two scopes that are not nested
 }
@@ -176,34 +247,44 @@ end
 
 Function declarations have a number of pieces:
 
-@justcode{
-fun-expr: "fun" fun-header ":" doc-string block where-clause "end"
-fun-header: ty-params NAME args return-ann
+@bnf['Pyret]{
+FUN: "fun"
+COLON: ":"
+END: "end"
+LANGLE: "<"
+RANGLE: ">"
+COMMA: ","
+LPAREN: "("
+THINARROW: "->"
+DOC: "doc:"
+WHERE: "where:"
+fun-expr: FUN NAME fun-header COLON doc-string block where-clause END
+fun-header: ty-params args return-ann
 ty-params:
-  ["<" list-ty-param* NAME ">"]
-list-ty-param: NAME ","
-args: (PARENSPACE|PARENNOSPACE) [list-arg-elt* binding] ")"
-list-arg-elt: binding ","
-return-ann: ["->" ann]
-doc-string: ["doc:" STRING]
-where-clause: ["where:" block]
+  [LANGLE list-ty-param* NAME RANGLE]
+list-ty-param: NAME COMMA
+args: LPAREN [list-arg-elt* binding] RPAREN
+list-arg-elt: binding COMMA
+return-ann: [THINARROW ann]
+doc-string: [DOC STRING]
+where-clause: [WHERE block]
 }
 
 A function expression is syntactic sugar for a let and an anonymous function
-expression.  The statement:
+expression for non-recursive case. The statement:
 
 @justcode{
-"fun" ty-params NAME args return-ann ":"
+"fun" NAME ty-params args return-ann ":"
   doc-string
   block
   where-clause
 "end"
 }
 
-Is equivalent to
+is equivalent to
 
 @justcode{
-NAME "=" "fun" ty-params args return-ann ":"
+NAME "=" "lam" ty-params args return-ann ":"
   doc-string
   block
 "end"
@@ -211,7 +292,7 @@ NAME "=" "fun" ty-params args return-ann ":"
 
 With the @tt{where-clause} registered in check mode.  Concretely:
 
-@justcode{
+@pyret-block{
 fun f(x, y):
   x + y
 end
@@ -219,7 +300,7 @@ end
 
 is equivalent to
 
-@justcode{
+@pyret-block{
 f = lam(x, y):
   x + y
 end
@@ -233,20 +314,31 @@ and annotations' behavior, as well as @tt{doc-strings}.
 Data declarations define a number of related functions for creating and
 manipulating a data type.  Their grammar is:
 
-@justcode{
-data-expr: "data" NAME ty-params data-mixins ":"
+@bnf['Pyret]{
+COLON: ":"
+END: "end"
+DATA: "data"
+PIPE: "|"
+LPAREN: "("
+RPAREN: ")"
+data-expr: DATA NAME ty-params data-mixins COLON
     data-variant*
     data-sharing
     where-clause
-  "end"
-data-mixins: ["deriving" mixins]
-data-variant: "|" NAME variant-members data-with | "|" NAME data-with
-variant-members: (PARENSPACE|PARENNOSPACE) [list-variant-member* variant-member] ")"
-list-variant-member: variant-member ","
-variant-member: ["mutable"|"cyclic"] binding
-data-with: ["with:" fields]
-data-sharing: ["sharing:" fields]
+  END
+data-variant: PIPE NAME variant-members data-with | PIPE NAME data-with
+variant-members: LPAREN [list-variant-member* variant-member] RPAREN
+COMMA: ","
+REF: "ref"
+list-variant-member: variant-member COMMA
+variant-member: [REF] binding
+WITH: "with:"
+data-with: [WITH fields]
+SHARING: "sharing:"
+data-sharing: [SHARING fields]
 }
+
+@; data-mixins: ["deriving" mixins] ;; we don't have mixins yet
 
 A @tt{data-expr} causes a number of new names to be bound in the scope of the
 block it is defined in:
@@ -259,7 +351,7 @@ block it is defined in:
 
 For example, in this data definition:
 
-@justcode{
+@pyret-block{
 data BTree:
   | node(value :: Number, left :: BTree, right :: BTree)
   | leaf(value :: Number)
@@ -268,7 +360,7 @@ end
 
 These names are defined, with the given types:
 
-@justcode{
+@pyret-block{
 BTree :: (Any -> Bool)
 node :: (Number, BTree, BTree -> BTree)
 is-node :: (Any -> Bool)
@@ -294,7 +386,7 @@ for values created by calling @tt{node}, and correspondingly for @tt{leaf}.
 Here is a longer example of the behavior of detectors, field access, and
 constructors:
 
-@justcode{
+@pyret-block{
 data BTree:
   | node(value :: Number, left :: BTree, right :: BTree)
   | leaf(value :: Number)
@@ -327,15 +419,15 @@ only be defined for instances of that variant, while methods defined on the
 union of all the variants with @tt{sharing:} are defined on all instances.  For
 example:
 
-@justcode{
+@pyret-block{
 data BTree:
   | node(value :: Number, left :: BTree, right :: BTree) with:
-    size(self): 1 + self.left.size() + self.right.size() end
+    method size(self): 1 + self.left.size() + self.right.size() end
   | leaf(value :: Number) with:
-    size(self): 1 end,
-    increment(self): leaf(self.value + 1) end
+    method size(self): 1 end,
+    method increment(self): leaf(self.value + 1) end
 sharing:
-  values-equal(self, other):
+  method values-equal(self, other):
     self.value == other.value
   end
 where:
@@ -354,8 +446,11 @@ end
 A when expression has a single test condition with a corresponding
 block.
 
-@justcode{
-when-expr: "when" binop-expr COLON block "end"
+@bnf['Pyret]{
+WHEN: "when"
+COLON: ":"
+END: "end"
+when-expr: WHEN binop-expr COLON block END
 }
 
 For example:
@@ -374,8 +469,10 @@ test condition is false, nothing is done, and @pyret{nothing} is returned.
 Variable declarations look like @seclink["s:let-expr" "let bindings"], but
 with an extra @tt{var} keyword in the beginning:
 
-@justcode{
-var-expr: "var" binding "=" expr
+@bnf['Pyret]{
+             VAR: "var"
+             EQUALS: "="
+var-expr: VAR binding EQUALS expr
 }
 
 A @tt{var} expression creates a new @emph{assignable variable} in the current
@@ -395,8 +492,9 @@ updating.
 Assignment statements have a name on the left, and an expression on the right
 of @tt{:=}:
 
-@justcode{
-assign-expr: NAME ":=" binop-expr
+@bnf['Pyret]{
+             COLON-EQUALS: ":="
+assign-expr: NAME COLON-EQUALS binop-expr
 }
 
 If @tt{NAME} is not declared in the same or an outer scope of the assignment
@@ -411,18 +509,29 @@ variable @tt{NAME} to the result of the right-hand side expression.
 
 The grammar for a lambda expression is:
 
-@justcode{
-lambda-expr: "lam" ty-params [args] return-ann ":"
+@bnf['Pyret]{
+             LAM: "lam"
+             COLON: ":"
+             END: "end"
+lambda-expr: LAM fun-header COLON
     doc-string
     block
-  "end"
+    where-clause
+  END
+LANGLE: "<"
+RANGLE: ">"
 ty-params:
-  ["<" list-ty-param* NAME ">"]
-list-ty-param: NAME ","
-args: (PARENSPACE|PARENNOSPACE) [list-arg-elt* binding] ")"
-list-arg-elt: binding ","
-return-ann: ["->" ann]
-doc-string: ["doc:" STRING]
+  [LANGLE list-ty-param* NAME RANGLE]
+list-ty-param: NAME COMMA
+COMMA: ","
+LAPREN: "("
+RPAREN: ")"
+args: LPAREN [list-arg-elt* binding] RPAREN
+list-arg-elt: binding COMMA
+THINARROW: "->"
+DOC: "doc:"
+return-ann: [THINARROW ann]
+doc-string: [DOC STRING]
 }
 
 A lambda expression creates a function value that can be applied with
@@ -452,7 +561,7 @@ If the arguments have @seclink["s:annotations" "annotations"] associated with
 them, they are checked before the body of the function starts evaluating, in
 order from left to right.  If an annotation fails, an exception is thrown.
 
-@examples{
+@pyret-block{
 add1 = lam(x :: Number):
   x + 1
 end
@@ -507,10 +616,13 @@ end
 
 Function application expressions have the following grammar:
 
-@justcode{
+@bnf['Pyret]{
+             LPAREN: "("
+             RPAREN: ")"
+             COMMA: ","
 app-expr: expr app-args
-app-args: PARENNOSPACE [app-arg-elt* binop-expr] ")"
-app-arg-elt: binop-expr ","
+app-args: LPAREN [app-arg-elt* binop-expr] RPAREN
+app-arg-elt: binop-expr COMMA
 }
 
 An application expression is an expression followed by a comma-separated list
@@ -524,7 +636,7 @@ is thrown.
 Note that there is @emph{no space} allowed before the opening parenthesis of
 the application.  If you make a mistake, Pyret will complain:
 
-@justcode{
+@pyret-block{
 f(1) # This is the function application expression f(1)
 f (1) # This is the id-expr f, followed by the paren-expr (1)
 # The second form yields a well-formedness error that there
@@ -535,22 +647,22 @@ f (1) # This is the id-expr f, followed by the paren-expr (1)
 
 Suppose a function is defined with multiple arguments:
 
-@justcode{
+@pyret-block{
 fun f(v, w, x, y, z): ... end
 }
 
 Sometimes, it is particularly convenient to define a new function that
 calls @tt{f} with some arguments pre-specified:
 
-@justcode{
+@pyret-block{
 call-f-with-123 = lam(y, z): f(1, 2, 3, y, z) end
 }
 
 Pyret provides syntactic sugar to make writing such helper functions
 easier:
 
-@justcode{
-call-f-with-123 = f(1, 2, 3, _, _) # same as the lam expression above
+@pyret-block{
+call-f-with-123 = f(1, 2, 3, _, _) # same as the fun expression above
 }
 
 Specifically, when Pyret code contains a function application some of
@@ -564,7 +676,7 @@ This syntactic sugar also works
 with operators.  For example, the following are two ways to sum a list
 of numbers:
 
-@justcode{
+@pyret-block{
 [list: 1, 2, 3, 4].foldl(lam(a, b): a + b end, 0)
 
 [list: 1, 2, 3, 4].foldl(_ + _, 0)
@@ -573,7 +685,7 @@ of numbers:
 Likewise, the following are two ways to compare two lists for
 equality:
 
-@justcode{
+@pyret-block{
 list.map_2(lam(x, y): x == y end, first-list, second-list)
 
 list.map_2(_ == _, first-list, second-list)
@@ -586,22 +698,22 @@ outcomes are known when writing tests.  Also, note that the sugar is
 applied only to one function application at a time.  As a result, the
 following code:
 
-@justcode{
+@pyret-block{
 _ + _ + _
 }
 
 desugars to
 
-@justcode{
+@pyret-block{
 lam(z):
-  (fun (x, y): x + y end) + z
+  (lam(x, y): x + y end) + z
 end
 }
 
 which is probably not what was intended.  You can still write the
 intended expression manually:
 
-@justcode{
+@pyret-block{
 lam(x, y, z): x + y + z end
 }
 
@@ -610,7 +722,7 @@ Pyret just does not provide syntactic sugar to help in this case
 
 @subsection[#:tag "s:cannonball-expr"]{Chaining Application}
 
-@justcode{
+@bnf['Pyret]{
 CARET: "^"
 chain-app-expr: binop-expr CARET binop-expr
 }
@@ -667,10 +779,11 @@ t = empty-tree
 @subsection[#:tag "s:binop-expr"]{Binary Operators}
 
 There are a number of binary operators in Pyret.  A binary operator expression
-is written by putting an operator between two other expressions, as in:
+is a series of expressions joined by binary operators. An expression itself
+is also a binary operator expression.
 
-@justcode{
-binop-expr: binop-expr BINOP binop-expr
+@bnf['Pyret]{
+binop-expr: expr (BINOP expr)*
 }
 
 Each binary operator is syntactic sugar for a particular method or function
@@ -699,12 +812,18 @@ account for these binary operations.
 
 Object expressions map field names to values:
 
-@justcode{
-obj-expr: "{" fields "}" | "{" "}"
-fields: list-field* field [","]
-list-field: field ","
-field: key ":" binop-expr
-     | key args return-ann ":" doc-string block where-clause "end"
+@bnf['Pyret]{
+             LBRACE: "{"
+             RBRACE: "}"
+obj-expr: LBRACE fields RBRACE | LBRACE RBRACE
+COMMA: ","
+COLON: ":"
+fields: list-field* field [COMMA]
+list-field: field COMMA
+END: "end"
+METHOD: "method"
+field: key COLON binop-expr
+     | METHOD key fun-header COLON doc-string block where-clause END
 key: NAME
 }
 
@@ -712,16 +831,16 @@ A comma-separated sequence of fields enclosed in @tt{{}} creates an object; we
 refer to the expression as an @emph{object literal}.  There are two types of
 fields: @emph{data} fields and @emph{method} fields.  A data field in an object
 literal simply creates a field with that name on the resulting object, with its
-value equal to the right-hand side of the field.  A method field
+value equal to the right-hand side of the field. A method field
 
 @justcode{
-method key args return-ann ":" doc-string block where-clause "end"
+"method" key fun-header ":" doc-string block where-clause "end"
 }
 
 is syntactic sugar for:
 
 @justcode{
-key ":" "method" args return-ann ":" doc-string block where-clause "end"
+key ":" "method" fun-header ":" doc-string block where-clause "end"
 }
 
 That is, it's just special syntax for a data field that contains a method
@@ -734,8 +853,9 @@ more than once, it is a compile-time error.
 
 A dot expression is any expression, followed by a dot and name:
 
-@justcode{
-dot-expr: expr "." NAME
+@bnf['Pyret]{
+             DOT: "."
+dot-expr: expr DOT NAME
 }
 
 A dot expression evaluates the @tt{expr} to a value @tt{val}, and then does one
@@ -752,13 +872,13 @@ of three things:
     If the @tt{NAME} field is a method value, evaluates to a function that is
     the @emph{method binding} of the method value to @tt{val}.  For a method
 
-    @justcode{
+    @pyret-block{
       m = method(self, x): body end
     }
 
     The @emph{method binding} of @tt{m} to a value @tt{v} is equivalent to:
 
-    @justcode{
+    @pyret-block{
       (lam(self): lam(x): body end end)(v)
     }
 
@@ -768,8 +888,8 @@ of three things:
 
     For example:
 
-    @justcode{
-      o = { m(self, x): self.y + x end, y: 22 }
+    @pyret-block{
+      o = { method m(self, x): self.y + x end, y: 22 }
       check:
         the-m-method-closed-over-o = o.m
         the-m-method-closed-over-o(5) is 27
@@ -783,8 +903,11 @@ of three things:
 The extend expression consists of an base expression and a list of fields to
 extend it with:
 
-@justcode{
-extend-expr: expr "." "{" fields "}"
+@bnf['Pyret]{
+             DOT: "."
+             LBRACE: "{"
+             RBRACE: "}"
+extend-expr: expr DOT LBRACE fields RBRACE
 }
 
 The extend expression first evaluates @tt{expr} to a value @tt{val}, and then
@@ -793,7 +916,7 @@ field is present in both, the new field is used.
 
 Examples:
 
-@justcode{
+@pyret-block{
 check:
   o = {x : "original-x", y: "original-y"}
   o2 = o.{x : "new-x", z : "new-z"}
@@ -807,8 +930,13 @@ end
 
 An if expression has a number of test conditions and an optional else case.
 
-@justcode{
-if-expr: IF binop-expr COLON block else-if* [ELSECOLON block] end
+@bnf['Pyret]{
+             IF: "if"
+             COLON: ":"
+             ELSECOLON: "else:"
+             ELSEIF: "else if"
+             END: "end"
+if-expr: IF binop-expr COLON block else-if* [ELSECOLON block] END
 else-if: ELSEIF binop-expr COLON block
 }
 
@@ -845,8 +973,13 @@ other than @pyret{true} or @pyret{false}, a runtime error is thrown.
 An @pyret{ask} expression is a different way of writing an @pyret{if}
 expression that can be easier to read in some cases.
 
-@justcode{
-ask-expr: ASKCOLON ask-branch* [BAR OTHERWISECOLON block] end
+@bnf['Pyret]{
+             ASKCOLON: "ask:"
+             BAR: "|"
+             OTHERWISECOLON: "otherwise:"
+             THENCOLON: "then:"
+             END: "end"
+ask-expr: ASKCOLON ask-branch* [BAR OTHERWISECOLON block] END
 ask-branch: BAR binop-expr THENCOLON block
 }
 
@@ -881,18 +1014,25 @@ A cases expression consists of a datatype (in parentheses), an expression to
 inspect (before the colon), and a number of branches.  It is intended to be
 used in a structure parallel to a data definition.
 
-@justcode{
-cases-expr: "cases" (PARENSPACE|PARENNOSPACE) check-ann ")" expr-target ":"
+@bnf['Pyret]{
+             CASES: "cases"
+             LPAREN: "("
+             RPAREN: ")"
+             COLON: ":"
+             BAR: "|"
+             ELSE: "else"
+             THICKARROW: "=>"
+             END: "end"
+cases-expr: CASES LPAREN check-ann RPAREN expr COLON
     cases-branch*
-    ["|" "else" "=>" block]
-  "end"
-cases-branch: "|" NAME [args] "=>" block
+    [BAR ELSE THICKARROW block]
+  END
+cases-branch: BAR NAME [args] THICKARROW block
 }
 
-The @pyret{check-ann} must be an annotation that refers to a @tt{data}
-declaration, like @pyret-id["List" "lists"].  Then @pyret{expr-target} is
-evaluated and checked against the given annotation.  If it has the right type,
-the cases are then checked.
+The @pyret{check-ann} must be a type, like @pyret-id["List" "lists"].  Then
+@pyret{expr} is evaluated and checked against the given annotation.  If
+it has the right type, the cases are then checked.
 
 Cases should use the names of the variants of the given data type as the
 @tt{NAME}s of each branch.  In the branch that matches, the fields of the
@@ -905,7 +1045,7 @@ match.  If no @tt{else} clause is provided, a runtime error results.
 
 For example, some cases expression on lists looks like:
 
-@examples{
+@pyret-block{
 check:
   result = cases(List) [list: 1,2,3]:
     | empty => "empty"
@@ -932,18 +1072,25 @@ end
 For expressions consist of the @tt{for} keyword, followed by a list of
 @tt{binding from expr} clauses in parentheses, followed by a block:
 
-@justcode{
-for-expr: "for" expr PARENNOSPACE [for-bind-elt* for-bind] ")" return-ann ":"
+@bnf['Pyret]{
+             FOR: "for"
+             PARENNOSPACE: "("
+             RPAREN: ")"
+             COLON: ":"
+             END: "end"
+for-expr: FOR expr PARENNOSPACE [for-bind-elt* for-bind] RPAREN return-ann COLON
   block
-"end"
-for-bind-elt: for-bind ","
-for-bind: binding "from" binop-expr
+END
+COMMA: ","
+for-bind-elt: for-bind COMMA
+FROM: "from"
+for-bind: binding FROM binop-expr
 }
 
 The for expression is just syntactic sugar for a
 @seclink["s:lam-expr"]{@tt{lam-expr}} and a @seclink["s:app-expr"]{@tt{app-expr}}.  An expression
 
-@justcode{
+@pyret-block{
 for fun-expr(arg1 :: ann1 from expr1, ...) -> ann-return:
   block
 end
@@ -951,7 +1098,7 @@ end
 
 is equivalent to:
 
-@justcode{
+@pyret-block{
 fun-expr(lam(arg1 :: ann1, ...) -> ann-return: block end, expr1, ...)
 }
 
@@ -960,7 +1107,7 @@ iteration functions because it puts the identifier of the function and the
 value it draws from closer to one another.  Use of @tt{for-expr} is a matter of
 style; here is an example that compares @tt{fold} with and without @tt{for}:
 
-@examples{
+@pyret-block{
 for fold(sum from 0, number from [list: 1,2,3,4]):
   sum + number
 end
@@ -1039,7 +1186,7 @@ Each of these names represents a particular type of runtime value, and using
 them in annotation position will check each time the identifier is bound that
 the value is of the right type.
 
-@justcode{
+@pyret-block{
 x :: Number = "not-a-number"
 # Error: expected Number and got "not-a-number"
 }
@@ -1055,9 +1202,13 @@ An arrow annotation is used to describe the behavior of functions.  It consists
 of a list of comma-separated argument types followed by an ASCII arrow and
 return type:
 
-@justcode{
-arrow-ann: (PARENSPACE|PARENNOSPACE) arrow-ann-elt* ann "->" ann ")"
-arrow-ann-elt: ann ","
+@bnf['Pyret]{
+             LPAREN: "("
+             RPAREN: ")"
+             THINARROW: "->"
+             COMMA: ","
+arrow-ann: LPAREN arrow-ann-elt* ann THINARROW ann RPAREN
+arrow-ann-elt: ann COMMA
 }
 
 When an arrow annotation appears in a binding, that binding position simply

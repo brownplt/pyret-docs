@@ -168,7 +168,7 @@ check:
 end
 
 check:
-  fun<a> equal-any-order(l1 :: List<a>, l2 :: List<a>):
+  fun equal-any-order<a>(l1 :: List<a>, l2 :: List<a>):
     same-length = (l1.length() == l2.length())
     all-present = for lists.all(elt from l1):
       lists.member(l2, elt)
@@ -192,14 +192,14 @@ check:
 end
 
 check:
-  fun within(delta):
+  fun around(delta):
     lam(actual, target):
       num-abs(target - actual) <= delta
     end
   end
 
-  5.05 is%(within(0.1)) 5
-  5.00002 is-not%(within(0.00001)) 5
+  5.05 is%(around(0.1)) 5
+  5.00002 is-not%(around(0.00001)) 5
 end
 }
 
