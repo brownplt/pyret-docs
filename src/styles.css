@@ -32,8 +32,36 @@
   font-size: 1rem;
 }
 
-pre.pyret-highlight {
-  padding-bottom: 1rem;
+.pyret-highlight.good-ex::before {
+   content: "✔";
+   font-size: 5rem;
+   color: #008800;
+   float: right;
+}
+
+.pyret-highlight.good-ex {
+   background-color: #eeffee;
+}
+
+.pyret-highlight.bad-ex {
+   background-color: #ffeeee;
+}
+
+.pyret-highlight.bad-ex::before {
+   content: "✘";
+   font-size: 5rem;
+   color: #880000;
+   float: right;
+}
+
+.pyret-highlight.ok-ex {
+   background-color: #ffffee;
+}
+
+
+pre.pyret-block {
+   padding-bottom: 1rem;
+   margin: 0;
 }
 
 
