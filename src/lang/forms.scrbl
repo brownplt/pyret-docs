@@ -139,7 +139,7 @@ Example:
   import equality as EQ
   check:
     f = lam(): "" end
-    EQ.equal-always3(f, f) is EQ.Unknown
+    equal-always3(f, f) is EQ.Unknown
   end
 }
 
@@ -1340,6 +1340,10 @@ x :: ... = 5 # parse error
 
 @section[#:tag "s:annotations"]{Annotations}
 
+@bnf['Pyret]{
+ann: name-ann | record-ann | arrow-ann | app-ann | pred-ann | dot-ann | tuple-ann
+}
+
 Annotations in Pyret express intended types values will have at runtime.
 They appear next to identifiers anywhere a @tt{binding} is specified in the
 grammar, and if an annotation is present adjacent to an identifier, the program
@@ -1352,6 +1356,12 @@ have the expected types and are used correctly.
 
 @subsection[#:tag "s:name-ann"]{Name Annotations}
 
+
+@bnf['Pyret]{
+DOT: "."
+name-ann: NAME
+dot-ann: NAME DOT NAME
+          }
 Some annotations are simply names.  For example, a
 @seclink["s:data-expr"]{@tt{data declaration}} binds the name of the
 declaration as a value suitable for use as a name annotation.  There are
@@ -1377,6 +1387,40 @@ x :: Number = "not-a-number"
 equivalent to not putting an annotation on an identifier, but it allows a
 program to clearly signal that no restrictions are intended for the identifier
 it annotates.
+
+Dot-annotations allow for importing types from modules:
+@pyret-block{
+import equality as EQ
+eq-reqult :: EQ.EqualityResult = equal-always3(5, 6)
+}
+
+@subsection[#:tag "s:app-ann"]{Parametric Annotations}
+@bnf['Pyret]{
+LANGLE: "<"
+RANGLE: ">"
+COMMA: ","
+app-ann: name-ann  LANGLE comma-anns RANGLE
+| dot-ann LANGLE comma-anns RANGLE
+comma-anns: ann (COMMA ann)*
+}
+
+Many data definitions are parametric, meaning they can contain any
+uniform type of data, such as lists of numbers.  Accordingly, while
+the following annotation isn't quite wrong, it is incomplete:
+@pyret-block[#:style "ok-ex"]{
+list-of-nums :: List = [list: 1, 2, 3]
+}
+
+To properly express the constraint on the contents, we need to
+specialize the list annotation:
+@pyret-block[#:style "good-ex"]{
+list-of-nums :: List<Number> = [list: 1, 2, 3]
+}
+
+Note that this annotation will @emph{not dynamically check} that every
+item in the list is in fact a @tt{Number} --- that would be infeasibly
+expensive.  However, the @seclink["s:type-checker"]{static type checker}
+will make use of this information more fully.
 
 @subsection[#:tag "s:arrow-ann"]{Arrow Annotations}
 
