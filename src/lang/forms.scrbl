@@ -388,7 +388,7 @@ A binding also has a case with tuples, where several names can be given in a bin
 @justcode{
 {x;y;z} = {"he" + "llo"; true; 42}
 x = "hi"
-#Error: x is not assignable
+#Error: x defined twice
 
 }
 
@@ -789,8 +789,6 @@ end
 }
 
 @subsection[#:tag "s:curly-lam-expr"]{Curly-Brace Lambda Shorthand}
-
-NOTE: SHOULD THIS GO AWAY?
 
 Lambda expressions can also be written with a curly-brace shorthand:
 
