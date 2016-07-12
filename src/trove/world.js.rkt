@@ -20,20 +20,19 @@
 ))
 
 @docmodule["world"]{
-  The Pyret world library is based on the universe teachpack in HtDP, and borrows much of the language for documentation. You can find documentation for the teachpack here:
 
-  @url["http://docs.racket-lang.org/teachpack/2htdpuniverse.html"]
+  @margin-note{ The world model is based on the universe teachpack in HtDP. You
+  can find documentation for the teachpack here:
+
+  @url["http://docs.racket-lang.org/teachpack/2htdpuniverse.html"]}
+
+  The Pyret world library provides functions for building animations and
+  interactive programs.
 
   @section[#:tag "image_DataTypes"]{Data Types}
-  @data-spec["WorldConfig"]{
-    @para{
-        This datatype is abstract, and its implementation details (such
-        as it constructors) are not exposed directly; use one of the
-        functions described below to construct a @secref[(tag-name "world"
-        "WorldConfig")] instead.
-    }
-  }
 
+  @type-spec["WorldConfig" (list "a")]
+    
   @section{Functions}
   @function["big-bang"
             #:contract (a-arrow "a"
