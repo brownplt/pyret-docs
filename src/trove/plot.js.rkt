@@ -11,14 +11,16 @@
   `(module "plot"
     (path "src/arr/trove/plot.arr")
 
-    (fun-spec (name "histogram") (arity 2))
-    (fun-spec (name "pie-chart"))
+    (fun-spec (name "histogram") (arity 3))
+    (fun-spec (name "pie-chart") (arity 2))
+    (fun-spec (name "bar-chart") (arity 3))
+    (fun-spec (name "grouped-bar-chart") (arity 3))
 
-    (fun-spec (name "plot-function"))
-    (fun-spec (name "plot-scatter"))
-    (fun-spec (name "plot-line"))
+    (fun-spec (name "plot-function") (arity 2))
+    (fun-spec (name "plot-scatter") (arity 2))
+    (fun-spec (name "plot-line") (arity 2))
 
-    (fun-spec (name "plot-multi") (arity 2))
+    (fun-spec (name "plot-multi") (arity 3))
 
     (type-spec (name "PlotOptions"))
     (type-spec (name "PlotWindowOptions"))
@@ -32,13 +34,16 @@
   The visualization will appear on a dialog.
 
   @itemlist[
-    @item{To close the dialog, click the "X" button at the left toolbar or press @tt{esc}}
-    @item{To save a snapshot of the visualization, click the save button at the left toolbar and choose a location to save the image}
+    @item{To close the dialog, click the close button on the title bar or press @tt{esc}}
+    @item{To save a snapshot of the visualization, click the save button on the
+          title bar and choose a location to save the image}
   ]
 
-  Every function in this library is available on the @tt{plot} module object. For
-  example, if you used @pyret{import plot as P}, you would write
-  @pyret{P.plot-function} to access @pyret{plot-function} below.
+  Every function in this library is available on the @tt{plot} module object.
+  For example, if you used @pyret{import plot as P}, you would write
+  @pyret{P.plot-function} to access @pyret{plot-function} below. If you used
+  @pyret{include}, then you can refer to identifiers without needing to prefix
+  with @pyret{P.}.
 
   @;############################################################################
   @section{The Plot Type}
@@ -122,9 +127,21 @@
   instead of connecting lines between them. This is to avoid the problem of inaccurate plotting
   causing from, for example, discontinuity of the function, or a function which oscillates infinitely.
 
+  @function["plot-multi"
+    #:contract (a-arrow S
+                        (L-of (link "Plot"))
+                        (link "PlotWindowOptions")
+                        (L-of (link "Plot")))
+    #:args '(("title" #f) ("lst" #f) ("options" #f))
+    #:return (L-of (link "Plot"))
+  ]{
+
+  Display all @pyret-id{Plot}s in @pyret{lst} on a window with the configuration
+  from @pyret{options} and with the title @pyret{title}.
+
   @function["plot-function"
-    #:contract (a-arrow (a-arrow N N) (a-arrow N N))
-    #:args '(("f" #f))
+    #:contract (a-arrow S (a-arrow N N) (a-arrow N N))
+    #:args '(("title" #f) ("f" #f))
     #:return (a-arrow N N)
   ]{
     A shorthand to construct an @link{function-plot} with default options and then
@@ -132,8 +149,8 @@
   }
 
   @function["plot-line"
-    #:contract (a-arrow TA TA)
-    #:args '(("tab" #f))
+    #:contract (a-arrow S TA TA)
+    #:args '(("title" #f) ("tab" #f))
     #:return TA
   ]{
   A shorthand to construct a @link{line-plot} with default options and then
@@ -141,22 +158,13 @@
   }
 
   @function["plot-scatter"
-    #:contract (a-arrow TA TA)
-    #:args '(("tab" #f))
+    #:contract (a-arrow S TA TA)
+    #:args '(("title" #f) ("tab" #f))
     #:return TA
   ]{
   A shorthand to construct a @link{scatter-plot} with default options and then
   display it. See @link{scatter-plot} for more information.
   }
-
-  @function["plot-multi"
-    #:contract (a-arrow (L-of (link "Plot")) (link "PlotWindowOptions") (L-of (link "Plot")))
-    #:args '(("lst" #f) ("options" #f))
-    #:return (L-of (link "Plot"))
-  ]{
-
-  Display all @pyret-id{Plot}s in @pyret{lst} on a window with the configuration
-  from @pyret{options}.
 
   @examples{
   import image-structs as I
@@ -167,7 +175,10 @@
       row: 3, 9
       row: 4, 16
     end, _.{color: I.green})
-  plot-multi([list: p1, p2], _.{x-min: 0, x-max: 20, y-min: 0, y-max: 20})
+  plot-multi(
+    'quadratic function and a scatter plot',
+    [list: p1, p2],
+    _.{x-min: 0, x-max: 20, y-min: 0, y-max: 20})
   }
 
   The above example will plot a function @tt{y = x^2} using red color, and show
@@ -179,8 +190,8 @@
   @section{Visualization Functions}
 
   @function["histogram"
-    #:contract (a-arrow TA N TA)
-    #:args '(("tab" #f) ("n" #f))
+    #:contract (a-arrow S TA N TA)
+    #:args '(("title" #f) ("tab" #f) ("n" #f))
     #:return TA
   ]{
   Display a histogram with @pyret{n} bins using data from @pyret{tab}
@@ -189,12 +200,53 @@
   }
 
   @function["pie-chart"
-    #:contract (a-arrow TA TA)
-    #:args '(("tab" #f))
+    #:contract (a-arrow S TA TA)
+    #:args '(("title" #f) ("tab" #f))
     #:return TA
   ]{
   Display a pie chart using data from @pyret{tab} which is a table with two columns:
   @t-field["label" S] and @t-field["value" N].
+  }
+
+  @function["bar-chart"
+    #:contract (a-arrow S TA S TA)
+    #:args '(("title" #f) ("tab" #f) ("legend" #f))
+    #:return TA
+  ]{
+  Display a bar chart using data from @pyret{tab} which is a table with two columns:
+  @t-field["label" S] and @t-field["value" N]. @pyret{legend} indicates the legend
+  of the data.
+  }
+
+  @function["grouped-bar-chart"
+    #:contract (a-arrow S TA (L-of S) TA)
+    #:args '(("title" #f) ("tab" #f) ("legends" #f))
+    #:return TA
+  ]{
+  Display a bar chart using data from @pyret{tab} which is a table with two columns:
+  @t-field["label" S] and @t-field["values" (L-of N)]. @pyret{legends} indicates the legends
+  of the data where the first value of the table column @pyret{values} corresponds to the first legend
+  in @pyret{legends}, and so on.
+  }
+
+  @examples{
+  grouped-bar-chart(
+    'Populations of different states by age group',
+    table: label, values
+      row: 'CA', [list: 2704659, 4499890, 2159981, 3853788, 10604510, 8819342, 4114496]
+      row: 'TX', [list: 2027307, 3277946, 1420518, 2454721, 7017731, 5656528, 2472223]
+      row: 'NY', [list: 1208495, 2141490, 1058031, 1999120, 5355235, 5120254, 2607672]
+      row: 'FL', [list: 1140516, 1938695, 925060, 1607297, 4782119, 4746856, 3187797]
+      row: 'IL', [list: 894368, 1558919, 725973, 1311479, 3596343, 3239173, 1575308]
+      row: 'PA', [list: 737462, 1345341, 679201, 1203944, 3157759, 3414001, 1910571]
+    end, [list:
+      'Under 5 Years',
+      '5 to 13 Years',
+      '14 to 17 Years',
+      '18 to 24 Years',
+      '25 to 44 Years',
+      '45 to 64 Years',
+      '65 Years and Over'])
   }
 
   @;############################################################################
