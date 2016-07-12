@@ -75,60 +75,83 @@
 
 
 @(define Image (a-id "Image" (xref "image" "Image")))
+@(define Scene (a-id "Scene" (xref "image" "Scene")))
+@(define ImageColor (a-id "ImageColor" (xref "image" "ImageColor")))
+@(define Color (a-id "Color" (xref "image-structs" "Color")))
+@(define Mode (a-id "Mode" (xref "image" "Mode")))
+@(define FontFamily (a-id "FontFamily" (xref "image" "FontFamily")))
+@(define FontStyle (a-id "FontStyle" (xref "image" "FontStyle")))
+@(define FontWeight (a-id "FontWeight" (xref "image" "FontWeight")))
 @(define XPlace (a-pred S (a-id "is-x-place" (xref "image" "is-x-place"))))
 @(define YPlace (a-pred S (a-id "is-y-place" (xref "image" "is-y-place"))))
 @docmodule["image"]{
-  The Pyret images library is based on the images teachpack in HtDP, and borrows much of the language for documentation. You can find documentation for the teachpack here:
+
+  The functions in this module are used for creating, combining, and displaying
+  images.
+
+  @margin-note{
+  The Pyret images library is based on the images teachpack in HtDP, and
+  borrows much of the language for documentation. You can find documentation
+  for the teachpack here:
 
   @url["http://docs.racket-lang.org/teachpack/2htdpimage.html"] 
-
-  Differences in function names and their corresponding Racket equivalent
-  are noted where appropriate.
+  }
 
   @section[#:tag "image_DataTypes"]{Data Types}
-  @data-spec["Image"]{
-    @para{
-        This datatype is abstract, and its implementation details (such as
-        it constructors) are not exposed directly; use one of the functions
-        described below to construct an @secref[(tag-name "image" "Image")]
-        instead.
-    }
-  }
-  @data-spec["Scene"]{
-    @para{
-        This datatype is abstract, and its implementation details (such as
-        it constructors) are not exposed directly; use one of the functions
-        described below to construct a @secref[(tag-name "image" "Scene")]
-        instead.
-    }
-  }
+  @type-spec["Image" (list)]
+
+    This is the return type of many of the functions in this module; it
+    includes simple shapes, like circles and squares, and also combinations
+    or transformations of existing shapes, like rotations, overlays, and
+    scaling.
+
+  @type-spec["Scene" (list)]
+
+    Like an @pyret-id["Image"] but with a few special functions that crop any
+    overhanging parts of images that are placed atop them, instead of
+    stretching to accommodate.
+
+  @type-spec["ImageColor" (list)]
+
+    An @tt{ImageColor} is either a string from the list in
+    @secref["s:color-constants"], or a @pyret-id["Color" "image-structs"],
+    which you can use to construct colors other than the predefined ones.
+
+  @function[
+    "name-to-color"
+            #:contract (a-arrow S Color)
+            #:return Color
+            #:args (list '("name" ""))]
+
+  Looks up the given string in the list of predefined colors.
+
+  @type-spec["Mode" (list)]
+
+    A @pyret-id["String" "<global>"] that describes a style for a shape.  Either the string
+    @pyret{"outline"} or the string @pyret{"solid"}.
+
 
   @section{Basic Images}
   @function[
     "circle"
-            #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "Color"  (xref "image-structs" "Color"))
-                                Image)
+            #:contract (a-arrow N Mode ImageColor Image)
+            #:return Image
             #:args (list '("radius" "") 
                          '("mode" "") 
                          '("color" ""))]{
-    Constructs a circle with the given radius, mode and color. Corresponds
-    to @racket[(circle ...)] in HtDP.
+    Constructs a circle with the given radius, mode and color.
   }
+
   @function[
     "ellipse"
-            #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "Color"  (xref "image-structs" "Color"))
-                                Image)
+            #:contract (a-arrow N N Mode ImageColor Image)
+            #:return Image
             #:args (list '("width" "") 
                          '("height" "") 
                          '("mode" "") 
                          '("color" ""))]{
     Constructs an ellipse with the given width, height, mode and
-    color. Corresponds to @racket[(ellipse ...)] in HtDP.
+    color.
   }
   @function[
     "line"
@@ -136,11 +159,12 @@
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("x" "") 
                          '("y" "") 
                          '("color" ""))]{
     Draws an image of a line that connects the point (0,0) to the point
-    (x,y). Corresponds to @racket[(line ...)] in HtDP.
+    (x,y).
   }
   @function[
     "add-line"
@@ -151,64 +175,84 @@
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image                                  
             #:args (list '("img" "") 
                          '("x1" "") 
                          '("y1" "") 
                          '("x2" "") 
                          '("y2" "") 
                          '("color" ""))]{
-    Adds a line to the image @pyret["img"], starting from the point (x1,y1)
-    and going to the point (x2,y2). Unlike @secref[(tag-name "image" "scene-line")],
+    Creates a new image like @pyret["img"] with a line added starting from
+    the point (x1,y1)
+    and going to the point (x2,y2). Unlike @pyret-id["scene-line"],
     if the line passes outside of @pyret["img"], the image gets larger to
     accommodate the line.
   }
+
+  @section{Text}
+
   @function[
     "text"
-            #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
-                                (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Color"  (xref "image-structs" "Color"))
-                                Image)
-            #:args (list '("string" "Text to draw.") 
-                         '("size" "Font size in pixels.") 
-                         '("color" "Color of text."))]{
+            #:contract (a-arrow S N ImageColor Image)
+            #:return Image                                  
+            #:args (list '("string" "") 
+                         '("font-size" "") 
+                         '("color" ""))]{
     Constructs an image of @pyret["string"], using the given font size
     and color.
   }
+  @margin-note{@pyret{font-face} is system-dependent
+    (different computers and operating systems have different fonts installed),
+    so you can try different options for the names of fonts on your machine,
+    and @pyret-id{text-font} will fall back to a default in the given family if
+    it can't find the one provided.}
   @function[
     "text-font"
-            #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
-                                (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Color"  (xref "image-structs" "Color"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "Boolean" (xref "<global>" "Boolean"))
-                                Image)
-            #:args (list '("string" "Text to draw") 
-                         '("size" "Font size in pixels.") 
-                         '("color" "Color of text.") 
-                         '("font-face" "Font face to use for text.") 
-                         '("font-family" "Font family to use for text.") 
-                         '("style" "Style of text.") 
-                         '("weight" "Weight of text.") 
-                         '("underline" "Whether or not the text should be underlined."))]{
+            #:contract (a-arrow S N ImageColor S FontFamily FontStyle FontWeight B Image)
+            #:return Image
+            #:args (list '("string" "") 
+                         '("size" "") 
+                         '("color" "") 
+                         '("font-face" "") 
+                         '("font-family" "") 
+                         '("style" "") 
+                         '("weight" "") 
+                         '("underline" ""))]{
     Like @secref[(tag-name "image" "text")], constructs an image that draws the given
-    string, but makes use of a complete font specification. This function
-    corresponds to @racket[(text/font ...)] in HtDP.
+    string, but makes use of a complete font specification.  The various style
+    options are described below.  
   }
-  @function[
-    "name-to-color"
-            #:contract (a-arrow (a-id "String" (xref "<global>" "String")))
-            #:args (list '("name" ""))]{
-  }
+  @type-spec["FontFamily" (list)]
+
+    A @pyret-id["String" "<global>"] that describes a family of fonts.  The
+    following strings are options:
+
+    @itemlist[
+      @item{@pyret{"default"}}
+      @item{@pyret{"decorative"}}
+      @item{@pyret{"roman"}}
+      @item{@pyret{"script"}}
+      @item{@pyret{"swiss"}}
+      @item{@pyret{"modern"}}
+      @item{@pyret{"symbol"}}
+      @item{@pyret{"system"}}
+    ]
+
+  @type-spec["FontStyle" (list)]
+
+    A @pyret-id["String" "<global>"] that describes the style of a font.  One
+    of @pyret{"normal"}, @pyret{"italic"}, or @pyret{"slant"}.
+
+  @type-spec["FontWeight" (list)]
+
+    A @pyret-id["String" "<global>"] that describes the weight of a font.  One
+    of @pyret{"normal"}, @pyret{"bold"}, or @pyret{"light"}.
+
   @section{Polygons}
   @function[
     "triangle"
-            #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "String" (xref "<global>" "String"))
-                                (a-id "Color"  (xref "image-structs" "Color"))
-                                Image)
+            #:contract (a-arrow N S ImageColor Image)
+            #:return Image
             #:args (list '("side-length" "") 
                          '("mode" "") 
                          '("color" ""))]{
@@ -222,6 +266,7 @@
                                 (a-id "String" (xref "<global>" "String"))
                                 (a-id "Color"  (xref "image-structs" "Color"))
                                 Image)
+            #:return Image
             #:args (list '("side-length1" "") 
                          '("side-length2" "") 
                          '("mode" "") 

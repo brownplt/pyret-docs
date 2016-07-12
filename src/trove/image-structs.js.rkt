@@ -629,7 +629,7 @@
     }
   }
 
-  @section{Predefined colors}
+  @section[#:tag "s:color-constants"]{Predefined colors}
   The following colors are predefined constants:
   @itemlist[
     @render-color["orange" 255 165 0 255]

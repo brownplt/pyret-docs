@@ -740,7 +740,7 @@
                    #:examples (examples '())
                    . contents
                    )
-   (let ([ans
+   (let* ([ans
           (render-fun-helper
            (find-doc (curr-module-name) name) name
            (list 'part (tag-name (curr-module-name) name))
