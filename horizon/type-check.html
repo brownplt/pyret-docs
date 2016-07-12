@@ -16,7 +16,7 @@ the required locations is the arguments of top level functions.</p><p>The functi
 argument <span class="pyret-highlight"><span class="stt">x</span></span>. The return annotation is not necessary so the function
 <span class="pyret-highlight"><span class="stt">bar</span></span> also type checks. However, the function <span class="pyret-highlight"><span class="stt">baz</span></span> will fail
 to type check with an error requiring an annotation on the argument
-<span class="pyret-highlight"><span class="stt">x</span></span>.</p><pre class="pyret-highlight"><p># Type checks
+<span class="pyret-highlight"><span class="stt">x</span></span>.</p><pre class="pyret-block"><pre class="pyret-highlight"><p># Type checks
 fun foo(x :: Number) -&gt; Number:
   x
 end
@@ -29,17 +29,17 @@ end
 # Fails
 fun baz(x):
   x
-end</p></pre><p>The other place that annotations are required is on
+end</p></pre></pre><p>The other place that annotations are required is on
 <a href="Statements.html#%28part._s~3adata-expr%29" data-pltdoc="x">data declarations</a>. Each field must be annotated
-with its type.</p><pre class="pyret-highlight"><p># Type checks
+with its type.</p><pre class="pyret-block"><pre class="pyret-highlight"><p># Type checks
 data BTree:
   | node(value :: Number, left :: BTree, right :: BTree)
   | leaf(value :: Number)
-end</p></pre><h5>2.5.2<tt>&nbsp;</tt><a name="(part._working-with-data-types)"></a>Working with Data Types</h5><p>There are a couple important notes when working with polymorphic data
-types such as <span class="pyret-highlight"><span class="stt">Option</span></span> (defined below).</p><pre class="pyret-highlight"><p>data Option&lt;A&gt;:
+end</p></pre></pre><h5>2.5.2<tt>&nbsp;</tt><a name="(part._working-with-data-types)"></a>Working with Data Types</h5><p>There are a couple important notes when working with polymorphic data
+types such as <span class="pyret-highlight"><span class="stt">Option</span></span> (defined below).</p><pre class="pyret-block"><pre class="pyret-highlight"><p>data Option&lt;A&gt;:
   | none
   | some(value :: A)
-end</p></pre><p>Whenever a value is being annotated with a polymorphic type, the type
+end</p></pre></pre><p>Whenever a value is being annotated with a polymorphic type, the type
 instantiation must be written. So <span class="pyret-highlight"><span class="stt">x :: Option&lt;Number&gt; = some(1)</span></span>
 is okay, but <span class="pyret-highlight"><span class="stt">x :: Option = some(1)</span></span> is not. The caveat to this is
 when writing <span class="pyret-highlight"><span class="stt">cases</span></span> statements. On these the instantiating type is
@@ -48,7 +48,7 @@ The first one is that they are the type of records (<span class="pyret-highlight
 has the type shown above). In addition, any data type where all
 variants have the fields <span class="pyret-highlight"><span class="stt">x :: Number</span></span> and <span class="pyret-highlight"><span class="stt">y :: String</span></span> would
 satisfy that type. For example, if we have the code shown below, the type
-checker will accept the program.</p><pre class="pyret-highlight"><p>data Side:
+checker will accept the program.</p><pre class="pyret-block"><pre class="pyret-highlight"><p>data Side:
   | left(x :: Number)
   | right(x :: Number)
 end
@@ -58,4 +58,4 @@ fun f(thing :: {x :: Number}) -&gt; Number:
 end
 
 side-thing :: Side = left(1)
-x :: Number = f(side-thing) # Type checks</p></pre><div class="navsetbottom"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="brands.html" title="backward to &quot;2.4 Brands&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="Language_Concepts.html" title="up to &quot;2 Language Concepts&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Builtins_and_Libraries.html" title="forward to &quot;3 Builtins and Libraries&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
+x :: Number = f(side-thing) # Type checks</p></pre></pre><div class="navsetbottom"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="brands.html" title="backward to &quot;2.4 Brands&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="Language_Concepts.html" title="up to &quot;2 Language Concepts&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Builtins_and_Libraries.html" title="forward to &quot;3 Builtins and Libraries&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
