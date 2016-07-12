@@ -175,6 +175,25 @@ provide {
 Where the @pyret{id}s are all the toplevel names in the file defined with
 @pyret{fun}, @pyret{data}, or @pyret{x = e}.
 
+@section{Bindings}
+
+Many syntactic forms in Pyret need to designate names for values.  These are
+uniformly represented as @py-prod{binding}s:
+
+@bnf['Pyret]{
+binding: [SHADOW] NAME [COLONCOLON ann] | tuple-binding
+tuple-binding: LBRACE tuple-bind-list RBRACE
+tuple-bind-list: bind-tuple* binding [SEMI]
+bind-tuple: binding SEMI
+SHADOW: "shadow"
+COLONCOLON: "::"
+SEMI: ";"
+LBRACE: "{"
+RBRACE: "}"
+}
+
+
+
 @section{Blocks}
 
 A block's syntax is a list of statements:
