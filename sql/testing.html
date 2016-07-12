@@ -66,7 +66,7 @@ check:
 end
 
 check:
-  fun&lt;a&gt; equal-any-order(l1 :: List&lt;a&gt;, l2 :: List&lt;a&gt;):
+  fun equal-any-order&lt;a&gt;(l1 :: List&lt;a&gt;, l2 :: List&lt;a&gt;):
     same-length = (l1.length() == l2.length())
     all-present = for lists.all(elt from l1):
       lists.member(l2, elt)
@@ -90,14 +90,14 @@ check:
 end
 
 check:
-  fun within(delta):
+  fun around(delta):
     lam(actual, target):
       num-abs(target - actual) &lt;= delta
     end
   end
 
-  5.05 is%(within(0.1)) 5
-  5.00002 is-not%(within(0.00001)) 5
+  5.05 is%(around(0.1)) 5
+  5.00002 is-not%(around(0.00001)) 5
 end</p></pre></div></p></div><p class="boxed pyret-header"><span class="stt">expr1</span><span class="stt"> </span><a name="(part._testing_is~3d~3d)" class="pyret-code"></a><a href="#%28part._testing_is~3d~3d%29" data-pltdoc="x"><span class="stt">is==</span></a><span class="stt"> </span><span class="stt">expr2</span></p><p>Shorthand for <span class="pyret-highlight"><span class="stt">expr1</span></span> <a href="#%28part._testing_is~25%29" data-pltdoc="x"><span class="stt">is%</span></a><span class="pyret-highlight"><span class="stt">(</span></span><a href="equality.html#%28part._equality_equal-always%29" data-pltdoc="x"><span class="stt">equal-always</span></a><span class="pyret-highlight"><span class="stt">)</span></span> <span class="pyret-highlight"><span class="stt">expr1</span></span>.
 Same as <a href="#%28part._testing_is%29" data-pltdoc="x"><span class="stt">is</span></a>.</p><p class="boxed pyret-header"><span class="stt">expr1</span><span class="stt"> </span><a name="(part._testing_is-not~3d~3d)" class="pyret-code"></a><a href="#%28part._testing_is-not~3d~3d%29" data-pltdoc="x"><span class="stt">is-not==</span></a><span class="stt"> </span><span class="stt">expr2</span></p><p>Like <a href="#%28part._testing_is~3d~3d%29" data-pltdoc="x"><span class="stt">is==</span></a>, but failure and success are reversed.
 Same as <a href="#%28part._testing_is-not%29" data-pltdoc="x"><span class="stt">is-not</span></a>.</p><p class="boxed pyret-header"><span class="stt">expr1</span><span class="stt"> </span><a name="(part._testing_is~3d~7e)" class="pyret-code"></a><a href="#%28part._testing_is~3d~7e%29" data-pltdoc="x"><span class="stt">is=~</span></a><span class="stt"> </span><span class="stt">expr2</span></p><p>Shorthand for <span class="pyret-highlight"><span class="stt">expr1</span></span> <a href="#%28part._testing_is~25%29" data-pltdoc="x"><span class="stt">is%</span></a><span class="pyret-highlight"><span class="stt">(</span></span><a href="equality.html#%28part._equality_equal-now%29" data-pltdoc="x"><span class="stt">equal-now</span></a><span class="pyret-highlight"><span class="stt">)</span></span> <span class="pyret-highlight"><span class="stt">expr1</span></span></p><p class="boxed pyret-header"><span class="stt">expr1</span><span class="stt"> </span><a name="(part._testing_is-not~3d~7e)" class="pyret-code"></a><a href="#%28part._testing_is-not~3d~7e%29" data-pltdoc="x"><span class="stt">is-not=~</span></a><span class="stt"> </span><span class="stt">expr2</span></p><p>Like <a href="#%28part._testing_is~3d~7e%29" data-pltdoc="x"><span class="stt">is=~</span></a>, but failure and success are reversed.</p><p class="boxed pyret-header"><span class="stt">expr1</span><span class="stt"> </span><a name="(part._testing_is~3c~3d~3e)" class="pyret-code"></a><a href="#%28part._testing_is~3c~3d~3e%29" data-pltdoc="x"><span class="stt">is&lt;=&gt;</span></a><span class="stt"> </span><span class="stt">expr2</span></p><p>Shorthand for <span class="pyret-highlight"><span class="stt">expr1</span></span> <a href="#%28part._testing_is~25%29" data-pltdoc="x"><span class="stt">is%</span></a><span class="pyret-highlight"><span class="stt">(</span></span><a href="equality.html#%28part._equality_identical%29" data-pltdoc="x"><span class="stt">identical</span></a><span class="pyret-highlight"><span class="stt">)</span></span> <span class="pyret-highlight"><span class="stt">expr1</span></span></p><p class="boxed pyret-header"><span class="stt">expr1</span><span class="stt"> </span><a name="(part._testing_is-not~3c~3d~3e)" class="pyret-code"></a><a href="#%28part._testing_is-not~3c~3d~3e%29" data-pltdoc="x"><span class="stt">is-not&lt;=&gt;</span></a><span class="stt"> </span><span class="stt">expr2</span></p><p>Like <a href="#%28part._testing_is~3c~3d~3e%29" data-pltdoc="x"><span class="stt">is&lt;=&gt;</span></a>, but failure and success are reversed.</p><h5>2.2.2.2<tt>&nbsp;</tt><a name="(part._.Unary_.Test_.Operators)"></a>Unary Test Operators</h5><p class="boxed pyret-header"><span class="stt">expr</span><span class="stt"> </span><a name="(part._testing_satisfies)" class="pyret-code"></a><a href="#%28part._testing_satisfies%29" data-pltdoc="x"><span class="stt">satisfies</span></a><span class="stt"> </span><span class="stt">pred</span></p><p>Evaluates <span class="pyret-highlight"><span class="stt">expr</span></span> to a value and <span class="pyret-highlight"><span class="stt">pred</span></span> to a value expected to be a
