@@ -23,6 +23,7 @@
 @(define (prod-ref name) (list "‹" name "›"))
 @(define (prod-link grammar name)
    (elemref (prod-tag grammar name) (prod-ref name)))
+@(define (py-prod name) (prod-link 'Pyret name))
 
 @(define (render grammar parsed)
    (define-values (constants prods) (partition constant? parsed))
@@ -33,7 +34,7 @@
      (elem s #:style (make-style #f (list (attributes '((class . "bnf-lit")))))))
    (define (unknown-lit s)
      (elem s #:style (make-style #f (list (attributes '((class . "bnf-lit bnf-unknown")))))))
-     
+   (define rule-name (make-parameter #f))
    (define (render-help p)
      (cond
        [(pattern-seq? p)
@@ -44,7 +45,20 @@
         (list (meta "(") (render-help (pattern-repeat-val p)) (meta ")")
               (if (= 0 (pattern-repeat-min p)) (meta "*") (meta "+")))]
        [(pattern-choice? p)
-        (add-between (map render-help (pattern-choice-vals p)) (meta " | "))]
+        (define choices (pattern-choice-vals p))
+        (define breaks
+          (filter (λ(i) i)
+                  (for/list
+                   ([c1 choices] [c2 (rest choices)])
+                   (if (> (pos-line (pattern-start c2)) (pos-line (pattern-start c1))) c2 #f))))
+        (define translated
+          (map (λ(c)
+                 (list (if (member c breaks)
+                           (string-append "\n" (make-string (* 2 (string-length (rule-name))) #\space))
+                           "")
+                       (meta " | ")
+                       (render-help c))) choices))
+        (drop (flatten translated) 2)]
        [(pattern-token? p)
         (define tok (assoc (pattern-token-val p) names))
         (cond
@@ -56,18 +70,20 @@
         (prod-link grammar (pattern-id-val p))]
        [else
         (printf "Unknown prod: ~a" p)]))
-   
+
    (nested #:style (make-style 'code-inset (list (attributes '((style . "white-space: pre;")))))
            (add-between (for/list [(p prods)]
-                                  (define rule-name (lhs-id-val (rule-lhs p)))
-                                  (list (elemtag (prod-tag grammar rule-name) (prod-ref rule-name)) (meta ":") " " (render-help (rule-pattern p)))
+                                  (parameterize ([rule-name (lhs-id-val (rule-lhs p))])
+                                    (list (elemtag (prod-tag grammar (rule-name)) (prod-ref (rule-name))) (meta ":") " " (render-help (rule-pattern p))))
                                   ) "\n")
            )
    )
 
 @(define (bnf grammar . stx)
    (define text (string-join stx ""))
-   (define parsed (grammar-parser (tokenize (open-input-string text))))
+   (define text-port (open-input-string text))
+   (port-count-lines! text-port)
+   (define parsed (grammar-parser (tokenize text-port)))
    (render grammar parsed)
    )
 
@@ -88,11 +104,10 @@ block:
 @bnf['Pyret]{
 PROVIDE: "provide"
 STAR: "*"
+END: "end"
 PROVIDE-TYPES: "provide-types"
 program: prelude block
 prelude: [provide-stmt] [provide-types-stmt] import-stmt*
-
-provide-stmt: PROVIDE stmt end | PROVIDE STAR
 provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
 }
 
@@ -108,19 +123,19 @@ COMMA: ","
 RPAREN: ")"
 FROM: "from"
 import-stmt: IMPORT import-source AS NAME
-import-stmt: IMPORT NAME (COMMA NAME)* FROM import-source
+           | IMPORT NAME (COMMA NAME)* FROM import-source
 import-source: import-special | import-name | import-string
 import-special: NAME PARENNOSPACE STRING (COMMA STRING)* RPAREN
 import-name: NAME
 import-string: STRING
 }
 
-The form with @prod-link['Pyret]{import-name} looks for a file with that name in the
+The form with @py-prod{import-name} looks for a file with that name in the
 built-in libraries of Pyret, and it is an error if there is no such library.
 
 Example:
 
-@pyret{
+@pyret-block{
   import equality as EQ
   check:
     f = lam(): "" end
@@ -157,7 +172,7 @@ provide {
 } end
 }
 
-Where the @justcode{id}s are all the toplevel names in the file defined with
+Where the @pyret{id}s are all the toplevel names in the file defined with
 @pyret{fun}, @pyret{data}, or @pyret{x = e}.
 
 @section{Blocks}
@@ -166,6 +181,9 @@ A block's syntax is a list of statements:
 
 @bnf['Pyret]{
 block: stmt*
+user-block-expr: BLOCK block END
+BLOCK: "block:"
+END: "end"
 }
 
 Blocks serve two roles in Pyret:
@@ -175,12 +193,134 @@ Blocks serve two roles in Pyret:
   @item{Units of lexical scope}
 ]
 
-The @prod-link['Pyret]{let-expr}, @tt{fun-expr}, @tt{data-expr}, and @tt{var-expr} forms are
-handled specially and non-locally within blocks.  A detailed description of
-scope will appear here soon.
+The @py-prod{let-expr}, @py-prod{fun-expr},
+@py-prod{data-expr}, and @py-prod{var-expr} forms
+are handled specially and non-locally within blocks.  A detailed
+description of scope will appear here soon.
 
 Blocks evaluate each of their statements in order, and evaluate to the value of
 the final statement in the block.
+
+The @py-prod{user-block-expr} form @emph{additionally}
+creates a scope for any names bound inside it.  That is, definitions
+within such a block are visible only within that block:
+
+@pyret-block{
+x = 10
+ans = block:
+  y = 5 + x # x is visible here
+  42 # value result of the block
+end
+z = y + ans # error: y is not in scope here
+}
+
+@subsection[#:tag "s:blocky-blocks"]{Block shorthand}
+
+Many expressions in Pyret include one or more blocks within them.  For
+example, the body of a function is defined as a block.  Technically,
+this means the following program is legal:
+
+@pyret-block[#:style "bad-ex"]{
+fun weather-reaction(forecast, temp):
+  ask:
+    | forecast == "sunny" then: "sunglasses"
+    | forecast == "rainy" then: "umbrella"
+    | otherwise: ""
+  end
+  ask:
+    | temp > 85 then: "shorts"
+    | temp > 50 then: "jeans"
+    | temp > 0 then: "parka"
+    | otherwise: "stay inside!"
+  end
+end
+}
+
+However, the program probably won't behave as expected: rather than
+returning some combination of "sunglasses" and "shorts" for a warm,
+sunny day, it will evaluate the first @tt{ask} expression,
+@emph{discard the result}, and then evaluate the second @tt{ask}
+expression and return its result.
+
+Pyret will warn the programmer if it encounters programs like these,
+and complain that the block contains multiple expressions.  Often
+as in this case, it signals a real mistake, and the programmer ought
+to revise the code to comprise a single expression --- say, by
+concatenating the two results above.  Sometimes, though, multiple
+expressions are deliberate:
+
+@pyret-block[#:style "bad-ex"]{
+if some-condition():
+  temp = some-complicated-expression()
+  print(temp) # make sure we got it right!
+  do-something-with(temp)
+else:
+  do-something-else()
+end
+}
+
+To tell Pyret that these multiple statements are intentional, we could
+write an explicit @tt{block} form:
+
+@pyret-block[#:style "ok-ex"]{
+if some-condition():
+  block:
+    temp = some-complicated-expression()
+    print(temp) # make sure we got it right!
+    do-something-with(temp)
+  end
+else:
+  do-something-else()
+end
+}
+
+...but that is syntactically annoying for a straightforward situation!
+Instead, Pyret allows for block @emph{shorthands}: writing @tt{block}
+before the opening colon of a blocky expression signals that the
+expression is deliberate.
+
+
+@pyret-block[#:style "good-ex"]{
+if some-condition() block:
+  temp = some-complicated-expression()
+  print(temp) # make sure we got it right!
+  do-something-with(temp)
+else:
+  do-something-else()
+end
+}
+
+The leading @tt{block} allows for multiple statements in @emph{all} of
+the blocks of this expression.  Analogous markers exist for
+@py-prod{ask-expr}, @py-prod{cases-expr}, @py-prod{fun-expr}, etc.
+
+However, even this marker is sometimes too much.  Suppose we
+eliminated the @tt{print} call in the example above:
+
+@pyret-block{
+if some-condition() block:
+  temp = some-complicated-expression()
+  do-something-with(temp)
+else:
+  do-something-else()
+end
+}
+
+Why should this expression be penalized, but the equivalent one, where
+we inline the definition of @tt{temp}, not be?  After all, this one is
+clearer to read!  In fact, Pyret will @emph{not} complain about this
+block containing multiple expressions.  Instead, Pyret will consider
+the following to be valid "non-blocky" blocks:
+
+@bnf['Pyret]{
+non-blocky-block: stmt* template-expr stmt* | let-expr* expr | user-block-expr
+}
+
+Any sequence of let-bindings followed by exactly one expression is
+fine, as is any block containing even a single template-expression, or
+(obviously) an explicit @tt{block} expression.  All other blocks will
+trigger the multiple-expressions warning and require either an
+explicit block or a block-shorthand to fix.
 
 @section{Statements}
 
@@ -258,7 +398,8 @@ LPAREN: "("
 THINARROW: "->"
 DOC: "doc:"
 WHERE: "where:"
-fun-expr: FUN NAME fun-header COLON doc-string block where-clause END
+BLOCK: "block"
+fun-expr: FUN NAME fun-header [BLOCK] COLON doc-string block where-clause END
 fun-header: ty-params args return-ann
 ty-params:
   [LANGLE list-ty-param* NAME RANGLE]
@@ -321,7 +462,7 @@ DATA: "data"
 PIPE: "|"
 LPAREN: "("
 RPAREN: ")"
-data-expr: DATA NAME ty-params data-mixins COLON
+data-expr: DATA NAME ty-params COLON
     data-variant*
     data-sharing
     where-clause
@@ -338,7 +479,6 @@ SHARING: "sharing:"
 data-sharing: [SHARING fields]
 }
 
-@; data-mixins: ["deriving" mixins] ;; we don't have mixins yet
 
 A @tt{data-expr} causes a number of new names to be bound in the scope of the
 block it is defined in:
@@ -450,7 +590,8 @@ block.
 WHEN: "when"
 COLON: ":"
 END: "end"
-when-expr: WHEN binop-expr COLON block END
+BLOCK: "block"
+when-expr: WHEN binop-expr [BLOCK] COLON block END
 }
 
 For example:
@@ -505,6 +646,47 @@ variable @tt{NAME} to the result of the right-hand side expression.
 
 @section{Expressions}
 
+The following are all the expression forms of Pyret:
+
+@bnf['Pyret]{
+expr: paren-expr | id-expr | prim-expr
+    | lambda-expr | method-expr | app-expr
+    | obj-expr | tuple-expr | tuple-get
+    | dot-expr
+    | template-expr
+#    | bracket-expr NOTE(joe): commented out until it has semantics
+    | get-bang-expr | update-expr
+    | extend-expr
+    | if-expr | ask-expr | cases-expr
+    | for-expr
+    | user-block-expr | inst-expr
+    | multi-let-expr | letrec-expr
+    | type-let-expr
+    | construct-expr
+paren-expr: LPAREN expr RPAREN
+id-expr: NAME
+prim-expr: NUMBER | RATIONAL | BOOLEAN | STRING
+LPAREN: "("
+RPAREN: ")"
+}
+
+@subsection[#:tag "s:template-expr"]{Template Expressions}
+@bnf['Pyret]{
+DOTS: "..."
+template-expr: DOTS
+}
+Template expressions are placeholders.  They indicate portions of the
+code that are unfinished, and are particularly useful when expanding
+the template step of the Design Recipe (hence the name).
+
+A template expression will evaluate to a runtime error, if it ever
+gets evaluated.
+
+Because templates are by definition unfinished, the presence of a
+template expression in a block exempts that block from
+@seclink["s:well-formedness"]{well-formedness checking}, or from
+@seclink["s:blocky-blocks"]{explicit-blockiness checking}.
+
 @subsection[#:tag "s:lam-expr"]{Lambda Expressions}
 
 The grammar for a lambda expression is:
@@ -513,25 +695,19 @@ The grammar for a lambda expression is:
              LAM: "lam"
              COLON: ":"
              END: "end"
-lambda-expr: LAM fun-header COLON
+             BLOCK: "block"
+lambda-expr: LAM fun-header [BLOCK] COLON
     doc-string
     block
     where-clause
   END
 LANGLE: "<"
 RANGLE: ">"
-ty-params:
-  [LANGLE list-ty-param* NAME RANGLE]
-list-ty-param: NAME COMMA
 COMMA: ","
 LAPREN: "("
 RPAREN: ")"
-args: LPAREN [list-arg-elt* binding] RPAREN
-list-arg-elt: binding COMMA
 THINARROW: "->"
 DOC: "doc:"
-return-ann: [THINARROW ann]
-doc-string: [DOC STRING]
 }
 
 A lambda expression creates a function value that can be applied with
@@ -822,8 +998,9 @@ fields: list-field* field [COMMA]
 list-field: field COMMA
 END: "end"
 METHOD: "method"
+BLOCK: "block"
 field: key COLON binop-expr
-     | METHOD key fun-header COLON doc-string block where-clause END
+     | METHOD key fun-header [BLOCK] COLON doc-string block where-clause END
 key: NAME
 }
 
@@ -936,7 +1113,8 @@ An if expression has a number of test conditions and an optional else case.
              ELSECOLON: "else:"
              ELSEIF: "else if"
              END: "end"
-if-expr: IF binop-expr COLON block else-if* [ELSECOLON block] END
+             BLOCK: "block"
+if-expr: IF binop-expr [BLOCK] COLON block else-if* [ELSECOLON block] END
 else-if: ELSEIF binop-expr COLON block
 }
 
@@ -974,12 +1152,14 @@ An @pyret{ask} expression is a different way of writing an @pyret{if}
 expression that can be easier to read in some cases.
 
 @bnf['Pyret]{
-             ASKCOLON: "ask:"
+             ASKCOLON: "ask"
+             BLOCK: "block"
+             COLON: ":"
              BAR: "|"
              OTHERWISECOLON: "otherwise:"
              THENCOLON: "then:"
              END: "end"
-ask-expr: ASKCOLON ask-branch* [BAR OTHERWISECOLON block] END
+ask-expr: ASK [BLOCK] COLON ask-branch* [BAR OTHERWISECOLON block] END
 ask-branch: BAR binop-expr THENCOLON block
 }
 
@@ -1023,7 +1203,8 @@ used in a structure parallel to a data definition.
              ELSE: "else"
              THICKARROW: "=>"
              END: "end"
-cases-expr: CASES LPAREN check-ann RPAREN expr COLON
+             BLOCK: "block"
+cases-expr: CASES LPAREN check-ann RPAREN expr [BLOCK] COLON
     cases-branch*
     [BAR ELSE THICKARROW block]
   END
@@ -1078,7 +1259,8 @@ For expressions consist of the @tt{for} keyword, followed by a list of
              RPAREN: ")"
              COLON: ":"
              END: "end"
-for-expr: FOR expr PARENNOSPACE [for-bind-elt* for-bind] RPAREN return-ann COLON
+             BLOCK: "block"
+for-expr: FOR expr PARENNOSPACE [for-bind-elt* for-bind] RPAREN return-ann [BLOCK] COLON
   block
 END
 COMMA: ","

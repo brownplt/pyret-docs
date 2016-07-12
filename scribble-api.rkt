@@ -21,6 +21,7 @@
          racket/bool
          racket/dict
          racket/path
+         racket/string
          racket/runtime-path
          "scribble-helpers.rkt"
          )
@@ -247,8 +248,13 @@
 (define (dt-style name) (make-style name (list (make-alt-tag "dt"))))
 (define (dd-style name) (make-style name (list (make-alt-tag "dd"))))
 
-(define (pyret-block . body) (nested #:style (pre-style "pyret-highlight") (apply literal body)))
-(define (pyret . body) (elem #:style (span-style "pyret-highlight") (apply tt body)))
+(define (pyret-block #:style [style #f] . body)
+  (define real-style (if style (string-append "pyret-highlight " style) "pyret-highlight"))
+  (nested #:style (pre-style "pyret-block")
+          (nested #:style (pre-style real-style) (apply literal body))))
+(define (pyret #:style [style #f] . body)
+  (define real-style (if style (string-append "pyret-highlight " style) "pyret-highlight"))
+  (elem #:style (span-style real-style) (apply tt body)))
 (define (pyret-id id (mod (curr-module-name)))
   (seclink (xref mod id) (tt id)))
 (define (pyret-method datatype id (mod (curr-module-name)))
@@ -371,10 +377,10 @@
   (define name-elt (make-header-elt-for (seclink (xref (curr-module-name) variant-name) (tt variant-name)) variant-name))
   (define detector-name (string-append "is-" variant-name))
   (append
-    (list 
+    (list
       (para #:style (div-style "boxed") (tt name-elt " :: " return))
       #;(render-fun-helper
-       '(fun) detector-name 
+       '(fun) detector-name
        (list 'part (tag-name (curr-module-name) detector-name))
        (a-arrow (a-id "Any") (a-id "Boolean" (xref "<global>" "Boolean")))
        (a-id "Boolean" (xref "<global>" "Boolean")) (list (list "value" #f)) '() '() '()))
@@ -393,7 +399,7 @@
        (apply a-arrow (append member-types (list return)))
        return members-as-args '() '() '())
       #;(render-fun-helper
-       '(fun) detector-name 
+       '(fun) detector-name
        (list 'part (tag-name (curr-module-name) detector-name))
        (a-arrow (a-id "Any") (a-id "Boolean" (xref "<global>" "Boolean")))
        (a-id "Boolean" (xref "<global>" "Boolean")) (list (list "value" #f)) '() '() '()))
@@ -517,7 +523,7 @@
          (list (subsubsub*section #:tag (list (tag-name (curr-module-name) name) (tag-name (curr-module-name) (string-append "is-" name))) name) body))))
 
 @(define (with-members . members)
-   (if (empty? members) 
+   (if (empty? members)
        empty
        (list "Methods" members)))
 @(define (members . mems)
@@ -591,17 +597,24 @@
 
 
 @(define (render-multiline-args names types descrs)
-   (map (lambda (name type descr)
-          (cond [(and name type descr)
-                 (list (dt-indent (tt name " :: " type))
-                       (dd descr))]
-                [(and name type)
-                 (list (dt-indent (tt name " :: " type))
-                       (dd ""))]
-                [(and name descr)
-                 (list (dt-indent (tt name)) (dd descr))]
-                [else (list (dt-indent (tt name)) (dd ""))]))
-        names types descrs))
+  (define len (length names))
+    (map (lambda (name type descr i)
+           (define (add-comma lst)
+             (if (< i len)
+                 (append lst (list ","))
+                 lst))
+           (cond
+             [(and name type descr)
+              (list (dt-indent (apply tt (add-comma (list name " :: " type))))
+                    (dd descr))]
+             [(and name type)
+              (list (dt-indent (apply tt (add-comma (list name " :: " type))))
+                    (dd ""))]
+             [(and name descr)
+              (list (dt-indent (apply tt (add-comma (list name))))
+                    (dd descr))]
+             [else (list (dt-indent (tt name)) (dd ""))]))
+         names types descrs (range 1 (add1 len))))
 
 @(define (render-singleline-args names types)
   (define args
@@ -623,8 +636,8 @@
       (error (format "Ill-formed docs in ~a" name)))
     (first elt))
    (define is-method (symbol=? (check-first spec) 'method-spec))
-   (let* ([contract (or contract-in (interp (get-defn-field 'contract spec)))] 
-          [return (or return-in (interp (get-defn-field 'return spec)))] 
+   (let* ([contract (or contract-in (interp (get-defn-field 'contract spec)))]
+          [return (or return-in (interp (get-defn-field 'return spec)))]
           [orig-argnames (if (list? args) (map check-first args) (get-defn-field 'args spec))]
           [input-types (map (lambda(i)
             (define ret (drop contract (+ 1 (* 2 i))))
@@ -672,9 +685,9 @@
                     (render-singleline-args argnames input-types)
                     (if return
                       (list (tt ")" " -> " return))
-                      (list (tt ")")))))] 
-                [else 
-                 (nested #:style (div-style "boxed")
+                      (list (tt ")")))))]
+                [else
+                 (nested #:style (div-style "boxed pyret-header")
                  (apply para #:style (dl-style "multiline-args")
                    (append
                     (list (dt name-elt " :: " "("))
@@ -773,4 +786,3 @@
     (set! ALL-GEN-DOCS (cons s-exp ALL-GEN-DOCS)))
   (set! curr-doc-checks (init-doc-checker ALL-GEN-DOCS))
   '())
-
