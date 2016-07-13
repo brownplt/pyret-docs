@@ -1,4 +1,0 @@
-- include statement
-- explain how fun desugars in recursive case
-- tuples
-- new lambda syntax
