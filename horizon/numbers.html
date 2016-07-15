@@ -8,7 +8,7 @@
 numbers and rough numbers (&ldquo;roughnums&rdquo;). Both are to base ten;
 real; and finite.</p><p>Exact numbers are arbitrarily precise rational numbers: these
 include integers and rational fractions.  For integers whose
-magnitude is less than <span class="pyret-highlight"><span class="stt">(2^53 - 1)</span></span>,
+magnitude is less than <span class="pyret-highlight"><span class="stt">(num-expt(2, 53) - 1)</span></span>,
 Pyret internally uses JavaScript
 fixnums, in order to optimize basic arithmetic.</p><p>Roughnums are numbers that are necessarily or
 deliberately imprecise. These correspond to the same set of
