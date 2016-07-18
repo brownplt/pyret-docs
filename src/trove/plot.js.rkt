@@ -101,7 +101,7 @@
   }
 
   @examples{
-    my-plot = function-plot(lam(x): num-sqrt(x) end, plot-options)
+    my-plot = function-plot(lam(x): num-sqrt(x + 1) end, plot-options)
   }
 
   @;############################################################################
@@ -139,33 +139,6 @@
   Display all @pyret-id{Plot}s in @pyret{lst} on a window with the configuration
   from @pyret{options} and with the title @pyret{title}.
 
-  @function["plot-function"
-    #:contract (a-arrow S (a-arrow N N) (a-arrow N N))
-    #:args '(("title" #f) ("f" #f))
-    #:return (a-arrow N N)
-  ]{
-    A shorthand to construct an @link{function-plot} with default options and then
-    display it. See @link{function-plot} for more information.
-  }
-
-  @function["plot-line"
-    #:contract (a-arrow S TA TA)
-    #:args '(("title" #f) ("tab" #f))
-    #:return TA
-  ]{
-  A shorthand to construct a @link{line-plot} with default options and then
-  display it. See @link{line-plot} for more information.
-  }
-
-  @function["plot-scatter"
-    #:contract (a-arrow S TA TA)
-    #:args '(("title" #f) ("tab" #f))
-    #:return TA
-  ]{
-  A shorthand to construct a @link{scatter-plot} with default options and then
-  display it. See @link{scatter-plot} for more information.
-  }
-
   @examples{
   import image-structs as I
   p1 = function-plot(lam(x): x * x end, _.{color: I.red})
@@ -186,6 +159,59 @@
   top, bottom window boundary are 0, 20, 0, 20 respectively.
   }
 
+  @function["plot-function"
+    #:contract (a-arrow S (a-arrow N N) (a-arrow N N))
+    #:args '(("title" #f) ("f" #f))
+    #:return (a-arrow N N)
+  ]{
+  A shorthand to construct an @link{function-plot} with default options and then
+  display it. See @link{function-plot} for more information.
+
+  @examples{
+  NUM_E = ~2.71828
+  plot-function('converge to 1', lam(x): 1 - num-expt(NUM_E, 0 - x) end)
+  }
+  }
+
+  @function["plot-line"
+    #:contract (a-arrow S TA TA)
+    #:args '(("title" #f) ("tab" #f))
+    #:return TA
+  ]{
+  A shorthand to construct a @link{line-plot} with default options and then
+  display it. See @link{line-plot} for more information.
+
+  @examples{
+  plot-line('My line', table: x, y
+    row: 1, 2
+    row: 2, 10
+    row: 2.1, 3
+    row: 2.4, 5
+    row: 5, 1
+  end)
+  }
+  }
+
+  @function["plot-scatter"
+    #:contract (a-arrow S TA TA)
+    #:args '(("title" #f) ("tab" #f))
+    #:return TA
+  ]{
+  A shorthand to construct a @link{scatter-plot} with default options and then
+  display it. See @link{scatter-plot} for more information.
+
+  @examples{
+  plot-scatter('My scatter plot', table: x, y
+    row: 1, 2
+    row: 1, 3.1
+    row: 4, 1
+    row: 7, 3
+    row: 4, 6
+    row: 2, 5
+  end)
+  }
+  }
+
   @;############################################################################
   @section{Visualization Functions}
 
@@ -197,6 +223,19 @@
   Display a histogram with @pyret{n} bins using data from @pyret{tab}
   which is a table with one column: @t-field["value" N].
   The range of the histogram is automatically inferred from the data.
+
+  @examples{
+  histogram('My histogram', table: value :: Number
+    row: 1
+    row: 1.2
+    row: 2
+    row: 3
+    row: 10
+    row: 3
+    row: 6
+    row: -1
+  end, 4)
+  }
   }
 
   @function["pie-chart"
@@ -206,6 +245,15 @@
   ]{
   Display a pie chart using data from @pyret{tab} which is a table with two columns:
   @t-field["label" S] and @t-field["value" N].
+
+  @examples{
+  pie-chart('My pie chart', table: label, value
+    row: 'EU', 10.12
+    row: 'Asia', 93.1
+    row: 'America', 56.33
+    row: 'Africa', 101.1
+  end)
+  }
   }
 
   @function["bar-chart"
@@ -216,6 +264,19 @@
   Display a bar chart using data from @pyret{tab} which is a table with two columns:
   @t-field["label" S] and @t-field["value" N]. @pyret{legend} indicates the legend
   of the data.
+
+  @examples{
+  bar-chart(
+    'Frequency of letters',
+    table: label, value
+      row: 'A', 11
+      row: 'B', 1
+      row: 'C', 3
+      row: 'D', 4
+      row: 'E', 9
+      row: 'F', 3
+    end, 'Letter')
+  }
   }
 
   @function["grouped-bar-chart"
