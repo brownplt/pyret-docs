@@ -100,12 +100,35 @@
     @secref[(tag-name "world" "big-bang")], will be called every time a
     key is pressed. The function is called with the current world state
     and a @secref[(tag-name "<global>" "String")] representing the pressed
-    key. For most keys, this is just the corresponding single character. Some
-    examples of single character strings that you may receive are @pyret{"a"},
-    @pyret{"b"}, @pyret{"c"}, @pyret{" "}, @pyret{"\r"} (return/enter key),
-    @pyret{"\t"} (tab key), @pyret{"\b"} (backspace). In some cases, you
-    may receive multiple characters.
+    key. For most keys, this is just the corresponding single character.
 
+    The special keys are:
+
+    @itemlist[
+
+    @item{Backspace key: @pyret{"backspace"}}
+    @item{Tab key: @pyret{"tab"}}
+    @item{Enter key: @pyret{"enter"}}
+    @item{Shift key: @pyret{"shift"}}
+    @item{Control key: @pyret{"control"}}
+    @item{Pause key: @pyret{"pause"}}
+    @item{Escape key: @pyret{"escape"}}
+    @item{Prior key: @pyret{"prior"}}
+    @item{Next key: @pyret{"next"}}
+    @item{End key: @pyret{"end"}}
+    @item{Home key: @pyret{"home"}}
+    @item{Left arrow: @pyret{"left"}}
+    @item{Up arrow: @pyret{"up"}}
+    @item{Right arrow: @pyret{"right"}}
+    @item{Down arrow: @pyret{"down"}}
+    @item{Print key: @pyret{"print"}}
+    @item{Insert key: @pyret{"insert"}}
+    @item{Delete key: @pyret{"delete"}}
+    @item{Backspace key: @pyret{"backspace"}}
+    @item{Num lock key: @pyret{"numlock"}}
+    @item{Scroll key: @pyret{"scroll"}}
+
+    ]
 
   }
   @function["on-mouse"
@@ -114,14 +137,13 @@
                                          "a")
                                 WC)
             #:return (a-app WC "a")
-            #:args (list '("onMouse" ""))]{
+            #:args (list '("mouse-handler" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called on every sampled
     mouse movement. The function will receive the world state, the current
     @pyret["x"] and @pyret["y"] positions of the mouse, and a @secref[(tag-name
     "<global>" "String")] representing a mouse event. Possible mouse
     events are:
-
 
     @itemlist[(item (pyret "\"button-down\"") 
                     " signals that the computer user has pushed a mouse button down;")
