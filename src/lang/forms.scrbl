@@ -482,7 +482,7 @@ f = lam(x, y):
 end
 }
 
-See the documentation for @tt{lambda-exprs} for an explanation of arguments'
+See the documentation for @tt{lam-exprs} for an explanation of arguments'
 and annotations' behavior, as well as @tt{doc-strings}.
 
 @subsection[#:tag "s:data-decl"]{Data Declarations}
@@ -701,7 +701,7 @@ The following are all the expression forms of Pyret:
 
 @bnf['Pyret]{
 expr: paren-expr | id-expr | prim-expr
-    | lambda-expr | method-expr | app-expr
+    | lam-expr | method-expr | app-expr
     | obj-expr | tuple-expr | tuple-get
     | dot-expr
     | template-expr
@@ -746,7 +746,7 @@ The grammar for a lambda expression is:
              COLON: ":"
              END: "end"
              BLOCK: "block"
-lambda-expr: LAM fun-header [BLOCK] COLON
+lam-expr: LAM fun-header [BLOCK] COLON
     doc-string
     block
     where-clause
@@ -1076,10 +1076,8 @@ corresponding call:
 ]
 
 For the primitive strings and numbers, the operation happens internally.  For
-all object values, the operator looks for the method appropriate method and
-calls it.  The special names allow a form of operator overloading, and avoid
-adding an extra concept beyond function and method calls to the core to
-account for these binary operations.
+all object or data values, the operator looks for the method appropriate method
+and calls it.
 
 @subsection[#:tag "s:obj-expr"]{Object Expressions}
 
@@ -1127,26 +1125,25 @@ more than once, it is a compile-time error.
 
 Tuples are an immutable, fixed-length collection of expressions indexed by non-negative integers:
 
-@justcode{
+@bnf['Pyret]{
 tuple-expr: "{" tuple-fields "}"
 tuple-fields: binop-expr (";" binop-expr)* [";"]
 }
 
-A semicolom-separated sequence of fields enclosed in @tt{{}} creates a tuple. 
+A semicolon-separated sequence of fields enclosed in @tt{{}} creates a tuple. 
 
-Tuple indexing:
+@subsection[#:tag "s:tuple-get-expr"]{Tuple Access Expressions}
 
-@justcode{
+@bnf['Pyret]{
 tuple-get: expr "." "{" NUMBER "}"
 }
 
-An expression that evlautes to a tuple, followed by a dot, followed by and index enclosed in @tt{{}} indexes into a tuple.  
+A tuple-get expression evaluates the @tt{expr} to a value @tt{val}, and then
+does one of three things:
 
-A tuple-get expression evaluates the @tt{expr} to a value @tt{val}, and then does one
-of four things:
-
+@margin-note{A static well-formedness error is raised if the index is
+negative}
 @itemlist[
-  @item{Raises a well-formedness error, if @tt{NUMBER} is negative}
   @item{Raises an exception, if @tt{expr} is not a tuple}
 
   @item{Raises an exception, if @tt{NUMBER} is equal to or greater than the length of the given tuple}
