@@ -96,6 +96,212 @@ rather than to
 
 @(table-of-contents)
 
+@section[#:tag "s:literals"]{Primitives and Literals}
+
+There are several different literal token types referred to in this
+documentation.
+
+@subsection{Names}
+
+@bnf['Pyret]{
+id-expr: NAME
+key: NAME
+}
+
+Names in Pyret match the following regular expression:
+
+@justcode{
+^[_a-zA-Z][_a-zA-Z0-9]*(?:-+[_a-zA-Z0-9]+)*
+}
+
+@margin-note{The convention in Pyret is that @pyret{kebab-case-names} are used
+for names of values and fields, and @pyret{TitleCaseNames} are used for
+annotations.} That is, they start with an alphabetical character or an
+underscore, followed by any number of alphanumeric characters mixed with
+underscores and hyphens, ending in a non-hyphen.  So, for example, the
+following are valid names (though not necessarily good style):
+
+@pyret-block[#:style "good-ex"]{
+a
+a1
+a-1
+abc
+ABC
+a----------b
+a-_-_-_-__--b
+a--_
+_a
+__
+}
+
+
+The following are not valid names:
+
+@pyret-block[#:style "bad-ex"]{
+_-
+-_
+a-
+-a
+-a-
+-abc
+a1-
+a-1-
+a_1-
+α
+1abc
+$abc
+}
+
+@subsection{String Literals}
+
+@bnf['Pyret]{
+string-expr: STRING
+}
+
+Strings in Pyret come in several forms.  First, they can be enclosed in double
+quotes:
+
+@pyret-block[#:style "good-ex"]{
+"a string"
+"a string\" with escapes"
+"'single quotes' are allowed unescaped or \' escaped"
+}
+
+They can also be enclosed in single quotes:
+
+@pyret-block[#:style "good-ex"]{
+'a string'
+'a string\' with escapes'
+'"double quotes" are allowed unescaped or \" escaped'
+}
+
+String literals with single or double quotes must terminate by the end of the
+line:
+
+@pyret-block[#:style "bad-ex"]{
+"multi-line
+strings not
+allowed with double quotes"
+}
+
+Finally, multi-line string literals can be created by starting and ending them
+with three backticks (@pyret{```}).  For example:
+
+@pyret-block[#:style "good-ex"]{
+```
+This string
+spans
+multiple lines
+```
+}
+
+Multi-line string literals strip all whitespace before the first non-whitespace
+character and after the last non-whitespace character.  All whitespace at the
+beginning of intermediate lines is preserved.
+
+@subsection{Number Literals}
+
+@bnf['Pyret]{
+num-expr: NUMBER
+}
+
+Pyret has several types of number literals.  The most traditional allows for
+decimal numbers, negation, and an exponent:
+
+@justcode{
+^[-+]?[0-9]+(?:\\.[0-9]+)?(?:[eE][-+]?[0-9]+)?
+}
+
+That is, an optional sign, then some number of digits, optionally followed by a
+decimal point and more digits, optionally followed by an exponent.  These are
+valid number literals:
+
+@pyret-block[#:style "good-ex"]{
+0.1
+1
+1e100
+1.1e100
++1.1e100
+-1.1e-100
+1.1230e-0
+10
+19
+19.0
+}
+
+Note that a number literal cannot start with a decimal point; some leading
+digits are required.  These are not number literals:
+
+@pyret-block[#:style "bad-ex"]{
+.1
+1.1.1
+1.+1
+0.1+100
+}
+
+This first kind of number literal represents an @emph{exact} number, or
+@pyret-id["Exactnum" "numbers"].  Number literals can also be prefixed with a
+tilde, to indicate that the number is an approximation, or a
+@pyret-id["Roughnum" "numbers"].  So these are all valid rough number literals:
+
+@pyret-block[#:style "good-ex"]{
+~0.1
+~1
+~1e100
+~1.1e100
+~+1.1e100
+~-1.1e-100
+~1.1230e-0
+~10
+~19
+~19.0
+}
+
+And these are not valid:
+
+@pyret-block[#:style "bad-ex"]{
+~.1
+~1.1.1
+~1.+1
+~0.1+100
+}
+
+Finally, numbers can be written as exact ratios of whole numbers:
+
+@justcode{
+^[-+]?[0-9]+/[0-9]+
+}
+
+These numbers are interpreted as @pyret-id["Exactnum" "numbers"]s.  These are
+valid rational literals:
+
+@pyret-block[#:style "good-ex"]{
+1/2
+-1/2
++1/4
+1234/9
+0/1234
+}
+
+It is a syntax error to use zero as the denominator in a fraction literal.
+These are not valid rational literals:
+
+
+@pyret-block[#:style "bad-ex"]{
+1+1/2
+-1/0
+1.1/9
+1/-3
+}
+
+@subsection{Boolean Literals}
+
+@bnf['Pyret]{
+bool-expr: "true" | "false"
+}
+
+Boolean literals are the lowercase words @pyret{true} and @pyret{false}.
+
 @section[#:tag "s:program"]{Programs}
 
 Programs consist of a sequence of import or provide statements, followed by a
@@ -233,7 +439,7 @@ end
 z = y + ans # error: y is not in scope here
 }
 
-@subsection[#:tag "s:blocky-blocks"]{Block shorthand}
+@subsection[#:tag "s:blocky-blocks"]{Block Shorthand}
 
 Many expressions in Pyret include one or more blocks within them.  For
 example, the body of a function is defined as a block.  Technically,
@@ -1330,7 +1536,7 @@ used in a structure parallel to a data definition.
              THICKARROW: "=>"
              END: "end"
              BLOCK: "block"
-cases-expr: CASES LPAREN check-ann RPAREN expr [BLOCK] COLON
+cases-expr: CASES LPAREN ann RPAREN expr [BLOCK] COLON
     cases-branch*
     [BAR ELSE THICKARROW block]
   END
@@ -1581,4 +1787,5 @@ arrow-ann-elt: ann COMMA
 
 When an arrow annotation appears in a binding, that binding position simply
 checks that the value is a function.
+
 
