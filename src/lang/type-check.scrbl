@@ -44,7 +44,7 @@ end
 }
 
 The other place that annotations are required is on
-@seclink["s:data-expr"]{data declarations}. Each field must be annotated
+@seclink["s:data-decl"]{data declarations}. Each field must be annotated
 with its type.
 
 @pyret-block{
