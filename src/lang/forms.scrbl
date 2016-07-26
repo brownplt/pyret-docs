@@ -192,7 +192,34 @@ LBRACE: "{"
 RBRACE: "}"
 }
 
+One form of binding is @py-prod{tuple-binding}s. When a tuple is bound using a tuple binding each value in the tuple is assigned to its corresponding identifier.
 
+Nested tuples cannot be bound using @py-prod{tuple-binding}s. The number of indentifiers must match the length of the given tuple. 
+
+@examples{
+check:
+  {x;y} = {1;2}
+  x is 1
+  y is 2
+
+  fun sum-two({k;v;}, {a;b;c;}):
+    k + v + a + b + c
+  end
+
+  sum-two({10; 12}, {1; 4; 5}) is 32
+
+  fun sum-vals(elts) block:
+    var sum = 0
+    for each({k;v;} from elts):
+      sum := sum + v
+    end
+    sum
+  end
+
+  elts = [list: {"a"; 5}, {"b"; 6}, {"c"; 7}]
+  sum-vals(elts) is 18 
+end
+}
 
 @section{Blocks}
 
