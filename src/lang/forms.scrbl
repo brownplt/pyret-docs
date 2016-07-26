@@ -400,6 +400,7 @@ RBRACE: "}"
 
 One form of binding is @py-prod{tuple-binding}s. When a tuple is bound using a tuple binding each value in the tuple is assigned to its corresponding identifier.
 
+@margin-note{Nested binding will be added in the future.}
 Nested tuples cannot be bound using @py-prod{tuple-binding}s. The number of indentifiers must match the length of the given tuple. 
 
 @examples{
@@ -953,23 +954,6 @@ LPAREN: "("
 RPAREN: ")"
 }
 
-@subsection[#:tag "s:template-expr"]{Template Expressions}
-@bnf['Pyret]{
-DOTS: "..."
-template-expr: DOTS
-}
-Template expressions are placeholders.  They indicate portions of the
-code that are unfinished, and are particularly useful when expanding
-the template step of the Design Recipe (hence the name).
-
-A template expression will evaluate to a runtime error, if it ever
-gets evaluated.
-
-Because templates are by definition unfinished, the presence of a
-template expression in a block exempts that block from
-@seclink["s:well-formedness"]{well-formedness checking}, or from
-@seclink["s:blocky-blocks"]{explicit-blockiness checking}.
-
 @subsection[#:tag "s:lam-expr"]{Lambda Expressions}
 
 The grammar for a lambda expression is:
@@ -1312,6 +1296,59 @@ For the primitive strings and numbers, the operation happens internally.  For
 all object or data values, the operator looks for the method appropriate method
 and calls it.
 
+@subsection[#:tag "s:tuple-expr"]{Tuple Expressions}
+
+Tuples are an immutable, fixed-length collection of expressions indexed by non-negative integers:
+
+@bnf['Pyret]{
+tuple-expr: "{" tuple-fields "}"
+tuple-fields: binop-expr (";" binop-expr)* [";"]
+}
+
+A semicolon-separated sequence of fields enclosed in @tt{{}} creates a tuple. 
+
+@subsection[#:tag "s:tuple-get-expr"]{Tuple Access Expressions}
+
+@bnf['Pyret]{
+tuple-get: expr "." "{" NUMBER "}"
+}
+
+A tuple-get expression evaluates the @tt{expr} to a value @tt{val}, and then
+does one of three things:
+
+@margin-note{A static well-formedness error is raised if the index is
+negative}
+@itemlist[
+  @item{Raises an exception, if @tt{expr} is not a tuple}
+
+  @item{Raises an exception, if @tt{NUMBER} is equal to or greater than the length of the given tuple}
+
+  @item{Evaluates the expression, returning the @tt{val} at the given index.  The first index is @pyret{0}}
+]
+
+For example:
+
+@pyret-block[#:style "good-ex"]{
+check:
+  t = {"a";"b";true}
+  t.{0} is "a"
+  t.{1} is "b"
+  t.{2} is true
+end
+}
+
+
+Note that the index is restricted @emph{syntactically} to being a number.  So this program is a parse error:
+
+@pyret-block[#:style "bad-ex"]{
+t = {"a";"b";"c"}
+t.{1 + 1}
+}
+
+This restriction ensures that tuple access is typable.
+
+
+
 @subsection[#:tag "s:obj-expr"]{Object Expressions}
 
 Object expressions map field names to values:
@@ -1353,37 +1390,6 @@ value.
 
 The fields are evaluated in the order they appear.  If the same field appears
 more than once, it is a compile-time error.
-
-@subsection[#:tag "s:tuple-expr"]{Tuple Expressions}
-
-Tuples are an immutable, fixed-length collection of expressions indexed by non-negative integers:
-
-@bnf['Pyret]{
-tuple-expr: "{" tuple-fields "}"
-tuple-fields: binop-expr (";" binop-expr)* [";"]
-}
-
-A semicolon-separated sequence of fields enclosed in @tt{{}} creates a tuple. 
-
-@subsection[#:tag "s:tuple-get-expr"]{Tuple Access Expressions}
-
-@bnf['Pyret]{
-tuple-get: expr "." "{" NUMBER "}"
-}
-
-A tuple-get expression evaluates the @tt{expr} to a value @tt{val}, and then
-does one of three things:
-
-@margin-note{A static well-formedness error is raised if the index is
-negative}
-@itemlist[
-  @item{Raises an exception, if @tt{expr} is not a tuple}
-
-  @item{Raises an exception, if @tt{NUMBER} is equal to or greater than the length of the given tuple}
-
-  @item{Evaluates the expression, returning the @tt{val} at the given index}
-]
-
 
 @subsection[#:tag "s:dot-expr"]{Dot Expressions}
 
@@ -1676,8 +1682,9 @@ fold(lam(sum, number): sum + number end, 0, [list: 1,2,3,4])
 
 A template expression is three dots in a row:
 
-@justcode{
-template-expr: "..."
+@bnf['Pyret]{
+DOTS: "..."
+template-expr: DOTS
 }
 
 It is useful for a placeholder for other expressions in code-in-progress.  When
@@ -1712,6 +1719,9 @@ end
 x :: ... = 5 # parse error
 }
 
+Because templates are by definition unfinished, the presence of a
+template expression in a block exempts that block from
+@seclink["s:blocky-blocks"]{explicit-blockiness checking}.
 
 @section[#:tag "s:annotations"]{Annotations}
 
