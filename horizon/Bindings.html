@@ -8,4 +8,25 @@
 uniformly represented as <a href="#%28elem._%28bnf-prod._%28.Pyret._binding%29%29%29" data-pltdoc="x">&#8249;binding&#8250;</a>s:</p><blockquote class="SCodeFlow" style="white-space: pre;"><p><a name="(elem._(bnf-prod._(.Pyret._binding)))"></a>&#8249;binding&#8250;<span class="bnf-meta">:</span> <span class="bnf-meta">[</span><span class="bnf-lit">shadow</span><span class="bnf-meta">]</span> <span class="bnf-lit bnf-unknown">NAME</span> <span class="bnf-meta">[</span><span class="bnf-lit">::</span> <a href="s_annotations.html#%28elem._%28bnf-prod._%28.Pyret._ann%29%29%29" data-pltdoc="x">&#8249;ann&#8250;</a><span class="bnf-meta">]</span><span class="bnf-meta"> | </span><a href="#%28elem._%28bnf-prod._%28.Pyret._tuple-binding%29%29%29" data-pltdoc="x">&#8249;tuple-binding&#8250;</a>
 <a name="(elem._(bnf-prod._(.Pyret._tuple-binding)))"></a>&#8249;tuple-binding&#8250;<span class="bnf-meta">:</span> <span class="bnf-lit">{</span> <a href="#%28elem._%28bnf-prod._%28.Pyret._tuple-bind-list%29%29%29" data-pltdoc="x">&#8249;tuple-bind-list&#8250;</a> <span class="bnf-lit">}</span>
 <a name="(elem._(bnf-prod._(.Pyret._tuple-bind-list)))"></a>&#8249;tuple-bind-list&#8250;<span class="bnf-meta">:</span> <span class="bnf-meta">(</span><a href="#%28elem._%28bnf-prod._%28.Pyret._bind-tuple%29%29%29" data-pltdoc="x">&#8249;bind-tuple&#8250;</a><span class="bnf-meta">)</span><span class="bnf-meta">*</span> <a href="#%28elem._%28bnf-prod._%28.Pyret._binding%29%29%29" data-pltdoc="x">&#8249;binding&#8250;</a> <span class="bnf-meta">[</span><span class="bnf-lit">;</span><span class="bnf-meta">]</span>
-<a name="(elem._(bnf-prod._(.Pyret._bind-tuple)))"></a>&#8249;bind-tuple&#8250;<span class="bnf-meta">:</span> <a href="#%28elem._%28bnf-prod._%28.Pyret._binding%29%29%29" data-pltdoc="x">&#8249;binding&#8250;</a> <span class="bnf-lit">;</span></p></blockquote><div class="navsetbottom"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="Provide_Statements.html" title="backward to &quot;2.1.3 Provide Statements&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="s_forms.html" title="up to &quot;2.1 Language Constructs&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Blocks.html" title="forward to &quot;2.1.5 Blocks&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
+<a name="(elem._(bnf-prod._(.Pyret._bind-tuple)))"></a>&#8249;bind-tuple&#8250;<span class="bnf-meta">:</span> <a href="#%28elem._%28bnf-prod._%28.Pyret._binding%29%29%29" data-pltdoc="x">&#8249;binding&#8250;</a> <span class="bnf-lit">;</span></p></blockquote><p>One form of binding is <a href="#%28elem._%28bnf-prod._%28.Pyret._tuple-binding%29%29%29" data-pltdoc="x">&#8249;tuple-binding&#8250;</a>s. When a tuple is bound using a tuple binding each value in the tuple is assigned to its corresponding identifier.</p><p>Nested tuples cannot be bound using <a href="#%28elem._%28bnf-prod._%28.Pyret._tuple-binding%29%29%29" data-pltdoc="x">&#8249;tuple-binding&#8250;</a>s. The number of indentifiers must match the length of the given tuple.</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-block"><pre class="pyret-highlight"><p>check:
+  {x;y} = {1;2}
+  x is 1
+  y is 2
+
+  fun sum-two({k;v;}, {a;b;c;}):
+    k + v + a + b + c
+  end
+
+  sum-two({10; 12}, {1; 4; 5}) is 32
+
+  fun sum-vals(elts) block:
+    var sum = 0
+    for each({k;v;} from elts):
+      sum := sum + v
+    end
+    sum
+  end
+
+  elts = [list: {"a"; 5}, {"b"; 6}, {"c"; 7}]
+  sum-vals(elts) is 18
+end</p></pre></pre></div></p></div><div class="navsetbottom"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="Provide_Statements.html" title="backward to &quot;2.1.3 Provide Statements&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="s_forms.html" title="up to &quot;2.1 Language Constructs&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Blocks.html" title="forward to &quot;2.1.5 Blocks&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
