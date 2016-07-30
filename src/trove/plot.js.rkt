@@ -5,7 +5,8 @@
 @(define (link T) (a-id T (xref "plot" T)))
 @(define Color (a-id "Color" (xref "image-structs" "Color")))
 @(define (t-field name ty) (a-field (tt name) ty))
-@(define (t-record . rest) (a-record (apply tt rest)))
+@(define (t-record . rest)
+   (apply a-record (map tt (filter (lambda (x) (not (string=? x "\n"))) rest))))
 
 @(append-gen-docs
   `(module "plot"
@@ -16,11 +17,11 @@
     (fun-spec (name "bar-chart") (arity 3))
     (fun-spec (name "grouped-bar-chart") (arity 3))
 
-    (fun-spec (name "plot-function") (arity 2))
-    (fun-spec (name "plot-scatter") (arity 2))
-    (fun-spec (name "plot-line") (arity 2))
+    (fun-spec (name "display-function") (arity 2))
+    (fun-spec (name "display-scatter") (arity 2))
+    (fun-spec (name "display-line") (arity 2))
 
-    (fun-spec (name "plot-multi") (arity 3))
+    (fun-spec (name "display-multi-plot") (arity 3))
 
     (type-spec (name "PlotOptions"))
     (type-spec (name "PlotWindowOptions"))
@@ -41,7 +42,7 @@
 
   Every function in this library is available on the @tt{plot} module object.
   For example, if you used @pyret{import plot as P}, you would write
-  @pyret{P.plot-function} to access @pyret{plot-function} below. If you used
+  @pyret{P.display-function} to access @pyret{display-function} below. If you used
   @pyret{include}, then you can refer to identifiers without needing to prefix
   with @pyret{P.}.
 
@@ -127,7 +128,7 @@
   instead of connecting lines between them. This is to avoid the problem of inaccurate plotting
   causing from, for example, discontinuity of the function, or a function which oscillates infinitely.
 
-  @function["plot-multi"
+  @function["display-multi-plot"
     #:contract (a-arrow S
                         (L-of (link "Plot"))
                         (link "PlotWindowOptions")
@@ -148,7 +149,7 @@
       row: 3, 9
       row: 4, 16
     end, _.{color: I.green})
-  plot-multi(
+  display-multi-plot(
     'quadratic function and a scatter plot',
     [list: p1, p2],
     _.{x-min: 0, x-max: 20, y-min: 0, y-max: 20})
@@ -159,7 +160,7 @@
   top, bottom window boundary are 0, 20, 0, 20 respectively.
   }
 
-  @function["plot-function"
+  @function["display-function"
     #:contract (a-arrow S (a-arrow N N) (a-arrow N N))
     #:args '(("title" #f) ("f" #f))
     #:return (a-arrow N N)
@@ -169,11 +170,11 @@
 
   @examples{
   NUM_E = ~2.71828
-  plot-function('converge to 1', lam(x): 1 - num-expt(NUM_E, 0 - x) end)
+  display-function('converge to 1', lam(x): 1 - num-expt(NUM_E, 0 - x) end)
   }
   }
 
-  @function["plot-line"
+  @function["display-line"
     #:contract (a-arrow S TA TA)
     #:args '(("title" #f) ("tab" #f))
     #:return TA
@@ -182,7 +183,7 @@
   display it. See @link{line-plot} for more information.
 
   @examples{
-  plot-line('My line', table: x, y
+  display-line('My line', table: x, y
     row: 1, 2
     row: 2, 10
     row: 2.1, 3
@@ -192,7 +193,7 @@
   }
   }
 
-  @function["plot-scatter"
+  @function["display-scatter"
     #:contract (a-arrow S TA TA)
     #:args '(("title" #f) ("tab" #f))
     #:return TA
@@ -201,7 +202,7 @@
   display it. See @link{scatter-plot} for more information.
 
   @examples{
-  plot-scatter('My scatter plot', table: x, y
+  display-scatter('My scatter plot', table: x, y
     row: 1, 2
     row: 1, 3.1
     row: 4, 1
@@ -313,15 +314,16 @@
   @;############################################################################
   @section{The Options Types and Default Values}
 
-  An Option type is actually a function type consuming a default config and
-  produces a desired config.
+  The PlotOptions and PlotWindowOptions type is actually a function type
+  consuming a default config and produces a desired config.
 
   To use a default config, you could construct
   @pyret-block{lam(default-configs): default-configs end}
   which consumes a default config and merely returns it. We provide a value
-  @pyret{default-options} which is the above value for convenience.
+  @pyret{default-options} and @pyret{default-window-options} which are the
+  identity function above for convenience.
 
-  A new Option can be constructed by the using @secref["s:extend-expr"] on
+  A new Options can be constructed by the using @secref["s:extend-expr"] on
   the default config.
 
   @pyret-block{
@@ -355,16 +357,21 @@
             (t-field "x-max" N)
             (t-field "y-min" N)
             (t-field "y-max" N)
+            (t-field "num-samples" N)
             (t-field "infer-bounds" B)]
 
-  The default config is @tt{plot-window-options} is
+  The default config is
   @t-record{x-min: -10
             x-max: 10
             y-min: -10
             y-max: 10
+            num-samples: 1000
             infer-bounds: false}
 
   If @pyret{infer-bounds} is true,
   @pyret{x-min}, @pyret{x-max}, @pyret{y-min}, @pyret{y-max} will be inferred,
   and old values will be overwritten.
+
+  @pyret{num-samples} is to control the number of sample points for
+  @link{function-plot}s.
 }
