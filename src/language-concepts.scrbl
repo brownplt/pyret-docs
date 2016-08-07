@@ -20,6 +20,8 @@ Pyret-specific libraries and concepts, like @seclink["testing"] and
 
 @include-section["lang/brands.scrbl"]
 
+@include-section["lang/type-check.scrbl"]
+
 
 @;@include-section["lang/annotations.scrbl"]
 

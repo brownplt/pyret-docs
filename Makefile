@@ -1,4 +1,6 @@
-all:
+all: docs
+
+docs:
 	scribble \
     ++style ./node_modules/codemirror/lib/codemirror.css \
     ++extra ./node_modules/codemirror/lib/codemirror.js \
@@ -15,3 +17,8 @@ all:
     --dest-name docs \
     ++arg "$(VERSION)" \
     --htmls src/index.scrbl
+
+release-docs: docs
+	scp -r build/docs/ $(DOCS_TARGET)/$(VERSION)/
+	chmod -R a+rx $(DOCS_TARGET)/$(VERSION)/
+	cd $(DOCS_TARGET) && unlink latest && ln -s $(VERSION) latest

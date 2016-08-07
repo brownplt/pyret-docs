@@ -288,8 +288,8 @@ numbers and rough numbers (``roughnums''). Both are to base ten;
 real; and finite.
 
 Exact numbers are arbitrarily precise rational numbers: these
-include integers and rational fractions.  For integers whose
-magnitude is less than @pyret{(2^53 - 1)},
+include integers and rational fractions.  For integers whose 
+magnitude is less than @pyret{(num-expt(2, 53) - 1)},
 Pyret internally uses JavaScript
 fixnums, in order to optimize basic arithmetic.
 

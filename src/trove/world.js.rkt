@@ -20,26 +20,31 @@
 ))
 
 @docmodule["world"]{
-  The Pyret world library is based on the universe teachpack in HtDP, and borrows much of the language for documentation. You can find documentation for the teachpack here:
 
-  @url["http://docs.racket-lang.org/teachpack/2htdpuniverse.html"]
+  @margin-note{ The world model is based on the universe teachpack in HtDP. You
+  can find documentation for the teachpack here:
+
+  @url["http://docs.racket-lang.org/teachpack/2htdpuniverse.html"]}
+
+  The Pyret world library provides functions for building animations and
+  interactive programs.
 
   @section[#:tag "image_DataTypes"]{Data Types}
-  @data-spec["WorldConfig"]{
-    @para{
-        This datatype is abstract, and its implementation details (such
-        as it constructors) are not exposed directly; use one of the
-        functions described below to construct a @secref[(tag-name "world"
-        "WorldConfig")] instead.
-    }
-  }
 
+  @type-spec["WorldConfig" (list "a")]
+
+  This type includes the values that can be passed to @pyret-id{big-bang} as
+  event handlers (e.g. @pyret-id{on-tick} and @pyret-id{on-key}), renderers
+  (e.g. @pyret-id{to-draw}), and other configuration options (e.g.
+  @pyret-id{stop-when}).
+    
   @section{Functions}
   @function["big-bang"
             #:contract (a-arrow "a"
                                 (a-app L
-                                       WC)
+                                       (a-app WC "a"))
                                 "a")
+            #:return "a"
             #:args (list '("init" "")
                          '("handlers" ""))]{
     This function starts a world program in the initial state specified
@@ -56,6 +61,7 @@
             #:contract (a-arrow (a-arrow "a"
                                          (a-id "Scene" (xref "image" "Scene")))
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("drawer" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will inform the world program
@@ -65,6 +71,7 @@
             #:contract (a-arrow (a-arrow "a"
                                          "a")
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("handler" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called each program tick
@@ -75,6 +82,7 @@
                                          "a")
                                 N
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("handler" "")
                          '("n" ""))]{
     Consumes a function and returns a handler that, when passed to
@@ -86,31 +94,56 @@
                                          S
                                          "a")
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("onKey" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called every time a
     key is pressed. The function is called with the current world state
     and a @secref[(tag-name "<global>" "String")] representing the pressed
-    key. For most keys, this is just the corresponding single character. Some
-    examples of single character strings that you may receive are @pyret{"a"},
-    @pyret{"b"}, @pyret{"c"}, @pyret{" "}, @pyret{"\r"} (return/enter key),
-    @pyret{"\t"} (tab key), @pyret{"\b"} (backspace). In some cases, you
-    may receive multiple characters. For a full enumeration of these, you
-    should reference the Racket world documentation on @hyperlink["http://docs.racket-lang.org/teachpack/2htdpuniverse.html#%28tech._world._keyevent%29"]{key events}.
+    key. For most keys, this is just the corresponding single character.
+
+    The special keys are:
+
+    @itemlist[
+
+    @item{Backspace key: @pyret{"backspace"}}
+    @item{Tab key: @pyret{"tab"}}
+    @item{Enter key: @pyret{"enter"}}
+    @item{Shift key: @pyret{"shift"}}
+    @item{Control key: @pyret{"control"}}
+    @item{Pause key: @pyret{"pause"}}
+    @item{Escape key: @pyret{"escape"}}
+    @item{Prior key: @pyret{"prior"}}
+    @item{Next key: @pyret{"next"}}
+    @item{End key: @pyret{"end"}}
+    @item{Home key: @pyret{"home"}}
+    @item{Left arrow: @pyret{"left"}}
+    @item{Up arrow: @pyret{"up"}}
+    @item{Right arrow: @pyret{"right"}}
+    @item{Down arrow: @pyret{"down"}}
+    @item{Print key: @pyret{"print"}}
+    @item{Insert key: @pyret{"insert"}}
+    @item{Delete key: @pyret{"delete"}}
+    @item{Backspace key: @pyret{"backspace"}}
+    @item{Num lock key: @pyret{"numlock"}}
+    @item{Scroll key: @pyret{"scroll"}}
+
+    ]
+
   }
   @function["on-mouse"
             #:contract (a-arrow (a-arrow "a"
                                          N N S
                                          "a")
                                 WC)
-            #:args (list '("onMouse" ""))]{
+            #:return (a-app WC "a")
+            #:args (list '("mouse-handler" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called on every sampled
     mouse movement. The function will receive the world state, the current
     @pyret["x"] and @pyret["y"] positions of the mouse, and a @secref[(tag-name
     "<global>" "String")] representing a mouse event. Possible mouse
     events are:
-
 
     @itemlist[(item (pyret "\"button-down\"") 
                     " signals that the computer user has pushed a mouse button down;")
@@ -128,6 +161,7 @@
   @function["stop-when"
             #:contract (a-arrow (a-arrow "a" B)
                                 WC)
+            #:return (a-app WC "a")
             #:args (list '("stopper" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called to determine if
@@ -137,6 +171,7 @@
   }
   @function["is-world-config"
             #:contract (a-arrow "Any" B)
+            #:return (a-app WC "a")
             #:args (list '("v" ""))]{
     Tests if the input is of type @secref[(tag-name "world" "WorldConfig")].
   }
@@ -144,6 +179,7 @@
             #:contract (a-arrow S
                                 S
                                 B)
+            #:return (a-app WC "a")
             #:args (list '("key1" "")
                          '("key2" ""))]{
     Tests if two key events are equals to each other.

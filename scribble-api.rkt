@@ -21,6 +21,7 @@
          racket/bool
          racket/dict
          racket/path
+         racket/string
          racket/runtime-path
          "scribble-helpers.rkt"
          )
@@ -247,8 +248,13 @@
 (define (dt-style name) (make-style name (list (make-alt-tag "dt"))))
 (define (dd-style name) (make-style name (list (make-alt-tag "dd"))))
 
-(define (pyret-block . body) (nested #:style (pre-style "pyret-highlight") (apply literal body)))
-(define (pyret . body) (elem #:style (span-style "pyret-highlight") (apply tt body)))
+(define (pyret-block #:style [style #f] . body)
+  (define real-style (if style (string-append "pyret-highlight " style) "pyret-highlight"))
+  (nested #:style (pre-style "pyret-block")
+          (nested #:style (pre-style real-style) (apply literal body))))
+(define (pyret #:style [style #f] . body)
+  (define real-style (if style (string-append "pyret-highlight " style) "pyret-highlight"))
+  (elem #:style (span-style real-style) (apply tt body)))
 (define (pyret-id id (mod (curr-module-name)))
   (seclink (xref mod id) (tt id)))
 (define (pyret-method datatype id (mod (curr-module-name)))
@@ -681,7 +687,7 @@
                       (list (tt ")" " -> " return))
                       (list (tt ")")))))]
                 [else
-                 (nested #:style (div-style "boxed")
+                 (nested #:style (div-style "boxed pyret-header")
                  (apply para #:style (dl-style "multiline-args")
                    (append
                     (list (dt name-elt " :: " "("))
@@ -747,7 +753,7 @@
                    #:examples (examples '())
                    . contents
                    )
-   (let ([ans
+   (let* ([ans
           (render-fun-helper
            (find-doc (curr-module-name) name) name
            (list 'part (tag-name (curr-module-name) name))

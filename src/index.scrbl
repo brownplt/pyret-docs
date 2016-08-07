@@ -38,8 +38,6 @@ examples in Pyret.}
 
 @include-section["language-concepts.scrbl"]
 
-@include-section["builtins.scrbl"]
-
 @include-section["libraries.scrbl"]
 
-@include-section/if-set["IS_DEVELOPMENT" "internal.scrbl"]
+@include-section["internal.scrbl"]

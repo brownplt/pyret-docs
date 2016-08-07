@@ -4,3 +4,4 @@ node_modules/
 !src/*.html
 *.bak
 .DS_Store
+*.swp
