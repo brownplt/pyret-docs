@@ -1403,19 +1403,6 @@
         (a-app (a-id "List" (xref "lists" "List")) "a")
         (a-app (a-id "List" (xref "lists" "List")) "a"))))
   (fun-spec
-    (name "index")
-    (arity 2)
-    (params [list: leaf("a")])
-    (args ("lst" "n"))
-    (return "a")
-    (contract
-      (a-arrow
-        (a-app (a-id "List" (xref "lists" "List")) "a")
-        (a-id "Number" (xref "<global>" "Number"))
-        "a"))
-    (doc
-      "Returns the nth element of the given list, or raises an error if n is out of range"))
-  (fun-spec
     (name "get-help")
     (arity 2)
     (params [list: leaf("a")])
@@ -2028,15 +2015,6 @@ end
 
   }
 
-  @function[
-    "index"
-    #:examples
-    '@{
-      @; get-help([list: 1, 2, 3], 0) is 1
-      @; get-help([list: ], 0) raises ""
-      
-    }
-  ]
   @function[
     "member"
   ]
