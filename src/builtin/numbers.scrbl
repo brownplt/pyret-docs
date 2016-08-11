@@ -625,7 +625,7 @@ the argument is rough.
 check:
   num-round(4.2) is 4
   num-round(4.8) is 5
-  num-round(-½4.2) is -4
+  num-round(-4.2) is -4
   num-round(-4.8) is -5
 end
 }
