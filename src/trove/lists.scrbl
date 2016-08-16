@@ -1,4 +1,4 @@
-#lang scribble/base
+#lang scribble/manual
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 
 @(append-gen-docs
@@ -1403,19 +1403,6 @@
         (a-app (a-id "List" (xref "lists" "List")) "a")
         (a-app (a-id "List" (xref "lists" "List")) "a"))))
   (fun-spec
-    (name "index")
-    (arity 2)
-    (params [list: leaf("a")])
-    (args ("lst" "n"))
-    (return "a")
-    (contract
-      (a-arrow
-        (a-app (a-id "List" (xref "lists" "List")) "a")
-        (a-id "Number" (xref "<global>" "Number"))
-        "a"))
-    (doc
-      "Returns the nth element of the given list, or raises an error if n is out of range"))
-  (fun-spec
     (name "get-help")
     (arity 2)
     (params [list: leaf("a")])
@@ -1483,6 +1470,9 @@ check:
 end
 }
 
+@bold{Note:} explicitly writing the trailing @pyret-id{empty} is both
+unnecessary and wrong; the constructor notation needs only the
+@emph{elements} of the list.
 
 @section{List Methods}
 
@@ -1504,19 +1494,23 @@ end
 
 @list-method["map"]
 
-Applies @pyret{f} to each element of the list, constructing a new list out
-of the return values in the same order.
+Applies @pyret{f} to each element of the list from left to right, and
+constructs a new list out of the return values in the corresponding order.
 
 @examples{
 check:
   [list: 1, 2].map(lam(n): n + 1 end) is [list: 2, 3] 
-  [list: 1, 2].map(num-tostring) is [list: "1", "2"] 
+  [list: 1, 2].map(num-tostring) is [list: "1", "2"]
+  empty.map(lam(x): raise "This never happens!" end) is empty
 end
 }
 
 @list-method["each"]
 
-Applies @pyret{f} to each element of the list, returning nothing
+Applies @pyret{f} to each element of the list from left to right, and
+returns @pyret-id{nothing}.  Because it returns @pyret-id{nothing},
+use @pyret-id{each} instead of @pyret-id{map} when the function
+@pyret{f} is needed only for its side-effects.
 
 @examples{
 check:
@@ -1528,8 +1522,9 @@ end
 
 @list-method["filter"]
 
-Applies @pyret{f} to each element of list, constructing a new list out of the
-elements for which @pyret{f} returned @pyret{true}.
+Applies @pyret{f} to each element of list from left to right,
+constructing a new list out of the elements for which @pyret{f}
+returned @pyret{true}.
 
 @examples{
 check:
@@ -1553,6 +1548,12 @@ end
 }
 
 @list-method["split-at"]
+Produces a record containing two lists, consisting of the items before
+and the items at-or-after the
+splitting index of the current list.  The index is 0-based, so
+splitting a list at index @math{n} will produce a prefix of length
+exactly @math{n}.  Moreover, @pyret-id{append}ing the two lists
+together will be equivalent to the original list.
 
 @examples{
 check:
@@ -1563,18 +1564,30 @@ check:
   one-four.split-at(2) is { prefix: link(1, link(2, empty)), suffix: link(3, link(4, empty)) }
   one-four.split-at(-1) raises "Invalid index"
   one-four.split-at(5) raises "Index too large"
+
+  for each(i from range(0, 4)):
+    split = one-four.split-at(i)
+    split.prefix.length() is i
+    split.prefix.append(split.suffix) is one-four
+  end
 end
 }
 
 @list-method["take"]
+Given a length @math{n}, returns a new list containing the first
+@math{n} items of the list.
+
 
 @examples{
 check:
   [list: 1, 2, 3, 4, 5, 6].take(3) is [list: 1, 2, 3]
+  [list: 1, 2, 3].take(6) raises "Index too large"
+  [list: 1, 2, 3].take(-1) raises "Invalid index"
 end
 }
 
 @list-method["drop"]
+Given a length @math{n}, returns a list containing all but the first @math{n} items of the list.
 
 @examples{
 check:
@@ -1583,15 +1596,18 @@ end
 }
 
 @list-method["get"]
-
+Returns the item at the given index of the list.
 @examples{
 check:
   [list: 1, 2, 3].get(0) is 1
   [list: ].get(0) raises "too large"
+  [list: 1, 2, 3].get(-1) raises "invalid argument"
 end
 }
 
 @list-method["set"]
+Returns a new list, with the same contents as the existing list,
+except the value at the specified index is replaced with the given value.
 
 @examples{
 check:
@@ -1602,34 +1618,113 @@ end
 
 @list-method["foldl"]
 
-Applies @pyret{f(last-elt, f(second-last-elt, ... f(first-elt, base)))}.  For
-@pyret-id{empty}, returns @pyret{base}.
+Computes @pyret{f(last-elt, ... f(second-elt, f(first-elt, base))...)}.  For
+@pyret-id{empty}, returns @pyret{base}.  In other words, it uses
+@pyret{f} to combine @pyret{base} with each item in the list starting from the left.
 
 @examples{
 check:
-  [list: 3, 2, 1].foldl(link, empty) is [list: 1, 2, 3]
+  fun combine(elt, acc): tostring(elt) + ", " + acc end
+  [list: 3, 2, 1].foldl(combine, "END") is "1, 2, 3, END"
+  empty.foldl(combine, "END") is "END"
+
+  [list: 3, 2, 1].foldl(link, empty) is link(1, link(2, link(3, empty)))
 end
 }
 
 @list-method["foldr"]
 
-Applies @pyret{f(first-elt, f(second-elt, ... f(last-elt, base)))}.  For
-@pyret-id{empty}, returns @pyret{base}.
+Computes @pyret{f(first-elt, f(second-elt, ... f(last-elt, base)))}.  For
+@pyret-id{empty}, returns @pyret{base}.  In other words, it uses
+@pyret{f} to combine @pyret{base} with each item in the list starting from the right.
 
 @examples{
 check:
-  [list: 3, 2, 1].foldr(link, empty) is [list: 3, 2, 1]
+  fun combine(elt, acc): tostring(elt) + ", " + acc end
+  [list: 3, 2, 1].foldr(combine, "END") is "1, 2, 3, END"
+  
+  [list: 3, 2, 1].foldr(link, empty) is link(3, link(2, link(1, empty)))
 end
 }
 
 @list-method["member"]
-@list-method["append"]
-@list-method["last"]
-@list-method["reverse"]
-@list-method["sort"]
-@list-method["sort-by"]
-@list-method["join-str"]
+Returns true if the current list contains the given value, as compared
+by @pyret{==}.
 
+@examples{
+check:
+  [list: 1, 2, 3].member(2) is true
+  [list: 2, 4, 6].member(3) is false
+  [list: ].member(empty) is false
+
+  [list: ~1, ~2, ~3].member(~1) raises "Roughnums"
+end
+}
+
+@list-method["append"]
+Produces a new list with all the elements of the current list,
+followed by all the elements of the given list.
+
+@examples{
+check:
+  [list: 1, 2].append([list: 3, 4]) is [list: 1, 2, 3, 4]
+  empty.append([list: 1, 2]) is [list: 1, 2]
+  [list: 1, 2].append(empty) is [list: 1, 2]
+end
+}
+
+@list-method["last"]
+Returns the last item of the list.
+@examples{
+check:
+  [list: 1, 2, 3].last() is 3
+  empty.last() raises "last of empty list"
+end
+}
+
+@list-method["reverse"]
+Produces a new list with the items of the original list in reversed order.
+@examples{
+check:
+  [list: 1, 2, 3].reverse() is [list: 3, 2, 1]
+  empty.reverse() is empty
+end
+}
+
+@list-method["sort"]
+Produces a new list whose contents are the same as those of the
+current list, sorted by @pyret-id{<} and @pyret-id{==}.  This requires that
+the items of the list be comparable by @pyret-id{<} (see @secref["s:binop-expr"]).
+@examples{
+check:
+  [list: 1, 5, 3, 2, 4].sort() is [list: 1, 2, 3, 4, 5]
+  [list: "aaaa", "B", "a"].sort() is [list: "B", "a", "aaaa"]
+  [list: true, false].sort() raises "binop-error"
+end
+}
+
+@list-method["sort-by"]
+Like @pyret-id{sort}, but the comparison and equality operators can be
+specified.  This allows for sorting lists whose contents are not
+comparable by @pyret{<}.
+@examples{
+check:
+  fun true-after-false(x, y): y and not(x) end
+  [list: true, false].sort-by(true-after-false, lam(x, y): x == y end)
+    is [list: false, true]
+end
+}
+
+@list-method["join-str"]
+Combines the values of the current list by converting them to strings
+with @pyret{tostring} and joining them with the given string.
+@examples{
+check:
+  [list: 1, 2, 3].join-str(", ") is "1, 2, 3"
+  [list: "a", true, ~5.3].join-str(" : ") is "a : true : ~5.3"
+  empty.join-str("nothing at all") is ""
+end
+}
 
 
 @section{List Functions}
@@ -1920,15 +2015,6 @@ end
 
   }
 
-  @function[
-    "index"
-    #:examples
-    '@{
-      @; get-help([list: 1, 2, 3], 0) is 1
-      @; get-help([list: ], 0) raises ""
-      
-    }
-  ]
   @function[
     "member"
   ]

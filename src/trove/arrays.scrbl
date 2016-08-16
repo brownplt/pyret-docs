@@ -163,7 +163,7 @@ end
   #:return "a"
 ]
 
-Returns the value at the given @pyret{index}.  If the array is too large, is
+Returns the value at the given @pyret{index}.  If the index is too large, is
 negative, or isn't a whole number, an error is signaled.  This method has a
 @pyret{-now} suffix because its answer can change from one call to the next if,
 for example, @a-ref["set-now"] is used.
