@@ -546,7 +546,7 @@ annotation below
 
 @examples{
 check:
-  {{w :: List; x :: Boolean} as wx; {y; z} :: {String, Number} as yz} as wxyz = {{empty; true}; {"hello"; 4}}
+  {{w :: List; x :: Boolean} as wx; {y; z} as yz :: {String, Number}} as wxyz = {{empty; true}; {"hello"; 4}}
   w is [list: ]
   x is true
   y is "hello"
