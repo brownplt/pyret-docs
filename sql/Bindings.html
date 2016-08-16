@@ -100,7 +100,7 @@ these components.  Tuple annotations should only go on the tuples
 themselves or on their components; annotating the <span class="pyret-highlight"><span class="stt">as NAME</span></span>
 binding is not allowed.  We demonstrate both permitted styles of
 annotation below</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-block"><pre class="pyret-highlight"><p>check:
-  {{w :: List; x :: Boolean} as wx; {y; z} :: {String, Number} as yz} as wxyz = {{empty; true}; {"hello"; 4}}
+  {{w :: List; x :: Boolean} as wx; {y; z} as yz :: {String, Number}} as wxyz = {{empty; true}; {"hello"; 4}}
   w is [list: ]
   x is true
   y is "hello"
