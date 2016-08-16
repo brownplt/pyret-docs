@@ -387,29 +387,105 @@ Many syntactic forms in Pyret need to designate names for values.  These are
 uniformly represented as @py-prod{binding}s:
 
 @bnf['Pyret]{
-binding: [SHADOW] NAME [COLONCOLON ann] | tuple-binding
-tuple-binding: LBRACE tuple-bind-list RBRACE
-tuple-bind-list: bind-tuple* binding [SEMI]
-bind-tuple: binding SEMI
+binding: name-binding | tuple-binding
+name-binding: [SHADOW] NAME [COLONCOLON ann]
+tuple-binding: LBRACE (binding SEMI)* binding [SEMI] RBRACE [AS name-binding]
 SHADOW: "shadow"
 COLONCOLON: "::"
 SEMI: ";"
 LBRACE: "{"
 RBRACE: "}"
+AS: "as"
 }
 
-One form of binding is @py-prod{tuple-binding}s. When a tuple is bound using a tuple binding each value in the tuple is assigned to its corresponding identifier.
+@subsection{Name bindings}
+The simplest form of binding is a @py-prod{name-binding}.  This form
+simply associates a name with a given value:
+@pyret-block[#:style "good-ex"]{
+PI = ~3.141592
+five = num-sqrt((3 * 3) + (4 * 4))
+hw = string-append("Hello", " world")
+}
 
-@margin-note{Nested binding will be added in the future.}
-Nested tuples cannot be bound using @py-prod{tuple-binding}s. The number of indentifiers must match the length of the given tuple. 
+@subsection{Annotated bindings}
+Slightly more complicated, a name binding may also specify an
+@seclink["s:annotations"]{annotation}, that will ensure that the
+value being bound has the correct type:
+@pyret-block[#:style "good-ex"]{
+PI :: Number = ~3.141592
+hw :: String = string-append("Hello", "world")
+
+this-will-fail :: Boolean = 5
+}
+That last line will fail at runtime with an annotation error.
+
+@subsection{Shadowing}
+
+Pyret does not permit a program to implicitly bind the same name
+multiple times in the same scope, as this can be confusing or
+ambiguous: which name was meant?
+
+@pyret-block[#:style "bad-ex"]{
+ans = 3 + 4
+ans = true # did you mean to use a different name here?
+
+ans # which one was meant?
+}
+
+Pyret will signal an error on the second binding of @pyret{ans} above,
+saying that it @emph{shadows} the earlier definition.  Shadowing can
+occur within functions, too:
+
+@pyret-block[#:style "bad-ex"]{
+ans = 3 + 4
+
+fun oops(x):
+  ans = x * 2  # Shadows the outer ans
+  ans
+end
+
+fun another-oops(ans): # also shadows the outer ans
+  if ans: 3 else: 4 end
+end
+}
+
+The general rule for shadowing is to look "upward and leftward",
+i.e. looking outward from the current scope to any enclosing scopes,
+to see if there are any existing bindings of the same name.  The inner
+definitions @emph{shadow} the outer ones: because they are "hiding in
+its shadow", the outer definitions are not visible in the inner scope.
+
+But sometimes, redefining the same name makes the most sense.  In this
+case, a program can explicitly specify that it means to hide the outer
+definition, using the @pyret{shadow} keyword:
+@pyret-block[#:style "good-ex"]{
+ans = 3 + 4
+fun oops(x):
+  shadow ans = x * 2 # <-------------------------+
+  ans    # uses the ans defined the line above --+
+end
+fun another-oops(shadow ans):
+  if ans: 3 else: 3 end # uses the function's parameter
+end
+}
+
+@subsection{Tuple bindings}
+Tuples are useful to package up several Pyret values into a single
+value, which can then be passed around and manipulated as a single
+entity.  But often, the most useful manipulation is to break the tuple
+apart into its components.  While there are @py-prod{tuple-get}
+expressions to access individual components, it's often easiest to
+give all the components names.  We do this with a
+@py-prod{tuple-binding}, which binds each component of a tuple to its
+own name. The number of bindings must match the length of the given tuple:
 
 @examples{
 check:
-  {x;y} = {1;2}
+  {x; y} = {1; 2}
   x is 1
   y is 2
 
-  fun sum-two({k;v;}, {a;b;c;}):
+  fun sum-two({k; v}, {a; b; c}):
     k + v + a + b + c
   end
 
@@ -417,7 +493,7 @@ check:
 
   fun sum-vals(elts) block:
     var sum = 0
-    for each({k;v;} from elts):
+    for each({k; v} from elts):
       sum := sum + v
     end
     sum
@@ -425,6 +501,59 @@ check:
 
   elts = [list: {"a"; 5}, {"b"; 6}, {"c"; 7}]
   sum-vals(elts) is 18 
+end
+}
+
+It is also possible to @emph{nest} tuple bindings, if the tuple being
+bound has tuples nested inside it:
+
+@examples{
+check:
+  {{w; x}; {y; z}} = {{empty; true}; {"hello"; 4}}
+  w is [list: ]
+  x is true
+  y is "hello"
+  z is 4
+end
+}
+
+Nested bindings likewise must match the number of components in the
+tuple being bound, and follow the same rules of shadowing as normal
+name bindings.
+
+With nested tuples, it is sometimes also useful to not only decompose
+the nested tuples into their components, but to give a name to the
+nested tuple itself:
+
+@examples{
+check:
+  {{w; x} as wx; {y; z} as yz} as wxyz = {{empty; true}; {"hello"; 4}}
+  w is [list: ]
+  x is true
+  y is "hello"
+  z is 4
+  wx is {empty; true}
+  yz is {"hello", 4}
+  wxyz is {wx; yz}
+end
+}
+
+As with any other name bindings, you can provide annotations on any of
+these components.  Tuple annotations should only go on the tuples
+themselves or on their components; annotating the @pyret{as NAME}
+binding is not allowed.  We demonstrate both permitted styles of
+annotation below
+
+@examples{
+check:
+  {{w :: List; x :: Boolean} as wx; {y; z} :: {String, Number} as yz} as wxyz = {{empty; true}; {"hello"; 4}}
+  w is [list: ]
+  x is true
+  y is "hello"
+  z is 4
+  wx is {empty; true}
+  yz is {"hello", 4}
+  wxyz is {wx; yz}
 end
 }
 
@@ -936,8 +1065,8 @@ The following are all the expression forms of Pyret:
 @bnf['Pyret]{
 expr: paren-expr | id-expr | prim-expr
     | lam-expr | method-expr | app-expr
-    | obj-expr | tuple-expr | tuple-get
-    | dot-expr
+    | obj-expr | dot-expr
+    | tuple-expr | tuple-get
     | template-expr
     | get-bang-expr | update-expr
     | extend-expr
@@ -1825,4 +1954,37 @@ arrow-ann-elt: ann COMMA
 When an arrow annotation appears in a binding, that binding position simply
 checks that the value is a function.
 
+@subsection[#:tag "s:pred-ann"]{Predicate Annotations}
+A predicate annotation is used to @emph{refine} the annotations
+describing the a value.  
 
+@bnf['Pyret]{
+             PERCENT: "%"
+             LPAREN: "("
+             RPAREN: ")"
+pred-ann: ann PERCENT LPAREN NAME RPAREN
+          }
+
+
+For example, a function might only work on non-empty lists.  We might
+write this as
+
+@pyret-block[#:style "good-ex"]{
+fun do-something-with<a>(non-empty-list :: List<a>%(is-link)) -> a: ... end
+}
+
+If we want to write customized predicates, we can easily do so.  Those
+predicates must be defined @emph{before} being used in an annotation
+position, and must be refered to by name
+
+@subsection[#:tag "s:tuple-ann"]{Tuple Annotations}
+Annotating a tuple is syntactically very similar to writing a tuple value:
+
+@bnf['Pyret]{
+LBRACE: "{"
+RBRACE: "}"
+SEMI: ";"
+tuple-ann: LBRACE ann (SEMI ann)* [SEMI] RBRACE
+}
+
+Each component is itself an annotation.
