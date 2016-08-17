@@ -712,7 +712,7 @@ There are a number of forms that can only appear as statements in @tt{block}s
 @py-prod{data-decl} is an exception, and can appear only at the top level.
 
 @bnf['Pyret]{
-stmt: let-decl | fun-decl | data-decl | var-decl 
+stmt: let-decl | fun-decl | data-decl | var-decl | type-stmt | newtype-stmt
 }
 
 @subsection[#:tag "s:let-decl"]{Let Declarations}
@@ -1003,6 +1003,51 @@ statements"] to the variable check the annotation on the new value before
 updating.
 
 
+
+@subsection[#:tag "s:type-decl"]{Type Declarations}
+Pyret provides two means of defining new type names.  
+@bnf['Pyret]{
+TYPE: "type"
+EQUALS: "="
+type-stmt: TYPE type-decl
+type-decl: NAME ty-params EQUALS ann
+}
+
+A @py-prod{type-stmt} declares an alias to an existing type.  This allows for
+creating convenient names for types, especially when type parameters are
+involved.
+@examples{
+type Predicate<a> = (a -> Boolean)
+# Now we can use this alias to make the signatures for other functions more readable:
+fun filter<a>(pred :: Predicate<a>, elts :: List<a>) -> List<a>: ... end
+
+# We can specialize types, too:
+type NumList = List<Number>
+type StrPred = Predicate<String>
+}
+
+
+@subsection[#:tag "s:newtype-decl"]{Newtype Declarations}
+By contrast, sometimes we need to declare brand-new types, that are not easily
+describable using @py-prod{data-decl} or other existing types.  (For one common
+example, we might want to build an object-oriented type that encapsulates
+details of its internals.)  To do that we need to specify both a @emph{static name} to
+use as annotations to describe our data, and a @emph{dynamic brand} to mark the
+data and ensure that we can recognize it again when we see it.
+@bnf['Pyret]{
+NEWTYPE: "newtype"
+AS: "as"
+newtype-stmt: newtype-decl
+newtype-decl: NEWTYPE NAME AS NAME
+}
+When we write
+@examples{
+newtype MytypeBrander as MyType
+}
+we define both of these components.  See @secref{brands} for more information
+about branders.
+
+
 @section{Statements}
 
 There are just a few forms that can only appear as statements in @tt{block}s
@@ -1065,17 +1110,16 @@ The following are all the expression forms of Pyret:
 @bnf['Pyret]{
 expr: paren-expr | id-expr | prim-expr
     | lam-expr | method-expr | app-expr
-    | obj-expr | dot-expr
+    | obj-expr | dot-expr | extend-expr
     | tuple-expr | tuple-get
     | template-expr
     | get-bang-expr | update-expr
-    | extend-expr
     | if-expr | ask-expr | cases-expr
     | for-expr
     | user-block-expr | inst-expr
+    | construct-expr
     | multi-let-expr | letrec-expr
     | type-let-expr
-    | construct-expr
 paren-expr: LPAREN expr RPAREN
 id-expr: NAME
 prim-expr: NUMBER | RATIONAL | BOOLEAN | STRING
@@ -1392,6 +1436,33 @@ t = empty-tree
   ^ add(_, 3)
   # and so on
 }
+
+
+
+
+@subsection[#:tag "s:inst-expr"]{Instantiation Expressions}
+Functions may be defined with parametric signatures.  Calling those functions
+does not require specifying the type parameter, but supplying it might aid in
+readability, or may aid the static type checker.  You can supply the type
+arguments just between the function name and the left-paren of the function
+call.  Spaces are not permitted before the left-angle bracket or after the
+right-angle bracket
+
+@bnf['Pyret]{
+LANGLE: "<"
+RANGLE: ">"
+COMMA: ","
+inst-expr: expr LANGLE ann (COMMA ann)* RANGLE
+}
+
+@examples{
+fun is-even(n :: Number) -> Boolean: num-modulo(n, 2) == 0 end
+check:
+  map<Number, Boolean>(is-even, [list: 1, 2, 3]) is [list: false, true, false]
+end
+}
+
+
 
 @subsection[#:tag "s:binop-expr"]{Binary Operators}
 
@@ -1852,10 +1923,173 @@ Because templates are by definition unfinished, the presence of a
 template expression in a block exempts that block from
 @seclink["s:blocky-blocks"]{explicit-blockiness checking}.
 
+
+@subsection[#:tag "s:reference-fields"]{Mutable fields}
+Pyret allows creating data definitions whose fields are mutable.  Accordingly,
+it provides syntax for accessing and modifying those fields.
+@bnf['Pyret]{
+BANG: "!"
+LBRACE: "{"
+RBRACE: "}"
+get-bang-expr: expr BANG NAME
+update-expr: expr BANG LBRACE fields RBRACE
+}
+
+By analogy with how @py-prod{dot-expr} accesses normal fields,
+@py-prod{get-bang-expr} accesses mutable fields --- but more emphatically so,
+because mutable fields, by their nature, might change.  Dot-access to mutable
+fields also works, but does not return the field's value: it returns the
+reference itself, which is a Pyret value that's mostly inert and difficult to
+work with outside the context of its host object.
+
+@examples{
+data MutX:
+  | mut-x(ref x, y)
+end
+
+ex1 = mut-x(1, 2)
+
+check:
+  ex1!x is 1      # this access the value inside the reference
+  ex1.x is-not 1  # this does not
+end
+}
+
+To update a reference value, we use syntax similar to @py-prod{extend-expr},
+likewise made more emphatic:
+
+@examples{
+ex1!{x: 42}
+check:
+  ex1!x is 42
+end
+}
+
+
+
+
+
+
+@subsection[#:tag "s:construct-expr"]{Construction expressions}
+Individual Pyret data values are syntactically simple to construct: they look
+similar to function calls.  But arbitrarily-sized data is not as obvious.  For
+instance, we could write
+@examples{
+link(1, link(2, link(3, link(4, empty))))
+}
+to construct a 4-element list of numbers, but this gets tiresome quite
+quickly.  Many languages provide built-in syntactic support for constructing
+lists, but in Pyret we want all data types to be treated equally.  Accordingly,
+we can write the above example as
+@examples{
+[list: 1, 2, 3, 4]
+}
+where @emph{@pyret{list} is not a syntactic keyword} in the language.  Instead,
+this is one example of a @emph{construction expression}, whose syntax is simply
+@bnf['Pyret]{
+LBRACK: "["
+RBRACK: "]"
+COLON: ":"
+COMMA: ","
+construct-expr: LBRACK binop-expr COLON construct-args RBRACK
+construct-args: [binop-expr (COMMA binop-expr)*]
+}
+
+Pyret defines several of these constructors for you: lists, sets, arrays, and
+string-dictionaries all have the same syntax.
+
+
+The expression before the initial colon is a Pyret object that has a particular
+set of methods available.  Users can define their own constructors as well.
+@pyret-block{
+type Constructor<A> = {
+  make0 :: ( -> A),
+  make1 :: (Any -> A),
+  make2 :: (Any, Any -> A),
+  make3 :: (Any, Any, Any -> A),
+  make4 :: (Any, Any, Any, Any -> A),
+  make5 :: (Any, Any, Any, Any, Any -> A)
+  make  :: (RawArray<Any> -> A),
+}
+}
+When Pyret encounters a construction expression, it will call the
+appropriately-numbered method on the constructor objects, depending on the
+number of arguments it received.
+
+@examples{
+weird :: Constructor<String> = {
+  make0: lam(): "nothing at all" end,
+  make1: lam(a): "just " + tostring(a) end,
+  make2: lam(a, b): tostring(a) + " and " + tostring(b) end,
+  make3: lam(a, b, c): "several things" end,
+  make4: lam(a, b, c, d): "four things" end,
+  make5: lam(a, b, c, d, e): "five things" end,
+  make : lam(args): "too many things" end
+}
+check:
+  [weird: ] is "nothing at all"
+  [weird: true] is "just true"
+  [weird: 5, 6.24] is "5 and 6.24"
+  [weird: true, false, 5] is "several things"
+  [weird: 1, 2, 3, 4] is "four things"
+  [weird: 1, 1, 1, 1, 1] is "five things"
+  [weird: "a", "b", "c", true, false, 5] is "too many things"
+end
+}
+
+
+@subsection[#:tag "s:binding-expressions"]{Expression forms of bindings}
+Every definition is Pyret is visible until the end of its scope, which is
+usually the nearest enclosing block.  To limit that scope, you can wrap
+definitions in explicit @py-prod{user-block-expr}s, but this is sometimes awkward to
+read.  Pyret allows for three additional forms that combine bindings with
+expression blocks in a manner that is sometimes more legible:
+
+@bnf['Pyret]{
+LET: "let"
+LETREC: "letrec"
+TYPE-LET: "type-let"
+COMMA: ","
+BLOCK: "block"
+COLON: ":"
+END: "end"
+EQUALS: "="
+NEWTYPE: "newtype"
+AS: "as"
+multi-let-expr: LET let-or-var (COMMA let-or-var)* [BLOCK] COLON block END
+let-or-var: let-decl | var-decl
+letrec-expr: LETREC let-decl (COMMA let-decl)* [BLOCK] COLON block END
+type-let-expr: TYPE-LET type-let-or-newtype (COMMA type-let-or-newtype)* [BLOCK] COLON END
+type-let-or-newtype: type-decl | newtype-decl
+}
+
+These define their bindings only for the scope of the following block.  A
+@py-prod{multi-let-expr} defines a sequence of either let- or
+variable-bindings, each of which are in scope for subsequent ones.  A
+@py-prod{letrec-expr} defines a set of mutually-recursive let-bindings that may
+refer to each other in a well-formed way (i.e., no definition may rely on other
+definitions before they've been fully evaluated).  These are akin to the
+@py-prod{let-decl} and @py-prod{var-decl} forms seen earlier, but with more
+explicitly-visible scoping rules.
+
+Finally, @py-prod{type-let-expr} defines local type aliases or new types, akin
+to @py-prod{type-stmt}.
+
+
+
+@;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+@;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+
 @section[#:tag "s:annotations"]{Annotations}
 
 @bnf['Pyret]{
-ann: name-ann | record-ann | arrow-ann | app-ann | pred-ann | dot-ann | tuple-ann
+ann: name-ann | dot-ann
+   | app-ann | arrow-ann | pred-ann
+   | tuple-ann | record-ann
 }
 
 Annotations in Pyret express intended types values will have at runtime.
@@ -1988,3 +2222,28 @@ tuple-ann: LBRACE ann (SEMI ann)* [SEMI] RBRACE
 }
 
 Each component is itself an annotation.
+
+For example we could write
+@examples{
+num-bool :: {Number; Boolean} = {3; true}
+num-bool--string-list :: {{Number; Boolean}; {String; List<Any>}} = {{3; true}; {"hi"; empty}}
+}
+
+@subsection[#:tag "s:record-ann"]{Record Annotations}
+Annotating a record is syntactically very similar to writing a record value,
+but where the single-colon separators between field names and their values have
+been replaced with the double-colon of all annotations:
+
+@bnf['Pyret]{
+LBRACE: "{"
+RBRACE: "}"
+COMMA: ","
+COLONCOLON: "::"
+record-ann: LBRACE ann-field (COMMA ann-field)* RBRACE
+ann-field: NAME COLONCOLON ann
+}
+
+As with object literals, the order of fields does not matter.  For example,
+@examples{
+my-obj :: {n :: Number, s :: String, b :: Boolean} = {s: "Hello", b: true, n: 42}
+}
