@@ -759,7 +759,7 @@ Approximations of numbers (Roughnums) cannot be compared for equality. The
 program may need to use within().
 }
 
-If you see this erorr, it's a hint that the program should be using an
+If you see this error, it's a hint that the program should be using an
 equality from the @pyret-id["within"] family of functions to do a relative
 comparison, rather than a direct equality comparison.  So in this case, we
 could check that the answer is equal up to an relative error of @pyret{0.001}:

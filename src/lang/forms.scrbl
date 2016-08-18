@@ -96,6 +96,212 @@ rather than to
 
 @(table-of-contents)
 
+@section[#:tag "s:literals"]{Primitives and Literals}
+
+There are several different literal token types referred to in this
+documentation.
+
+@subsection{Names}
+
+@bnf['Pyret]{
+id-expr: NAME
+key: NAME
+}
+
+Names in Pyret match the following regular expression:
+
+@justcode{
+^[_a-zA-Z][_a-zA-Z0-9]*(?:-+[_a-zA-Z0-9]+)*
+}
+
+@margin-note{The convention in Pyret is that @pyret{kebab-case-names} are used
+for names of values and fields, and @pyret{TitleCaseNames} are used for
+annotations.} That is, they start with an alphabetical character or an
+underscore, followed by any number of alphanumeric characters mixed with
+underscores and hyphens, ending in a non-hyphen.  So, for example, the
+following are valid names (though not necessarily good style):
+
+@pyret-block[#:style "good-ex"]{
+a
+a1
+a-1
+abc
+ABC
+a----------b
+a-_-_-_-__--b
+a--_
+_a
+__
+}
+
+
+The following are not valid names:
+
+@pyret-block[#:style "bad-ex"]{
+_-
+-_
+a-
+-a
+-a-
+-abc
+a1-
+a-1-
+a_1-
+α
+1abc
+$abc
+}
+
+@subsection{String Literals}
+
+@bnf['Pyret]{
+string-expr: STRING
+}
+
+Strings in Pyret come in several forms.  First, they can be enclosed in double
+quotes:
+
+@pyret-block[#:style "good-ex"]{
+"a string"
+"a string\" with escapes"
+"'single quotes' are allowed unescaped or \' escaped"
+}
+
+They can also be enclosed in single quotes:
+
+@pyret-block[#:style "good-ex"]{
+'a string'
+'a string\' with escapes'
+'"double quotes" are allowed unescaped or \" escaped'
+}
+
+String literals with single or double quotes must terminate by the end of the
+line:
+
+@pyret-block[#:style "bad-ex"]{
+"multi-line
+strings not
+allowed with double quotes"
+}
+
+Finally, multi-line string literals can be created by starting and ending them
+with three backticks (@pyret{```}).  For example:
+
+@pyret-block[#:style "good-ex"]{
+```
+This string
+spans
+multiple lines
+```
+}
+
+Multi-line string literals strip all whitespace before the first non-whitespace
+character and after the last non-whitespace character.  All whitespace at the
+beginning of intermediate lines is preserved.
+
+@subsection{Number Literals}
+
+@bnf['Pyret]{
+num-expr: NUMBER
+}
+
+Pyret has several types of number literals.  The most traditional allows for
+decimal numbers, negation, and an exponent:
+
+@justcode{
+^[-+]?[0-9]+(?:\\.[0-9]+)?(?:[eE][-+]?[0-9]+)?
+}
+
+That is, an optional sign, then some number of digits, optionally followed by a
+decimal point and more digits, optionally followed by an exponent.  These are
+valid number literals:
+
+@pyret-block[#:style "good-ex"]{
+0.1
+1
+1e100
+1.1e100
++1.1e100
+-1.1e-100
+1.1230e-0
+10
+19
+19.0
+}
+
+Note that a number literal cannot start with a decimal point; some leading
+digits are required.  These are not number literals:
+
+@pyret-block[#:style "bad-ex"]{
+.1
+1.1.1
+1.+1
+0.1+100
+}
+
+This first kind of number literal represents an @emph{exact} number, or
+@pyret-id["Exactnum" "numbers"].  Number literals can also be prefixed with a
+tilde, to indicate that the number is an approximation, or a
+@pyret-id["Roughnum" "numbers"].  So these are all valid rough number literals:
+
+@pyret-block[#:style "good-ex"]{
+~0.1
+~1
+~1e100
+~1.1e100
+~+1.1e100
+~-1.1e-100
+~1.1230e-0
+~10
+~19
+~19.0
+}
+
+And these are not valid:
+
+@pyret-block[#:style "bad-ex"]{
+~.1
+~1.1.1
+~1.+1
+~0.1+100
+}
+
+Finally, numbers can be written as exact ratios of whole numbers:
+
+@justcode{
+^[-+]?[0-9]+/[0-9]+
+}
+
+These numbers are interpreted as @pyret-id["Exactnum" "numbers"]s.  These are
+valid rational literals:
+
+@pyret-block[#:style "good-ex"]{
+1/2
+-1/2
++1/4
+1234/9
+0/1234
+}
+
+It is a syntax error to use zero as the denominator in a fraction literal.
+These are not valid rational literals:
+
+
+@pyret-block[#:style "bad-ex"]{
+1+1/2
+-1/0
+1.1/9
+1/-3
+}
+
+@subsection{Boolean Literals}
+
+@bnf['Pyret]{
+bool-expr: "true" | "false"
+}
+
+Boolean literals are the lowercase words @pyret{true} and @pyret{false}.
+
 @section[#:tag "s:program"]{Programs}
 
 Programs consist of a sequence of import or provide statements, followed by a
@@ -194,6 +400,7 @@ RBRACE: "}"
 
 One form of binding is @py-prod{tuple-binding}s. When a tuple is bound using a tuple binding each value in the tuple is assigned to its corresponding identifier.
 
+@margin-note{Nested binding will be added in the future.}
 Nested tuples cannot be bound using @py-prod{tuple-binding}s. The number of indentifiers must match the length of the given tuple. 
 
 @examples{
@@ -239,8 +446,8 @@ Blocks serve two roles in Pyret:
   @item{Units of lexical scope}
 ]
 
-The @py-prod{let-expr}, @py-prod{fun-expr},
-@py-prod{data-expr}, and @py-prod{var-expr} forms
+The @py-prod{let-decl}, @py-prod{fun-decl},
+@py-prod{data-decl}, and @py-prod{var-decl} forms
 are handled specially and non-locally within blocks.  A detailed
 description of scope will appear here soon.
 
@@ -260,7 +467,7 @@ end
 z = y + ans # error: y is not in scope here
 }
 
-@subsection[#:tag "s:blocky-blocks"]{Block shorthand}
+@subsection[#:tag "s:blocky-blocks"]{Block Shorthand}
 
 Many expressions in Pyret include one or more blocks within them.  For
 example, the body of a function is defined as a block.  Technically,
@@ -338,7 +545,7 @@ end
 
 The leading @tt{block} allows for multiple statements in @emph{all} of
 the blocks of this expression.  Analogous markers exist for
-@py-prod{ask-expr}, @py-prod{cases-expr}, @py-prod{fun-expr}, etc.
+@py-prod{ask-expr}, @py-prod{cases-expr}, @py-prod{fun-decl}, etc.
 
 However, even this marker is sometimes too much.  Suppose we
 eliminated the @tt{print} call in the example above:
@@ -359,7 +566,7 @@ block containing multiple expressions.  Instead, Pyret will consider
 the following to be valid "non-blocky" blocks:
 
 @bnf['Pyret]{
-non-blocky-block: stmt* template-expr stmt* | let-expr* expr | user-block-expr
+non-blocky-block: stmt* template-expr stmt* | let-decl* expr | user-block-expr
 }
 
 Any sequence of let-bindings followed by exactly one expression is
@@ -368,29 +575,30 @@ fine, as is any block containing even a single template-expression, or
 trigger the multiple-expressions warning and require either an
 explicit block or a block-shorthand to fix.
 
-@section{Statements}
+@section{Declarations}
 
 There are a number of forms that can only appear as statements in @tt{block}s
-and @tt{provide} expressions:
+(rather than anywhere an expression can appear).  Several of these are
+@emph{declarations}, which define new names within their enclosing block.
+@py-prod{data-decl} is an exception, and can appear only at the top level.
 
 @bnf['Pyret]{
-stmt: let-expr | fun-expr | data-expr | when-expr
-    | var-expr | assign-expr | binop-expr
+stmt: let-decl | fun-decl | data-decl | var-decl 
 }
 
-@subsection[#:tag "s:let-expr"]{Let Expressions}
+@subsection[#:tag "s:let-decl"]{Let Declarations}
 
-Let expressions are written with an equals sign:
+Let declarations are written with an equals sign:
 
 @bnf['Pyret]{
 EQUALS: "="
-let-expr: binding EQUALS binop-expr
+let-decl: binding EQUALS binop-expr
 }
 
 A let statement causes the name in the @tt{binding} to be put in scope in the
 current block, and upon evaluation sets the value to be the result of
 evaluating the @tt{binop-expr}.  The resulting binding cannot be changed via an
-@tt{assign-expr}, and cannot be shadowed by other bindings within the same or
+@py-prod{assign-stmt}, and cannot be shadowed by other bindings within the same or
 nested scopes:
 
 @pyret-block{
@@ -444,7 +652,7 @@ x = "hi"
 
 }
 
-@subsection[#:tag "s:fun-expr"]{Function Declaration Expressions}
+@subsection[#:tag "s:fun-decl"]{Function Declaration Expressions}
 
 Function declarations have a number of pieces:
 
@@ -460,7 +668,7 @@ THINARROW: "->"
 DOC: "doc:"
 WHERE: "where:"
 BLOCK: "block"
-fun-expr: FUN NAME fun-header [BLOCK] COLON doc-string block where-clause END
+fun-decl: FUN NAME fun-header [BLOCK] COLON doc-string block where-clause END
 fun-header: ty-params args return-ann
 ty-params:
   [LANGLE list-ty-param* NAME RANGLE]
@@ -508,10 +716,10 @@ f = lam(x, y):
 end
 }
 
-See the documentation for @tt{lambda-exprs} for an explanation of arguments'
+See the documentation for @tt{lam-exprs} for an explanation of arguments'
 and annotations' behavior, as well as @tt{doc-strings}.
 
-@subsection[#:tag "s:data-expr"]{Data Declarations}
+@subsection[#:tag "s:data-decl"]{Data Declarations}
 
 Data declarations define a number of related functions for creating and
 manipulating a data type.  Their grammar is:
@@ -523,7 +731,7 @@ DATA: "data"
 PIPE: "|"
 LPAREN: "("
 RPAREN: ")"
-data-expr: DATA NAME ty-params COLON
+data-decl: DATA NAME ty-params COLON
     data-variant*
     data-sharing
     where-clause
@@ -541,7 +749,7 @@ data-sharing: [SHARING fields]
 }
 
 
-A @tt{data-expr} causes a number of new names to be bound in the scope of the
+A @py-prod{data-decl} causes a number of new names to be bound in the scope of the
 block it is defined in:
 
 @itemlist[
@@ -642,7 +850,40 @@ where:
 end
 }
 
-@subsection[#:tag "s:when-exp"]{When Expressions}
+@subsection[#:tag "s:var-decl"]{Variable Declarations}
+
+Variable declarations look like @seclink["s:let-decl" "let bindings"], but
+with an extra @tt{var} keyword in the beginning:
+
+@bnf['Pyret]{
+             VAR: "var"
+             EQUALS: "="
+var-decl: VAR binding EQUALS expr
+}
+
+A @tt{var} expression creates a new @emph{assignable variable} in the current
+scope, initialized to the value of the expression on the right of the @tt{=}.
+It can be accessed simply by using the variable name, which will always
+evaluate to the last-assigned value of the variable.  @seclink["s:assign-stmt"
+"Assignment statements"] can be used to update the value stored in an
+assignable variable.
+
+If the @tt{binding} contains an annotation, the initial value is checked
+against the annotation, and all @seclink["s:assign-stmt" "assignment
+statements"] to the variable check the annotation on the new value before
+updating.
+
+
+@section{Statements}
+
+There are just a few forms that can only appear as statements in @tt{block}s
+that aren't declarations:
+
+@bnf['Pyret]{
+stmt: when-stmt | assign-stmt | binop-expr
+}
+
+@subsection[#:tag "s:when-stmt"]{When Statements}
 
 A when expression has a single test condition with a corresponding
 block.
@@ -652,7 +893,7 @@ WHEN: "when"
 COLON: ":"
 END: "end"
 BLOCK: "block"
-when-expr: WHEN binop-expr [BLOCK] COLON block END
+when-stmt: WHEN binop-expr [BLOCK] COLON block END
 }
 
 For example:
@@ -666,37 +907,14 @@ end
 If the test condition is true, the block is evaluated. If the
 test condition is false, nothing is done, and @pyret{nothing} is returned.
 
-@subsection[#:tag "s:var-expr"]{Variable Declarations}
-
-Variable declarations look like @seclink["s:let-expr" "let bindings"], but
-with an extra @tt{var} keyword in the beginning:
-
-@bnf['Pyret]{
-             VAR: "var"
-             EQUALS: "="
-var-expr: VAR binding EQUALS expr
-}
-
-A @tt{var} expression creates a new @emph{assignable variable} in the current
-scope, initialized to the value of the expression on the right of the @tt{=}.
-It can be accessed simply by using the variable name, which will always
-evaluate to the last-assigned value of the variable.  @seclink["s:assign-expr"
-"Assignment statements"] can be used to update the value stored in an
-assignable variable.
-
-If the @tt{binding} contains an annotation, the initial value is checked
-against the annotation, and all @seclink["s:assign-expr" "assignment
-statements"] to the variable check the annotation on the new value before
-updating.
-
-@subsection[#:tag "s:assign-expr"]{Assignment Statements}
+@subsection[#:tag "s:assign-stmt"]{Assignment Statements}
 
 Assignment statements have a name on the left, and an expression on the right
 of @tt{:=}:
 
 @bnf['Pyret]{
              COLON-EQUALS: ":="
-assign-expr: NAME COLON-EQUALS binop-expr
+assign-stmt: NAME COLON-EQUALS binop-expr
 }
 
 If @tt{NAME} is not declared in the same or an outer scope of the assignment
@@ -705,17 +923,22 @@ expression with a @tt{var} declaration, the program fails with a static error.
 At runtime, an assignment expression changes the value of the assignable
 variable @tt{NAME} to the result of the right-hand side expression.
 
+@subsection{Binop Expression “Statements”}
+
+The @py-prod{binop-expr} production is included in @py-prod{stmt} because any
+expression can appear where a statement can (subject to restrictions from
+@seclink["s:well-formedness"]{well-formedness checking}).
+
 @section{Expressions}
 
 The following are all the expression forms of Pyret:
 
 @bnf['Pyret]{
 expr: paren-expr | id-expr | prim-expr
-    | lambda-expr | method-expr | app-expr
+    | lam-expr | method-expr | app-expr
     | obj-expr | tuple-expr | tuple-get
     | dot-expr
     | template-expr
-#    | bracket-expr NOTE(joe): commented out until it has semantics
     | get-bang-expr | update-expr
     | extend-expr
     | if-expr | ask-expr | cases-expr
@@ -731,23 +954,6 @@ LPAREN: "("
 RPAREN: ")"
 }
 
-@subsection[#:tag "s:template-expr"]{Template Expressions}
-@bnf['Pyret]{
-DOTS: "..."
-template-expr: DOTS
-}
-Template expressions are placeholders.  They indicate portions of the
-code that are unfinished, and are particularly useful when expanding
-the template step of the Design Recipe (hence the name).
-
-A template expression will evaluate to a runtime error, if it ever
-gets evaluated.
-
-Because templates are by definition unfinished, the presence of a
-template expression in a block exempts that block from
-@seclink["s:well-formedness"]{well-formedness checking}, or from
-@seclink["s:blocky-blocks"]{explicit-blockiness checking}.
-
 @subsection[#:tag "s:lam-expr"]{Lambda Expressions}
 
 The grammar for a lambda expression is:
@@ -757,7 +963,7 @@ The grammar for a lambda expression is:
              COLON: ":"
              END: "end"
              BLOCK: "block"
-lambda-expr: LAM fun-header [BLOCK] COLON
+lam-expr: LAM fun-header [BLOCK] COLON
     doc-string
     block
     where-clause
@@ -774,7 +980,7 @@ DOC: "doc:"
 A lambda expression creates a function value that can be applied with
 @seclink["s:app-expr" "application expressions"].  The arguments in @tt{args}
 are bound to their arguments as immutable identifiers as in a
-@seclink["s:let-expr" "let expression"].
+@seclink["s:let-decl" "let expression"].
 
 @examples{
 check:
@@ -853,6 +1059,46 @@ check:
 end
 }
 
+@subsection[#:tag "s:method-expr"]{Anonymous Method Expressions}
+
+An anonymous method expression looks much like an anonymous function (defined
+with @pyret{lam}):
+
+@bnf['Pyret]{
+METHOD: "method"
+BLOCK: "block"
+COLON: ":"
+END: "end"
+method-expr: METHOD fun-header [BLOCK] COLON doc-string block where-clause END
+}
+
+All the same rules for bindings, including annotations and shadowing, apply the
+same to @py-prod{method-expr}s as they do to @py-prod{lam-expr}s.
+
+It is a well-formedness error for a method to have no arguments.
+
+At runtime, a @py-prod{method-expr} evaluates to a method value.  Method values
+cannot be applied directly:
+
+@examples{
+check:
+  m = method(self): self end
+  m(5) raises "non-function"
+end
+}
+
+Instead, methods must be included as object fields, where they can then be
+bound and invoked.  A method value can be used in multiple objects:
+
+@examples{
+check:
+  m = method(self): self.x end
+  o = { a-method-name: m, x: 20 }
+  o2 = { a-method-name: m, x: 30 }
+  o.m() is 20
+  o2.m() is 30
+end
+}
 
 @subsection[#:tag "s:app-expr"]{Application Expressions}
 
@@ -1028,6 +1274,8 @@ is also a binary operator expression.
 binop-expr: expr (BINOP expr)*
 }
 
+@margin-note{The @pyret{==} and @pyret{=~} operators also call methods, but are
+somewhat more complex.  They are documented in detail in @seclink["equality"].}
 Each binary operator is syntactic sugar for a particular method or function
 call.  The following table lists the operators, their intended use, and the
 corresponding call:
@@ -1045,10 +1293,61 @@ corresponding call:
 ]
 
 For the primitive strings and numbers, the operation happens internally.  For
-all object values, the operator looks for the method appropriate method and
-calls it.  The special names allow a form of operator overloading, and avoid
-adding an extra concept beyond function and method calls to the core to
-account for these binary operations.
+all object or data values, the operator looks for the method appropriate method
+and calls it.
+
+@subsection[#:tag "s:tuple-expr"]{Tuple Expressions}
+
+Tuples are an immutable, fixed-length collection of expressions indexed by non-negative integers:
+
+@bnf['Pyret]{
+tuple-expr: "{" tuple-fields "}"
+tuple-fields: binop-expr (";" binop-expr)* [";"]
+}
+
+A semicolon-separated sequence of fields enclosed in @tt{{}} creates a tuple. 
+
+@subsection[#:tag "s:tuple-get-expr"]{Tuple Access Expressions}
+
+@bnf['Pyret]{
+tuple-get: expr "." "{" NUMBER "}"
+}
+
+A tuple-get expression evaluates the @tt{expr} to a value @tt{val}, and then
+does one of three things:
+
+@margin-note{A static well-formedness error is raised if the index is
+negative}
+@itemlist[
+  @item{Raises an exception, if @tt{expr} is not a tuple}
+
+  @item{Raises an exception, if @tt{NUMBER} is equal to or greater than the length of the given tuple}
+
+  @item{Evaluates the expression, returning the @tt{val} at the given index.  The first index is @pyret{0}}
+]
+
+For example:
+
+@pyret-block[#:style "good-ex"]{
+check:
+  t = {"a";"b";true}
+  t.{0} is "a"
+  t.{1} is "b"
+  t.{2} is true
+end
+}
+
+
+Note that the index is restricted @emph{syntactically} to being a number.  So this program is a parse error:
+
+@pyret-block[#:style "bad-ex"]{
+t = {"a";"b";"c"}
+t.{1 + 1}
+}
+
+This restriction ensures that tuple access is typable.
+
+
 
 @subsection[#:tag "s:obj-expr"]{Object Expressions}
 
@@ -1091,38 +1390,6 @@ value.
 
 The fields are evaluated in the order they appear.  If the same field appears
 more than once, it is a compile-time error.
-
-@subsection[#:tag "s:tuple-expr"]{Tuple Expressions}
-
-Tuples are an immutable, fixed-length collection of expressions indexed by non-negative integers:
-
-@justcode{
-tuple-expr: "{" tuple-fields "}"
-tuple-fields: binop-expr (";" binop-expr)* [";"]
-}
-
-A semicolom-separated sequence of fields enclosed in @tt{{}} creates a tuple. 
-
-Tuple indexing:
-
-@justcode{
-tuple-get: expr "." "{" NUMBER "}"
-}
-
-An expression that evlautes to a tuple, followed by a dot, followed by and index enclosed in @tt{{}} indexes into a tuple.  
-
-A tuple-get expression evaluates the @tt{expr} to a value @tt{val}, and then does one
-of four things:
-
-@itemlist[
-  @item{Raises a well-formedness error, if @tt{NUMBER} is negative}
-  @item{Raises an exception, if @tt{expr} is not a tuple}
-
-  @item{Raises an exception, if @tt{NUMBER} is equal to or greater than the length of the given tuple}
-
-  @item{Evaluates the expression, returning the @tt{val} at the given index}
-]
-
 
 @subsection[#:tag "s:dot-expr"]{Dot Expressions}
 
@@ -1302,7 +1569,7 @@ used in a structure parallel to a data definition.
              THICKARROW: "=>"
              END: "end"
              BLOCK: "block"
-cases-expr: CASES LPAREN check-ann RPAREN expr [BLOCK] COLON
+cases-expr: CASES LPAREN ann RPAREN expr [BLOCK] COLON
     cases-branch*
     [BAR ELSE THICKARROW block]
   END
@@ -1387,7 +1654,7 @@ The for expression is just syntactic sugar for a
 @seclink["s:lam-expr"]{@tt{lam-expr}} and a @seclink["s:app-expr"]{@tt{app-expr}}.  An expression
 
 @pyret-block{
-for fun-expr(arg1 :: ann1 from expr1, ...) -> ann-return:
+for fexpr(arg1 :: ann1 from expr1, ...) -> ann-return:
   block
 end
 }
@@ -1395,7 +1662,7 @@ end
 is equivalent to:
 
 @pyret-block{
-fun-expr(lam(arg1 :: ann1, ...) -> ann-return: block end, expr1, ...)
+fexpr(lam(arg1 :: ann1, ...) -> ann-return: block end, expr1, ...)
 }
 
 Using a @tt{for-expr} can be a more natural way to call, for example, list
@@ -1415,8 +1682,9 @@ fold(lam(sum, number): sum + number end, 0, [list: 1,2,3,4])
 
 A template expression is three dots in a row:
 
-@justcode{
-template-expr: "..."
+@bnf['Pyret]{
+DOTS: "..."
+template-expr: DOTS
 }
 
 It is useful for a placeholder for other expressions in code-in-progress.  When
@@ -1451,6 +1719,9 @@ end
 x :: ... = 5 # parse error
 }
 
+Because templates are by definition unfinished, the presence of a
+template expression in a block exempts that block from
+@seclink["s:blocky-blocks"]{explicit-blockiness checking}.
 
 @section[#:tag "s:annotations"]{Annotations}
 
@@ -1477,7 +1748,7 @@ name-ann: NAME
 dot-ann: NAME DOT NAME
           }
 Some annotations are simply names.  For example, a
-@seclink["s:data-expr"]{@tt{data declaration}} binds the name of the
+@seclink["s:data-decl"]{@tt{data declaration}} binds the name of the
 declaration as a value suitable for use as a name annotation.  There are
 built-in name annotations, too:
 
@@ -1553,4 +1824,5 @@ arrow-ann-elt: ann COMMA
 
 When an arrow annotation appears in a binding, that binding position simply
 checks that the value is a function.
+
 
