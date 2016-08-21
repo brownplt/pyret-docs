@@ -954,6 +954,7 @@ expr: paren-expr | id-expr | prim-expr
     | table-extract
     | table-transform
     | table-extend
+    | load-table-expr
 paren-expr: LPAREN expr RPAREN
 id-expr: NAME
 prim-expr: NUMBER | RATIONAL | BOOLEAN | STRING
