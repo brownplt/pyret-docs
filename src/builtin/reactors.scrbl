@@ -43,7 +43,7 @@
 
 @docmodule["reactors"]{
 
-@section{Creating Reactors}
+@section[#:tag "s:reactors"]{Creating Reactors}
 
 @type-spec["Reactor" (list "a")]
 

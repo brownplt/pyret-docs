@@ -2189,7 +2189,7 @@ most use cases, there may be times when one would like to create a custom
 data sanitizer. To do so, one must simply create a function which conforms
 to the @pyret{Sanitizer<A,B>} type in the @tt{data-source} module.
 
-@subsection[#:tag "s:reactors"]{Reactor Expressions}
+@subsection[#:tag "s:reactor-expr"]{Reactor Expressions}
 
 @bnf['Pyret]{
 REACTOR: "reactor"
