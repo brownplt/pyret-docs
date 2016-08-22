@@ -1866,11 +1866,10 @@ Because templates are by definition unfinished, the presence of a
 template expression in a block exempts that block from
 @seclink["s:blocky-blocks"]{explicit-blockiness checking}.
 
-@subsection[#:tag "s:tables"]{Tables}
+@subsection[#:tag "s:table-exprs"]{Tables}
 
-Tables are immutable datatypes consisting of a sequence of one or more
-@italic{rows}, which each contain an equal amount of entries in named locations
-called @italic{columns}.
+Tables precise syntax is documented here.  For helper functions and data
+structures, see @secref["s:tables"].
 
 Table expressions consist of a list of column names followed by one or more
 rows of data:
@@ -1888,21 +1887,6 @@ table-rows: table-row* table-row
 table-row: ROW [binop-expr COMMA]* binop-expr
 }
 
-It is a well-formedness error for a table to have no rows or
-no columns.
-
-@examples{
-my-table = table: name :: String, age :: Number
-  row: "Bob", 12
-  row: "Alice", 17
-  row: "Eve", 13
-end
-}
-
-Note that @pyret{my-tables} is referred to in many of the
-following examples.
-
-@subsubsection[#:tag "s:tables:select"]{Selecting Table Rows}
 @bnf['Pyret]{
 TABLE-SELECT: "select"
 COMMA: ","
@@ -1911,21 +1895,6 @@ FROM: "from"
 table-select: TABLE-SELECT NAME (COMMA NAME)* FROM expr END
 }
 
-Selections are ways to pick only certain columns out from tables. For
-example, one might only be interested in the names of the people contained
-within @pyret{my-table}:
-@pyret-block{
-names-only = select name from my-table end
-check:
-  names-only is table: name
-    row: "Bob"
-    row: "Alice"
-    row: "Eve"
-  end
-end
-}
-
-@subsubsection[#:tag "s:tables:filter"]{Filtering Table Rows}
 @bnf['Pyret]{
 TABLE-FILTER: "sieve"
 COLON: ":"
@@ -1936,30 +1905,6 @@ USING: "using"
 table-sieve: TABLE-FILTER expr [USING binding (COMMA binding)*] COLON binop-expr END
 }
 
-The @pyret{sieve} mechanism allows for filtering out rows of tables based
-on some criteria. The @pyret{using} keyword specifies which columns may be
-used in the body of the @pyret{sieve} expression.
-
-For instance, we can find the individuals in @pyret{my-table} who are old
-enough to drive in the United States. The following would be incorrect, since
-the names being used in the expression body must follow @pyret{using}:
-@pyret-block[#:style "bad-ex"]{
-can-drive = sieve my-table using name:
-  # age is not visible inside of this expression
-  age >= 16
-end
-}
-Instead, this would be correct:
-@pyret-block[#:style "good-ex"]{
-can-drive = sieve my-table using age:
-  age >= 16
-end
-check:
-  can-drive is table: name, age
-    row: "Alice", 17
-  end
-end
-}
 
 @subsubsection[#:tag "s:tables:order"]{Sorting Table Rows}
 @bnf['Pyret]{
@@ -1973,23 +1918,6 @@ table-order: TABLE-ORDER expr COLON column-order END
 column-order: NAME ((ASCENDING | DESCENDING))
 }
 
-Since a table consists of a sequence of rows, one may desire to arrange
-those rows in some particular order. This can be done with any column whose
-type supports the use of @pyret{<} and @pyret{>} by using an @pyret{order}
-expression:
-
-@pyret-block{
-age-ordered = order my-table:
-  age descending
-end
-check:
-  age-ordered is table: name, age
-    row: "Alice", 17
-    row: "Eve", 13
-    row: "Bob", 12
-  end
-end
-}
 @subsubsection[#:tag "s:tables:transform"]{Transforming Table Rows}
 @bnf['Pyret]{
 TABLE-TRANSFORM: "transform"
@@ -2002,26 +1930,6 @@ transform-fields: transform-field (COMMA transform-field)* [COMMA]
 transform-field: key COLON binop-expr
 }
 
-The @pyret{transform} expression allows the changing of columns within a
-table, similar to the @pyret{map} function over lists (and, just like
-@pyret{map}, @pyret{transform} expressions do not mutate the table, but
-instead return a new one).
-
-Suppose we find out that @pyret{my-table} is wrong and everyone is actually
-a year older than it says they are. We can fix our data as follows:
-@pyret-block{
-age-fixed = update my-table using age:
-  age: age + 1
-end
-check:
-  age-fixed is table: name, age
-    row: "Bob", 13
-    row: "Alice", 18
-    row: "Eve", 14
-  end
-end
-}
-
 @subsubsection[#:tag "s:tables:extract"]{Extracting Table Columns}
 @bnf['Pyret]{
 TABLE-EXTRACT: "extract"
@@ -2030,21 +1938,6 @@ COMMA: ","
 END: "end"
 FROM: "from"
 table-extract: TABLE-EXTRACT NAME FROM expr END
-}
-
-A large number of Pyret modules work on lists instead of tables, so it
-may be desired to pull the contents of one column of a table as a list to
-use it elsewhere. The @pyret{extract} mechanism allows this ability, and
-serves as the primary "link" between processing tabular data and non-tabular
-Pyret functions.
-
-Suppose, for example, we wanted just the names of each person in
-@pyret{my-table}. We could pull those names out as follows:
-@pyret-block{
-name-list = select name from my-table end
-check:
-  name-list is [list: "Bob", "Alice", "Eve"]
-end
 }
 
 @subsubsection[#:tag "s:tables:extend"]{Adding Table Columns}
@@ -2061,80 +1954,6 @@ table-extend-field: key [COLONCOLON ann] COLON binop-expr
                   | key [COLONCOLON ann] COLON expr OF NAME
 }
 
-There are two types of extensions which can be made to tables: "mapping" and
-"reducing" columns. A "mapping" column is one whose contents depend only on
-the row it is being added to. An example of this would be a column which tells
-whether the @pyret{age} field of a given row in @pyret{my-table} indicates
-that the person in that row can drive in the United States or not (i.e.
-whether that person is at least 16):
-@pyret-block{
-can-drive-col = extend my-table using age:
-  can-drive: age >= 16
-end
-check:
-  can-drive-col is table: name, age, can-drive
-    row: "Bob", 12, false
-    row: "Alice", 17, true
-    row: "Eve", 13, false
-  end
-end
-}
-
-Note that just like in @seclink["s:tables:transform"]{@pyret{transform}}, it
-is required to specify which columns will be used in the body of the
-@pyret{extend} expression using the @pyret{using} keyword.
-
-Conversely, a "reducing" column is one whose information is computed from the
-row it is being added to @italic{and the rows above that row}. For example, given
-@pyret{can-drive-col} from the previous example, suppose we would like to
-keep a running total of how many people are able to drive. Importing the
-@tt{tables} module allows us to do this:
-@pyret-block{
-import tables as TS
-num-can-drive-col = extend my-table using can-drive:
-  num-can-drive: TS.running-fold({(acc, cur): acc + (if cur: 1 else: 0 end)})
-end
-check:
-  num-can-drive-col = table: name, age, can-drive, num-can-drive
-    row: "Bob", 12, false, 0
-    row: "Alice", 17, true, 1
-    row: "Eve", 13, false, 1
-  end
-end
-}
-
-While the reducers found in the @tt{tables} module should cover most all
-use cases, there may be times when one would like to create a reducer of their
-own. To do so, one must construct an object of the following type:
-@pyret-block{
-type Reducer<Acc, InVal, OutVal> = {
-  one :: (InVal -> {Acc; OutVal}),
-  reduce :: (Acc, InVal -> {Acc; OutVal})
-}
-}
-
-Reducers are essentially descriptions of folds (in the list @pyret{fold}
-sense) over table columns. Note that one can reduce over multiple columns
-as well, in which case the reducer will receive a tuple of values per row
-instead of the usual one per row. The way reducers are called by the language
-runtime is as follows: the value(s) from the first row are passed to the
-reducer's @pyret{.one} method, which should return a tuple containing both
-any accumulated information needed for the fold and the value which should
-be placed in the new column in that row. The remaining rows are then
-sequentially populated using the reducer's @pyret{.reduce} method, which is
-identical to the @pyret{.one} method except that it receives an additional
-argument which is the previously mentioned accumulated information from the
-previous row.
-
-To illustrate, a @pyret{running-mean} reducer which is equivalent to the
-one provided by the @tt{tables} module could be implemented as follows:
-@pyret-block{
-import tables as TS
-running-mean :: TS.Reducer<{Number; Number}, Number, Number> = {
-  one: lam(n): {{n; 1}; n} end,
-  reduce: lam({sum; count}, n): { {sum + n; count + 1}; (sum + n) / (count + 1) }
-}
-}
 
 @subsection[#:tag "s:table-loading"]{Table Loading Expressions}
 
@@ -2152,42 +1971,6 @@ load-table-specs: load-table-spec* load-table-spec
 load-table-spec: SOURCECOLON expr
                | SANITIZE NAME USING expr
 }
-
-Table loading expressions allow for the importing of tables from the
-outside world into Pyret. Currently, only Google Sheets is supported.
-@;(see the @tt{gdrive-sheets} module documentation for details)
-In addition to data sources, the notion of @italic{sanitizers} is used. These
-are used to properly load each entry of the table as the correct type;
-for example, the @pyret{string-sanitizer} in the @tt{data-source} module
-causes each item in its column to be loaded as a string (if it is not a
-string, it is first converted to one). This is illustrated by the following
-example:
-
-@examples{
-import data-source as DS
-import gdrive-sheets as GS
-music-ssheet = GS.load-spreadsheet("<some-spreadsheet-id>")
-
-music = load-table: artist :: String, title :: String, year, sales :: Number
-  source: music-ssheet.sheet-by-name("Sales", false)
-  sanitize artist using DS.string-sanitizer
-  sanitize title using DS.string-sanitizer
-  sanitize year using DS.strict-num-sanitizer
-  sanitize sales using DS.strict-num-sanitizer
-end
-}
-
-In general, it is @italic{safest} to sanitize @italic{every} input column, since it
-is the only way to guarantee that the data source will not guess the column's
-type incorrectly.
-
-Data sources are currently an internal concept to Pyret, so no public
-interface for creating them is supported.
-
-While the @tt{data-source} library provides sanitizers which should cover
-most use cases, there may be times when one would like to create a custom
-data sanitizer. To do so, one must simply create a function which conforms
-to the @pyret{Sanitizer<A,B>} type in the @tt{data-source} module.
 
 @subsection[#:tag "s:reactor-expr"]{Reactor Expressions}
 
@@ -2371,8 +2154,6 @@ to @py-prod{type-stmt}.
 
 
 
-
->>>>>>> sql
 
 @section[#:tag "s:annotations"]{Annotations}
 
