@@ -327,6 +327,7 @@
     (list (title #:tag (tag-name name) (or friendly-title name))
           (if noimport ""
                        (list (para "Usage:")
+                             (nested #:style (pre-style "code") "include " name)
                              (nested #:style (pre-style "code") "import " name " as ...")))
           defs))
 
