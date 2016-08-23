@@ -17,27 +17,28 @@ value being bound has the correct type:
 </div><div class="SIntrapara"><pre class="pyret-block"><pre class="pyret-highlight good-ex"><p>PI :: Number = ~3.141592
 hw :: String = string-append("Hello", "world")
 
-this-will-fail :: Boolean = 5</p></pre></pre></div><div class="SIntrapara">That last line will fail at runtime with an annotation error.</div></p><h5>2.1.5.3<tt>&nbsp;</tt><a name="(part._.Shadowing)"></a>Shadowing</h5><p>Pyret does not permit a program to implicitly bind the same name
+this-will-fail :: Boolean = 5</p></pre></pre></div><div class="SIntrapara">That last line will fail at runtime with an annotation error.</div></p><p><div class="SIntrapara">Note that the annotation always comes after a name; this is not allowed, for
+instance:
+</div><div class="SIntrapara"><pre class="pyret-block"><pre class="pyret-highlight bad-ex"><p>PI = ~3.14 :: Number</p></pre></pre></div></p><h5>2.1.5.3<tt>&nbsp;</tt><a name="(part._.Shadowing)"></a>Shadowing</h5><p>Pyret does not permit a program to implicitly bind the same name
 multiple times in the same scope, as this can be confusing or
 ambiguous: which name was meant?</p><pre class="pyret-block"><pre class="pyret-highlight bad-ex"><p>ans = 3 + 4
 ans = true # did you mean to use a different name here?
 
-ans # which one was meant?</p></pre></pre><p>Pyret will signal an error on the second binding of <span class="pyret-highlight"><span class="stt">ans</span></span> above,
-saying that it <span style="font-style: italic">shadows</span> the earlier definition.  Shadowing can
-occur within functions, too:</p><pre class="pyret-block"><pre class="pyret-highlight bad-ex"><p>ans = 3 + 4
+ans # which one was meant?</p></pre></pre><p>Pyret will signal an error on the second binding of <span class="pyret-highlight"><span class="stt">ans</span></span> above, saying
+that it <span style="font-style: italic">shadows</span> the earlier definition.  The same rule applies to names
+defined in nested scopes, like functions.  This program is disallowed by the
+shadowing rule, as well:</p><pre class="pyret-block"><pre class="pyret-highlight bad-ex"><p>ans = 3 + 4
 
 fun oops(x):
   ans = x * 2  # Shadows the outer ans
   ans
 end
 
-fun another-oops(ans): # also shadows the outer ans
+fun another-oops(ans): # Also shadows the outer ans
   if ans: 3 else: 4 end
 end</p></pre></pre><p>The general rule for shadowing is to look "upward and leftward",
 i.e. looking outward from the current scope to any enclosing scopes,
-to see if there are any existing bindings of the same name.  The inner
-definitions <span style="font-style: italic">shadow</span> the outer ones: because they are "hiding in
-its shadow", the outer definitions are not visible in the inner scope.</p><p><div class="SIntrapara">But sometimes, redefining the same name makes the most sense.  In this
+to see if there are any existing bindings of the same name.</p><p><div class="SIntrapara">But sometimes, redefining the same name makes the most sense.  In this
 case, a program can explicitly specify that it means to hide the outer
 definition, using the <span class="pyret-highlight"><span class="stt">shadow</span></span> keyword:
 </div><div class="SIntrapara"><pre class="pyret-block"><pre class="pyret-highlight good-ex"><p>ans = 3 + 4
@@ -77,8 +78,8 @@ own name. The number of bindings must match the length of the given tuple:</p><d
   sum-vals(elts) is 18
 end</p></pre></pre></div></p></div><p>It is also possible to <span style="font-style: italic">nest</span> tuple bindings, if the tuple being
 bound has tuples nested inside it:</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-block"><pre class="pyret-highlight"><p>check:
-  {{w; x}; {y; z}} = {{empty; true}; {"hello"; 4}}
-  w is [list: ]
+  {{w; x}; {y; z}} = {{~5; true}; {"hello"; 4}}
+  w is ~5
   x is true
   y is "hello"
   z is 4
@@ -87,25 +88,32 @@ tuple being bound, and follow the same rules of shadowing as normal
 name bindings.</p><p>With nested tuples, it is sometimes also useful to not only decompose
 the nested tuples into their components, but to give a name to the
 nested tuple itself:</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-block"><pre class="pyret-highlight"><p>check:
-  {{w; x} as wx; {y; z} as yz} as wxyz = {{empty; true}; {"hello"; 4}}
-  w is [list: ]
+  {{w; x} as wx; {y; z} as yz} as wxyz = {{~5; true}; {"hello"; 4}}
+  w is ~5
   x is true
   y is "hello"
   z is 4
-  wx is {empty; true}
+  wx is {~5; true}
   yz is {"hello", 4}
   wxyz is {wx; yz}
-end</p></pre></pre></div></p></div><p>As with any other name bindings, you can provide annotations on any of
-these components.  Tuple annotations should only go on the tuples
-themselves or on their components; annotating the <span class="pyret-highlight"><span class="stt">as NAME</span></span>
-binding is not allowed.  We demonstrate both permitted styles of
-annotation below</p><div class="examples"><p><div class="SIntrapara"><span style="font-weight: bold">Examples:</span></div><div class="SIntrapara"><pre class="pyret-block"><pre class="pyret-highlight"><p>check:
-  {{w :: List; x :: Boolean} as wx; {y; z} as yz :: {String, Number}} as wxyz = {{empty; true}; {"hello"; 4}}
-  w is [list: ]
+end</p></pre></pre></div></p></div><p>As with any other name bindings, you can provide annotations on any of these
+components.  The rule of annotations adjacent to names applies &#8211; the tuple
+components and the <span class="pyret-highlight"><span class="stt">as</span></span> name can have annotations.  We demonstrate both
+permitted styles of annotation below:</p><pre class="pyret-block"><pre class="pyret-highlight good-ex"><p>check:
+  {
+    {w :: Number; x :: Boolean} as wx;
+    {y; z} as yz :: {String, Number}
+  } as wxyz = {{~5; true}; {"hello"; 4}}
+  w is ~5
   x is true
   y is "hello"
   z is 4
-  wx is {empty; true}
+  wx is {~5; true}
   yz is {"hello", 4}
   wxyz is {wx; yz}
-end</p></pre></pre></div></p></div><div class="navsetbottom"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="Provide_Statements.html" title="backward to &quot;2.1.4 Provide Statements&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="s_forms.html" title="up to &quot;2.1 Language Constructs&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Blocks.html" title="forward to &quot;2.1.6 Blocks&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
+end</p></pre></pre><p>But this is not allowed, because the <span class="pyret-highlight"><span class="stt">{Number; Boolean}</span></span> annotation is
+not adjacent to a name:</p><pre class="pyret-block"><pre class="pyret-highlight bad-ex"><p>check:
+  {{w; x} :: {Number; Boolean} as wx; yz} = {{~5; true}; {"hello"; 4}}
+  w is ~5
+  x is true
+end</p></pre></pre><div class="navsetbottom"><span class="navleft"><div class="nosearchform"></div>&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="Provide_Statements.html" title="backward to &quot;2.1.4 Provide Statements&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="s_forms.html" title="up to &quot;2.1 Language Constructs&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<a href="Blocks.html" title="forward to &quot;2.1.6 Blocks&quot;" data-pltdoc="x">next &rarr;</a></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
