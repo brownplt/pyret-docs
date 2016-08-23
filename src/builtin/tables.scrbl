@@ -4,10 +4,26 @@
 @(append-gen-docs
   '(module "tables"
     (path "src/js/base/runtime-anf.js")
+    (fun-spec
+      (name "difference-from"))
+    (fun-spec
+      (name "running-fold"))
     (data-spec
       (name "Table")
       (variants)
-      (shared))))
+      (shared))
+    (data-spec
+      (name "Reducer")
+      (type-vars ("Acc" "InVal" "OutVal"))
+      (variants ("reducer"))
+      (shared (
+        (method-spec (name "reduce"))
+        (method-spec (name "one")))))))
+
+@(define (Red-of acc in result) (a-app (a-id "Reducer" (xref "tables" "Reducer")) acc in result))
+@(define (red-method name #:args args #:return ret #:contract contract)
+  (method-doc "Reducer" "reducer" name #:alt-docstrings "" #:args args #:return ret #:contract contract))
+@(define Red-params (list "Acc" "InVal" "OutVal"))
 
 @docmodule["tables" #:noimport #t #:friendly-title "Tables"]{
 
@@ -78,10 +94,10 @@ and ages from @pyret{my-table} above:
 @pyret-block{
 names-and-ages = select name, age from my-table end
 check:
-  names-only is table: name, age
-    row: "Bob"
-    row: "Alice"
-    row: "Eve"
+  names-and-ages is table: name, age
+    row: "Bob", 12
+    row: "Alice", 17
+    row: "Eve", 13
   end
 end
 }
@@ -225,17 +241,21 @@ end
 While the reducers found in the @tt{tables} module should cover most all
 use cases, there may be times when one would like to create a reducer of their
 own. To do so, one must construct an object of the following type:
-@pyret-block{
-type Reducer<Acc, InVal, OutVal> = {
-  one :: (InVal -> {Acc; OutVal}),
-  reduce :: (Acc, InVal -> {Acc; OutVal})
-}
-}
+
+
+@type-spec["Reducer" (list "Acc" "InVal" "OutVal")]
+@red-method["one"
+  #:contract (a-arrow (apply Red-of Red-params) "InVal" (a-tuple "Acc" "OutVal"))
+  #:args '(("self" #f) ("value-from-column" #f))
+  #:return (a-tuple "Acc" "OutVal")]
+@red-method["reduce"
+  #:contract (a-arrow (apply Red-of Red-params) "Acc" "InVal" (a-tuple "Acc" "OutVal"))
+  #:args '(("self" #f) ("accumulator" #f) ("value-from-column" #f))
+  #:return (a-tuple "Acc" "OutVal")]
+
 
 Reducers are essentially descriptions of folds (in the list @pyret{fold}
-sense) over table columns. Note that one can reduce over multiple columns
-as well, in which case the reducer will receive a tuple of values per row
-instead of the usual one per row. The way reducers are called by the language
+sense) over table columns. The way reducers are called by the language
 runtime is as follows: the value(s) from the first row are passed to the
 reducer's @pyret{.one} method, which should return a tuple containing both
 any accumulated information needed for the fold and the value which should
@@ -251,9 +271,36 @@ one provided by the @tt{tables} module could be implemented as follows:
 import tables as TS
 running-mean :: TS.Reducer<{Number; Number}, Number, Number> = {
   one: lam(n): {{n; 1}; n} end,
-  reduce: lam({sum; count}, n): { {sum + n; count + 1}; (sum + n) / (count + 1) }
+  reduce: lam({sum; count}, n):
+    { {sum + n; count + 1}; (sum + n) / (count + 1) }
+  end
 }
 }
+
+@subsection{Reducers}
+
+The following reducers are provided:
+
+@value["running-mean" (Red-of N N N)]
+
+@function["difference-from"
+  #:contract (a-arrow N (Red-of N N N))
+  #:args '(("start-value" #f))
+  #:return (Red-of N N N)]{
+
+  }
+@function["running-fold"
+  #:contract (a-arrow (a-arrow "a" "a" "a") (Red-of "a" "a" "a"))
+  #:args '(("start-value" #f))
+  #:return (Red-of "a" "a" "a")]{
+
+  }
+
+@value["difference" (Red-of N N N)]
+
+@value["running-max" (Red-of N N N)]
+@value["running-min" (Red-of N N N)]
+@value["running-sum" (Red-of N N N)]
 
 
   @section[#:tag "s:tables:comparing"]{Comparing Tables}

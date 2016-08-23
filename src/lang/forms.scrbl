@@ -352,6 +352,12 @@ this-will-fail :: Boolean = 5
 }
 That last line will fail at runtime with an annotation error.
 
+Note that the annotation always comes after a name; this is not allowed, for
+instance:
+@pyret-block[#:style "bad-ex"]{
+PI = ~3.14 :: Number
+}
+
 @subsection{Shadowing}
 
 Pyret does not permit a program to implicitly bind the same name
@@ -365,9 +371,10 @@ ans = true # did you mean to use a different name here?
 ans # which one was meant?
 }
 
-Pyret will signal an error on the second binding of @pyret{ans} above,
-saying that it @emph{shadows} the earlier definition.  Shadowing can
-occur within functions, too:
+Pyret will signal an error on the second binding of @pyret{ans} above, saying
+that it @emph{shadows} the earlier definition.  The same rule applies to names
+defined in nested scopes, like functions.  This program is disallowed by the
+shadowing rule, as well:
 
 @pyret-block[#:style "bad-ex"]{
 ans = 3 + 4
@@ -377,16 +384,14 @@ fun oops(x):
   ans
 end
 
-fun another-oops(ans): # also shadows the outer ans
+fun another-oops(ans): # Also shadows the outer ans
   if ans: 3 else: 4 end
 end
 }
 
 The general rule for shadowing is to look "upward and leftward",
 i.e. looking outward from the current scope to any enclosing scopes,
-to see if there are any existing bindings of the same name.  The inner
-definitions @emph{shadow} the outer ones: because they are "hiding in
-its shadow", the outer definitions are not visible in the inner scope.
+to see if there are any existing bindings of the same name.
 
 But sometimes, redefining the same name makes the most sense.  In this
 case, a program can explicitly specify that it means to hide the outer
@@ -442,8 +447,8 @@ bound has tuples nested inside it:
 
 @examples{
 check:
-  {{w; x}; {y; z}} = {{empty; true}; {"hello"; 4}}
-  w is [list: ]
+  {{w; x}; {y; z}} = {{~5; true}; {"hello"; 4}}
+  w is ~5
   x is true
   y is "hello"
   z is 4
@@ -460,33 +465,46 @@ nested tuple itself:
 
 @examples{
 check:
-  {{w; x} as wx; {y; z} as yz} as wxyz = {{empty; true}; {"hello"; 4}}
-  w is [list: ]
+  {{w; x} as wx; {y; z} as yz} as wxyz = {{~5; true}; {"hello"; 4}}
+  w is ~5
   x is true
   y is "hello"
   z is 4
-  wx is {empty; true}
+  wx is {~5; true}
   yz is {"hello", 4}
   wxyz is {wx; yz}
 end
 }
 
-As with any other name bindings, you can provide annotations on any of
-these components.  Tuple annotations should only go on the tuples
-themselves or on their components; annotating the @pyret{as NAME}
-binding is not allowed.  We demonstrate both permitted styles of
-annotation below
+As with any other name bindings, you can provide annotations on any of these
+components.  The rule of annotations adjacent to names applies – the tuple
+components and the @pyret{as} name can have annotations.  We demonstrate both
+permitted styles of annotation below:
 
-@examples{
+@pyret-block[#:style "good-ex"]{
 check:
-  {{w :: List; x :: Boolean} as wx; {y; z} as yz :: {String, Number}} as wxyz = {{empty; true}; {"hello"; 4}}
-  w is [list: ]
+  {
+    {w :: Number; x :: Boolean} as wx;
+    {y; z} as yz :: {String, Number}
+  } as wxyz = {{~5; true}; {"hello"; 4}}
+  w is ~5
   x is true
   y is "hello"
   z is 4
-  wx is {empty; true}
+  wx is {~5; true}
   yz is {"hello", 4}
   wxyz is {wx; yz}
+end
+}
+
+But this is not allowed, because the @pyret{{Number; Boolean}} annotation is
+not adjacent to a name:
+
+@pyret-block[#:style "bad-ex"]{
+check:
+  {{w; x} :: {Number; Boolean} as wx; yz} = {{~5; true}; {"hello"; 4}}
+  w is ~5
+  x is true
 end
 }
 

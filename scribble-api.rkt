@@ -35,6 +35,7 @@
   
          docmodule
          function
+         value
          render-fun-helper
          re-export from
          pyret pyret-id pyret-method pyret-block
@@ -58,6 +59,7 @@
          a-compound
          a-id
          a-arrow
+         a-tuple
          a-named-arrow
          a-record
          a-field
@@ -567,6 +569,8 @@
    (append (list "(") (add-between (append pairs (list last)) ", " #:before-last " -> ") (list ")")))
 @(define (a-record . fields)
    (append (list "{") (add-between fields ", ") (list "}")))
+@(define (a-tuple . fields)
+   (append (list "{") (add-between fields "; ") (list "}")))
 @(define (a-field name type . desc)
    (list name " :: " type))
 @(define (variants . vars)
@@ -769,6 +773,31 @@
           ; error checking complete, record name as documented
      (set-documented! (curr-module-name) name)
      ans))
+
+(define (value name ann . contents)
+  (set-documented! (curr-module-name) name)
+   (let ([processing-module (curr-module-name)])
+     (define part-tag (list 'part (tag-name (curr-module-name) name)))
+     (define name-tt (seclink (xref processing-module name) (tt name)))
+     (define name-elt (toc-target-element code-style (list name-tt) part-tag))
+     (interleave-parbreaks/all
+      (list
+        (traverse-block ; use this to build xrefs on an early pass through docs
+         (lambda (get set!)
+           (set! 'doc-xrefs (cons (list name processing-module)
+                                  (get 'doc-xrefs '())))
+           (define header-part
+               (apply para #:style (div-style "boxed pyret-header")
+                 (append
+                  (list (tt name-elt " :: "))
+                  ann)))
+           (nested #:style (div-style "value")
+                   (cons
+                     header-part
+                     (interleave-parbreaks/all
+                      (append
+                        (list (nested #:style (div-style "description") contents))))))))))))
+
 
 ;; starts empty, different modules will add bindings
 (define ALL-GEN-DOCS (list))
