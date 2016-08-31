@@ -8,6 +8,8 @@
       (name "difference-from"))
     (fun-spec
       (name "running-fold"))
+    (fun-spec
+      (name "running-reduce"))
     (data-spec
       (name "Table")
       (variants)
@@ -188,7 +190,7 @@ Pyret functions.
 Suppose, for example, we wanted just the names of each person in
 @pyret{my-table}. We could pull those names out as follows:
 @pyret-block{
-name-list = select name from my-table end
+name-list = extract name from my-table end
 check:
   name-list is [list: "Bob", "Alice", "Eve"]
 end
@@ -226,8 +228,9 @@ keep a running total of how many people are able to drive. Importing the
 @tt{tables} module allows us to do this:
 @pyret-block{
 import tables as TS
-num-can-drive-col = extend my-table using can-drive:
-  num-can-drive: TS.running-fold({(acc, cur): acc + (if cur: 1 else: 0 end)})
+num-can-drive-col = extend can-drive-col using can-drive:
+  count-true = TS.running-fold(0, {(acc, cur): acc + (if cur: 1 else: 0 end)})
+  num-can-drive: count-true of can-drive
 end
 check:
   num-can-drive-col = table: name, age, can-drive, num-can-drive
@@ -290,9 +293,68 @@ The following reducers are provided:
 
   }
 @function["running-fold"
-  #:contract (a-arrow (a-arrow "a" "a" "a") (Red-of "a" "a" "a"))
-  #:args '(("start-value" #f))
-  #:return (Red-of "a" "a" "a")]{
+  #:contract (a-arrow "Result" (a-arrow "Result" "Col" "Result") (Red-of "Result" "Col" "Result"))
+  #:args '(("start-value" #f) ("combiner" #f))
+  #:return (Red-of "Result" "Col" "Result")]{
+
+@pyret-block{
+check:
+  count-if-driver = TS.running-fold(0, {(sum, col): if col >= 16: 1 + sum else: sum end})
+  t = table: name, age
+    row: "Bob", 17
+    row: "Mary", 22
+    row: "Jane", 6
+    row: "Jim", 15
+    row: "Barbara", 30
+  end
+  with-driver-count = extend t using age:
+    total-drivers: count-if-driver of age
+  end
+
+  with-drive-count is table: name, age, total-drivers
+    row: "Bob", 17, 1
+    row: "Mary", 22, 2
+    row: "Jane", 6, 2
+    row: "Jim", 15, 2
+    row: "Barbara", 30, 3
+  end
+end
+}
+
+  }
+
+@function["running-reduce"
+  #:contract (a-arrow (a-arrow "Col" "Col" "Col") (Red-of "Col" "Col" "Col"))
+  #:args '(("combiner" #f))
+  #:return (Red-of "Col" "Col" "Col")]{
+
+Creates a reducer that combines the first value in the column with the second,
+then the result of that combination with the third, then the result of that
+combination with the fourth, and so on.
+
+@pyret-block{
+check:
+  running-product = TS.running-reduce(lam(x, y): x * y end)
+
+  t = table: outcome, probability
+    row: "H-T", 0.5
+    row: "T-T", 0.25
+    row: "T-T", 0.25
+    row: "T-T", 0.25
+    row: "H-T", 0.5
+    row: "H-T", 0.5
+    row: "H-H", 0.25
+  end
+
+  with-cumulative = extend t using probability:
+    cumulative: running-product of probability
+  end
+
+  extract cumulative from with-cumulative end
+    is [list: 0.5, 0.125, 0.03125, 0.0078125, 0.00390625, 0.001953125, 0.00048828125]
+
+end
+}
 
   }
 
