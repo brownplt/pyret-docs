@@ -43,13 +43,79 @@
       (contract (a-arrow "Any" (a-id "Boolean" (xref "<global>" "Boolean"))))
       (doc "Checks whether the provided argument is in fact a Unknown"))
     (fun-spec
+      (name "<")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name "_lessthan")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name "<=")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name "_lessequal")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name ">")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name "_greaterthan")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name ">=")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name "_greaterequal")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name "=~")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
       (name "equal-now")
       (arity 2)
       (args ("val1" "val2"))
       (return ,boolean)
       (doc ""))
     (fun-spec
+      (name "==")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
       (name "equal-always")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name "<=>")
       (arity 2)
       (args ("val1" "val2"))
       (return ,boolean)
@@ -205,6 +271,7 @@ reason to use @emph{identical}.
 @section{Equal Now}
 
 @function["equal-now" #:contract (a-arrow A A B)]
+@function["=~" #:contract (a-arrow A A B)]
 
 Checks if the two values are equal @emph{now} (they may not be later).
 Corresponds to the @equal-now-op operator.
@@ -297,6 +364,7 @@ end
 @section{Identical}
 
 @function["identical" #:contract (a-arrow A A B)]
+@function["<=>" #:contract (a-arrow A A B)]
 
 @subsection[#:tag "s:identical-primitives"]{Identical and Primitives}
 
@@ -394,6 +462,7 @@ end
 @section{Always Equal}
 
 @function["equal-always" #:contract (a-arrow A A B)]
+@function["==" #:contract (a-arrow A A B)]
 
 Checks if the two values will always be equal, and corresponds to the
 @equal-always-op operator.
@@ -1179,4 +1248,105 @@ are threefold:
   not the tolerance is absolute or relative.}
 ]
 
+
+@section[#:tag "inequalities"]{Inequalities}
+
+The inequality operators and functions in Pyret follow different rules than
+those for equality.  In particular:
+
+@itemlist[
+  @item{There are no 3-valued forms for the inequality functions, because...}
+  @item{All the inequalities (even non-strict inequality like @pyret-id{<=})
+  are defined on @pyret-id["Roughnum" "numbers"]s.}
+]
+
+Comparing approximate numbers with inequalities is technically a bit fraught.
+If @pyret{x < y} and @pyret{x} and @pyret{y} are both approximations, it may be
+that the approximation error causes the comparison to return @pyret{true}
+rather than @pyret{false}.  The same argument holds for the other inequality
+operators.  However, the inequality operators can be a part of correct use of
+approximations, for example by using a test like @pyret{x < (y + tolerance)},
+(where @pyret{tolerance} could be usefully specified as either positive or
+negative), in applications that closely track approximation error.  Since in
+common cases inequality comparison of approximation is quite useful, and it is
+quite onerous to program with an analog of @pyret-id{within} for inequalities
+as well, Pyret chooses to allow the inequality operators to work on
+approximations.
+
+The inequality operators all work on either:
+
+@itemlist[
+@item{Pairs of numbers (whether exact or approximate)}
+@item{Pairs of strings}
+@item{Left-hand-side objects with an appropriately-named method (for example,
+for the @pyret-id{<} operator, the object must have a @pyret{_lessthan}
+method.)}
+]
+
+Numbers are compared in their standard mathematical order.  Strings are
+compared lexicographically (examples below).  For objects with overloaded
+methods, the method should return a @B and that return value is used as the
+result.
+
+@function["<=" #:contract (a-arrow A A B)]
+@function["_lessequal" #:contract (a-arrow A A B)]
+@function["<" #:contract (a-arrow A A B)]
+@function["_lessthan" #:contract (a-arrow A A B)]
+@function[">=" #:contract (a-arrow A A B)]
+@function["_greaterequal" #:contract (a-arrow A A B)]
+@function[">" #:contract (a-arrow A A B)]
+@function["_greaterthan" #:contract (a-arrow A A B)]
+
+@pyret-block{
+check "strings":
+  "a" < "b" is true
+  "b" > "a" is true
+  
+  "a" < "a" is false
+  "a" > "a" is false
+  
+  "a" <= "a" is true
+  "a" >= "a" is true
+  
+  "A" < "a" is true
+  "a" > "A" is true
+  
+  "a" < "A" is false
+  "A" > "a" is false
+  
+  "a" < "aa" is true
+  "a" > "aa" is false
+  
+  "a" < "baa" is true
+  "a" > "baa" is false
+  "abb" < "b" is true
+  "abb" > "b" is false
+  
+  "ab" < "aa" is false
+  "ab" > "aa" is true
+  
+  "aa" < "ab" is true
+  "aa" > "ab" is false
+end
 }
+
+@pyret-block{
+check "numbers":
+  ~5 < 5 is false
+  ~5 > 5 is false
+  
+  ~5 <= 5 is true
+  ~5 >= 5 is true
+  
+  ~5 < ~5 is false
+  ~4.9 < ~5 is true
+  
+  
+  ~5 <= ~5 is true
+  ~5 >= ~5 is true
+  
+end
+}
+
+}
+

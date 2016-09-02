@@ -1300,6 +1300,12 @@
         (a-compound
           (a-dot "equality" "EqualityResult")
           (xref "equality" "EqualityResult")))))
+  (fun-spec (name "append"))
+  (fun-spec (name "sort"))
+  (fun-spec (name "sort-by"))
+  (fun-spec (name "push"))
+  (fun-spec (name "join-str"))
+  (fun-spec (name "last"))
   (fun-spec
     (name "member")
     (arity 2)
@@ -1717,8 +1723,9 @@ end
 
 @list-method["sort"]
 Produces a new list whose contents are the same as those of the
-current list, sorted by @pyret-id{<} and @pyret-id{==}.  This requires that
-the items of the list be comparable by @pyret-id{<} (see @secref["s:binop-expr"]).
+current list, sorted by @pyret-id["<" "equality"] and @pyret-id["==" "equality"].  This requires that
+the items of the list be comparable by @pyret-id["<" "equality"] (see
+@secref["s:binop-expr"]).
 @examples{
 check:
   [list: 1, 5, 3, 2, 4].sort() is [list: 1, 2, 3, 4, 5]
@@ -1940,6 +1947,51 @@ end
     end
     }
   ]}
+
+@function["sort"
+  #:contract (a-arrow (L-of "A") (L-of "A"))
+  #:args '(("lst" #f))
+  #:return (L-of "A")]{
+Produces a new list whose contents are the same as those of the
+current list, sorted by @pyret-id{<} and @pyret-id{==}.  This requires that
+the items of the list be comparable by @pyret-id{<} (see @secref["s:binop-expr"]).
+@examples{
+check:
+  sort([list: 1, 5, 3, 2, 4]) is [list: 1, 2, 3, 4, 5]
+  sort([list: "aaaa", "B", "a"]) is [list: "B", "a", "aaaa"]
+  sort([list: true, false]) raises "binop-error"
+end
+}
+}
+
+@function["sort-by"
+  #:contract (a-arrow (L-of "A") (L-of "A"))
+  #:args '(("lst" #f))
+  #:return (L-of "A")]{
+Like @pyret-id{sort}, but the comparison and equality operators can be
+specified.  This allows for sorting lists whose contents are not
+comparable by @pyret{<}.
+@examples{
+check:
+  lists.sort-by([list:
+      { name: "Bob", age: 22 },
+      { name: "Amy", age: 5 },
+      { name: "Bob", age: 17 },
+      { name: "Joan", age: 43 },
+      { name: "Alex", age: 3 }],
+    lam(p1, p2): p1.age < p2.age end,
+    lam(p1, p2): p1.age == p2.age end)
+    is
+    [list:
+      { name: "Alex", age: 3 },
+      { name: "Amy", age: 5 },
+      { name: "Bob", age: 17 },
+      { name: "Bob", age: 22 },
+      { name: "Joan", age: 43 }]
+end
+}
+}
+
   @function[
     "range"
     #:examples
@@ -2017,6 +2069,52 @@ end
     end
     }
   ]
+  @function["last"
+    #:contract (a-arrow (L-of "A") "A")
+    #:return "A"
+    #:args '(("lst" #f))]{
+
+  Returns the last element in @pyret{lst}.  Raises an error if the list is
+  empty.
+
+  @pyret-block{
+check:
+  last([list: 1, 3, 5]) is 5
+  last([list: 1]) is 1
+  last([list: ]) raises "last of empty list"
+end
+  }
+
+  }
+
+  @function["append"
+    #:contract (a-arrow (L-of "A") (L-of "A") (L-of "A"))
+    #:return (L-of "A")
+    #:args '(("front" #f) ("back" #f))]{
+
+    Produce a new list with the elements of @pyret{front} followed by the
+    elements of @pyret{back}.
+
+    @pyret-block[#:style "good-ex"]{
+check:
+  append([list: 1, 2, 3], [list: 4, 5, 6]) is [list: 1, 2, 3, 4, 5, 6]
+  append([list:], [list:]) is [list:]
+  append([list: 1], [list: 2]) is [list: 1, 2]
+end
+    }
+
+    Note that it does @emph{not} change either list:
+
+    @pyret-block[#:style "bad-ex"]{
+check:
+  l = [list: 1, 2, 3]
+  append(l, [list: 4])
+  l is [list: 1, 2, 3, 4] # this test fails
+end
+    }
+
+  }
+
   @function[
     "any"
     #:examples
@@ -2199,6 +2297,8 @@ end
   @function[
     "reverse"
   ]
+
+
 
 
   @function[
