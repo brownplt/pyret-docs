@@ -54,7 +54,19 @@
     (return (a-id "String" (xref "<global>" "String")))
     (doc "Creates a string representation of the value"))
   (fun-spec
+    (name "to-repr")
+    (arity 1)
+    (args ("val"))
+    (return (a-id "String" (xref "<global>" "String")))
+    (doc "Creates a string representation of the value"))
+  (fun-spec
     (name "tostring")
+    (arity 1)
+    (args ("val"))
+    (return (a-id "String" (xref "<global>" "String")))
+    (doc "Creates a string representation of the value"))
+  (fun-spec
+    (name "to-string")
     (arity 1)
     (args ("val"))
     (return (a-id "String" (xref "<global>" "String")))
@@ -107,6 +119,7 @@
 @section[#:tag "global-builtins"]{Built-in Utility Functions}
 
 @function["torepr" #:contract (a-arrow A S) #:alt-docstrings ""]
+@function["to-repr" #:contract (a-arrow A S) #:alt-docstrings ""]
 
 Creates a string representation of the value that resembles an expression that
 could be used to construct it.  This is what the REPL and test-results printer
@@ -122,6 +135,7 @@ check:
 }
 
 @function["tostring" #:contract (a-arrow A S) #:alt-docstrings ""]
+@function["to-string" #:contract (a-arrow A S) #:alt-docstrings ""]
 
 Creates a string representation of the value for display, that is
 value-dependent.  Error messages, for example, have different

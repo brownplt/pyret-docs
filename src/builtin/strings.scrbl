@@ -64,7 +64,17 @@
       (args ("s" "n"))
       (doc ""))
     (fun-spec
+      (name "string-to-upper")
+      (arity 1)
+      (args ("s"))
+      (doc ""))
+    (fun-spec
       (name "string-toupper")
+      (arity 1)
+      (args ("s"))
+      (doc ""))
+    (fun-spec
+      (name "string-to-lower")
       (arity 1)
       (args ("s"))
       (doc ""))
@@ -306,24 +316,27 @@ end
 }
 
   @function["string-toupper" #:contract (a-arrow S S) #:return S]
+  @function["string-to-upper" #:contract (a-arrow S S) #:return S]
+
 
 @examples{
 check:
-  string-toupper("a") is "A"
-  string-toupper("I'm not yelling!") is "I'M NOT YELLING!"
-  string-toupper("ß") is "SS"
-  string-toupper("λαμβδα") is "ΛΑΜΒΔΑ"
+  string-to-upper("a") is "A"
+  string-to-upper("I'm not yelling!") is "I'M NOT YELLING!"
+  string-to-upper("ß") is "SS"
+  string-to-upper("λαμβδα") is "ΛΑΜΒΔΑ"
 end
 }
 
   @function["string-tolower" #:contract (a-arrow S S) #:return S]
+  @function["string-to-lower" #:contract (a-arrow S S) #:return S]
 
 @examples{
 check:
-  string-tolower("A") is "a"
-  string-tolower("I'M NOT YELLING!") is "i'm not yelling!"
-  string-tolower("SS") is "ss"
-  string-tolower("ΛΑΜΒΔΑ") is "λαμβδα"
+  string-to-lower("A") is "a"
+  string-to-lower("I'M NOT YELLING!") is "i'm not yelling!"
+  string-to-lower("SS") is "ss"
+  string-to-lower("ΛΑΜΒΔΑ") is "λαμβδα"
 end
 }
 
