@@ -35,7 +35,7 @@ the following annotation isn&rsquo;t quite wrong, it is incomplete:
 specialize the list annotation:
 </div><div class="SIntrapara"><pre class="pyret-block"><pre class="pyret-highlight good-ex"><p>list-of-nums :: List&lt;Number&gt; = [list: 1, 2, 3]</p></pre></pre></div></p><p>Note that this annotation will <span style="font-style: italic">not dynamically check</span> that every
 item in the list is in fact a <span class="stt">Number</span> &#8212;<wbr></wbr> that would be infeasibly
-expensive.  However, the <font class="badlink">static type checker</font>
+expensive.  However, the <a href="type-check.html" data-pltdoc="x">static type checker</a>
 will make use of this information more fully.</p><h5>2.1.10.3<tt>&nbsp;</tt><a name="(part._s~3aarrow-ann)"></a>Arrow Annotations</h5><p>An arrow annotation is used to describe the behavior of functions.  It consists
 of a list of comma-separated argument types followed by an ASCII arrow and
 return type:</p><blockquote class="SCodeFlow" style="white-space: pre;"><p><a name="(elem._(bnf-prod._(.Pyret._arrow-ann)))"></a>&#8249;arrow-ann&#8250;<span class="bnf-meta">:</span> <span class="bnf-lit">(</span> <span class="bnf-meta">(</span><a href="#%28elem._%28bnf-prod._%28.Pyret._arrow-ann-elt%29%29%29" data-pltdoc="x">&#8249;arrow-ann-elt&#8250;</a><span class="bnf-meta">)</span><span class="bnf-meta">*</span> <a href="#%28elem._%28bnf-prod._%28.Pyret._ann%29%29%29" data-pltdoc="x">&#8249;ann&#8250;</a> <span class="bnf-lit">-&gt;</span> <a href="#%28elem._%28bnf-prod._%28.Pyret._ann%29%29%29" data-pltdoc="x">&#8249;ann&#8250;</a> <span class="bnf-lit">)</span>
