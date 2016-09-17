@@ -395,7 +395,7 @@
             (a-id "is-List" (xref "lists" "is-List"))
             (a-app (a-id "List" (xref "lists" "List")) "a")))
         (doc
-          "Returns a new list whose contents are the smae as those in this list,\n            sorted by the default ordering and equality"))
+          "Returns a new list whose contents are the same as those in this list,\n            sorted by the default ordering and equality"))
       (method-spec
         (name "join-str")
         (arity 2)
@@ -1538,7 +1538,7 @@ end
 @list-method["each"]
 
 Applies @pyret{f} to each element of the list from left to right, and
-returns @pyret-id{nothing}.  Because it returns @pyret-id{nothing},
+returns @pyret{nothing}.  Because it returns @pyret{nothing},
 use @pyret-id{each} instead of @pyret-id{map} when the function
 @pyret{f} is needed only for its side-effects.
 
@@ -1953,8 +1953,8 @@ end
   #:args '(("lst" #f))
   #:return (L-of "A")]{
 Produces a new list whose contents are the same as those of the
-current list, sorted by @pyret-id{<} and @pyret-id{==}.  This requires that
-the items of the list be comparable by @pyret-id{<} (see @secref["s:binop-expr"]).
+current list, sorted by @pyret-id["<" "equality"] and @pyret-id["==" "equality"].  This requires that
+the items of the list be comparable by @pyret-id["<" "equality"] (see @secref["s:binop-expr"]).
 @examples{
 check:
   sort([list: 1, 5, 3, 2, 4]) is [list: 1, 2, 3, 4, 5]

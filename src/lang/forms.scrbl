@@ -1052,7 +1052,8 @@ variable @tt{NAME} to the result of the right-hand side expression.
 
 The @py-prod{binop-expr} production is included in @py-prod{stmt} because any
 expression can appear where a statement can (subject to restrictions from
-@seclink["s:well-formedness"]{well-formedness checking}).
+well-formedness checking).
+@;TODO: Link to well-formedness once section is written
 
 @section{Expressions}
 
@@ -2256,7 +2257,7 @@ list-of-nums :: List<Number> = [list: 1, 2, 3]
 
 Note that this annotation will @emph{not dynamically check} that every
 item in the list is in fact a @tt{Number} --- that would be infeasibly
-expensive.  However, the @seclink["s:type-checker"]{static type checker}
+expensive.  However, the @seclink["type-check"]{static type checker}
 will make use of this information more fully.
 
 @subsection[#:tag "s:arrow-ann"]{Arrow Annotations}
