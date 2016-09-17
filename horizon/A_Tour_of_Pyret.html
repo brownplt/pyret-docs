@@ -224,7 +224,7 @@ fun replicate(n :: Number%(non-negative), e) -&gt; List:
   end
 end</p></pre></pre><p>And if you were to call &lsquo;replicate&lsquo; with a negative number, it would
 not run (instead of running forever):</p><pre class="pyret-block"><pre class="pyret-highlight"><p>check:
-  replicate(-1, "val") raises "predicate failure"
+  replicate(-1, "val") raises "non-negative"
 end</p></pre></pre><p>Some kinds of annotations only get limited checks:</p><ul><li><p>Arrow annotations, like <span class="pyret-highlight"><span class="stt">(Number, String -&gt; String)</span></span> will only
 check that the value is a function, and not wrap the function to check its
 arguments.</p></li><li><p>Parameterized annotations, like <span class="pyret-highlight"><span class="stt">List&lt;Number&gt;</span></span>, will only check
