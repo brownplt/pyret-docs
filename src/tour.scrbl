@@ -513,7 +513,7 @@ not run (instead of running forever):
 
 @pyret-block{
 check:
-  replicate(-1, "val") raises "predicate failure"
+  replicate(-1, "val") raises "non-negative"
 end
 }
 

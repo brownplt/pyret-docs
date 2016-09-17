@@ -64,7 +64,17 @@
       (args ("s" "n"))
       (doc ""))
     (fun-spec
+      (name "string-to-upper")
+      (arity 1)
+      (args ("s"))
+      (doc ""))
+    (fun-spec
       (name "string-toupper")
+      (arity 1)
+      (args ("s"))
+      (doc ""))
+    (fun-spec
+      (name "string-to-lower")
       (arity 1)
       (args ("s"))
       (doc ""))
@@ -154,8 +164,7 @@ Returns the number of characters in the string.
 
 @note{Because Pyret currently uses a representation of strings that closely
 matches browsers' behavior, @pyret{string-length} reports a count of @pyret{2}
-for code points over 65535.  This behavior will likely change as Unicode
-support in Pyret stabilizes.}
+for code points over 65535.}
 
 @examples{
 check:
@@ -306,24 +315,45 @@ end
 }
 
   @function["string-toupper" #:contract (a-arrow S S) #:return S]
+  @function["string-to-upper" #:contract (a-arrow S S) #:return S]
+
+@note{Pyret uses JavaScript's built-in string operations, and so will
+have the same behavior as @link["https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase" "toUpperCase"].}
+Convert a string to all uppercase characters.  Punctuation and other characters
+without an uppercase equivalent are left alone.  Note that because of
+characters like @pyret{ß}, the length of the input is not guaranteed to
+match the length of the output.
 
 @examples{
 check:
-  string-toupper("a") is "A"
-  string-toupper("I'm not yelling!") is "I'M NOT YELLING!"
-  string-toupper("ß") is "SS"
-  string-toupper("λαμβδα") is "ΛΑΜΒΔΑ"
+  string-to-upper("a") is "A"
+  string-to-upper("I'm not yelling!") is "I'M NOT YELLING!"
+  string-to-upper("ß") is "SS"
+  string-to-upper("λαμβδα") is "ΛΑΜΒΔΑ"
 end
 }
 
-  @function["string-tolower" #:contract (a-arrow S S) #:return S]
+When performing case-insensitive comparisons, it can be useful to convert both
+strings to uppercase first:
+
 
 @examples{
 check:
-  string-tolower("A") is "a"
-  string-tolower("I'M NOT YELLING!") is "i'm not yelling!"
-  string-tolower("SS") is "ss"
-  string-tolower("ΛΑΜΒΔΑ") is "λαμβδα"
+  string-to-upper("This Title may have been Capitalized Inconsistently")
+    is string-to-upper("This Title May Have Been Capitalized Inconsistently")
+end
+}
+
+
+  @function["string-tolower" #:contract (a-arrow S S) #:return S]
+  @function["string-to-lower" #:contract (a-arrow S S) #:return S]
+
+@examples{
+check:
+  string-to-lower("A") is "a"
+  string-to-lower("I'M NOT YELLING!") is "i'm not yelling!"
+  string-to-lower("SS") is "ss"
+  string-to-lower("ΛΑΜΒΔΑ") is "λαμβδα"
 end
 }
 

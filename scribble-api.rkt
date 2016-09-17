@@ -333,7 +333,7 @@
                              #:friendly-title (friendly-title #f)
                              #:noimport (noimport #f)
                              . defs)
-    (list (title #:tag (tag-name name) (or friendly-title name))
+    (list (title #:version #f #:tag (tag-name name) (or friendly-title name))
           (if noimport ""
                        (list (para "Usage:")
                              (nested #:style (pre-style "code") "include " name)
