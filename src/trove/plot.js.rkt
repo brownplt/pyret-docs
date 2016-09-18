@@ -43,8 +43,9 @@
   Every function in this library is available on the @tt{plot} module object.
   For example, if you used @pyret{import plot as P}, you would write
   @pyret{P.display-function} to access @pyret{display-function} below. If you used
-  @pyret{include}, then you can refer to identifiers without needing to prefix
-  with @pyret{P.}.
+  @pyret{include}, then you can refer to identifiers without writing @pyret{P.} 
+  as a prefix.
+  
 
   @;############################################################################
   @section{The Plot Type}
