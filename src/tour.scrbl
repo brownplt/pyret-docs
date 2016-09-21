@@ -491,7 +491,7 @@ check:
 end
 }
 
-You can also define arbitrary predicates for use in annotations to *refine* the
+You can also define arbitrary predicates for use in annotations to @emph{refine} the
 annotation with additional checks. For example:
 
 @pyret-block{
@@ -508,7 +508,7 @@ fun replicate(n :: Number%(non-negative), e) -> List:
 end
 }
 
-And if you were to call `replicate` with a negative number, it would
+And if you were to call @pyret{replicate} with a negative number, it would
 not run (instead of running forever):
 
 @pyret-block{
