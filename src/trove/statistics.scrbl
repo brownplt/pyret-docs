@@ -13,10 +13,7 @@
   `(module "statistics"
     (path "src/arr/trove/statistics.arr")
 
-    (fun-spec (name "sum") (arity 1))
     (fun-spec (name "mean") (arity 1))
-    (fun-spec (name "min") (arity 1))
-    (fun-spec (name "max") (arity 1))
     (fun-spec (name "median") (arity 1))
     (fun-spec (name "stdev") (arity 1))
     (fun-spec (name "distinct") (arity 1))
@@ -108,6 +105,25 @@
     @member-spec["beta" #:type "normal" #:contract N]{
       The slope of the linear predictor function.
     }
+  }
+  }
+
+  @;############################################################################
+  @section{Regression and Modeling}
+
+  Each of these functions is used to perform a regression by creating
+  a certain variant of StatModel.
+
+  @function["lin-reg-2V"
+    #:contract (a-arrow (L-of N) (L-of N) (link "StatModel"))
+    #:args '(("X" #f)("Y" #f))
+    #:return (link "StatModel")
+  ]{
+  Calculates a linear regression to model simple independent -> dependent
+  variable relationship.  Uses Ordinary Least Squares.
+    
+  @examples{
+    lin-reg-2V([list: 0, 1, 2, 3], [list: 3, 2, 1, 0])
   }
   }
 }
