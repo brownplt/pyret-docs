@@ -33,5 +33,6 @@ This section contains information on libraries that come with Pyret.
 @include-section["trove/plot.js.rkt"]
 @include-section["builtin/tables.scrbl"]
 @include-section["trove/statistics.scrbl"]
+@include-section["trove/math.scrbl"]
 @;@include-section["trove/graph.js.rkt"]
 
