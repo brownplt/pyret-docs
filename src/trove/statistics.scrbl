@@ -27,19 +27,19 @@
         (name "simple-linear-model")
         (members 
           (("alpha" (type normal) (contract "Number"))
-          ("beta" (type normal) (contract "Number")))
-        (with-members
-          ((method-spec
-            (name "predictor")
-            (arity 1)
-            (params ())
-            (args ("self"))
-            (return (a-id "Number" (xref "<global>" "Number")))
-            (contract
-              (a-arrow
-                (a-id "is-StatModel" (xref "statistics" "is-StatModel"))
-                (a-arrow (a-id "Number" (xref "<global>" "Number"))
-                         (a-id "Number" (xref "<global>" "Number")))))))))))
+          ("beta" (type normal) (contract "Number")))))
+      (shared
+        ((method-spec
+          (name "predictor")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return (a-id "Number" (xref "<global>" "Number")))
+          (contract
+            (a-arrow
+              (a-id "is-StatModel" (xref "statistics" "is-StatModel"))
+              (a-arrow (a-id "Number" (xref "<global>" "Number"))
+                       (a-id "Number" (xref "<global>" "Number")))))))))
   ))
 
 @(define (statmodel-method name)
