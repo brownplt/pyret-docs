@@ -22,7 +22,24 @@
 
     (data-spec
       (name "StatModel")
-      (variants ("simple-linear-model")))
+      (variants ("simple-linear-model"))
+      (constr-spec 
+        (name "simple-linear-model")
+        (members 
+          (("alpha" (type normal) (contract "Number"))
+          ("beta" (type normal) (contract "Number")))
+        (with-members
+          ((method-spec
+            (name "predictor")
+            (arity 1)
+            (params ())
+            (args ("self"))
+            (return (a-id "Number" (xref "<global>" "Number")))
+            (contract
+              (a-arrow
+                (a-id "is-StatModel" (xref "statistics" "is-StatModel"))
+                (a-arrow (a-id "Number" (xref "<global>" "Number"))
+                         (a-id "Number" (xref "<global>" "Number")))))))))))
   ))
 
 @docmodule["statistics"]{
