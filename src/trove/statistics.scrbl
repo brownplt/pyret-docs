@@ -42,6 +42,9 @@
                          (a-id "Number" (xref "<global>" "Number")))))))))))
   ))
 
+@(define (statmodel-method name)
+  (method-doc "StatModel" "simple-linear-model" name #:alt-docstrings ""))
+
 @docmodule["statistics"]{
   The Pyret Statistics library.  It consists of functions that calculate 
   relevant statistical values of data sets, and functions for statistical
@@ -124,6 +127,16 @@
     }
   }
   }
+
+  @;############################################################################
+  @section{StatModel Methods}
+  
+  Below are all of the methods that can be used by variants of the StatModel
+  data type.  Some methods are specific to certain variants;  these methods
+  will specify which variant uses which.
+
+  @statmodel-method["predictor"]
+  Returns the linear predictor function for a simple-linear-model variant. 
 
   @;############################################################################
   @section{Regression and Modeling}
