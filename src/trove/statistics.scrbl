@@ -34,13 +34,41 @@
           (arity 1)
           (params ())
           (args ("self"))
-          (return (a-id "Number" (xref "<global>" "Number")))
+          (return (a-arrow (a-id "Number" (xref "<global>" "Number"))
+                           (a-id "Number" (xref "<global>" "Number"))))
           (contract
             (a-arrow
               (a-id "is-StatModel" (xref "statistics" "is-StatModel"))
               (a-arrow (a-id "Number" (xref "<global>" "Number"))
-                       (a-id "Number" (xref "<global>" "Number")))))))))
-  ))
+                       (a-id "Number" (xref "<global>" "Number"))))))
+         (method-spec
+          (name "apply")
+          (arity 2)
+          (params ())
+          (args ("self" "l"))
+          (return (a-app (a-id "List" (xref "lists" "List")) (a-id "Number" (xref "<global>" "Number"))))
+          (contract
+            (a-arrow
+              (a-id "is-StatModel" (xref "statistics" "is-StatModel"))
+              (a-app (a-id "List" (xref "lists" "List")) (a-id "Number" (xref "<global>" "Number")))
+              (a-app (a-id "List" (xref "lists" "List")) (a-id "Number" (xref "<global>" "Number")))))
+         )
+         (method-spec
+          (name "r-squared")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return (a-id "Number" (xref "<global>" "Number")))
+          (contract
+            (a-arrow
+              (a-id "is-StatModel" (xref "statistics" "is-StatModel"))
+              (a-id "Number" (xref "<global>" "Number"))))
+         )
+        )
+      )
+    )
+   )
+ )
 
 @(define (statmodel-method name)
   (method-doc "StatModel" "simple-linear-model" name #:alt-docstrings ""))
@@ -136,7 +164,14 @@
   will specify which variant uses which.
 
   @statmodel-method["predictor"]
-  Returns the linear predictor function for a simple-linear-model variant. 
+  Returns the linear predictor function for a simple-linear-model variant.
+
+  @statmodel-method["apply"]
+  Applies the linear predictor for a simple-linear-model to a list of numerical
+  data.
+
+  @statmodel-method["r-squared"]
+  Gives the coefficient of correlation for a simple-linear-model.
 
   @;############################################################################
   @section{Regression and Modeling}
