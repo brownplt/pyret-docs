@@ -1830,9 +1830,9 @@ end
     }
   ]
   @function["distinct"
-    #:contract (a-arrow (L-of N) N)
+    #:contract (a-arrow (L-of "a") (L-of "a"))
     #:args '(("lst" #f))
-    #:return N
+    #:return (L-of "a")
   ]{
 
   Given a list, returns a new list containing only one copy of each element
@@ -1841,7 +1841,7 @@ end
   output list.
 
 @examples{
-examples:
+check:
   distinct([list: 3, 1, 2, 2, 3, 2]) is [list: 1, 3, 2]
   distinct([list: ~1, ~1]) is-roughly [list: ~1, ~1]
   distinct([list: ~1, ~1, 1]) is-roughly [list: ~1, ~1, 1]

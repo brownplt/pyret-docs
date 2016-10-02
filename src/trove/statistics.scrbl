@@ -95,7 +95,11 @@
   Calculates the arithmetic mean of the numbers in @pyret{l}.
   
   @examples{
-  mean([list: 2, 2, 4.5, 1.5, 1, 1])
+    check:
+      mean([list: ]) raises "Empty List"
+      mean([list: 1]) is 1
+      mean([list: 2, 2, 4.5, 1.5, 1, 1]) is 2
+    end
   }
   }
   
@@ -107,7 +111,11 @@
   Calculates the median of the numbers in @pyret{l}.
   
   @examples{
-  median([list: -1, 0, 1, 2, 5])
+    check:
+      median([list: ]) raises "Empty List"
+      median([list: 2]) is 2
+      median([list: -1, 0, 1, 2, 5]) is 1
+    end
   }
   }
 
@@ -120,7 +128,11 @@
   numbers in @pyret{l}.
   
   @examples{
-  stdev([list: -1, 0, 1, 2, 5])
+    check:  
+      stdev([list: ]) raises "Empty List"
+      stdev([list: 2]) is 0
+      stdev([list: 2, 4, 4, 4, 5, 5, 7, 9]) is 2
+    end 
   }
   }
 
@@ -188,7 +200,9 @@
   variable relationship.  Uses Ordinary Least Squares.
     
   @examples{
-    lin-reg-2V([list: 0, 1, 2, 3], [list: 3, 2, 1, 0])
+    check:
+      lin-reg-2V([list: 0, 1, 2, 3], [list: 3, 2, 1, 0]) is StatModel(3, -1, 1)
+    end
   }
   }
 }
