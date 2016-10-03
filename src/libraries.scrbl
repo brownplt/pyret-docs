@@ -12,6 +12,7 @@ This section contains information on libraries that come with Pyret.
 @include-section["builtin/strings.scrbl"]
 @include-section["builtin/booleans.scrbl"]
 @include-section["builtin/raw-arrays.scrbl"]
+@include-section["builtin/tables.scrbl"]
 
 @include-section["trove/lists.scrbl"]
 @include-section["trove/sets.scrbl"]
@@ -31,7 +32,6 @@ This section contains information on libraries that come with Pyret.
 @include-section["trove/world.js.rkt"]
 @include-section["builtin/reactors.scrbl"]
 @include-section["trove/plot.js.rkt"]
-@include-section["builtin/tables.scrbl"]
 @include-section["trove/statistics.scrbl"]
-@;@include-section["trove/graph.js.rkt"]
+@include-section["trove/math.scrbl"]
 

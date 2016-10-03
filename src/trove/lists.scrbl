@@ -1783,140 +1783,7 @@ end
 
   }
 
-  @function["max"
-    #:contract (a-arrow (L-of N) N)
-    #:args '(("lst" #f))
-    #:return N
-  ]{
-
-  Given a list of numbers, returns the largest.  Raises an error on empty lists.
-
-@examples{
-examples:
-  max([list: 1, 2, 3]) is 3
-  max([list: ]) raises "empty"
-  max([list: ~1, 3, 7/2]) is 7/2
-end
-}
-
-  }
-
-  @function["min"
-    #:contract (a-arrow (L-of N) N)
-    #:args '(("lst" #f))
-    #:return N
-  ]{
-
-  Given a list of numbers, returns the smallest.  Raises an error on empty lists.
-
-@examples{
-examples:
-  min([list: 1, 2, 3]) is 1
-  min([list: ]) raises "empty"
-  min([list: ~1, 3, -7/2]) is -7/2
-end
-}
-
-  }
-
-
-  @function["sum"
-    #:contract (a-arrow (L-of N) N)
-    #:args '(("lst" #f))
-    #:return N
-  ]{
-
-  Given a list of numbers @pyret{x1, x2, ..., xn}, returns @pyret{x1 + x2 + ... + xn}.
-
-@examples{
-examples:
-  sum([list: 1, 2, 3]) is 6
-  sum([list: ]) is 0
-  sum([list: ~1, 3]) is-roughly ~4
-end
-}
-  }
-
-  @function["mean"
-    #:contract (a-arrow (L-of N) N)
-    #:args '(("lst" #f))
-    #:return N
-  ]{
-
-  Given a list of numbers, returns their arithmetic mean.  Raises an error on empty lists.
-
-@examples{
-examples:
-  mean([list: 1, 2, 6]) is 3
-  mean([list: ]) raises "empty"
-  mean([list: ~1, 3]) is-roughly ~2
-end
-}
-
-  }
-
-  @function["median"
-    #:contract (a-arrow (L-of N) N)
-    #:args '(("lst" #f))
-    #:return N
-  ]{
-
-  Given a list of numbers, returns their median (taking the mean of the two
-  middle numbers if the list has even length).  Raises an error on empty lists.
-
-@examples{
-examples:
-  median([list: 1, 2, 6]) is 2
-  median([list: ]) raises "empty"
-  median([list: ~1, 3]) is-roughly ~2
-end
-}
-
-  }
-
-  @function["stdev"
-    #:contract (a-arrow (L-of N) N)
-    #:args '(("lst" #f))
-    #:return N
-  ]{
-
-  Given a list of numbers, returns their standard deviation.  Raises an error
-  on empty lists.
-
-@examples{
-examples:
-  stdev([list: 3, 4, 5, 6, 7]) is%(within(0.01)) 1.41
-  stdev([list: 1, 1, 1, 1]) is-roughly ~0
-  stdev([list:]) raises "empty"
-end
-}
-
-  }
-
-  @function["distinct"
-    #:contract (a-arrow (L-of N) N)
-    #:args '(("lst" #f))
-    #:return N
-  ]{
-
-  Given a list, returns a new list containing only one copy of each element
-  that is duplicated in the list.  The last (latest in the list) copy is kept.
-  Roughnums are not compared for equality, and so will always appear in the
-  output list.
-
-@examples{
-examples:
-  distinct([list: 3, 1, 2, 2, 3, 2]) is [list: 1, 3, 2]
-  distinct([list: ~1, ~1]) is-roughly [list: ~1, ~1]
-  distinct([list: ~1, ~1, 1]) is-roughly [list: ~1, ~1, 1]
-  distinct([list: ~1, ~1, 1, 1]) is-roughly [list: ~1, ~1, 1]
-  distinct([list: ~1, ~2, ~3]) is-roughly [list: ~1, ~2, ~3]
-end
-}
-
-  }
-
-
+  
   @function[
     "get"
     #:examples
@@ -2014,6 +1881,30 @@ end
     end
     }
   ]
+  @function["distinct"
+    #:contract (a-arrow (L-of N) N)
+    #:args '(("lst" #f))
+    #:return N
+  ]{
+
+  Given a list, returns a new list containing only one copy of each element
+  that is duplicated in the list.  The last (latest in the list) copy is kept.
+  Roughnums are not compared for equality, and so will always appear in the
+  output list.
+
+@examples{
+examples:
+  distinct([list: 3, 1, 2, 2, 3, 2]) is [list: 1, 3, 2]
+  distinct([list: ~1, ~1]) is-roughly [list: ~1, ~1]
+  distinct([list: ~1, ~1, 1]) is-roughly [list: ~1, ~1, 1]
+  distinct([list: ~1, ~1, 1, 1]) is-roughly [list: ~1, ~1, 1]
+  distinct([list: ~1, ~2, ~3]) is-roughly [list: ~1, ~2, ~3]
+end
+}
+
+  }
+
+
   @function[
     "filter"
     #:examples
