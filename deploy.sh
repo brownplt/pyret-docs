@@ -3,6 +3,7 @@
 SHORT_COMMIT=`echo $TRAVIS_COMMIT | cut -c1-7`
 VERSION=$SHORT_COMMIT
 BRANCH=$TRAVIS_BRANCH
+npm install
 make
 
 tar czf build/docs.tgz build/docs
