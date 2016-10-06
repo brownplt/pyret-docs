@@ -33,7 +33,8 @@
 
 @docmodule["plot"]{
   The Pyret Plot library. It consists of plot, chart, and data visualization tools.
-  The visualization will appear on a dialog.
+  The visualization will appear in a separate dialog window, and/or be returned
+  as an @pyret-id["Image" "image"].
 
   @itemlist[
     @item{To close the dialog, click the close button on the title bar or press @tt{esc}}
@@ -223,7 +224,7 @@
   @section{Visualization Functions}
 
   @function["histogram"
-    #:contract (a-arrow TA N (link "PlotOptions") Image)
+    #:contract (a-arrow TA N (link "PlotWindowOptions") Image)
     #:args '(("tab" #f) ("n" #f) ("options" #f))
     #:return Image
   ]{
@@ -246,7 +247,7 @@
   }
 
   @function["pie-chart"
-    #:contract (a-arrow TA (link "PlotOptions") Image)
+    #:contract (a-arrow TA (link "PlotWindowOptions") Image)
     #:args '(("tab" #f) ("options" #f))
     #:return Image
   ]{
@@ -264,7 +265,7 @@
   }
 
   @function["bar-chart"
-    #:contract (a-arrow TA S (link "PlotOptions") Image)
+    #:contract (a-arrow TA S (link "PlotWindowOptions") Image)
     #:args '(("tab" #f) ("legend" #f) ("options" #f))
     #:return Image
   ]{
@@ -288,7 +289,7 @@
   }
 
   @function["grouped-bar-chart"
-    #:contract (a-arrow TA (L-of S) (link "PlotOptions") Image)
+    #:contract (a-arrow TA (L-of S) (link "PlotWindowOptions") Image)
     #:args '(("tab" #f) ("legends" #f) ("options" #f))
     #:return Image
   ]{
@@ -323,7 +324,7 @@
   @section{The Options Types and Default Values}
 
   The PlotOptions and PlotWindowOptions type is actually a function type
-  consuming a default config and produces a desired config.
+  which consumes a default config and produces a desired config.
 
   To use a default config, you could construct
   @pyret-block{lam(default-configs): default-configs end}
@@ -348,24 +349,14 @@
   @type-spec["PlotOptions" '()]
 
   A config associated with @pyret-id{PlotOptions} consists of the following fields:
-  @a-record[(t-field "color" Color) (t-field "title" S) (t-field "interact" B)]
+  @a-record[(t-field "color" Color)]
 
-  @itemlist[
-  @item{@tt{color} controls the color of the rendered data (e.g. line or points)}
-  @item{@tt{title} controls the title string that appears at the top of the plot}
-  @item{@tt{interact} controls whether the interactive rendering window
-  appears.  If @pyret{false}, the plot simply returns an @pyret-id["Image"
-  "image"] without opening the interactive window}
-  ]
-
-  The default config is @t-record{color: blue, title: "", interact: true}
+  The default config is @t-record{color: blue}
 
   @examples{
     import image-structs as I
     my-plot-options-1 = _.{color: I.red}
     my-plot-options-2 = default-options
-    my-plot-options-3 = _.{title: "My Plot", color: I.red}
-    my-plot-options-4 = _.{interact: false, color: I.red}
   }
 
   @type-spec["PlotWindowOptions" '()]
@@ -376,7 +367,9 @@
             (t-field "y-min" N)
             (t-field "y-max" N)
             (t-field "num-samples" N)
-            (t-field "infer-bounds" B)]
+            (t-field "infer-bounds" B)
+            (t-field "interact" B)
+            (t-field "title" S)]
 
   The default config is
   @t-record{x-min: -10
@@ -384,7 +377,10 @@
             y-min: -10
             y-max: 10
             num-samples: 1000
-            infer-bounds: false}
+            infer-bounds: false
+            interact: true
+            title: ""
+            }
 
   If @pyret{infer-bounds} is true,
   @pyret{x-min}, @pyret{x-max}, @pyret{y-min}, @pyret{y-max} will be inferred,
@@ -392,4 +388,11 @@
 
   @pyret{num-samples} is to control the number of sample points for
   @link{function-plot}s.
+
+  @pyret{title} is displayed at the top of the plot window.
+
+  @pyret{interact}, when @pyret{true} (the default) shows a separate window
+  containing the plot.  When @pyret{false}, the window does not appear; this is
+  useful for simply getting an @pyret-id["Image" "image"] from the plot.
+  
 }
