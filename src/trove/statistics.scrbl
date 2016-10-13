@@ -16,7 +16,7 @@
     (fun-spec (name "mean") (arity 1))
     (fun-spec (name "median") (arity 1))
     (fun-spec (name "stdev") (arity 1))
-    (fun-spec (name "distinct") (arity 1))
+    (fun-spec (name "chi-sqr") (arity 1))
 
     (fun-spec (name "lin-reg-2V") (arity 2))
 
@@ -133,6 +133,22 @@
       stdev([list: 2]) is 0
       stdev([list: 2, 4, 4, 4, 5, 5, 7, 9]) is 2
     end 
+  }
+  }
+
+  @function["chi-sqr"
+    #:contract (a-arrow (L-of (L-of N)) N)
+    #:args '(("counts" #f))
+    #:return N
+  ]{
+  Gives the chi-squared value for a two way table of observed counts,
+  represented by a @pyret{List<List<Number>>}.
+
+  @examples{
+    check:
+      chi-sqr([list: ]) is 0
+      chi-sqr([list: [list: 55, 20], [list: 45, 30]]) is 3
+    end
   }
   }
 
