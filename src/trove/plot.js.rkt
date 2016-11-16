@@ -4,6 +4,7 @@
 
 @(define (link T) (a-id T (xref "plot" T)))
 @(define Color (a-id "Color" (xref "image-structs" "Color")))
+@(define Image (a-id "Image" (xref "image" "Image")))
 @(define (t-field name ty) (a-field (tt name) ty))
 @(define (t-record . rest)
    (apply a-record (map tt (filter (lambda (x) (not (string=? x "\n"))) rest))))
@@ -32,7 +33,8 @@
 
 @docmodule["plot"]{
   The Pyret Plot library. It consists of plot, chart, and data visualization tools.
-  The visualization will appear on a dialog.
+  The visualization will appear in a separate dialog window, and/or be returned
+  as an @pyret-id["Image" "image"].
 
   @itemlist[
     @item{To close the dialog, click the close button on the title bar or press @tt{esc}}
@@ -132,9 +134,9 @@
     #:contract (a-arrow S
                         (L-of (link "Plot"))
                         (link "PlotWindowOptions")
-                        (L-of (link "Plot")))
+                        Image)
     #:args '(("title" #f) ("lst" #f) ("options" #f))
-    #:return (L-of (link "Plot"))
+    #:return Image
   ]{
 
   Display all @pyret-id{Plot}s in @pyret{lst} on a window with the configuration
@@ -150,9 +152,14 @@
       row: 4, 16
     end, _.{color: I.green})
   display-multi-plot(
-    'quadratic function and a scatter plot',
     [list: p1, p2],
-    _.{x-min: 0, x-max: 20, y-min: 0, y-max: 20})
+    _.{ 
+      title: 'quadratic function and a scatter plot',
+      x-min: 0,
+      x-max: 20,
+      y-min: 0,
+      y-max: 20
+    })
   }
 
   The above example will plot a function @tt{y = x^2} using red color, and show
@@ -161,9 +168,9 @@
   }
 
   @function["display-function"
-    #:contract (a-arrow S (a-arrow N N) (a-arrow N N))
+    #:contract (a-arrow S (a-arrow N N) Image)
     #:args '(("title" #f) ("f" #f))
-    #:return (a-arrow N N)
+    #:return Image
   ]{
   A shorthand to construct an @link{function-plot} with default options and then
   display it. See @link{function-plot} for more information.
@@ -175,9 +182,9 @@
   }
 
   @function["display-line"
-    #:contract (a-arrow S TA TA)
+    #:contract (a-arrow S TA Image)
     #:args '(("title" #f) ("tab" #f))
-    #:return TA
+    #:return Image
   ]{
   A shorthand to construct a @link{line-plot} with default options and then
   display it. See @link{line-plot} for more information.
@@ -194,9 +201,9 @@
   }
 
   @function["display-scatter"
-    #:contract (a-arrow S TA TA)
+    #:contract (a-arrow S TA Image)
     #:args '(("title" #f) ("tab" #f))
-    #:return TA
+    #:return Image
   ]{
   A shorthand to construct a @link{scatter-plot} with default options and then
   display it. See @link{scatter-plot} for more information.
@@ -217,16 +224,16 @@
   @section{Visualization Functions}
 
   @function["histogram"
-    #:contract (a-arrow S TA N TA)
-    #:args '(("title" #f) ("tab" #f) ("n" #f))
-    #:return TA
+    #:contract (a-arrow TA N (link "PlotWindowOptions") Image)
+    #:args '(("tab" #f) ("n" #f) ("options" #f))
+    #:return Image
   ]{
   Display a histogram with @pyret{n} bins using data from @pyret{tab}
   which is a table with one column: @t-field["value" N].
   The range of the histogram is automatically inferred from the data.
 
   @examples{
-  histogram('My histogram', table: value :: Number
+  histogram(table: value :: Number
     row: 1
     row: 1.2
     row: 2
@@ -235,32 +242,32 @@
     row: 3
     row: 6
     row: -1
-  end, 4)
+  end, 4, _.{title: "A histogram with 4 bins"})
   }
   }
 
   @function["pie-chart"
-    #:contract (a-arrow S TA TA)
-    #:args '(("title" #f) ("tab" #f))
-    #:return TA
+    #:contract (a-arrow TA (link "PlotWindowOptions") Image)
+    #:args '(("tab" #f) ("options" #f))
+    #:return Image
   ]{
   Display a pie chart using data from @pyret{tab} which is a table with two columns:
   @t-field["label" S] and @t-field["value" N].
 
   @examples{
-  pie-chart('My pie chart', table: label, value
+  pie-chart(table: label, value
     row: 'EU', 10.12
     row: 'Asia', 93.1
     row: 'America', 56.33
     row: 'Africa', 101.1
-  end)
+  end, _.{title: "A pie chart"})
   }
   }
 
   @function["bar-chart"
-    #:contract (a-arrow S TA S TA)
-    #:args '(("title" #f) ("tab" #f) ("legend" #f))
-    #:return TA
+    #:contract (a-arrow TA S (link "PlotWindowOptions") Image)
+    #:args '(("tab" #f) ("legend" #f) ("options" #f))
+    #:return Image
   ]{
   Display a bar chart using data from @pyret{tab} which is a table with two columns:
   @t-field["label" S] and @t-field["value" N]. @pyret{legend} indicates the legend
@@ -268,7 +275,6 @@
 
   @examples{
   bar-chart(
-    'Frequency of letters',
     table: label, value
       row: 'A', 11
       row: 'B', 1
@@ -276,14 +282,16 @@
       row: 'D', 4
       row: 'E', 9
       row: 'F', 3
-    end, 'Letter')
+    end, 'Letter', _.{
+      title: 'Frequency of letters',
+    })
   }
   }
 
   @function["grouped-bar-chart"
-    #:contract (a-arrow S TA (L-of S) TA)
-    #:args '(("title" #f) ("tab" #f) ("legends" #f))
-    #:return TA
+    #:contract (a-arrow TA (L-of S) (link "PlotWindowOptions") Image)
+    #:args '(("tab" #f) ("legends" #f) ("options" #f))
+    #:return Image
   ]{
   Display a bar chart using data from @pyret{tab} which is a table with two columns:
   @t-field["label" S] and @t-field["values" (L-of N)]. @pyret{legends} indicates the legends
@@ -293,7 +301,6 @@
 
   @examples{
   grouped-bar-chart(
-    'Populations of different states by age group',
     table: label, values
       row: 'CA', [list: 2704659, 4499890, 2159981, 3853788, 10604510, 8819342, 4114496]
       row: 'TX', [list: 2027307, 3277946, 1420518, 2454721, 7017731, 5656528, 2472223]
@@ -308,14 +315,16 @@
       '18 to 24 Years',
       '25 to 44 Years',
       '45 to 64 Years',
-      '65 Years and Over'])
+      '65 Years and Over'],
+    _.{title: 'Populations of different states by age group'}
+    )
   }
 
   @;############################################################################
   @section{The Options Types and Default Values}
 
   The PlotOptions and PlotWindowOptions type is actually a function type
-  consuming a default config and produces a desired config.
+  which consumes a default config and produces a desired config.
 
   To use a default config, you could construct
   @pyret-block{lam(default-configs): default-configs end}
@@ -358,7 +367,9 @@
             (t-field "y-min" N)
             (t-field "y-max" N)
             (t-field "num-samples" N)
-            (t-field "infer-bounds" B)]
+            (t-field "infer-bounds" B)
+            (t-field "interact" B)
+            (t-field "title" S)]
 
   The default config is
   @t-record{x-min: -10
@@ -366,7 +377,10 @@
             y-min: -10
             y-max: 10
             num-samples: 1000
-            infer-bounds: false}
+            infer-bounds: false
+            interact: true
+            title: ""
+            }
 
   If @pyret{infer-bounds} is true,
   @pyret{x-min}, @pyret{x-max}, @pyret{y-min}, @pyret{y-max} will be inferred,
@@ -374,4 +388,11 @@
 
   @pyret{num-samples} is to control the number of sample points for
   @link{function-plot}s.
+
+  @pyret{title} is displayed at the top of the plot window.
+
+  @pyret{interact}, when @pyret{true} (the default) shows a separate window
+  containing the plot.  When @pyret{false}, the window does not appear; this is
+  useful for simply getting an @pyret-id["Image" "image"] from the plot.
+  
 }
