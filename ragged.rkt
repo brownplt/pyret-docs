@@ -33,6 +33,10 @@
 (struct pattern-token pattern (val)
         #:transparent)
 
+;; The empty production
+(struct pattern-epsilon pattern ()
+        #:transparent)
+
 ;; Token structure defined as the literal string to be matched.
 (struct pattern-lit pattern (val)
         #:transparent)
@@ -73,6 +77,7 @@
                        CONSTANT
                        LIT
                        EOF
+                       EPS
                        UNKNOWN))
 
 
@@ -98,6 +103,8 @@
     (token-PIPE lexeme)]
    [(:or "+" "*")
     (token-REPEAT lexeme)]
+   ["~eps~"
+    (token-EPS lexeme)]
    [whitespace
     ;; Skip whitespace
     (return-without-pos (lex/1 input-port))]
@@ -234,6 +241,9 @@
       $1]]
 
     [atomic-pattern
+     [(EPS)
+      (pattern-epsilon (position->pos $1-start-pos)
+                       (position->pos $1-end-pos))]
      [(LIT)
       (pattern-lit (position->pos $1-start-pos)
                    (position->pos $1-end-pos)
