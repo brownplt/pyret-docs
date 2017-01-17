@@ -15,6 +15,8 @@
 
     (fun-spec (name "mean") (arity 1))
     (fun-spec (name "median") (arity 1))
+    (fun-spec (name "mode") (arity 1))
+    (fun-spec (name "modes") (arity 1))
     (fun-spec (name "stdev") (arity 1))
     (fun-spec (name "distinct") (arity 1))
 
@@ -92,10 +94,15 @@
     #:args '(("l" #f))
     #:return N
   ]{
-  Calculates the arithmetic mean of the numbers in @pyret{l}.
+  Calculates the arithmetic mean of the numbers in @pyret{l},
+  or raises an exception for an empty list.
   
   @examples{
-  mean([list: 2, 2, 4.5, 1.5, 1, 1])
+  check:
+    mean([list: ]) raises "empty list"
+    mean([list: 1, 2, 3]) is 2
+    mean([list: ~1, ~2, -1.2, 0.4, 0.3]) is-roughly ~0.5
+  end
   }
   }
   
@@ -104,10 +111,58 @@
     #:args '(("l" #f))
     #:return N
   ]{
-  Calculates the median of the numbers in @pyret{l}.
+  Calculates the median of the numbers in @pyret{l},
+  or raises an exception for an empty list.  If 
+  @pyret{l} contains an even number of elements, 
+  then @pyret{median} gives the average between the
+  two middle numbers of the list.  Note that this 
+  implies @pyret{median} may not always return a 
+  value contained in the list @pyret{l}.
   
   @examples{
-  median([list: -1, 0, 1, 2, 5])
+  check:
+    median([list: ]) raises "empty list"
+    median([list: 3, 5, 7]) is 5
+    median([list: -1, ~2.1, 3.1, 7]) is-roughly ~2.6
+  end
+  }
+  }
+
+  @function["mode"
+    #:contract (a-arrow (L-of N) N)
+    #:args '(("l" #f))
+    #:return N
+  ]{
+  Calculates the mode of the numbers in @pyret{l},
+  or raises an exception if @pyret{l} is empty.
+  If @pyret{l} contains multiple modes, @pyret{mode}
+  returns the mode with the least value.
+
+  @examples{
+  check:
+    mode([list: ]) raises "empty list"
+    mode([list: -1, 0, -1, 2]) is -1
+    mode([list: 0, 0, 1, 1]) is 0
+  end
+  }
+  }
+
+  @function["modes"
+    #:contract (a-arrow (L-of N) (L-of N))
+    #:args '(("l" #f))
+    #:return (L-of N)
+  ]{
+  Calculates a list containing each mode for
+  the numbers within @pyret{l}, in ascending
+  order.  If @pyret{l} is empty, @pyret{modes} 
+  returns an empty list.
+
+  @examples{
+  check:
+    modes([list: ]) is [list: ]
+    modes([list: 1, 1, 2]) is [list: 1]
+    modes([list: ~1, ~0.2, ~3]) is [list: ~0.2, ~1, ~3]
+  end
   }
   }
 
@@ -116,11 +171,17 @@
     #:args '(("l" #f))
     #:return N
   ]{
-  Gives the standard deviation of the data set represented by
-  numbers in @pyret{l}.
+  Calculates the population standard deviation 
+  of the data set represented by numbers 
+  in @pyret{l}, or raises an error if 
+  @pyret{l} is empty.
   
   @examples{
-  stdev([list: -1, 0, 1, 2, 5])
+  check:
+    stdev([list: ]) raises "empty list"
+    stdev([list: 5]) is 0
+    stdev([list: 1, 2, 3]) is 1
+  end
   }
   }
 
@@ -192,5 +253,4 @@
   }
   }
 }
->>>>>>> stats-fix
 
