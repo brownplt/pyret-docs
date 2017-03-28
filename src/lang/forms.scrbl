@@ -930,6 +930,21 @@ where:
 end
 }
 
+When you have a single kind of datum in a data definition, instead of
+writing:
+
+@pyret-block{
+data Point:
+  | pt(x, y)
+end
+}
+
+You can drop the | and simply write:
+
+@pyret-block{
+data Point: pt(x, y) end
+}
+
 @subsection[#:tag "s:var-decl"]{Variable Declarations}
 
 Variable declarations look like @seclink["s:let-decl" "let bindings"], but
