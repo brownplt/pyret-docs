@@ -317,7 +317,7 @@ As the name suggests, this combines the idea of @pyret-id{raises} with
 import is-field-not-found from error
 check:
   o = {}
-  o.x raises-satisfies E.is-field-not-found
+  o.x raises-satisfies is-field-not-found
 end
 }
 
