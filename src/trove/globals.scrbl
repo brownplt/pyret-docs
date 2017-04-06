@@ -136,7 +136,7 @@ end
 
 Creates a string representation of the value for display that is
 value-dependent in some cases, such as error messages.  For built-in types
-the output is identical to @pyret-id["torepr"], except for @seclink["strings"].
+the output is identical to @pyret-id["torepr"], except for @pyret{String}s.
 
 @examples{
 check:
@@ -164,11 +164,11 @@ A type specification that permits all values.  This is mainly useful
 in built-in language forms, like in @secref["equality"] or 
 @pyret-id{torepr}, which truly do handle any value.  
 
-Pyret programs that use @pyret-id{Any} on their own can usually be 
+Pyret programs that use @pyret{Any} on their own can usually be 
 restructured to use a specific type declaration to be more clear about 
 what data they are working with.
 
-Specifying @pyret-id{Any} will prevent Pyret from attempting to infer types, as
+Specifying @pyret{Any} will prevent Pyret from attempting to infer types, as
 it will if no type specification is provided.
 
 @type-spec["Boolean" (list)]
@@ -219,7 +219,8 @@ particular value is.
 
 @function["is-boolean" #:contract (a-arrow "Any" (a-id "Boolean" (xref "<global>" "Boolean")))]
 
-Returns @tt{true} for @tt{true} and @tt{false}, and @tt{false} for all other values.
+Returns @pyret{true} if the provided argument is a @pyret{Boolean},
+ @pyret{false} if not.
 
 @examples{
 check:
@@ -230,6 +231,9 @@ end
 }
 
 @function["is-number" #:contract (a-arrow "Any" (a-id "Boolean" (xref "<global>" "Boolean")))]
+
+Returns @pyret{true} if the provided argument is a @pyret{Number},
+ @pyret{false} if not.
 
   Numbers are @itemlist[
      @item{Integers, e.g. @tt{345} or @tt{-321}}
@@ -248,6 +252,9 @@ end
 }
   
 @function["is-string" #:contract (a-arrow "Any" (a-id "Boolean" (xref "<global>" "Boolean")))]
+
+Returns @pyret{true} if the provided argument is a @pyret{String},
+ @pyret{false} if not.
 
   @para{ Strings can be written @tt{@literal{"}text@literal{"}} or @tt{@literal{'}text@literal{'}},
   and may not span multiple lines.  Allowed escapes are @tt{\n} (newline),
@@ -271,6 +278,9 @@ end
   
 @function["is-raw-array" #:contract (a-arrow "Any" (a-id "Boolean" (xref "<global>" "Boolean")))]
 
+Returns @pyret{true} if the provided argument is a @pyret{RawArray},
+ @pyret{false} if not.
+
 @examples{
 check:
   is-raw-array([raw-array: 3, "Jones", false]) is true
@@ -278,6 +288,9 @@ end
 }
 
 @function["is-nothing" #:contract (a-arrow "Any" (a-id "Boolean" (xref "<global>" "Boolean")))]
+
+Returns @pyret{true} if the provided argument is a @pyret{Nothing},
+ @pyret{false} if not.
 
 @examples{
 check:
@@ -288,7 +301,10 @@ check:
 end
 }
 
-@function["is-function" #:contract (a-arrow "Any" (a-id "Boolean" (xref "<global>" "Boolean")))]
+@function["is-function" #:contract (a-arrow "Any" (a-id "Function" (xref "<global>" "Boolean")))]
+
+Returns @pyret{true} if the provided argument is a @pyret{Function},
+ @pyret{false} if not.
 
 @examples{
 fun inc(x): x + 1 end
@@ -301,6 +317,9 @@ end
 }
 
 @function["is-object" #:contract (a-arrow "Any" (a-id "Boolean" (xref "<global>" "Boolean")))]
+
+Returns @pyret{true} if the provided argument is a @pyret{Object},
+ @pyret{false} if not.
 
 @examples{
 data Point: pt(x, y) end
