@@ -117,10 +117,14 @@
 
 @docmodule["strings" #:noimport #t #:friendly-title "Strings"]{
 
-@pyret{String}s are sequences of characters.  This includes not only letters in
+@type-spec["String" (list)]
+
+The type of string values.
+                                                               
+A @pyret{String} is a fixed-length array of characters.  This includes not only letters in
 the Latin alphabet and numerals, but any Unicode character, including languages
 using non-Latin characters, such as Arabic, Russian or Chinese, as well as emoji
-defined in the unicode specification.
+defined in the Unicode specification.
 
 @(image "src/builtin/valid-string.png")
 
@@ -137,10 +141,6 @@ Internally, a Pyret @pyret{String} is implemented as a JavaScript
 that characters that are identified by a Unicode code point greater than
 65535 are sometimes treated as two characters by Pyret, as noted below.}
 
-
-@type-spec["String" (list)]
-
-The type of string values.
 
 @section{String Functions}
 
@@ -212,10 +212,16 @@ Converts the argument string to a number, returning @pyret-id["none" "option"]
 if it is not a valid numeric string, and a @a-app[@pyret-id["some" "option"]
 @pyret-id["Number" "numbers"]] if it is.
 
+A valid numeric string is in this context is strictly defined.  No extra spaces
+or punctuation not allowed in a Pyret @pyret{Number} are allowed.
+
 @examples{
 check:
   string-to-number("100") is some(100)
   string-to-number("not-a-number") is none
+  string-to-number(" 100") is none
+  string-to-number("1,000") is none
+  string-to-number("1-800-555-1212") is none
 end
 }
 
@@ -239,7 +245,8 @@ than @tt{end}, if @pyret{start} or @tt{end} is greater than the length of the st
 
 The returned string always has length @tt{end} - @pyret{start}.
 
-@margin-note{Count string indexes starting a zero for the first character.}
+@margin-note{@pyret{String} indexes are counted starting from zero for the
+first character.}
 
 @examples{
 check:
