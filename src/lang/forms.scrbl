@@ -1245,8 +1245,8 @@ check:
   m = method(self): self.x end
   o = { a-method-name: m, x: 20 }
   o2 = { a-method-name: m, x: 30 }
-  o.m() is 20
-  o2.m() is 30
+  o.a-method-name() is 20
+  o2.a-method-name() is 30
 end
 }
 
