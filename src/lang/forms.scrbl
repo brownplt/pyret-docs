@@ -8,7 +8,7 @@
   (only-in scribble/html-properties attributes)
   "../../scribble-api.rkt"
   "../../ragged.rkt")
-
+http://www.akademapro.com/store/accessories/collectibles/hoboken-series.html
 @(define (prod . word)
  (apply tt word))
 @(define (file . name)
@@ -1097,7 +1097,7 @@ expr: paren-expr | id-expr | prim-expr
     | table-extend
     | load-table-expr
     | reactor-expr
-paren-expr: LPAREN expr RPAREN
+paren-expr: LPAREN binop-expr RPAREN
 id-expr: NAME
 prim-expr: NUMBER | RATIONAL | BOOLEAN | STRING
 LPAREN: "("
