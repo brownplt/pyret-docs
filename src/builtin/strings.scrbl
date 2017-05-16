@@ -161,7 +161,7 @@ end
   @function["string-contains" #:contract (a-arrow S S B) #:return B]
 
 Returns @pyret{true} if @tt{string-to-find} is contained in
-@tt{string-to-search}.  Returns true if an empty string is passed as
+@tt{string-to-search}.  Returns @pyret{true} if an empty string is passed as
 @tt{string-to-find}.
   
 @examples{
