@@ -73,20 +73,34 @@
 @docmodule["arrays" #:noimport #t]{
    @type-spec["Array" (list)]
 
-   The type of Array values.  Arrays are a mutable, fixed-length collection
-   indexed by non-negative integers.
+A @pyret{Array} is a mutable, fixed-length collection indexed
+by non-negative intgers.
 
-@section{Array Constructor}
+Pyret also provides @seclink{raw-arrays}, which is an efficient,
+Javascript implementation of an array.
+
+@section{Array Functions}
 
 @collection-doc["array" #:contract `(a-arrow ("elt" "a") ,(A-of "a"))]
 
-Creates an @pyret-id{Array} with the given @pyret{elt}s.
+Creates an @pyret-id{Array} with the given elements.  Note that
+@pyret-id{Array}s are mutable, so comparisons using @pyret["=="]
+(the operator for @pyret-id["equal-always" "equality"]) will only
+return @pyret{true} on @pyret-id{Array}s when they are also
+@pyret-id["identical" "equality"], regardless of their contents.  To compare
+the elements, use @pyret-id["equal-now" "equality"]/@pyret["=~"],
+and test with @pyret-id["is=~" "testing"].
 
 @examples{
-  a :: Array<String> = [array: "a", "b"]
+check:
+  a = [array: 1, 2, 3]
+  a is a
+  a is== a
+  [array: 1, 2, 3] is=~ [array: 1, 2, 3]
+  [array: 1, 2, 3] is-not== [array: 1, 2, 3]
+  [array: 1, 2, 3] is-not [array: 1, 2, 3]
+end
 }
-
-@section{Other Ways to Build Arrays}
 
 @function["array-of"
   #:contract (a-arrow "a" N (A-of "a"))
@@ -94,30 +108,32 @@ Creates an @pyret-id{Array} with the given @pyret{elt}s.
   #:return (A-of "a")
 ]
 
-Constructs an array of length @pyret{count}, where every element is the value
-given as @pyret{elt}.  Note the use of @pyret-id["is=~" "testing"] below, which
-is necessary because arrays are mutable and only compare their contents when
-using @pyret-id["equal-now" "equality"].
+Constructs an @pyret{Array} of length @tt{count}, where every element is the value
+given as @pyret{elt}.
+
+Note that @pyret{value} is not @emph{copied}, so,
+the elements of @pyret{Array}s created with @pyret-id{array-of} will always be
+@pyret-id["identical" "equality"].
 
 @examples{
 check:
-  a = array-of(true, 5)
-  a is=~ [array: true, true, true, true, true]
+  arr = array-of(true, 2)
+  arr is=~ [array: true, true]
+  arr is-not [array: true, true]
+  array-get-now(arr, 0) is<=> array-get-now(arr, 1)
+  
+  array-set-now(arr, 1, false)
+  arr is=~ [array: true, false]
+  
+  arr-of-arrs = array-of(arr, 3)
+  arr-of-arrs is=~ [array: [array: true, false], [array: true, false],
+    [array: true, false]]
+  
+  array-set-now(arr, 0, false)
+  arr-of-arrs is=~ [array: [array: false, false], [array: false, false],
+    [array: false, false]] 
 end
-}
 
-Note that the value is @emph{not} copied, so if you construct an array of
-arrays with @pyret-id["array-of"], all the elements will share updates.
-
-@examples{
-check:
-  a1 = [array: "a1"]
-  a2 = array-of(a1, 3)
-  a2 is=~ [array: [array: "a1"], [array: "a1"], [array: "a1"]]
-
-  a1.set-now(0, "b1")
-  a2 is=~ [array: [array: "b1"], [array: "b1"], [array: "b1"]]
-end
 }
 
 To create an array of arrays where each array is new and independent, use
@@ -163,8 +179,8 @@ end
   #:return "a"
 ]
 
-Returns the value at the given @pyret{index}.  If the index is too large, is
-negative, or isn't a whole number, an error is signaled.  This method has a
+Returns the value at the given @tt{index}.  If the index is too large, is
+negative, or isn't a whole number, an error is raised.  This method has a
 @pyret{-now} suffix because its answer can change from one call to the next if,
 for example, @a-ref["set-now"] is used.
 
@@ -173,29 +189,8 @@ check:
   a = [array: "a", "b", "c"]
   a.get-now(0) is "a"
   a.get-now(1) is "b"
-  a.get-now(2) is "c"
-  a.get-now(3) raises "index too large"
 end
 }
-
-@a-method["to-list-now"
-  #:contract (a-arrow (A-of "a") (L-of "a"))
-  #:args (list (list "self" #f))
-  #:return (L-of "a")
-]
-
-Returns a @pyret-id["List" "lists"] containing the same elements as this array
-in the same order.  This method has a
-@pyret{-now} suffix because its answer can change from one call to the next if,
-for example, @a-ref["set-now"] is used.
-
-@examples{
-check:
-  a = [array: "a", "b", "c"]
-  a.to-list-now() is [list: "a", "b", "c"]
-end
-}
-
 
 @a-method["set-now"
   #:contract (a-arrow (A-of "a") N "a" No)
@@ -203,27 +198,24 @@ end
   #:return No
 ]
 
-Updates the value at the given @pyret{index}, returning @pyret-id["Nothing"
+Updates the value at the given @tt{index}, returning @pyret-id["Nothing"
 "<global>"].  The update is stateful, so all references to the array see the
 update.  This also justifies the @pyret{-now} suffix; in the example below
-calling @pyret{a.get-now()} and @pyret{a.to-list-now()} at two different points
+calling @pyret{a.get-now()} at two different points
 in the program produces two different results.
 
 @examples{
 check:
   a = [array: "a", "b", "c"]
-
   a.get-now(0) is "a"
-  a.to-list-now() is [list: "a", "b", "c"]
 
   b = a
-
   a.set-now(0, "d")
-
-  a.get-now(0) is "d"
-  a.to-list-now() is [list: "d", "b", "c"]
-
-  b.get-now(0) is "d"
+  a is=~ [array: "d", "b", "c"]
+  b is=~ [array: "d", "b", "c"]
+  
+  c = b.set-now(0, 'z')
+  c is nothing
 end
 }
 
@@ -240,12 +232,35 @@ created and cannot be changed.
 check:
   a = [array: "a", "b"]
   a.length() is 2
-  
   b = [array:]
   b.length() is 0
 end
 }
 
+@a-method["to-list-now"
+  #:contract (a-arrow (A-of "a") (L-of "a"))
+  #:args (list (list "self" #f))
+  #:return (L-of "a")
+]
+
+    Converts a @pyret-id{Array} to a @pyret-id["List" "lists"] containing
+    the same elements in the same order. This method has a
+@pyret{-now} suffix because its answer can change from one call to the next if,
+for example, @a-ref["set-now"] is subsequently used.
+
+    Note that it does @emph{not} recursively convert @pyret-id{Array}s;
+    only the top-level is converted.
+
+@examples{
+check:
+  a = [array: 1, 2, 3]
+  a.to-list-now() is [list: 1, 2, 3]
+        
+  a2 = array-of([array:], 3)
+  a2.to-list-now() is=~ [list: [array:], [array:], [array:]]
+  a2.to-list-now() is-not=~ [list: [list:], [list:], [list:]]
+end
+}
 
 @section{Array Functions}
 
@@ -255,15 +270,33 @@ end
   #:return "a"
 ]
 
-Equivalent to @pyret{array}@a-ref["get-now"]@pyret{(index)} (function examples below).
+Equivalent to @pyret{array}@a-ref["get-now"]@pyret{(index)}
 
+@examples{
+check:
+  a = [array: 0, 1, 2]
+  array-get-now(a, 1) is 1
+end
+}
+          
 @function["array-set-now"
   #:contract (a-arrow (A-of "a") N "a" (A-of "a"))
   #:args (list (list "array" #f) (list "index" #f) (list "value" #f))
   #:return No
 ]
 
-Equivalent to @pyret{array}@a-ref["set-now"]@pyret{(index, value)} (function examples below).
+Equivalent to @pyret{array}@a-ref["set-now"]@pyret{(index, value)}.
+
+@examples{
+         
+check:
+  a = array-of("a", 3)
+  a is=~ [array: "a", "a", "a"]
+
+  array-set-now(a, 1, "b")
+  a is=~ [array: "a", "b", "a"]
+end
+}
 
 @function["array-to-list-now"
   #:contract (a-arrow (A-of "a") (L-of "a"))
@@ -271,15 +304,7 @@ Equivalent to @pyret{array}@a-ref["set-now"]@pyret{(index, value)} (function exa
   #:return (L-of "a")
 ]
 
-Equivalent to @pyret{array}@a-ref["to-list-now"]@pyret{()} (function examples below).
-
-@function["array-length"
-  #:contract (a-arrow (A-of "a") N)
-  #:args (list (list "array" #f))
-  #:return N
-]
-
-Equivalent to @pyret{array}@a-ref["length"]@pyret{()} (function examples below).
+Equivalent to @pyret{array}@a-ref["to-list-now"]@pyret{()}.
 
 @examples{
 check:
@@ -289,18 +314,23 @@ check:
   array-set-now(a, 1, "b")
   a is=~ [array: "a", "b", "a"]
 
-  array-get-now(a, 1) is "b"
-
-  array-length(a) is 3
   l = array-to-list-now(a)
   l is [list: "a", "b", "a"]
-
-  # Updating doesn't change the old to-list value
-  array-set-now(a, 2, "c")
-  l is [list: "a", "b", "a"]
-  l2 = array-to-list-now(a)
-  l2 is [list: "a", "b", "c"]
 end
 }
+@function["array-length"
+  #:contract (a-arrow (A-of "a") N)
+  #:args (list (list "array" #f))
+  #:return N
+]
 
+Equivalent to @pyret{array}@a-ref["length"]@pyret{()}
+
+@examples{
+check:
+  a = array-of("a", 3)
+  a is=~ [array: "a", "a", "a"]
+  array-length(a) is 3
+end
+}
 }

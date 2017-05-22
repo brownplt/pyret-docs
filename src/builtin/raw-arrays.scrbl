@@ -1,4 +1,3 @@
-
 #lang scribble/base
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 
@@ -8,7 +7,7 @@
   `(module "raw-arrays"
     (path "src/js/base/runtime-anf.js")
     (data-spec
-      (name "RawArray")
+      (name "RawArrays")
       (variants)
       (shared))
     (fun-spec
@@ -50,18 +49,28 @@
 @docmodule["raw-arrays" #:noimport #t #:friendly-title "RawArray"]{
    @type-spec["RawArray" (list "a")]
 
-   The type of raw array values.  Raw arrays are a primitive datastructure
-   that allows for lookup and (mutable) update by non-negative integers.
+   A @pyret{RawArray} is a mutable, fixed-length collection indexed
+   by non-negative intgers.  Unlike Pyret @seclink{arrays}, @pyret{RawArray}s are
+   a pure Javascript implementation, using @tt{JSArray} variables.  This
+   means that operations on @pyret{RawArray}s are relatively fast and
+   efficient.
 
-   Raw arrays are used in the interface to constructor functions like
-   @pyret{[constr: e1, e2, ...]}, as the way of bundling up the values from
-   @pyret{e1}, @pyret{e2}, etc. to pass them to @pyret{constr.make}.
+   @pyret{RawArray}s are widely used internally in Pyret
+   language development.
+
+   Another difference between Pyret @seclink{arrays}
+   and @pyret{RawArray}s is the @pyret-id["raw-array-fold"] function
+   available to @pyret{RawArray}s.
+ 
 
      @section{RawArray Functions}
 
 @collection-doc["raw-array" #:contract `(a-arrow ("elt" "a") ,(RA-of "a"))]
 
-Creates a @pyret-id{RawArray} with the given elements.  Note that
+Constructs a@pyret{RawArray} array of length @tt{count}, where every element is the value
+given as @pyret{elt}.
+
+Note that
 @pyret-id{RawArray}s are mutable, so comparisons using @pyret["=="]
 (the operator for @pyret-id["equal-always" "equality"]) will only
 return @pyret{true} on @pyret-id{RawArray}s when they are also
@@ -71,53 +80,86 @@ and test with @pyret-id["is=~" "testing"].
 
 @examples{
 check:
-  [raw-array: 1, 2, 3] is-not== [raw-array: 1, 2, 3]
-  [raw-array: 1, 2, 3] is-not [raw-array: 1, 2, 3]
-  [raw-array: 1, 2, 3] is=~ [raw-array: 1, 2, 3]
-
-  a = [raw-array: 1, 2, 3]
-  a is a
-  a is== a
+  a = raw-array-of(true, 5)
+  a is=~ [raw-array: true, true, true, true, true]
 end
 }
 
   @function["raw-array-of" #:contract (a-arrow "a" N (RA-of "a"))]
 
-Creates a @pyret-id{RawArray} with length equal to @pyret{count}, and with each
-index holding @pyret{value}.  Note that @pyret{value} is not @emph{copied}, so,
-the elements of arrays created with @pyret-id{raw-array-of} will always be
+Constructs an @pyret{RawArray} of length @tt{count}, where every element is the value
+given as @pyret{elt}.
+
+Note that @pyret{value} is not @emph{copied}, so,
+the elements of @pyret{RawArray}s created with @pyret-id{raw-array-of} will always be
 @pyret-id["identical" "equality"] (with the usual caveats if the @pyret{value}
 was a function or method).
 
 @examples{
 check:
-  a1 = raw-array-of("init", 3)
-  raw-array-length(a1) is 3
-  a1 is=~ [raw-array: "init", "init", "init"]
-
-  a2 = raw-array-of({}, 3)
-  raw-array-length(a2) is 3
-  raw-array-get(a2, 0) is<=> raw-array-get(a2, 1)
-  raw-array-get(a2, 1) is<=> raw-array-get(a2, 2)
+  arr = raw-array-of(true, 2)
+  arr is=~ [raw-array: true, true]
+  arr is-not [raw-array: true, true]
+  raw-array-get(arr, 0) is<=> raw-array-get(arr, 1)
+  
+  raw-array-set(arr, 1, false)
+  arr is=~ [raw-array: true, false]
+  
+  arr-of-arrs = raw-array-of(arr, 3)
+  arr-of-arrs is=~ [raw-array: [raw-array: true, false], 
+    [raw-array: true, false], [raw-array: true, false]]
+  
+  raw-array-set(arr, 0, false)
+  arr-of-arrs is=~ [raw-array: [raw-array: false, false], 
+    [raw-array: false, false], [raw-array: false, false]] 
 end
+
 }
 
   @function["raw-array-get" #:contract (a-arrow (RA-of "a") N "a") #:return "a"]
+
+Returns the value at the given @tt{index}.  If the index is too large, is
+negative, or isn't a whole number, an error is raised.
+  
+@examples{
+check:
+  a = [raw-array: "a", "b", "c"]
+  raw-array-get(a, 0) is "a"
+  raw-array-get(a, 1) is "b"
+  raw-array-get(a, 2) is "c"
+end
+}
+  
   @function["raw-array-set" #:contract (a-arrow (RA-of "a") N "a" (RA-of "a")) #:return (RA-of "a")]
+
+Updates the value at the given @tt{index}, returning the new value.  The update is stateful,
+so all references to the @pyret{RawArray} see the update.  
+
+@examples{
+check:
+  a = [raw-array: "a", "b", "c"]
+  raw-array-get(a, 0) is "a"
+  
+  b = a
+  raw-array-set(a, 0, "d")
+  a is=~ [raw-array: "d", "b", "c"]
+  b is=~ [raw-array: "d", "b", "c"]
+  
+  c = raw-array-set(a, 0, "z")
+  c is=~ [raw-array: "z", "b", "c"]
+end
+}
+
+          
   @function["raw-array-length" #:contract (a-arrow (RA-of "a") N) #:return N]
 
 @examples{
-  a1 = raw-array-of(0, 3)
-  raw-array-length(a1) is 3
-
-  raw-array-set(a1, 0, 1)
-  raw-array-set(a1, 1, 2)
-  raw-array-set(a1, 2, 3)
-
-  raw-array-get(a1, 0) is 1
-  raw-array-get(a1, 1) is 2
-  raw-array-get(a1, 2) is 3
-  raw-array-get(a1, 3) raises "too large"
+check:
+  a = [raw-array: "a", "b"]
+  raw-array-length(a) is 2
+  b = [raw-array:]
+  raw-array-length(b) is 0
+end
 }
   @function["raw-array-to-list" #:contract (a-arrow (RA-of "a") (L-of "a")) #:return (L-of "a")]
 
