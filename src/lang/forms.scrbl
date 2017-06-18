@@ -235,6 +235,87 @@ bool-expr: "true" | "false"
 
 Boolean literals are the lowercase words @pyret{true} and @pyret{false}.
 
+@section[#:tag "s:comments"]{Comments}
+Pyret supports two forms of comments:
+@itemlist[
+
+@item{@emph{Single-line comments} begin with a @pyret{#} symbol and extend to
+the end of the line:
+
+@pyret-block{
+# This is an example of a single-line, standalone comment
+fun example(n):
+  1 + n # This single-line comment starts after some code
+end
+}
+}
+
+@item{@emph{Block comments} begin with a @pyret{#|} symbol and end with a
+matching @pyret[#:style "force-comment"]{|#}.
+
+@pyret-block{
+fun example(n):
+  #|
+     This comment can extend
+     over multiple lines
+  |#
+  1 + n
+end
+}
+
+While the text of a comment block contains everything between the @pyret{#|}
+and @pyret[#:style "force-comment"]{|#} symbols, it is preferred to put them on
+their own lines, so they are visually distinctive and can easily be added or
+removed:
+
+@pyret-block[#:style "good-ex"]{
+#|
+  prefer this
+  style
+#|
+}
+
+@pyret-block[#:style "ok-ex"]{
+#| instead of
+   this style |#
+}
+
+The one exception is when block comments are being used to comment out sections
+of a single line of code:
+
+@pyret-block[#:style "good-ex"]{
+rectangle(30 #|width|#, 40 #|height|#, "solid", "red")
+}
+
+They can be nested within each other, so long as the delimiters are matched:
+
+@pyret-block{
+fun example(n):
+  #| this is in a comment
+     #| so is this
+        and this
+     |#
+     and this
+  |#
+  1 + n
+end
+}
+
+Within a block comment, single-line comments are ignored:
+@pyret-block[#:style "ok-ex"]{
+fun example(n):
+  #| This is a block comment.
+     Even though the next line starts a single-line comment
+     # the block-comment ends here |#
+  1 + n
+end
+}
+
+(Naturally, this style isn't preferred, as it is easy to ignore the
+end-of-comment marker when reading quickly!)
+
+}
+]
 @section[#:tag "s:program"]{Programs}
 
 Programs consist of a sequence of import or provide statements, followed by a
