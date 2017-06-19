@@ -645,7 +645,7 @@ Finally, we have to weave together the two termination conditions:
 fun game-ends(w):
   ask:
     | is-on-land-or-water(w)      then: true
-    | are-overlapping(w, BALLOON) then: true
+    | are-overlapping(w, BALLOON-LOC) then: true
     | otherwise: false
   end
 end
