@@ -1832,12 +1832,12 @@ end
 }
 
 @function["sort-by"
-  #:contract (a-arrow (L-of "A") (L-of "A"))
-  #:args '(("lst" #f))
+  #:contract (a-arrow (L-of "A") (a-arrow "A" "A" (a-id "Boolean" (xref "<global>" "Boolean"))) (a-arrow "A" "A" (a-id "Boolean" (xref "<global>" "Boolean"))) (L-of "A"))
+  #:args '(("lst" #f) ("cmp" #f) ("eq" #f))
   #:return (L-of "A")]{
 Like @pyret-id{sort}, but the comparison and equality operators can be
 specified.  This allows for sorting lists whose contents are not
-comparable by @pyret{<}.
+comparable by @pyret-id["<" "equality"].
 @examples{
 check:
   lists.sort-by([list:
