@@ -744,7 +744,7 @@ There are a number of forms that can only appear as statements in @tt{block}s
 @py-prod{data-decl} is an exception, and can appear only at the top level.
 
 @bnf['Pyret]{
-stmt: let-decl | fun-decl | data-decl | var-decl | type-stmt | newtype-stmt
+stmt: let-decl | rec-decl | fun-decl | data-decl | var-decl | type-stmt | newtype-stmt
 }
 
 @subsection[#:tag "s:let-decl"]{Let Declarations}
@@ -800,19 +800,48 @@ end
 
 A binding also has a case with tuples, where several names can be given in a binding which can then be assigned to values in a tuple.
 
-@justcode{
+@pyret-block{
 {x;y;z} = {"he" + "llo"; true; 42}
 x = "hi"
 #Error: x defined twice
 
 }
 
-@justcode{
+@pyret-block{
 {x;y;z} = {10; 12}
 #Error: The number of names must match the length of the tuple
 
 }
 
+@subsection[#:tag "s:rec-decl"]{Recursive Let Declarations}
+@bnf['Pyret]{
+EQUALS: "="
+REC: "rec"
+rec-decl: REC binding EQUALS binop-expr
+}
+
+A recursive let-binding is just like a normal let-binding, except that the name
+being defined is in scope in the definition itself, rather than only after it.
+That is:
+
+@pyret-block[#:style "bad-ex"]{
+countdown-bad = lam(n):
+  if n == 0: true
+  else: countdown-bad(n - 1) # countdown-bad is not in scope
+  end
+end
+# countdown-bad is in scope here
+}
+@pyret-block[#:style "good-ex"]{
+rec countdown-good =
+  # countdown-good is in scope here, because of the 'rec'
+  lam(n):
+    if n == 0: true
+    else: countdown-good(n - 1) # so this call is fine
+    end
+  end
+# countdown-good is in scope here
+}
 @subsection[#:tag "s:fun-decl"]{Function Declaration Expressions}
 
 Function declarations have a number of pieces:
@@ -841,44 +870,102 @@ doc-string: [DOC STRING]
 where-clause: [WHERE block]
 }
 
-A function expression is syntactic sugar for a let and an anonymous function
-expression for non-recursive case. The statement:
-
-@justcode{
-"fun" NAME ty-params args return-ann ":"
-  doc-string
-  block
-  where-clause
-"end"
-}
-
-is equivalent to
-
-@justcode{
-NAME "=" "lam" ty-params args return-ann ":"
-  doc-string
-  block
-"end"
-}
-
-With the @tt{where-clause} registered in check mode.  Concretely:
+Function declarations are statements used to define functions with a given
+name, parameters and signature, optional documentation, body, and optional tests.
+For example, the following code:
 
 @pyret-block{
-fun f(x, y):
-  x + y
+fun is-even(n):
+  num-modulo(n, 2) == 0
 end
 }
 
-is equivalent to
+defines a minimal function, with just its name, parameter names, and body.  A
+more complete example:
 
 @pyret-block{
-f = lam(x, y):
-  x + y
+fun fact(n :: NumNonNegative) -> Number:
+  doc: "Returns n! = 1 * 2 * 3 ... * n"
+  if n == 0: 1
+  else:      n * fact(n - 1)
+  end
+where:
+  fact(1) is 1
+  fact(5) is 120
 end
 }
 
-See the documentation for @tt{lam-exprs} for an explanation of arguments'
-and annotations' behavior, as well as @tt{doc-strings}.
+defines a recursive function with a fully-annotated signature (the types of its
+parameter and return value are specified), documents the purpose of the
+function with a doc-string, and includes a where-block definine some simple
+tests of the function.
+
+Function declarations are statements that can only appear either at the top
+level of a file, or within a block scope.  (This is commonly used for defining
+local helper functions within another one.)
+
+@subsubsection{Scope}
+Once defined, the name of the function is visible for the remainder of the
+scope in which it is defined.  Additionall, the function is in scope within its
+own body, to enable recursive functions like @pyret{fact} above:
+
+@pyret-block{
+fun outer-function(a, b, c):
+  ...
+  # outer-function is in scope here
+  # as are parameters a, b, and c
+  ...
+  fun inner-helper(d, e, f):
+    ...
+    # inner-helper is in scope here,
+    # as are parameters d, e, and f
+    # and also outer-helper, a, b and c
+    ...
+  end
+  ...
+  # outer-function, a, b, and c are in scope here,
+  # and so is inner-helper, but *not* d, e or f
+  ...
+end
+}
+
+As with all Pyret identifiers, these function and parameter names cannot be
+mutated, and they cannot be redefined while in scope unless they are explicitly
+@pyret{shadow}ed.
+
+@subsubsection{Where blocks}
+If a function defines a @pyret{where:} block, it can incorporate unit tests
+directly inline with its definition.  This helps to document the code in
+terms of executable examples.  Additionally, whenever the function declaration
+is executed, the tests will be executed as well.  This helps ensure that the
+code and tests don't fall out of synch with each other.  (The clarification
+about "whenever the declaration is executed" allows writing tests for nested
+functions that might rely on the parameters of their containing function: in
+the example above, @pyret{inner-helper} might have a test case that relied on
+the parameters @pyret{a}, @pyret{b} or @pyret{c} from the surrounding call to
+@pyret{outer-function}.) See the documentation for
+@seclink["testing-blocks"]{@pyret{check:} and @pyret{where:} blocks} for more
+details. 
+
+@subsubsection{Syntactic sugar}
+Function declarations are not a primitive concept in the language.  Instead,
+they can be thought of as an idiomatic declaration of a recursively-scoped let
+binding to a lambda expression.  That is, the following two definitions are
+equivalent: 
+@pyret-block{
+fun fact(n):
+  if n == 1: 1 else: n * fact(n - 1) end
+end
+}
+@pyret-block{
+rec fact = lam(n):
+  if n == 1: 1 else n * fact(n - 1) end
+end
+}
+
+See the @seclink["s:lam-expr"]{documentation} for more information about
+@py-prod{lam-expr}s, and also see @py-prod{rec-decl}s above for more
+information about recursive bindings.
 
 @subsection[#:tag "s:data-decl"]{Data Declarations}
 
