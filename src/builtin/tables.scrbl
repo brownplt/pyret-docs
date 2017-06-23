@@ -79,23 +79,27 @@ following examples.}
 Pyret supports loading spreadsheets from Google Sheets and
 interpreting them as Pyret tables.
 
-@margin-note{Currently no public interface for creating additional sources
-  beyond Google Sheets is supported.
+Currently no public interface for creating additional sources
+beyond Google Sheets is supported.
 
 You can import most relevant file types, including .xlsx,
 into Google Sheets, and then into Pyret, so you should be able to
-get almost any tabular data into Pyret with a little effort.}
-
-As a simple and consistent example, let's say we wanted to import the
-@tt{my-table} data from a spreadsheet:
-
-@(image "src/builtin/gsheet-1.png")
+get almost any tabular data into Pyret with a little effort.
 
 @margin-note{In Google Sheets, you create a file, referred to as a
-@tt{spreadsheet} that contains one or more tables called
-@tt{sheets}.  Excel refers to the file as a @tt{workbook} and each
-table as a @tt{worksheet}.  We will follow Google Sheets'
+"spreadsheet" that contains one or more grids called
+"sheets."  Excel refers to the file as a "workbook" and each
+grid as a "worksheet."  We will follow Google Sheets'
 nomenclature.}
+
+Pyret assumes each sheet contains only one table of neatly formatted
+data, without skipping columns or extra comments other than an
+optional single header row at the top.
+
+As a simple and consistent example, let's say we wanted to import the
+@tt{my-table} data from a spreadsheet.
+
+@(image "src/builtin/gsheet-1.png")
 
 To import this data into a Pyret program, you need to get the
 spreadsheet's
@@ -454,8 +458,28 @@ end
 Like @pyret{difference}, except the starting value is specified, instead
 of defaulting to 0.
 
-
-
+@examples{
+# calculates velocity of a dropping ball
+ball-info = table: pos-y
+  row: 25
+  row: 24
+  row: 21
+  row: 16
+  row: 0
+end
+with-velocity = extend ball-info using pos-y:
+  vel-y: T.difference-from(25) of pos-y
+end
+check:
+  with-velocity is table: pos-y, vel-y
+    row: 25, 0
+    row: 24, -1
+    row: 21, -3
+    row: 16, -5
+    row: 0, -16
+  end
+end
+}
 
 }
 
