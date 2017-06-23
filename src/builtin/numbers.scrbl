@@ -317,7 +317,7 @@ as @pyret{Roughnum} contagion.
 
 @pyret{Exactnum}s allow the usual comparison predicates. @pyret{Roughnum}s do
 too, with the significant exception that trying to compare
-@pyret{Roughnum} for equality throws an error.  To write an
+@pyret{Roughnum}s for equality throws an error.  To write an
 equality function that handles @pyret{Roughnum}s, use @pyret-id{within}, as
 documented in @seclink["s:bounded-equalities"].
 
@@ -379,7 +379,7 @@ the numerals on the same line all denote the same Pyret number.
 @pyret{Roughnum}s are represented with a leading tilde.  You can think of
 the tilde as representing a person waving his or her hands vaguely.
 
-They are either integers or decimals, with an optional exponent.
+They are integers, fractions or decimals, with an optional exponent.
 
 @examples{
 ~42 ~+42
@@ -392,7 +392,7 @@ They are either integers or decimals, with an optional exponent.
 }
 
 @pyret{Roughnum}s cannot be made arbitrarily precise. The absolute value
-ranges between 0 and 1.7976931348623157e+308 (JS’s Number.MAX_VALUE) with a
+ranges between 0 and 1.7976931348623157e+308 (JavaScript’s Number.MAX_VALUE) with a
 granularity of 5e-324 (JavaScript’s Number.MIN_VALUE).
 
 @section{Number Functions}
@@ -699,9 +699,8 @@ end
   }
   @function["num-expt" #:contract (a-arrow N N N) #:return N]{
 
-Returns the first argument raised to the second argument. The result
-is a @pyret{Exactnum} if both arguments are @pyret{Exactnum}s.  An error
-is thrown if the first argument is zero and the second is negative.
+Returns the first argument raised to the second argument.  An error
+is thrown if the first argument is 0 and the second is negative.
 If the first argument is @pyret{Exactnum} 0 or 1,
 or the second argument is @pyret{Exactnum} 0, then the result is an
 @pyret{Exactnum} even if the other argument is a @pyret{Roughnum}.

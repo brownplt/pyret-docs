@@ -32,11 +32,10 @@
 There are many examples of tables in computing, with
 spreadsheets being the most obvious.
                                                              
-A @pyret{Table} is made up of @bold{rows} and @bold{columns}. Each
-column has a name.  Each row has an equal number of columns,
-in the same order.  Each column may be assigned a type via an
-annotation, and each entry in that column will be checked against
-the annotation.
+A @pyret{Table} is made up of @bold{rows} and @bold{columns}. All rows have
+ the same number of columns, in the same order. Each column has a name.
+ Each column may also be assigned a type via an annotation; if so, all
+ entries in a column will then be checked against the annotation.
 
 @margin-note{Note that as of June 2017, the @pyret{tables} implementation in
 is rather minimal.  It meets the basic requirements of the curricula that
@@ -53,7 +52,7 @@ count on further development of @pyret{tables}.}
   
   @section[#:tag "s:tables"]{Creating Tables}
 
-A simple @pyret{Table} can be "manually" created with a @pyret{table:}
+A simple @pyret{Table} can be directly created with a @pyret{table:}
 expression, which lists any number of
 columns, with optional annotations, and then any number of rows.  For example,
 this expression creates a table with three columns, @pyret{name}, @pyret{age},
@@ -77,12 +76,11 @@ following examples.}
 
   @section[#:tag "s:tables:loading"]{Loading Tables}
 
-Almost any practical use of a @pyret{Table} will involve loading
-data from an external spreadsheet.  Currently, only importing
-from Google Sheets is supported.
+Pyret supports loading spreadsheets from Google Sheets and
+interpreting them as Pyret tables.
 
-@margin-note{Data sources are currently an internal concept to Pyret, so no public
-interface for creating them is yet supported.
+@margin-note{Currently no public interface for creating additional sources
+  beyond Google Sheets is supported.
 
 You can import most relevant file types, including .xlsx,
 into Google Sheets, and then into Pyret, so you should be able to
@@ -93,14 +91,14 @@ As a simple and consistent example, let's say we wanted to import the
 
 @(image "src/builtin/gsheet-1.png")
 
-@margin-note{Pyret tables and sanitizers don't understand or recognize
-the significance of header or footer rows in a spreadsheet, so you have to manually
-delete these before importing a table into Pyret.  In the @tt{my-table}
-example above, this means the first row.  
-If you do not delete header and footers you will get errors or spurious rows in your data,
-e.g., an entry with name "name" and the favorite-color "favorite-color."}
+@margin-note{In Google Sheets, you create a file, referred to as a
+@tt{spreadsheet} that contains one or more tables called
+@tt{sheets}.  Excel refers to the file as a @tt{workbook} and each
+table as a @tt{worksheet}.  We will follow Google Sheets'
+nomenclature.}
 
-To import this data into a Pyret program, you need to get its
+To import this data into a Pyret program, you need to get the
+spreadsheet's
 unique Google ID.  The easiest way to do this is to click
 on the blue @tt{Share} button in the upper right.
 
@@ -122,7 +120,7 @@ The Google ID is the part between @tt{/d/} and @tt{/edit...}, in this case:
 
 @tt{1BAexzf08Q5o8bXb_k8PwuE3tMKezxRfbKBKT-4L6UzI}
 
-@margin-note{If you do want to share the Sheet with others, click
+@margin-note{If you do want to share the spreadsheet with others, click
 on the blue @tt{Share} button as above, and then click
 @tt{Get sharable link}, choose the appropriate level of
 sharing, and copy the URL to get the Google ID as above.}
@@ -173,12 +171,18 @@ to the @pyret{Sanitizer<A,B>} type in the @tt{data-source} module.}
 Use the @pyret{load-table:} expression to create a table from an
 imported sheet.
 
-Each Google Sheet file contains multiple, named tables, displayed
+Each spreadsheet file contains multiple, named sheets, displayed
 as tabs across the bottom of the Sheets user interface.  When you start
 working with the data in an imported spreadsheet, you need to indentify
-the name of the table you are using as the data source.
+which sheet you are using as the data source.
 
-In the example above, there is one table, called @tt{3-rows}.
+The @pyret{source:} expression should be followed by the imported spreadsheet,
+calling the @pyret{.sheet-by-name()} method with two arguments, the sheet name and
+a boolean flag indicating whether or not there is a header row in the sheet
+that should be ignored.  In our example above,  @tt{imported-my-table} contains
+one sheet, called @tt{3-rows},
+and there is a header row that should be ignored by the importer, so the
+@pyret{source:} expression would be written as illustrated below.
 
 @examples{
 import gdrive-sheets as GS
@@ -188,7 +192,7 @@ imported-my-table =
   GS.load-spreadsheet("1BAexzf08Q5o8bXb_k8PwuE3tMKezxRfbKBKT-4L6UzI")
 
 my-table = load-table: name :: String, age :: Number, favorite-color :: String
-  source: imported-my-table.sheet-by-name("3-rows", false)
+  source: imported-my-table.sheet-by-name("3-rows", true)
   sanitize name using DS.string-sanitizer
   sanitize age using DS.strict-num-sanitizer
   sanitize favorite-color using DS.string-sanitizer
@@ -382,12 +386,10 @@ analogous to the @pyret{fold} function for @seclink{lists}.
 
 The simplest examples of reducing use reducers built into Pyret.
 
-In each reducer below, you will need to specify
+FOr each reducer below, you will need to specify
 a name for the new column and which existing column new value
-will be based on.  
-
-@margin-note{To use @pyret{extend} expressions you will need to
-@pyret{import} or @pyret{include} @pyret{tables}.}
+will be based on.  You will also need to
+@pyret{import} or @pyret{include} @pyret{tables}.
 
 @value["running-sum" (Red-of N N N)]
 
@@ -420,7 +422,8 @@ print(running-total-delegates)
 The @pyret{difference} extender creates a new column 
 containing the difference between the value in
 the current row (of the selected column) minus the value in @italic{only}
-the row directly above.  In the first row, zero is subtracted from the value.
+the row directly above.  In the first row, the value is unchanged.
+Since there's no value before the first row, Pyret behaves as if it were zero.
 
 @margin-note{Both @pyret{difference} and @pyret{difference-from} do
 @italic{not} calculate a running difference, only the difference between
@@ -451,26 +454,8 @@ end
 Like @pyret{difference}, except the starting value is specified, instead
 of defaulting to 0.
 
-@pyret-block[#:style "bad-ex"]{
-# This DOES NOT calculate a running balance in a checking account.
-checks = table: check-number :: Number, withdrawal :: Number
-  row: 001, 50
-  row: 002, 100
-  row: 003, 500
-end
-with-checking-balance = extend checks using withdrawal:
-  current-balance: T.difference-from(1000) of withdrawal
-end
-check:
-  with-checking-balance is table: check-number, withdrawal, current-balance
-    row: 001, 50, 950 
-    row: 002, 100, 850
-    row: 003, 500, 350
-  end
-end
 
-}
-@(image "src/builtin/darts.png")
+
 
 }
 

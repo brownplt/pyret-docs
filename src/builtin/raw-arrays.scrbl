@@ -67,7 +67,7 @@
 
 @collection-doc["raw-array" #:contract `(a-arrow ("elt" "a") ,(RA-of "a"))]
 
-Constructs a@pyret{RawArray} array of length @tt{count}, where every element is the value
+Constructs a @pyret{RawArray} array of length @tt{count}, where every element is the value
 given as @pyret{elt}.
 
 Note that
@@ -80,8 +80,13 @@ and test with @pyret-id["is=~" "testing"].
 
 @examples{
 check:
-  a = raw-array-of(true, 5)
-  a is=~ [raw-array: true, true, true, true, true]
+  [raw-array: 1, 2, 3] is-not== [raw-array: 1, 2, 3]
+  [raw-array: 1, 2, 3] is-not [raw-array: 1, 2, 3]
+  [raw-array: 1, 2, 3] is=~ [raw-array: 1, 2, 3]
+
+  a = [raw-array: 1, 2, 3]
+  a is a
+  a is== a
 end
 }
 

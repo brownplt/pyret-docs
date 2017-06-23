@@ -28,9 +28,14 @@ And will raise an error like:
 
 Conversely, these expressions are all valid in Pyret:
 
+@margin-note{Any number of identical operators can be grouped without pairwise
+parentheses.}
+
 @pyret-block[#:style "good-ex"]{
 1 + (1 - 1)
 (1 + 1) > 1
+1 + 1 + 1
+1 - 1 - 1
 (1 + 1) == 2
 3 * (4 / 2)
 (3 * (4 / 2))
