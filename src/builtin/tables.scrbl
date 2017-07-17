@@ -279,6 +279,23 @@ check:
 end
 }
 
+Tables can be sorted by multiple columns.  In general you may select as many
+columns as desired, and can mix and match @pyret{ascending} and
+@pyret{descending} sorts.  No column can be mentioned more than once.
+
+@pyret-block{
+order some-table:
+  column1 ascending,
+  column3 descending,
+  column2 ascending
+end
+}
+
+This example will first sort the data in increasing order on @tt{column1}.  If there
+are any duplicate values in @tt{column1}, each such group of rows will be sorted in
+decreasing order by @tt{column2}.  If there are any duplicates in both columns,
+each remaining group will be sorted in increasing order by @tt{column3}.
+
   @section{Transforming Tables}
 
 The @pyret{transform} expression allows the changing of columns within a
