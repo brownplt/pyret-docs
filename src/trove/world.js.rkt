@@ -71,9 +71,9 @@ big-bang(init,
 )
 }
 
-Syntactically, all of the handlers for @pyret{big-bang} are optional, with the
-exception of @pyret{init}.  They can also appear in any order – the order
-displayed above is not required.  Each option can only appear once.  So, for
+All of the handlers for @pyret{big-bang} (in the list argument) are
+optional.  They can also appear in any order --- the order displayed
+above is not required.  Each option can only appear once.  So, for
 example, these are valid @pyret{big-bang}s:
 
 @pyret-block[#:style "good-ex"]{

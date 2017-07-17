@@ -632,7 +632,7 @@ example, we can check if an answer is within 10% of a desired result:
 @pyret-block{
 check:
   within-10-percent = within(0.1)
-  within-10-percent(9.5, 10.5)
+  within-10-percent(9.5, 10.5) is true
 end
 }
 
@@ -668,6 +668,17 @@ define the binary predicate inline with the test:
 check:
   num-sqrt(10) is%(within(0.1)) 3.2
   num-sqrt(10) is-not%(within(0.1)) 5
+end
+}
+
+As a convenient shorthand, @pyret{is-roughly} is defined as a shorthand for
+@pyret-id["is%" "testing"](@pyret-id{within}(0.000001)), that is, an error
+tolerance of one-millionth, or six digits of accuracy:
+
+@examples{
+check:
+  num-acos(-1) is-roughly ~3.14159
+  num-acos(-1) is%(within(0.000001)) ~3.14159
 end
 }
 

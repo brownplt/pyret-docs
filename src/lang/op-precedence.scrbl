@@ -4,9 +4,12 @@
 
 @docmodule["op-precedence" #:noimport #t #:friendly-title "Operator Precedence"]
 
-Pyret does not use implicit operator precedence or the order of operations
-that you learned in math class.  "Please Excuse My Dear Aunt Sally" does not
-apply here.
+Pyret does not use implicit operator precedence or the order of operations that
+you learned in math class.  ``Please Excuse My Dear Aunt Sally'' does not apply
+here.@margin-note{Note for non-American readers: if you've never heard of dear
+Aunt Sally, it's a
+@hyperlink["https://en.wikipedia.org/wiki/Order_of_operations#Mnemonics"]{mnemonic}
+often used to memorize a standard order-of-operations.}
 
 Pyret disallows mixing operators without clearly defining the
 operator precedence using parentheses.  This includes all @secref["s:binop-expr"].

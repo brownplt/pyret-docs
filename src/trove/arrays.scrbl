@@ -73,11 +73,9 @@
 @docmodule["arrays" #:noimport #t]{
    @type-spec["Array" (list)]
 
-A @pyret{Array} is a mutable, fixed-length collection indexed
-by non-negative intgers.
-
-Pyret also provides @seclink{raw-arrays}, which is an efficient,
-Javascript implementation of an array.
+An @pyret{Array} is a mutable, fixed-length collection indexed
+by non-negative intgers.  These arrays are implemented using
+@seclink{raw-arrays}, but provide an easier-to-use, more Pyret-like API.
 
 @section{Array Functions}
 

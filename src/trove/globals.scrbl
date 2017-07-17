@@ -119,8 +119,12 @@
 Creates a string representation of the value that resembles an expression that
 could be used to construct it.
 
-Strings are wrapped in an additional layer of quotes with their original
-quotes escaped.  Functions are simply represented as @tt{"<function>"}.
+The @pyret{to-repr} of a string yields a string containing the Pyret syntax
+needed to write the original value as string literal: most characters are unchanged,
+but quotes, newlines, tabs, and backslashes are all escaped, and the whole
+value surrounded by quotes.
+
+Functions are simply represented as @tt{"<function>"}.
 
 @examples{
 check:

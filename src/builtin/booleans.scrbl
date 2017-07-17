@@ -29,7 +29,7 @@
 @examples{
 check:
   not(true) is false
-  not(2 > 1) is false
+  not(2 < 1) is true
 end
 }
   

@@ -81,13 +81,12 @@ reactor:
   stop-when: @py-prod["expr"],
   close-when-stop: @py-prod["expr"],
 
-  title: @py-prod["expr"],
-
+  title: @py-prod["expr"]
 end
 }
 
 Syntactically, all of the components of a @pyret{reactor} are optional, with the
-exception of @pyret{init:}.  They can also appear in any order – the order
+exception of @pyret{init:}.  They can also appear in any order --- the order
 displayed above is not required.  Each option can only appear once.  So, for
 example, these are valid reactors:
 
@@ -196,9 +195,10 @@ The @pyret{seconds-per-tick} option expects to be given a @|N|.
 seconds-per-tick :: @N
 }
 
-If it is provided, the delay between calling @pyret{on-tick} is equal to the
-provided number in seconds (up to the granularity of tick events on the
-underlying machine).  If not provided, the default delay is 1/28 seconds.
+If it is provided, the delay between two successive calls to the
+@pyret{on-tick} handler is equal to the provided number in seconds (up to the
+granularity of tick events on the underlying machine).  If not provided, the
+default delay is 1/28 seconds.
 
 
 

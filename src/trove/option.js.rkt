@@ -112,8 +112,8 @@ can be used to evaluate both @pyret{Option} response variants.
 fun set-angle(s :: String) -> Number:
   doc: "If s is not a numeric string, default to 0."
   cases(Option) string-to-number(s):
-    |some(a) => a
-    |none => 0
+    | some(a) => a
+    | none => 0
   end
 where:
   set-angle("90") is 90

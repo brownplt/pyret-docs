@@ -29,14 +29,6 @@
 
 @docmodule["tables" #:noimport #t #:friendly-title "Tables"]{
 
-There are many examples of tables in computing, with
-spreadsheets being the most obvious.
-                                                             
-A @pyret{Table} is made up of @bold{rows} and @bold{columns}. All rows have
- the same number of columns, in the same order. Each column has a name.
- Each column may also be assigned a type via an annotation; if so, all
- entries in a column will then be checked against the annotation.
-
 @margin-note{Note that as of June 2017, the @pyret{tables} implementation in
 is rather minimal.  It meets the basic requirements of the curricula that
 use it, but lacks many features that one might reasonably expect from a
@@ -49,6 +41,14 @@ to the current design on hold.
 
 Tabular data is here to stay in Pyret and Pyret-related curricula, so
 count on further development of @pyret{tables}.}
+
+There are many examples of tables in computing, with
+spreadsheets being the most obvious.
+                                                             
+A @pyret{Table} is made up of @bold{rows} and @bold{columns}. All rows have
+ the same number of columns, in the same order. Each column has a name.
+ Each column may also be assigned a type via an annotation; if so, all
+ entries in a column will then be checked against the annotation.
   
   @section[#:tag "s:tables"]{Creating Tables}
 
@@ -66,14 +66,13 @@ my-table = table: name :: String, age :: Number, favorite-color :: String
 end
   }
 
-Entering the name of a table in the interactions window after running the program
-or using the @pyret{print} function will display a formatted version of the table.
+@margin-note{Indeed, @pyret{my-table} is used as a running example in much of
+the following.}
+Evaluating @pyret{my-table} in the interactions window after running the
+program above will display a formatted version of the table:
 
 @(image "src/builtin/table-print.png")
   
-@margin-note{Note that @pyret{my-table} is referred to in many of the
-following examples.}
-
   @section[#:tag "s:tables:loading"]{Loading Tables}
 
 Pyret supports loading spreadsheets from Google Sheets and

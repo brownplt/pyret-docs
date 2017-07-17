@@ -50,25 +50,21 @@
    @type-spec["RawArray" (list "a")]
 
    A @pyret{RawArray} is a mutable, fixed-length collection indexed
-   by non-negative intgers.  Unlike Pyret @seclink{arrays}, @pyret{RawArray}s are
-   a pure Javascript implementation, using @tt{JSArray} variables.  This
-   means that operations on @pyret{RawArray}s are relatively fast and
-   efficient.
+   by non-negative intgers.  They are a very thin wrapper around native
+   JavaScript arrays, and are manipulated entirely via functions.  They are the
+   implementation mechanism for Pyret @seclink{arrays}, which provide a nicer
+   API for interacting with them.
 
    @pyret{RawArray}s are widely used internally in Pyret
    language development.
-
-   Another difference between Pyret @seclink{arrays}
-   and @pyret{RawArray}s is the @pyret-id["raw-array-fold"] function
-   available to @pyret{RawArray}s.
  
 
      @section{RawArray Functions}
 
 @collection-doc["raw-array" #:contract `(a-arrow ("elt" "a") ,(RA-of "a"))]
 
-Constructs a @pyret{RawArray} array of length @tt{count}, where every element is the value
-given as @pyret{elt}.
+Constructs a @pyret{RawArray} array of length @tt{count}, whose elements are
+the values specified in the construction expression.
 
 Note that
 @pyret-id{RawArray}s are mutable, so comparisons using @pyret["=="]

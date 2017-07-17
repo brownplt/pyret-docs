@@ -8,7 +8,6 @@
   (only-in scribble/html-properties attributes)
   "../../scribble-api.rkt"
   "../../ragged.rkt")
-http://www.akademapro.com/store/accessories/collectibles/hoboken-series.html
 @(define (prod . word)
  (apply tt word))
 @(define (file . name)

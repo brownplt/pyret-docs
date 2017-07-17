@@ -284,8 +284,8 @@
 @docmodule["numbers" #:noimport #t #:friendly-title "Numbers"]{
 
 Pyret numbers are of two kinds: exact numbers, or @pyret{Exactnum}s, 
-and rough numbers or @pyret{Roughnum}s. Both are to base ten;
-real; and finite.
+and rough numbers or @pyret{Roughnum}s. Both are 
+real; finite; and written in base ten.
 
 @margin-note{Note that imagaginary numbers were implemented in earlier versions of Pyret,
 but are not currently supported.}
@@ -420,9 +420,9 @@ Returns the greater of the two arguments.
 @examples{
 check:
   num-max(1, 2) is 2
-  num-max(2, ~3) is ~3
-  num-max(4, ~4) is ~4
-  num-max(~4, 4) is 4
+  num-max(2, ~3) is-roughly ~3
+  num-max(4, ~4) is 4
+  num-max(~4, 4) is-roughly ~4
   num-max(-1.1, 0) is 0
 end
 }
@@ -435,8 +435,8 @@ Returns the lesser of the two arguments.
 check:
   num-min(1, 2) is 1
   num-min(2, ~3) is 2
-  num-min(4, ~4) is ~4
-  num-min(~4, 4) is 4
+  num-min(4, ~4) is 4
+  num-min(~4, 4) is-roughly ~4
   num-min(-1.1, 0) is -1.1
 end
 }
@@ -450,8 +450,8 @@ Returns the absolute value of the argument. The result is an
 check:
   num-abs(2) is 2
   num-abs(-2.1) is 2.1
-  num-abs(~2) is ~2
-  num-abs(~-2.1) is ~2.1
+  num-abs(~2) is-roughly ~2
+  num-abs(~-2.1) is-roughly ~2.1
 end
 }
 
@@ -507,7 +507,7 @@ end
   @function["num-acos" #:contract (a-arrow N N) #:return N]{
 
 Returns the arc cosine of the argument, usually as a @pyret{Roughnum}. However, if
-the argumet is @pyret{Exactnum} 1, the result is @pyret{Exactnum} 0.
+the argument is @pyret{Exactnum} 1, the result is @pyret{Exactnum} 0.
 
 @examples{
 check:
@@ -519,7 +519,7 @@ end
   @function["num-atan" #:contract (a-arrow N N) #:return N]{
 
 Returns the arc tangent of the argument, usually as a @pyret{Roughnum}. However, if
-the argumet is @pyret{Exactnum} 0, the result is @pyret{Exactnum} 0.
+the argument is @pyret{Exactnum} 0, the result is @pyret{Exactnum} 0.
 
 @examples{
 check:
@@ -529,8 +529,8 @@ end
 }
   }
   @function["num-modulo" #:contract (a-arrow N N N) #:return N]{
-Returns the modulo of the first argument with respect to the
-second.
+Returns the modulus of the first argument with respect to the
+second, i.e. the remainder when dividing the first number by the second.
 
 @examples{
 check:
@@ -547,11 +547,11 @@ It is useful for calculating if one number is a multiple of
 another, by checking for a zero remainder.
 
 @examples{
-fun is-odd(n :: Number) -> Boolean:
+fun is-even(n :: Number) -> Boolean:
   num-modulo(n, 2) == 0
 where:
-  is-odd(6) is true
-  is-odd(3) is false
+  is-even(6) is true
+  is-even(3) is false
 end
 }
 
@@ -565,15 +565,15 @@ decimal part. Does not do any rounding.
 check:
   num-truncate(3.14) is 3
   num-truncate(-3.14) is -3
-  num-truncate(~3.14) is ~3
-  num-truncate(~-3.14) is ~-3
+  num-truncate(~3.14) is-roughly ~3
+  num-truncate(~-3.14) is-roughly ~-3
 end
 }
 
   }
   @function["num-sqrt" #:contract (a-arrow N N) #:return N]{
 
-Returns the square root.  If the argument is an @pyret{Exactnum} and a perfect
+Returns the square root of the given argument.  If the argument is an @pyret{Exactnum} and a perfect
 square, the result is an @pyret{Exactnum}, otherwise, it is a @pyret{Roughnum}.
 
 @examples{
@@ -589,20 +589,20 @@ end
   }
   @function["num-sqr" #:contract (a-arrow N N) #:return N]{
 
-Returns the square.
+Returns the square of the given argument.
 
 @examples{
 check:
   num-sqr(4) is 16
   num-sqr(5) is 25
   num-sqr(-4) is 16
-  num-sqr(~4) is ~16
+  num-sqr(~4) is-roughly ~16
   num-sqr(0.04) is 1/625
 end
 }
 
   }
-  @function["num-ceiling" #:contract (a-arrow N N) #:return N]{
+  @function["num-ceiling" #:contract (a-arrow N EN) #:return EN]{
 
 Returns the smallest integer @pyret{Exactnum} greater than or equal to the
 argument.
@@ -615,7 +615,7 @@ end
 }
 
   }
-  @function["num-floor" #:contract (a-arrow N N) #:return N]{
+  @function["num-floor" #:contract (a-arrow N EN) #:return EN]{
 
 Returns the largest integer @pyret{Exactnum} less than or equal to the argument.
 
@@ -626,7 +626,7 @@ check:
 end
 }
   }
-  @function["num-round" #:contract (a-arrow N N) #:return N]{
+  @function["num-round" #:contract (a-arrow N EN) #:return EN]{
 
 Returns the closest integer @pyret{Exactnum} to the argument. 
 
@@ -650,7 +650,7 @@ end
 }
 
   }
-  @function["num-round-even" #:contract (a-arrow N N) #:return N]{
+  @function["num-round-even" #:contract (a-arrow N EN) #:return EN]{
 
 Similar to @pyret{num-round}, except that if the argument is
 midway between integers, returns the even integer @pyret{Exactnum}.
@@ -720,7 +720,7 @@ end
   }
 
 
-  @function["num-to-roughnum" #:contract (a-arrow N N) #:return N]{
+  @function["num-to-roughnum" #:contract (a-arrow N RN) #:return RN]{
 
 Given a number, returns the @pyret{Roughnum} version.
 
@@ -997,12 +997,16 @@ and hence even small rationals such as 1.5 are considered non-@tt{fixnum},
 although they could be represented as JavaScript doubles.}
 
   }
-  @function["num-exact" #:contract (a-arrow N N) #:return N]
-  @function["num-to-rational" #:contract (a-arrow N N) #:return N]
+  @function["num-exact" #:contract (a-arrow N EN) #:return EN]
+  @function["num-to-rational" #:contract (a-arrow N EN) #:return EN]
 
 
 Given a @pyret{Roughnum}, returns an @pyret{Exactnum} number most equal to it. Given
 an @pyret{Exactnum} num, returns it directly.
+
+@margin-note{It is not good practice to indiscriminately convert
+ @pyret{Roughnum}s to @pyret{Exactnum}s to make comparison easier.
+ Use @pyret{within()} or @pyret{is-roughly}.}
 
 @examples{
 check:
@@ -1011,8 +1015,6 @@ check:
   num-to-rational(num-sqrt(2)) is 1.4142135623730951
 end
 }
-@margin-note{It is not good practice to indiscriminately convert
- @pyret{Roughnum}s to @pyret{Exactnum}s to make comparison easier.
- Use @pyret{within()}.}
+
   }
 

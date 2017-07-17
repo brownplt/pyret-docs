@@ -138,6 +138,11 @@ are equal, and failure if they are not.
 
 Like @pyret-id{is}, but failure and success are reversed.
 
+@test-doc["is-roughly" "expr1" "expr2"]
+
+Like @pyret-id{is}, but tolerant of roughnum values: specifically, this is a
+shorthand for @pyret-id{is%}(@pyret-id["within" "equality"](0.000001)).
+
 @test-doc-pred["is%" "pred" "expr1" "expr2"]
 
 Evaluates @pyret{expr1} and @pyret{expr2} to values, and @pyret{pred} to a

@@ -21,7 +21,7 @@
     (fun-spec
       (name "string-append")
       (arity 2)
-      (args ("beginning" "end"))
+      (args ("front" "back"))
       (doc ""))
     (fun-spec
       (name "string-length")
@@ -41,7 +41,7 @@
     (fun-spec
       (name "string-substring")
       (arity 3)
-      (args ("s" "start" "end"))
+      (args ("s" "start-index" "end-index"))
       (doc ""))
     (fun-spec
       (name "string-replace")
@@ -160,9 +160,9 @@ end
 
   @function["string-contains" #:contract (a-arrow S S B) #:return B]
 
-Returns @pyret{true} if @tt{string-to-find} is contained in
-@tt{string-to-search}.  Returns @pyret{true} if an empty string is passed as
-@tt{string-to-find}.
+Returns @pyret{true} if @pyret{string-to-find} is contained in
+@pyret{string-to-search}.  Returns @pyret{true} if an empty string is passed as
+@pyret{string-to-find}.
   
 @examples{
 check:
@@ -177,8 +177,8 @@ end
 
   @function["string-append" #:contract (a-arrow S S S) #:return S]
 
-Returns a @pyret{String} where @tt{end} is added to the right of
-@tt{beginning}.
+Returns a @pyret{String} where @pyret{back} is added to the right of
+@pyret{front}.
   
 @examples{
 check:
@@ -209,17 +209,18 @@ end
   @function["string-to-number" #:contract (a-arrow S N) #:return (O-of N)]
 
 Converts the argument string to a number, returning @pyret-id["none" "option"]
-if it is not a valid numeric string, and a @a-app[@pyret-id["some" "option"]
-@pyret-id["Number" "numbers"]] if it is.
+if it is not a valid numeric string, and @pyret-id["some" "option"] number if it is.
 
-A valid numeric string is in this context is strictly defined.  No extra spaces
-or punctuation not allowed in a Pyret @pyret{Number} are allowed.
+@pyret-id{string-to-number} is strict about its inputs, and recognizes exactly
+the same numbers that Pyret itself does: no surrounding whitespace, extra
+punctuation, or trailing characters are allowed.
 
 @examples{
 check:
   string-to-number("100") is some(100)
   string-to-number("not-a-number") is none
   string-to-number(" 100") is none
+  string-to-number("100abc") is none
   string-to-number("1,000") is none
   string-to-number("1-800-555-1212") is none
 end
@@ -239,11 +240,11 @@ end
   @function["string-substring" #:contract (a-arrow S N N S) #:return S]
 
 Returns a new string created from the characters of the input string, starting
-from @pyret{start} and ending at @tt{end}.  Raises an exception if @pyret{start} is greater
-than @tt{end}, if @pyret{start} or @tt{end} is greater than the length of the string, or if
-@pyret{start} or @tt{end} is less than 0.
+from @pyret{start-index} (inclusive) and ending at @pyret{end-index} (exclusive).
+Raises an exception if @pyret{start-index} is greater than @pyret{end-index}, if @pyret{start-index}
+is greater than the length of the string, or if @pyret{end-index} is less than 0.
 
-The returned string always has length @tt{end} - @pyret{start}.
+The returned string always has length @pyret{end-index} - @pyret{start-index}.
 
 @margin-note{@pyret{String} indexes are counted starting from zero for the
 first character.}
@@ -279,10 +280,10 @@ end
   
   @function["string-replace" #:contract (a-arrow S S S S) #:return S]
 
-Returns a string where each instance of @tt{string-to-find} in the
-@tt{original-string} is replaced by @tt{replacement-string}.
+Returns a string where each instance of @pyret{string-to-find} in the
+@pyret{original-string} is replaced by @pyret{replacement-string}.
 
-If the replacement string is empty @pyret{""}, the @tt{replacement-string}
+If the string to find is empty @pyret{""}, the @pyret{replacement-string}
 will be added between characters but not at the beginning or end of the
 string.
   
@@ -307,7 +308,7 @@ end
   If it is found, it returns a two-element @pyret-id["List" "lists"], whose
   first element is the portion of the string before @emph{first} occurence of
   @pyret{string-to-split-on}.  The second element contains the portion of the string
-  after.  The @tt{string-to-split-on} is @bold{not} included in either string.  The
+  after.  The @pyret{string-to-split-on} is @bold{not} included in either string.  The
   string before and the string after might be empty.
 
   For splitting beyond the first occurence of the string, see
@@ -350,8 +351,8 @@ end
 
   @function["string-char-at" #:contract (a-arrow S N S) #:return S]
 
-Returns a @pyret{String} containing the character at the string index @tt{n}
-from @pyret{String} @tt{n}.
+Returns a @pyret{String} containing the character at the string index @pyret{n}
+from @pyret{String} @pyret{n}.
 
 @examples{
 check:
@@ -363,7 +364,7 @@ end
   @function["string-toupper" #:contract (a-arrow S S) #:return S]
   @function["string-to-upper" #:contract (a-arrow S S) #:return S]
 
-@note{Pyret uses JavaScript's built-in string operations, and so will
+@margin-note{Pyret uses JavaScript's built-in string operations, and so will
 have the same behavior as @link["https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase" "toUpperCase"].}
 Convert a string to all uppercase characters.  Punctuation and other characters
 without an uppercase equivalent are left alone.  Note that because of
@@ -414,7 +415,7 @@ end
   To get multiple codes at once for a longer string (or a string with larger code points), use
   @pyret-id{string-to-code-points}.}
 
-  Converts @tt{s}, which must be a single-character @pyret{String}, to a character
+  Converts @pyret{s}, which must be a single-character @pyret{String}, to a character
   code -- a @pyret{Number} corresponding to its Unicode code point
   (@url["http://en.wikipedia.org/wiki/Code_point"]).
   

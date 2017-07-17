@@ -504,13 +504,13 @@
         (params ())
         (args ("self" "f"))
         (return
-          (a-app (a-compound (a-dot "O" "Option") (xref "option" "Option")) "a"))
+          (a-app (a-compound (a-id "Option") (xref "option" "Option")) "a"))
         (contract
           (a-arrow
             (a-id "is-List" (xref "lists" "is-List"))
             (a-arrow "a" (a-id "Boolean" (xref "<global>" "Boolean")))
             (a-app
-              (a-compound (a-dot "O" "Option") (xref "option" "Option"))
+              (a-compound (a-id "Option") (xref "option" "Option"))
               "a")))
         (doc
           "Takes a predicate and returns on option containing either the first item in this list that passes the predicate, or none"))
@@ -831,12 +831,12 @@
     (params [list: leaf("a")])
     (args ("f" "lst"))
     (return
-      (a-app (a-compound (a-dot "O" "Option") (xref "option" "Option")) "a"))
+      (a-app (a-compound (a-id "Option") (xref "option" "Option")) "a"))
     (contract
       (a-arrow
         (a-arrow "a" (a-id "Boolean" (xref "<global>" "Boolean")))
         (a-app (a-id "List" (xref "lists" "List")) "a")
-        (a-app (a-compound (a-dot "O" "Option") (xref "option" "Option")) "a")))
+        (a-app (a-compound (a-id "Option") (xref "option" "Option")) "a")))
     (doc
       "Returns some(elem) where elem is the first elem in lst for which\n        f(elem) returns true, or none otherwise"))
   (fun-spec
@@ -1519,7 +1519,7 @@ have reached the end of the @pyret{List}, the rest will be @pyret{empty}.}
 @collection-doc["list" #:contract `(a-arrow ("elt" "a") ,(L-of "a"))]
 
 @margin-note{This illustrates the underlying structure created when
-you define a @pyret{List} with @pyret{[list: ...}}
+you define a @pyret{List} with @pyret{[list: ...]}}
 
 Constructs a @pyret{List} out of @pyret{elt}s by chaining @pyret-id{link}s,
 ending in a single @pyret-id{empty}.
@@ -1532,9 +1532,9 @@ check:
 end
 }
 
-@margin-note{Explicitly writing the trailing @pyret-id{empty} is both
+@bold{Note:} Explicitly writing the trailing @pyret-id{empty} is both
 unnecessary and wrong; the constructor notation needs only the
-@emph{elements} of the @pyret{List}.}
+@emph{elements} of the @pyret{List}.
 
 @section{List Methods}
 
@@ -1694,14 +1694,12 @@ end
 
 @list-method["foldl"]
 
-Folds are used to recursively compute a single value from a @pyret{List}.
-
-@pyret{.foldl} computes @pyret{f(last-elt, ... f(second-elt, f(first-elt, base))...)}.  For
+Computes @pyret{f(last-elt, ... f(second-elt, f(first-elt, base))...)}.  For
 @pyret-id{empty}, returns @pyret{base}.
 
 In other words, @pyret{.foldl} uses the function @tt{f}, starting with the @tt{base}
 value, of type @tt{b}, to calculate the return value of type @tt{b} from each
-item in the @pyret{List}, of input type @tt{a}, starting the sequence from the left.
+item in the @pyret{List}, of input type @tt{a}, starting the sequence from the @emph{left} (hence, fold@bold{l}).
 
 @examples{
 check:
@@ -1717,14 +1715,12 @@ end
 
 @list-method["foldr"]
 
-Folds are used to recursively compute a single value from a @pyret{List}.
-
 Computes @pyret{f(first-elt, f(second-elt, ... f(last-elt, base)))}.  For
 @pyret-id{empty}, returns @pyret{base}. 
 
 In other words, @pyret{.foldl} uses the function @tt{f}, starting with the @tt{base}
 value, of type @tt{b}, to calculate the return value of type @tt{b} from each
-item in the @pyret{List}, of input type @tt{a}, starting the sequence from the right.
+item in the @pyret{List}, of input type @tt{a}, starting the sequence from the @emph{right} (hence, fold@bold{r}).
 
 @examples{
 check:
@@ -1739,11 +1735,10 @@ end
 }
 
 @list-method["member"]
-Returns true if the current @pyret{List} contains the given value, as compared
-by @pyret{==}.
-
 @margin-note{Passing a @pyret{Roughnum} as an argument will raise
 an error.}
+Returns true if the current @pyret{List} contains the given value, as compared
+by @pyret{==}.
 
 @examples{
 check:
@@ -2381,8 +2376,6 @@ end
 
   ]{
 
-Folds are used to recursively compute a single value from a @pyret{List}.
-
 @pyret{fold} computes @pyret{f(last-elt, ... f(second-elt, f(first-elt, base))...)}.  For
 @pyret-id{empty}, returns @pyret{base}.
 
@@ -2406,8 +2399,6 @@ end
   @function["foldl"]
   Another name for @pyret-id["fold"].
   @function["foldr"]
-Folds are used to recursively compute a single value from a @pyret{List}.
-
 Computes @pyret{f(first-elt, f(second-elt, ... f(last-elt, base)))}.  For
 @pyret-id{empty}, returns @pyret{base}.  In other words, it uses
 @pyret{f} to combine @pyret{base} with each item in the @pyret{List} starting from the right.
