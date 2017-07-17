@@ -54,4 +54,57 @@
   @function["is-left" #:alt-docstrings ""]
   @function["is-right" #:alt-docstrings ""]
   }
+  }
+
+@pyret{Either} implements a functional programming idiom that is often used
+when a function may return either a meaningful value or an error message.
+By convention, the @pyret{left} variant is used to return an error, usually
+as a string, and the @pyret{right} variant returns a valid value.
+
+The following example is based on a function that searches for a student
+with a specific numeric id in a list.  @tt{find-person-from-id} returns
+@pyret{Either} a valid @tt{Person} as @pyret{right} or one of two
+error messages as @pyret{String}s in @pyret{left}.
+
+@examples{
+import either as E
+
+data Person:
+  | student(id :: Number, name :: String)
+end
+
+people = [list: 
+  student(001, "Charlie Brown"),
+  student(002, "Sally Brown"),
+  student(003, "Lucy van Pelt"),
+  student(003, "Linus van Pelt")]
+
+fun find-person-from-id(p :: List<Person>, i :: Number) -> E.Either:
+  results = p.filter(lam(a): a.id == i end)
+  result-count = results.length()
+  ask:
+    | result-count == 0 then: E.left("Not found error.")
+    | result-count == 1 then: E.right(results.get(0))
+    | otherwise: E.left("Duplicate ID error.")
+  end
+where:
+  find-person-from-id(people, 007) is E.left("Not found error.")
+  find-person-from-id(people, 001) is E.right(student(001, "Charlie Brown"))
+  find-person-from-id(people, 003) is E.left("Duplicate ID error.")
+end
 }
+
+Typically, the @pyret{Either} variants are processed by a @pyret{cases}
+expression, for example:
+
+@examples{
+fun search(id :: Number):
+  doc: "Hypothetical function calls resulting from either result."
+  result = find-person-from-id(people, id)
+  cases(E.Either) result:
+    | left(s) => display-error-dialog(s)
+    | right(p) => display-person(p)
+  end
+end
+}
+

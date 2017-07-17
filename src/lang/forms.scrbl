@@ -8,7 +8,7 @@
   (only-in scribble/html-properties attributes)
   "../../scribble-api.rkt"
   "../../ragged.rkt")
-
+http://www.akademapro.com/store/accessories/collectibles/hoboken-series.html
 @(define (prod . word)
  (apply tt word))
 @(define (file . name)
@@ -1003,7 +1003,8 @@ block it is defined in:
 @itemlist[
   @item{The @tt{NAME} of the data definition}
   @item{@tt{NAME}, for each variant of the data definition}
-  @item{@tt{is-NAME}, for each variant of the data definition}
+  @item{@tt{is-NAME}, for the data definition and each variant of
+the data definition}
 ]
 
 For example, in this data definition:
@@ -1018,7 +1019,7 @@ end
 These names are defined, with the given types:
 
 @pyret-block{
-BTree :: (Any -> Bool)
+is-BTree :: (Any -> Bool)
 node :: (Number, BTree, BTree -> BTree)
 is-node :: (Any -> Bool)
 leaf :: (Number -> BTree)
@@ -1031,14 +1032,16 @@ if fields that don't match the annotations are given.  As with all annotations,
 they are optional.  The constructed values can have their fields accessed with
 @seclink["s:dot-expr" "dot expressions"].
 
-The function @tt{BTree} is a @emph{detector} for values created from this data
-definition, and can be used as an annotation to check for values created by the
-constructors of @tt{BTree}.  @tt{BTree} returns true when provided values
-created by @tt{node} or @tt{leaf}, but no others.
+The function @tt{is-BTree} is a @emph{detector} for values created from this data
+definition.  @tt{is-BTree} returns @pyret{true} when provided values
+created by @tt{node} or @tt{leaf}, but no others.  @tt{BTree} can be
+used as an annotation to check for values created by the constructors of
+@tt{BTree}.
 
 The functions @tt{is-node} and @tt{is-leaf} are detectors for the values
-created by the individual constructors: @tt{is-node} will only return @tt{true}
-for values created by calling @tt{node}, and correspondingly for @tt{leaf}.
+created by the individual constructors: @tt{is-node} will only return @pyret{true}
+for values created by calling @tt{node}, and @tt{is-leaf} correspondingly for
+@tt{leaf}.
 
 Here is a longer example of the behavior of detectors, field access, and
 constructors:
@@ -1050,9 +1053,9 @@ data BTree:
 where:
   a-btree = node(1, leaf(2), node(3, leaf(4), leaf(5)))
 
-  BTree(a-btree) is true
-  BTree("not-a-tree") is false
-  BTree(leaf(5)) is true
+  is-BTree(a-btree) is true
+  is-BTree("not-a-tree") is false
+  is-BTree(leaf(5)) is true
   is-leaf(leaf(5)) is true
   is-leaf(a-btree) is false
   is-leaf("not-a-tree") is false
@@ -1064,7 +1067,7 @@ where:
   a-btree.left.value is 2
   a-btree.right.value is 3
   a-btree.right.left.value is 4
-  a-btree.right.right.value is 4
+  a-btree.right.right.value is 5
 
 end
 }
@@ -1091,11 +1094,26 @@ where:
   a-btree = node(1, leaf(2), node(3, leaf(4), leaf(2)))
   a-btree.values-equal(leaf(1)) is true
   leaf(1).values-equal(a-btree) is true
-  a-btree.size() is 3
+  a-btree.size() is 5
   leaf(0).size() is 1
   leaf(1).increment() is leaf(2)
   a-btree.increment() # raises error: field increment not found.
 end
+}
+
+When you have a single kind of datum in a data definition, instead of
+writing:
+
+@pyret-block{
+data Point:
+  | pt(x, y)
+end
+}
+
+You can drop the | and simply write:
+
+@pyret-block{
+data Point: pt(x, y) end
 }
 
 @subsection[#:tag "s:var-decl"]{Variable Declarations}
@@ -1250,7 +1268,7 @@ expr: paren-expr | id-expr | prim-expr
     | table-extend
     | load-table-expr
     | reactor-expr
-paren-expr: LPAREN expr RPAREN
+paren-expr: LPAREN binop-expr RPAREN
 id-expr: NAME
 prim-expr: NUMBER | RATIONAL | BOOLEAN | STRING
 LPAREN: "("
@@ -1398,8 +1416,8 @@ check:
   m = method(self): self.x end
   o = { a-method-name: m, x: 20 }
   o2 = { a-method-name: m, x: 30 }
-  o.m() is 20
-  o2.m() is 30
+  o.a-method-name() is 20
+  o2.a-method-name() is 30
 end
 }
 

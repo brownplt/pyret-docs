@@ -18,6 +18,8 @@ Pyret-specific libraries and concepts, like @seclink["testing"] and
 
 @include-section["lang/equality.scrbl"]
 
+@include-section["lang/op-precedence.scrbl"]
+
 @include-section["lang/brands.scrbl"]
 
 @include-section["lang/type-check.scrbl"]

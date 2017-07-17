@@ -282,8 +282,7 @@ x = 10
 var x = 15
 }
 
-
-@section{Functions}
+@section[#:tag "functions-tour"]{Functions}
 
 In Pyret, most functions are defined with a function declaration.
 A function declaration looks like:
