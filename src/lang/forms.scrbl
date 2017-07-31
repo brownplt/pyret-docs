@@ -271,7 +271,7 @@ removed:
 #|
   prefer this
   style
-#|
+|#
 }
 
 @pyret-block[#:style "ok-ex"]{
