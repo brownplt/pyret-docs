@@ -18,9 +18,8 @@ before_install:
 - export PATH="${RACKET_DIR}/bin:${PATH}"
 deploy:
   provider: s3
-  bucket: pyret-docs
+  bucket: "pyret-docs"
   local_dir: build
-  upload-dir: docs/horizon
   skip_cleanup: true
   access_key_id:
     secure: RWAyQY4NQC55Sjqh0hZq0V9LNlIaaFLDeoW7F0psLFz6t0LVjLLnY319mPkdKJqiQ/zSd78LO4FqHJi6bYGXs0Tx193DWRk0GtbCgttzTIpTOXhyN0ujjGTfu1ysG2mSPOhJxmxWDStGEGi5PShaeUHHskVty6Cq6a3xZfzxzs/HmfFbWY5TprbrdPgH/64r+kv6kOi4IBlpo30PzYE+bRVdseGkaGloiXOeWUvT8kBzq7vOvn6Ijo1HxvtSv86J3VzhareXKi9oczoQHbqHxB+symanv3S4mvu+kGfb3FLBXsQKBBtFCEQsm6MNupHKg+S5A9eBTp1rF6Po7fxq08LrTKpvkvFSLvtGujI+jHeoLXF72Uxh4L1antcKzQYbKNmcJF2s5BJ4puxnDo2TOY+O8aUWYnPWNDj3Zp/WvROv7CMkzJc5ZG503FCHcKYuvL9zT662FtuD5j2pxXMtR9dFxodMzK7tjdUsv89kKMTgpwdcXphz0Fn8Ujpgr0F7CYrI5BDdk5weGkXTtnwh8AIM31Smynd6pEvD1eT/gaYoac+g0QujpyHGKfyEWyveuqJ9UbLOUzn9K6+PNPgQbJc9WRUPfYeqqOgO2JsTJypUbtJVe/TxZY/mpTtfSOSyVaH6HW3aVEL7emIp7hatjP9i8AxTUgbl8WnfhX0uHqs=
