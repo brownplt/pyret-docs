@@ -373,26 +373,75 @@ STAR: "*"
 provide-stmt: PROVIDE stmt END | PROVIDE STAR
 }
 
-Both forms have no effect when the program is run as the top-level program.
+@pyret{provide} statements specify which bindings and declarations in the
+program are available to other Pyret programs via @pyret{import} statements. 
 
-When the program is in a file that is evaluated via @tt{import}, the program is
-run, and then the @tt{provide} statement is run in top-level scope to determine
-the value bound to the identifier in the import statement.
+@pyret{provide} statements must be the first non-comment code in the
+program or a syntax error will be raised.  @pyret{provide} statements have no
+effect when the program is run as the top-level program.
+
+When the program is in a file that is evaluated via @pyret{import},
+the program is run, and then the @pyret{provide} statement is run in
+top-level scope to determine the value bound to the identifier in the
+@pyret{import} statement.
+
+@margin-note{Any interactive windows spawned by code in the
+@pyret{providing} program will appear when its code is @pyret{import}ed.}
 
 In the first form, the @tt{stmt} internal to the provide is evaluated, and the
-resulting value is provided.
+resulting value is provided.  This is usually done via an object literal, where
+the key represents the binding passed to the external program and
+the value after the colon is the local identifier.
 
-The second form is syntactic sugar for:
-
-@pyret-block{
+@examples{
 provide {
-  id: id,
-  ...
-} end
+  x : x
+  draw-character : draw-character
+  external-funct-name : internal-funct-name
+}
 }
 
-Where the @pyret{id}s are all the toplevel names in the file defined with
-@pyret{fun}, @pyret{data}, or @pyret{x = e}.
+Types -- but not subtypes -- can only be @pyret{provide}d by
+@pyret{provide-types} statements.  If types are included in a
+@pyret{provide} statement they are ignored.  In practice, types
+shared via @pyret{provide-types} also need to share detector
+functions to fully work as anticipated in @pyret{import}ing programs.
+
+The second wildcard @bold{*} form is syntactic sugar for sharing
+all top level bindings and declarations other than types
+defined in the file.
+
+To share all bindings and declarations in a file:
+
+@examples{
+provide *
+provide-types *
+}
+
+@margin-note{While the wildcard form is somewhat simpler, specifying
+which names are to be shared explicitly through the object literal
+syntax can prevent namespace pollution, especially if you expect
+programmers (students) to use @pyret{include} to add the
+commands directly to their top level namespace.}
+
+Programmers working through @url{http://code.pyret.org} can @pyret{provide}
+and @pyret{import} code via Google Drive sharing integrated into the
+development environment.  
+
+To allow other programs to @pyret{import} the @pyret{provide}d values
+in a program, click the @bold{Publish} button at the top of the window
+for the providing program and then the blue @bold{Publish} button on
+the resulting dialog.
+
+The published code can now be @pyret{import}ed using the provided
+code:
+
+@(image "src/lang/publish.png")
+
+Any time you make changes to the providing program that you want to
+be available to @pyret{import}ing programs, you must re-publish the
+providing program, and reload any open instances of the
+@pyret{import}ing programs.
 
 @section{Bindings}
 
