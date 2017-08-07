@@ -8,7 +8,6 @@
   (only-in scribble/html-properties attributes)
   "../../scribble-api.rkt"
   "../../ragged.rkt")
-
 @(define (prod . word)
  (apply tt word))
 @(define (file . name)
@@ -235,6 +234,87 @@ bool-expr: "true" | "false"
 
 Boolean literals are the lowercase words @pyret{true} and @pyret{false}.
 
+@section[#:tag "s:comments"]{Comments}
+Pyret supports two forms of comments:
+@itemlist[
+
+@item{@emph{Single-line comments} begin with a @pyret{#} symbol and extend to
+the end of the line:
+
+@pyret-block{
+# This is an example of a single-line, standalone comment
+fun example(n):
+  1 + n # This single-line comment starts after some code
+end
+}
+}
+
+@item{@emph{Block comments} begin with a @pyret{#|} symbol and end with a
+matching @pyret[#:style "force-comment"]{|#}.
+
+@pyret-block{
+fun example(n):
+  #|
+     This comment can extend
+     over multiple lines
+  |#
+  1 + n
+end
+}
+
+While the text of a comment block contains everything between the @pyret{#|}
+and @pyret[#:style "force-comment"]{|#} symbols, it is preferred to put them on
+their own lines, so they are visually distinctive and can easily be added or
+removed:
+
+@pyret-block[#:style "good-ex"]{
+#|
+  prefer this
+  style
+|#
+}
+
+@pyret-block[#:style "ok-ex"]{
+#| instead of
+   this style |#
+}
+
+The one exception is when block comments are being used to comment out sections
+of a single line of code:
+
+@pyret-block[#:style "good-ex"]{
+rectangle(30 #|width|#, 40 #|height|#, "solid", "red")
+}
+
+They can be nested within each other, so long as the delimiters are matched:
+
+@pyret-block{
+fun example(n):
+  #| this is in a comment
+     #| so is this
+        and this
+     |#
+     and this
+  |#
+  1 + n
+end
+}
+
+Within a block comment, single-line comments are ignored:
+@pyret-block[#:style "ok-ex"]{
+fun example(n):
+  #| This is a block comment.
+     Even though the next line starts a single-line comment
+     # the block-comment ends here |#
+  1 + n
+end
+}
+
+(Naturally, this style isn't preferred, as it is easy to ignore the
+end-of-comment marker when reading quickly!)
+
+}
+]
 @section[#:tag "s:program"]{Programs}
 
 Programs consist of a sequence of import or provide statements, followed by a
@@ -663,7 +743,7 @@ There are a number of forms that can only appear as statements in @tt{block}s
 @py-prod{data-decl} is an exception, and can appear only at the top level.
 
 @bnf['Pyret]{
-stmt: let-decl | fun-decl | data-decl | var-decl | type-stmt | newtype-stmt
+stmt: let-decl | rec-decl | fun-decl | data-decl | var-decl | type-stmt | newtype-stmt
 }
 
 @subsection[#:tag "s:let-decl"]{Let Declarations}
@@ -719,19 +799,48 @@ end
 
 A binding also has a case with tuples, where several names can be given in a binding which can then be assigned to values in a tuple.
 
-@justcode{
+@pyret-block{
 {x;y;z} = {"he" + "llo"; true; 42}
 x = "hi"
 #Error: x defined twice
 
 }
 
-@justcode{
+@pyret-block{
 {x;y;z} = {10; 12}
 #Error: The number of names must match the length of the tuple
 
 }
 
+@subsection[#:tag "s:rec-decl"]{Recursive Let Declarations}
+@bnf['Pyret]{
+EQUALS: "="
+REC: "rec"
+rec-decl: REC binding EQUALS binop-expr
+}
+
+A recursive let-binding is just like a normal let-binding, except that the name
+being defined is in scope in the definition itself, rather than only after it.
+That is:
+
+@pyret-block[#:style "bad-ex"]{
+countdown-bad = lam(n):
+  if n == 0: true
+  else: countdown-bad(n - 1) # countdown-bad is not in scope
+  end
+end
+# countdown-bad is in scope here
+}
+@pyret-block[#:style "good-ex"]{
+rec countdown-good =
+  # countdown-good is in scope here, because of the 'rec'
+  lam(n):
+    if n == 0: true
+    else: countdown-good(n - 1) # so this call is fine
+    end
+  end
+# countdown-good is in scope here
+}
 @subsection[#:tag "s:fun-decl"]{Function Declaration Expressions}
 
 Function declarations have a number of pieces:
@@ -760,44 +869,102 @@ doc-string: [DOC STRING]
 where-clause: [WHERE block]
 }
 
-A function expression is syntactic sugar for a let and an anonymous function
-expression for non-recursive case. The statement:
-
-@justcode{
-"fun" NAME ty-params args return-ann ":"
-  doc-string
-  block
-  where-clause
-"end"
-}
-
-is equivalent to
-
-@justcode{
-NAME "=" "lam" ty-params args return-ann ":"
-  doc-string
-  block
-"end"
-}
-
-With the @tt{where-clause} registered in check mode.  Concretely:
+Function declarations are statements used to define functions with a given
+name, parameters and signature, optional documentation, body, and optional tests.
+For example, the following code:
 
 @pyret-block{
-fun f(x, y):
-  x + y
+fun is-even(n):
+  num-modulo(n, 2) == 0
 end
 }
 
-is equivalent to
+defines a minimal function, with just its name, parameter names, and body.  A
+more complete example:
 
 @pyret-block{
-f = lam(x, y):
-  x + y
+fun fact(n :: NumNonNegative) -> Number:
+  doc: "Returns n! = 1 * 2 * 3 ... * n"
+  if n == 0: 1
+  else:      n * fact(n - 1)
+  end
+where:
+  fact(1) is 1
+  fact(5) is 120
 end
 }
 
-See the documentation for @tt{lam-exprs} for an explanation of arguments'
-and annotations' behavior, as well as @tt{doc-strings}.
+defines a recursive function with a fully-annotated signature (the types of its
+parameter and return value are specified), documents the purpose of the
+function with a doc-string, and includes a where-block definine some simple
+tests of the function.
+
+Function declarations are statements that can only appear either at the top
+level of a file, or within a block scope.  (This is commonly used for defining
+local helper functions within another one.)
+
+@subsubsection{Scope}
+Once defined, the name of the function is visible for the remainder of the
+scope in which it is defined.  Additionall, the function is in scope within its
+own body, to enable recursive functions like @pyret{fact} above:
+
+@pyret-block{
+fun outer-function(a, b, c):
+  ...
+  # outer-function is in scope here
+  # as are parameters a, b, and c
+  ...
+  fun inner-helper(d, e, f):
+    ...
+    # inner-helper is in scope here,
+    # as are parameters d, e, and f
+    # and also outer-helper, a, b and c
+    ...
+  end
+  ...
+  # outer-function, a, b, and c are in scope here,
+  # and so is inner-helper, but *not* d, e or f
+  ...
+end
+}
+
+As with all Pyret identifiers, these function and parameter names cannot be
+mutated, and they cannot be redefined while in scope unless they are explicitly
+@pyret{shadow}ed.
+
+@subsubsection{Where blocks}
+If a function defines a @pyret{where:} block, it can incorporate unit tests
+directly inline with its definition.  This helps to document the code in
+terms of executable examples.  Additionally, whenever the function declaration
+is executed, the tests will be executed as well.  This helps ensure that the
+code and tests don't fall out of synch with each other.  (The clarification
+about "whenever the declaration is executed" allows writing tests for nested
+functions that might rely on the parameters of their containing function: in
+the example above, @pyret{inner-helper} might have a test case that relied on
+the parameters @pyret{a}, @pyret{b} or @pyret{c} from the surrounding call to
+@pyret{outer-function}.) See the documentation for
+@seclink["testing-blocks"]{@pyret{check:} and @pyret{where:} blocks} for more
+details. 
+
+@subsubsection{Syntactic sugar}
+Function declarations are not a primitive concept in the language.  Instead,
+they can be thought of as an idiomatic declaration of a recursively-scoped let
+binding to a lambda expression.  That is, the following two definitions are
+equivalent: 
+@pyret-block{
+fun fact(n):
+  if n == 1: 1 else: n * fact(n - 1) end
+end
+}
+@pyret-block{
+rec fact = lam(n):
+  if n == 1: 1 else n * fact(n - 1) end
+end
+}
+
+See the @seclink["s:lam-expr"]{documentation} for more information about
+@py-prod{lam-expr}s, and also see @py-prod{rec-decl}s above for more
+information about recursive bindings.
 
 @subsection[#:tag "s:data-decl"]{Data Declarations}
 
@@ -835,7 +1002,8 @@ block it is defined in:
 @itemlist[
   @item{The @tt{NAME} of the data definition}
   @item{@tt{NAME}, for each variant of the data definition}
-  @item{@tt{is-NAME}, for each variant of the data definition}
+  @item{@tt{is-NAME}, for the data definition and each variant of
+the data definition}
 ]
 
 For example, in this data definition:
@@ -850,7 +1018,7 @@ end
 These names are defined, with the given types:
 
 @pyret-block{
-BTree :: (Any -> Bool)
+is-BTree :: (Any -> Bool)
 node :: (Number, BTree, BTree -> BTree)
 is-node :: (Any -> Bool)
 leaf :: (Number -> BTree)
@@ -863,14 +1031,16 @@ if fields that don't match the annotations are given.  As with all annotations,
 they are optional.  The constructed values can have their fields accessed with
 @seclink["s:dot-expr" "dot expressions"].
 
-The function @tt{BTree} is a @emph{detector} for values created from this data
-definition, and can be used as an annotation to check for values created by the
-constructors of @tt{BTree}.  @tt{BTree} returns true when provided values
-created by @tt{node} or @tt{leaf}, but no others.
+The function @tt{is-BTree} is a @emph{detector} for values created from this data
+definition.  @tt{is-BTree} returns @pyret{true} when provided values
+created by @tt{node} or @tt{leaf}, but no others.  @tt{BTree} can be
+used as an annotation to check for values created by the constructors of
+@tt{BTree}.
 
 The functions @tt{is-node} and @tt{is-leaf} are detectors for the values
-created by the individual constructors: @tt{is-node} will only return @tt{true}
-for values created by calling @tt{node}, and correspondingly for @tt{leaf}.
+created by the individual constructors: @tt{is-node} will only return @pyret{true}
+for values created by calling @tt{node}, and @tt{is-leaf} correspondingly for
+@tt{leaf}.
 
 Here is a longer example of the behavior of detectors, field access, and
 constructors:
@@ -882,9 +1052,9 @@ data BTree:
 where:
   a-btree = node(1, leaf(2), node(3, leaf(4), leaf(5)))
 
-  BTree(a-btree) is true
-  BTree("not-a-tree") is false
-  BTree(leaf(5)) is true
+  is-BTree(a-btree) is true
+  is-BTree("not-a-tree") is false
+  is-BTree(leaf(5)) is true
   is-leaf(leaf(5)) is true
   is-leaf(a-btree) is false
   is-leaf("not-a-tree") is false
@@ -896,7 +1066,7 @@ where:
   a-btree.left.value is 2
   a-btree.right.value is 3
   a-btree.right.left.value is 4
-  a-btree.right.right.value is 4
+  a-btree.right.right.value is 5
 
 end
 }
@@ -923,11 +1093,26 @@ where:
   a-btree = node(1, leaf(2), node(3, leaf(4), leaf(2)))
   a-btree.values-equal(leaf(1)) is true
   leaf(1).values-equal(a-btree) is true
-  a-btree.size() is 3
+  a-btree.size() is 5
   leaf(0).size() is 1
   leaf(1).increment() is leaf(2)
   a-btree.increment() # raises error: field increment not found.
 end
+}
+
+When you have a single kind of datum in a data definition, instead of
+writing:
+
+@pyret-block{
+data Point:
+  | pt(x, y)
+end
+}
+
+You can drop the | and simply write:
+
+@pyret-block{
+data Point: pt(x, y) end
 }
 
 @subsection[#:tag "s:var-decl"]{Variable Declarations}
@@ -1082,7 +1267,7 @@ expr: paren-expr | id-expr | prim-expr
     | table-extend
     | load-table-expr
     | reactor-expr
-paren-expr: LPAREN expr RPAREN
+paren-expr: LPAREN binop-expr RPAREN
 id-expr: NAME
 prim-expr: NUMBER | RATIONAL | BOOLEAN | STRING
 LPAREN: "("
@@ -1230,8 +1415,8 @@ check:
   m = method(self): self.x end
   o = { a-method-name: m, x: 20 }
   o2 = { a-method-name: m, x: 30 }
-  o.m() is 20
-  o2.m() is 30
+  o.a-method-name() is 20
+  o2.a-method-name() is 30
 end
 }
 

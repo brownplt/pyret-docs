@@ -25,7 +25,7 @@
 
   Every function in this library is available on the @tt{math} module
   object.  For example, if you used @pyret{import math as M}, you would
-  write @pyret{S.arg-max} to access @pyret{arg-max} below.  If you used
+  write @pyret{M.arg-max} to access @pyret{arg-max} below.  If you used
   @pyret{include}, then you can refer to identifiers without writing @pyret{M.}
   as a prefix.  
   

@@ -21,7 +21,7 @@
     (fun-spec
       (name "string-append")
       (arity 2)
-      (args ("beginning" "end"))
+      (args ("front" "back"))
       (doc ""))
     (fun-spec
       (name "string-length")
@@ -41,7 +41,7 @@
     (fun-spec
       (name "string-substring")
       (arity 3)
-      (args ("s" "start" "end"))
+      (args ("s" "start-index" "end-index"))
       (doc ""))
     (fun-spec
       (name "string-replace")
@@ -119,22 +119,51 @@
 
 @type-spec["String" (list)]
 
-The type of string values
+The type of string values.
+                                                               
+A @pyret{String} is a fixed-length array of characters.  This includes not only letters in
+the Latin alphabet and numerals, but any Unicode character, including languages
+using non-Latin characters, such as Arabic, Russian or Chinese, as well as emoji
+defined in the Unicode specification.
+
+@(image "src/builtin/valid-string.png")
+
+@margin-note{If you click on printed strings in the interactive window,
+the display will toggle between the character itself and the relevant
+Unicode escape code or codes.}
+
+@(image "src/builtin/codes.png")
+
+Internally, a Pyret @pyret{String} is implemented as a JavaScript
+@tt{JSString}.  See the @seclink["runtime"] for more context.
+
+@margin-note{One implication of how JavaScript handles Unicode characters is
+that characters that are identified by a Unicode code point greater than
+65535 are sometimes treated as two characters by Pyret, as noted below.}
+
 
 @section{String Functions}
 
   @function["string-equal" #:contract (a-arrow S S B) #:return B]
 
+Returns @pyret{true} if the two strings are equal.
+  
 @examples{
 check:
   string-equal("abc", "abc") is true
   "abc" is%(string-equal) "abc"
+  "abc" == "abc" is true
   string-equal("ab", "abc") is false
+  string-equal("abc     ", "abc") is false
 end
 }
 
   @function["string-contains" #:contract (a-arrow S S B) #:return B]
 
+Returns @pyret{true} if @pyret{string-to-find} is contained in
+@pyret{string-to-search}.  Returns @pyret{true} if an empty string is passed as
+@pyret{string-to-find}.
+  
 @examples{
 check:
   string-contains("Ahoy, world!", "world") is true
@@ -148,6 +177,9 @@ end
 
   @function["string-append" #:contract (a-arrow S S S) #:return S]
 
+Returns a @pyret{String} where @pyret{back} is added to the right of
+@pyret{front}.
+  
 @examples{
 check:
   string-append("a", "b") is "ab"
@@ -162,28 +194,35 @@ end
 
 Returns the number of characters in the string.
 
-@note{Because Pyret currently uses a representation of strings that closely
-matches browsers' behavior, @pyret{string-length} reports a count of @pyret{2}
+@margin-note{@pyret{string-length} reports a count of @pyret{2}
 for code points over 65535.}
 
 @examples{
 check:
   string-length("") is 0
+  string-length("    ") is 4
   string-length("four") is 4
-  string-length("𝄞") is 2
+  string-length("🏏") is 2
 end
 }
 
   @function["string-to-number" #:contract (a-arrow S N) #:return (O-of N)]
 
 Converts the argument string to a number, returning @pyret-id["none" "option"]
-if it is not a valid numeric string, and a @a-app[@pyret-id["some" "option"]
-@pyret-id["Number" "numbers"]] if it is.
+if it is not a valid numeric string, and @pyret-id["some" "option"] number if it is.
+
+@pyret-id{string-to-number} is strict about its inputs, and recognizes exactly
+the same numbers that Pyret itself does: no surrounding whitespace, extra
+punctuation, or trailing characters are allowed.
 
 @examples{
 check:
   string-to-number("100") is some(100)
   string-to-number("not-a-number") is none
+  string-to-number(" 100") is none
+  string-to-number("100abc") is none
+  string-to-number("1,000") is none
+  string-to-number("1-800-555-1212") is none
 end
 }
 
@@ -201,23 +240,23 @@ end
   @function["string-substring" #:contract (a-arrow S N N S) #:return S]
 
 Returns a new string created from the characters of the input string, starting
-from @pyret{start} and ending at @pyret{end}.  Raises an exception if @pyret{start} is greater
-than @pyret{end}, if @pyret{start} or @pyret{end} is greater than the length of the string, or if
-@pyret{start} or @pyret{end} is less than 0.
+from @pyret{start-index} (inclusive) and ending at @pyret{end-index} (exclusive).
+Raises an exception if @pyret{start-index} is greater than @pyret{end-index}, if @pyret{start-index}
+is greater than the length of the string, or if @pyret{end-index} is less than 0.
 
-The returned string always has length @pyret{end - start}.
+The returned string always has length @pyret{end-index} - @pyret{start-index}.
+
+@margin-note{@pyret{String} indexes are counted starting from zero for the
+first character.}
 
 @examples{
 check:
   string-substring("just the first", 0, 1) is "j"
-  
   string-substring("same index", 4, 4) is ""
   
   tws = "length is 12"
-  
   string-substring(tws, 4, 6) is "th"
   string-substring(tws, string-length(tws) - 1, string-length(tws)) is "2"
-  
   string-substring(tws, 6, 4) raises "index"
   string-substring(tws, 6, 13) raises "index"
   string-substring(tws, 13, 6) raises "index"
@@ -233,25 +272,30 @@ end
 
 @examples{
 check:
-  string-index-of("abcb", "b") is 1
-  string-index-of("", "b") is -1
+  string-index-of("Pyret", "P") is 0
+  string-index-of("012🤑45", "🤑") is 3
+  string-index-of("🤔🤔🤔", "🤒") is -1
 end
 }
   
   @function["string-replace" #:contract (a-arrow S S S S) #:return S]
 
+Returns a string where each instance of @pyret{string-to-find} in the
+@pyret{original-string} is replaced by @pyret{replacement-string}.
+
+If the string to find is empty @pyret{""}, the @pyret{replacement-string}
+will be added between characters but not at the beginning or end of the
+string.
+  
 @examples{
 check:
-  string-replace("", "", "c") is "c"
   string-replace("spaces to hyphens", " ", "-") is "spaces-to-hyphens"
-  
   string-replace("remove: the: colons", ":", "") is "remove the colons"
-  
+  string-replace("😊😊🤕😊", "🤕", "😊") is "😊😊😊😊"
   string-replace("rinky dinky", "inky", "azzle") is "razzle dazzle"
-  
   string-replace("a string", "not found", "not replaced") is "a string"
-  
-  string-replace("aaa", "", "b") is "bababab"
+  string-replace("", "", "c") is ""
+  string-replace("aaa", "", "b") is "ababa"
 end
 }
 
@@ -264,7 +308,7 @@ end
   If it is found, it returns a two-element @pyret-id["List" "lists"], whose
   first element is the portion of the string before @emph{first} occurence of
   @pyret{string-to-split-on}.  The second element contains the portion of the string
-  after.  The @pyret{string-to-split-on} is not included in either string.  The
+  after.  The @pyret{string-to-split-on} is @bold{not} included in either string.  The
   string before and the string after might be empty.
 
   For splitting beyond the first occurence of the string, see
@@ -279,7 +323,7 @@ check:
 end
 }
 
-  @function["string-split-all" #:contract (a-arrow S S) #:return S]
+  @function["string-split-all" #:contract (a-arrow S S) #:return (L-of S)]
 
   Searches for @pyret{string-to-split-on} in @pyret{original-string}.  If it is not found,
   returns a @pyret-id["List" "lists"] containing @pyret{original-string} as its
@@ -307,6 +351,9 @@ end
 
   @function["string-char-at" #:contract (a-arrow S N S) #:return S]
 
+Returns a @pyret{String} containing the character at the string index @pyret{n}
+from @pyret{String} @pyret{n}.
+
 @examples{
 check:
   string-char-at("abc", 1) is "b"
@@ -317,7 +364,7 @@ end
   @function["string-toupper" #:contract (a-arrow S S) #:return S]
   @function["string-to-upper" #:contract (a-arrow S S) #:return S]
 
-@note{Pyret uses JavaScript's built-in string operations, and so will
+@margin-note{Pyret uses JavaScript's built-in string operations, and so will
 have the same behavior as @link["https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase" "toUpperCase"].}
 Convert a string to all uppercase characters.  Punctuation and other characters
 without an uppercase equivalent are left alone.  Note that because of
@@ -330,6 +377,8 @@ check:
   string-to-upper("I'm not yelling!") is "I'M NOT YELLING!"
   string-to-upper("ß") is "SS"
   string-to-upper("λαμβδα") is "ΛΑΜΒΔΑ"
+  string-to-upper("😊") is "😊"
+  string-to-upper(" ﷵ‎") is " ﷵ‎"
 end
 }
 
@@ -339,8 +388,7 @@ strings to uppercase first:
 
 @examples{
 check:
-  string-to-upper("This Title may have been Capitalized Inconsistently")
-    is string-to-upper("This Title May Have Been Capitalized Inconsistently")
+  string-to-upper("E.E. Cummings") is string-to-upper("e.e. cummings")
 end
 }
 
@@ -348,6 +396,8 @@ end
   @function["string-tolower" #:contract (a-arrow S S) #:return S]
   @function["string-to-lower" #:contract (a-arrow S S) #:return S]
 
+Converts a @pyret{String} to all lower case.
+  
 @examples{
 check:
   string-to-lower("A") is "a"
@@ -365,8 +415,8 @@ end
   To get multiple codes at once for a longer string (or a string with larger code points), use
   @pyret-id{string-to-code-points}.}
 
-  Converts @pyret{s}, which must be a single-character string, to a character
-  code -- a number corresponding to its unicode code point
+  Converts @pyret{s}, which must be a single-character @pyret{String}, to a character
+  code -- a @pyret{Number} corresponding to its Unicode code point
   (@url["http://en.wikipedia.org/wiki/Code_point"]).
   
 
@@ -388,6 +438,7 @@ end
 check:
   string-to-code-points("") is [list:]
   string-to-code-points("abc") is [list: 97, 98, 99]
+  string-to-code-points("😊") is [list: 55357, 56842]
   string-to-code-points("𝄞") is [list: 55348, 56606] 
 end
 }

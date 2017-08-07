@@ -17,6 +17,10 @@
     (fun-spec (name "median") (arity 1))
     (fun-spec (name "stdev") (arity 1))
     (fun-spec (name "distinct") (arity 1))
+    (fun-spec (name "modes") (arity 1))
+    (fun-spec (name "has-mode") (arity 1))
+    (fun-spec (name "mode-smallest") (arity 1))
+    (fun-spec (name "mode-largest") (arity 1))
 
     (fun-spec (name "lin-reg-2V") (arity 2))
 
@@ -108,7 +112,8 @@
     #:args '(("l" #f))
     #:return N
   ]{
-  Calculates the median of the numbers in @pyret{l}.
+  Calculates the median of the numbers in @pyret{l}.  If the list is of even
+  length, returns the average of the two middle-most values.
   
   @examples{
     check:
@@ -119,6 +124,75 @@
   }
   }
 
+  @function["modes"
+    #:contract (a-arrow (L-of N) (L-of N))
+    #:args '(("l" #f))
+    #:return (L-of N)
+    ]{
+    Calculates the modes of the numbers in @pyret{l}.  If no number appears
+  more than once, returns the empty list.  The modes will be returned in sorted order.
+
+  @examples{
+  check:
+    modes([list: ]) is [list: ]
+    modes([list: 1, 2, 3, 4]) is [list: 1]
+    modes([list: 1, 2, 1, 2, 2, 1]) is [list: 1, 2]
+  end
+  }
+  }
+
+  @function["has-mode"
+    #:contract (a-arrow (L-of N) B)
+    #:args '(("l" #f))
+    #:return B
+    ]{
+    Determines if a list of numbers has any modes, i.e., any repeated values.
+
+  @examples{
+  check:
+    has-mode([list: ]) is false
+    has-mode([list: 1, 2, 3, 4]) is false
+    has-mode([list: 1, 2, 2, 1, 2, 2]) is true
+    has-mode([list: 1, 2, 3, 2]) is true
+  end
+  }
+  }
+
+  @function["mode-smallest"
+    #:contract (a-arrow (L-of N) N)
+    #:args '(("l" #f))
+    #:return N
+    ]{
+    Returns the smallest mode of a list of numbers, if any is present.
+
+  @examples{
+  check:
+    mode-smallest([list: ]) raises "empty" 
+    mode-smallest([list: 1]) raises "no duplicate values"
+    mode-smallest([list: 1, 2, 3, 4, 5]) raises "no duplicate values"
+    mode-smallest([list: 1, 1, 2]) is 1
+    mode-smallest([list: 1, 2, 1, 2]) is 1
+  end
+  }
+  }
+
+  @function["mode-largest"
+    #:contract (a-arrow (L-of N) N)
+    #:args '(("l" #f))
+    #:return N
+    ]{
+    Returns the largest mode of a list of numbers, if any is present.
+
+  @examples{
+  check:
+    mode-smallest([list: ]) raises "empty" 
+    mode-smallest([list: 1]) raises "no duplicate values"
+    mode-smallest([list: 1, 2, 3, 4, 5]) raises "no duplicate values"
+    mode-smallest([list: 1, 1, 2]) is 1
+    mode-smallest([list: 1, 2, 1, 2]) is 2
+  end
+  }
+  }
   @function["stdev"
     #:contract (a-arrow (L-of N) N)
     #:args '(("l" #f))
@@ -206,5 +280,3 @@
   }
   }
 }
->>>>>>> stats-fix
-

@@ -26,5 +26,12 @@
 
   Returns @pyret{true} when given @pyret{false} and vice versa.
 
+@examples{
+check:
+  not(true) is false
+  not(2 < 1) is true
+end
+}
+  
 }
 

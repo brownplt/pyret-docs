@@ -30,7 +30,7 @@ to post a message on the
 list"], and we'll be happy to help.}
 
 @nested{If you want to learn about (or teach!) programming and computer science
-using Pyret, check out @link["http://papl.cs.brown.edu/2014/" "Programming and
+using Pyret, check out @link["http://papl.cs.brown.edu/2015/" "Programming and
 Programming Languages (PAPL)"], which is a textbook on programming with all its
 examples in Pyret.}
 

@@ -625,7 +625,8 @@
   )]
   @nested[#:style 'inset]{
     @constructor-doc["Color" "color" color-args (a-id "Color" (xref "image-structs" "Color"))]{
-      Valid arguments are in the range 0--255, inclusive.
+      The values for red, green, and blue should be in the range 0--255, inclusive.
+      The values for alpha should be in the range 0--1, and indicates how transparent the color is, with 0 as fully transparent and 1 as fully opaque.
     }
   }
 

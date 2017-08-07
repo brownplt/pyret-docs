@@ -8,7 +8,7 @@ First, the easiest place to run Pyret is @url["https://code.pyret.org"], which
 runs Pyret entirely within your browser.
 
 If you're interested in a textbook, you can try out
-@link["http://papl.cs.brown.edu/2014/" "Programming and Programming Languages
+@link["http://papl.cs.brown.edu/2015/" "Programming and Programming Languages
 (PAPL)"], which has all its programs in Pyret.
 
 You can follow a short tour of Pyret's features to get a feel for the language,

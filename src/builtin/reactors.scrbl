@@ -43,11 +43,28 @@
 
 @docmodule["reactors"]{
 
+Pyret's @secref["world"] and @secref["reactors"] modules both facilitate
+creating animated time-based simulation and interactive programs.
+Using the @pyret{world} module and the @pyret{big-bang} function is
+the quickest way to get a basic simulation or game running.  @pyret{reactors}
+provide more advanced features for exploring, testing and debugging
+reactive programs.
+
+Handler functions written for @pyret{big-bang} are compatible with
+@pyret{reactors}, so it is easy to start with @pyret{big-bang} and
+move to @pyret{reactors} if you need their advanced features.
+                       
+  @margin-note{The world/reactor model is based on the universe teachpack in HtDP. You
+  can find documentation for the teachpack here:
+
+  @url["http://docs.racket-lang.org/teachpack/2htdpuniverse.html"]}
+
+                       
 @section[#:tag "s:reactors"]{Creating Reactors}
 
 @type-spec["Reactor" (list "a")]
 
-Reactors are created with special syntax:
+@pyret{reactor}s are created with special syntax:
 
 @verbatim{
 reactor:
@@ -64,15 +81,12 @@ reactor:
   stop-when: @py-prod["expr"],
   close-when-stop: @py-prod["expr"],
 
-  title: @py-prod["expr"],
-
+  title: @py-prod["expr"]
 end
 }
 
-The behavior of the various components are described below.
-
-Syntactically, all of the components of a reactor are optional, with the
-exception of @pyret{init}.  They can also appear in any order – the order
+Syntactically, all of the components of a @pyret{reactor} are optional, with the
+exception of @pyret{init:}.  They can also appear in any order --- the order
 displayed above is not required.  Each option can only appear once.  So, for
 example, these are valid reactors:
 
@@ -151,7 +165,9 @@ reactor.
 
 @subsection{@pyret{init}}
 
-Specifies the initial value for the reactor.
+Specifies the initial value for the reactor.  This is the beginning state of
+the values that change throughout the simulation or game.
+
 
 @subsection{@pyret{on-tick}}
 
@@ -171,12 +187,30 @@ new value of the reactor.
 
 @(image "src/builtin/on-tick.gif")
 
+@subsection[#:tag "s:seconds-per-tick"]{@pyret{seconds-per-tick}}
+
+The @pyret{seconds-per-tick} option expects to be given a @|N|.
+
+@tt{
+seconds-per-tick :: @N
+}
+
+If it is provided, the delay between two successive calls to the
+@pyret{on-tick} handler is equal to the provided number in seconds (up to the
+granularity of tick events on the underlying machine).  If not provided, the
+default delay is 1/28 seconds.
+
+
+
+
 @subsection{@pyret{to-draw}}
 
 The @pyret{to-draw} option expects to be given a function of one argument.  The
 argument should be of the same type as the value given to @pyret{init}, and the
 function should return a @pyret-id["Image" "image"].  So for a @(R-of "a"), the
 type of the to-draw handler is:
+
+@(image "src/builtin/to-draw.gif")
 
 @tt{
 to-draw :: @(a-arrow "a" Image)
@@ -185,32 +219,8 @@ to-draw :: @(a-arrow "a" Image)
 This function is called each time the reactor's value changes, and is displayed
 instead of the reactor's value.
 
-@(image "src/builtin/to-draw.gif")
 
-@subsection{@pyret{on-mouse}}
 
-The @pyret{on-mouse} handler expects to be given a function of four arguments,
-which describe the current reactor state and a mouse event:
-
-@tt{
-on-mouse :: @(a-arrow "a" N N S "a")
-}
-
-The two numbers indicate the x and y coordinates of the mouse, and the string
-indicates the type of mouse event, which is one of:
-
-@itemlist[(item (pyret "\"button-down\"") 
-                " signals that the computer user has pushed a mouse button down;")
-          (item (pyret "\"button-up\"") 
-                " signals that the computer user has let go of a mouse button;")
-          (item (pyret "\"drag\"") 
-                " signals that the computer user is dragging the mouse. A dragging event occurs when the mouse moves while a mouse button is pressed.")
-          (item (pyret "\"move\"") 
-                " signals that the computer user has moved the mouse;")
-          (item (pyret "\"enter\"") 
-                " signals that the computer user has moved the mouse into the canvas area; and")
-          (item (pyret "\"leave\"") 
-                " signals that the computer user has moved the mouse out of the canvas area.")]
 
 
 @subsection{@pyret{on-key}}
@@ -253,6 +263,32 @@ use:
 
 ]
 
+@subsection{@pyret{on-mouse}}
+
+The @pyret{on-mouse} handler expects to be given a function of four arguments,
+which describe the current reactor state and a mouse event:
+
+@tt{
+on-mouse :: @(a-arrow "a" N N S "a")
+}
+
+The two numbers indicate the x and y coordinates of the mouse, and the string
+indicates the type of mouse event, which is one of:
+
+@itemlist[(item (pyret "\"button-down\"") 
+                " signals that the computer user has pushed a mouse button down;")
+          (item (pyret "\"button-up\"") 
+                " signals that the computer user has let go of a mouse button;")
+          (item (pyret "\"drag\"") 
+                " signals that the computer user is dragging the mouse. A dragging event occurs when the mouse moves while a mouse button is pressed.")
+          (item (pyret "\"move\"") 
+                " signals that the computer user has moved the mouse;")
+          (item (pyret "\"enter\"") 
+                " signals that the computer user has moved the mouse into the canvas area; and")
+          (item (pyret "\"leave\"") 
+                " signals that the computer user has moved the mouse out of the canvas area.")]
+
+
 @subsection[#:tag "s:stop-when"]{@pyret{stop-when}}
 
 The @pyret{stop-when} handler expects to be given a function of one argument.
@@ -281,17 +317,6 @@ If it is @pyret{false} or not provided, the window stays open when
 @pyret{stop-when} is triggered, showing the last drawn frame.  If it is
 @pyret{true}, the window is immediately closed.
 
-@subsection[#:tag "s:seconds-per-tick"]{@pyret{seconds-per-tick}}
-
-The @pyret{seconds-per-tick} option expects to be given a @|N|.
-
-@tt{
-seconds-per-tick :: @N
-}
-
-If it is provided, the delay between calling @pyret{on-tick} is equal to the
-provided number in seconds (up to the granularity of tick events on the
-underlying machine).  If not provided, the default delay is 1/28 seconds.
 
 @subsection[#:tag "s:title"]{@pyret{title}}
 

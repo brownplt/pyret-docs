@@ -1,9 +1,11 @@
 #lang racket/base
 (require "../scribble-api.rkt")
-(provide A N No B S EQ RA TA Ar RA-of A-of L L-of O-of S-of E-of P-of)
+(provide A N EN RN No B S EQ RA TA Ar RA-of A-of L L-of O-of S-of E-of P-of)
 
 (define A (a-id "Any" (xref "<global>" "Any")))
 (define N (a-id "Number" (xref "<global>" "Number")))
+(define EN (a-id "Exactnum" (xref "numbers" "Exactnum")))
+(define RN (a-id "Roughnum" (xref "numbers" "Roughnum")))
 (define No (a-id "Nothing" (xref "<global>" "Nothing")))
 (define B (a-id "Boolean" (xref "<global>" "Boolean")))
 (define S (a-id "String" (xref "<global>" "String")))
