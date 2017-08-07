@@ -11,9 +11,32 @@
     (fun-spec
       (name "running-reduce"))
     (data-spec
+      (name "Row")
+      (variants ("row"))
+      (shared (
+        (method-spec (name "get-value")) 
+        (method-spec (name "get")) 
+      )))
+    (data-spec
       (name "Table")
-      (variants)
-      (shared))
+      (variants ("table"))
+      (shared (
+        (method-spec (name "build-column"))
+        (method-spec (name "add-column"))
+        (method-spec (name "add-row"))
+        (method-spec (name "row"))
+        (method-spec (name "add-row"))
+        (method-spec (name "row-n"))
+        (method-spec (name "column"))
+        (method-spec (name "column-n"))
+        (method-spec (name "column-names"))
+        (method-spec (name "all-rows"))
+        (method-spec (name "all-columns"))
+        (method-spec (name "filter"))
+        (method-spec (name "sort-by-column"))
+        (method-spec (name "sort-by-columns"))
+        (method-spec (name "select-columns"))
+      )))
     (data-spec
       (name "Reducer")
       (type-vars ("Acc" "InVal" "OutVal"))
@@ -22,6 +45,13 @@
         (method-spec (name "reduce"))
         (method-spec (name "one")))))))
 
+@(define (table-method name #:args args #:return ret #:contract contract)
+  (method-doc "Table" "table" name #:alt-docstrings "" #:args args #:return ret #:contract contract))
+@(define Table  (a-id "Table" (xref "tables" "Table")))
+@(define (row-method name #:args args #:return ret #:contract contract)
+  (method-doc "Row" "row" name #:alt-docstrings "" #:args args #:return ret #:contract contract))
+@(define Row  (a-id "Row" (xref "tables" "Row")))
+
 @(define (Red-of acc in result) (a-app (a-id "Reducer" (xref "tables" "Reducer")) acc in result))
 @(define (red-method name #:args args #:return ret #:contract contract)
   (method-doc "Reducer" "reducer" name #:alt-docstrings "" #:args args #:return ret #:contract contract))
@@ -29,7 +59,7 @@
 
 @docmodule["tables" #:noimport #t #:friendly-title "Tables"]{
 
-@margin-note{Note that as of June 2017, the @pyret{tables} implementation in
+@margin-note{Note that as of Summer 2017, the @pyret{tables} implementation in
 is rather minimal.  It meets the basic requirements of the curricula that
 use it, but lacks many features that one might reasonably expect from a
 complete table library.
@@ -45,10 +75,11 @@ count on further development of @pyret{tables}.}
 There are many examples of tables in computing, with
 spreadsheets being the most obvious.
                                                              
-A @pyret{Table} is made up of @bold{rows} and @bold{columns}. All rows have
- the same number of columns, in the same order. Each column has a name.
- Each column may also be assigned a type via an annotation; if so, all
- entries in a column will then be checked against the annotation.
+A @pyret{Table} is made up of @bold{rows} and @bold{columns}. All rows have the
+same number of columns, in the same order. Each column has a name.  Each column
+may also be assigned a type via an annotation; if so, all entries in a column
+will then be checked against the annotation.  Unsurprisingly, they are useful
+for representing tabular data from sources like spreadsheets or CSV files.
   
   @section[#:tag "s:tables"]{Creating Tables}
 
@@ -666,8 +697,275 @@ The order of both rows and columns are part of a table value.  To be considered
 equal, tables need to have all the same rows and columns, with the rows and
 columns appearing in the same order.
 
+  @section[#:tag "s:tables:methods"]{Advanced Table Manipulation}
+
+The operations listed above come with a significant restriction: all column
+names must also be valid identifier names. In addition, column names are always
+chosen directly by the programmer in each query, and there's no way to abstract
+over them.
+
+To see why this is a significant restriction, consider this (non-working)
+example:
+
+@examples{
+fun sieve-by-large-number(t :: Table, colname :: String) -> Table:
+  doc: ```Return a new table containing the rows of t whose column
+          named by the string provided for colname have value greater than
+          1000```
+  sieve t using colname:
+    colname > 1000
+  end
+where:
+  my-t = table: item, price
+    row: "Chromebook", 250
+    row: "Macbook", 1300
+  end
+
+  sieve-by-large-number(my-t, "price") is table: item, price
+    row: "Macbook", 1300
+  end
+end
+}
+
+We may well want to write this if we have a number of tables, all of which we
+want to sieve by the same criteria. However, it isn't possible to abstract over
+a column name using @tt{sieve}: the program above conflates the identifier
+@tt{colname} with the column name @tt{colname}. As a result, that program gives
+an error that the @tt{colname} in the query shadows the @tt{colname} that's a
+parameter of the function.
+
+Pyret provides facilities for writing programs like the above, they are simply
+a different set of operations than the query syntax. These table manipulation
+operations are useful for building abstractions over tables and for creating
+tables programmatically.
+
+@type-spec["Row" (list)]
+
+The type of all row values.
+
+@collection-doc["raw-row" #:contract `(a-arrow ("elt" ,(a-tuple S "Col")) ,Row)]
+
+Takes a sequence of tuples and constructs a @pyret-id["Row"] value. Note that
+the type for each column may be different. The constructed row can be added to
+appropriate tables by using the table methods like @pyret-method["Table"
+"add-row"].
+
+It is often preferable to construct rows for an existing table by using the
+@pyret-method["Table" "row"] method, which avoids typing out the names of each
+column for each created row, and provides built-in checking for the count of
+columns.
 
 
+@row-method["get-value"
+  #:contract (a-arrow Row S "Col")
+  #:args '((self #f) ("col-name" #f))
+  #:return "Col"]
 
+Consumes the name of a column, and produces the corresponding value. Results in
+an error if the value isn't found. Square-bracket (@tt{[]}) accessor syntax
+uses @tt{get-value}, which is often more pleasant to write than writing out
+@tt{get-value} fully.
+
+@examples{
+check:
+  r = [raw-row: {"city"; "NYC"}, {"pop"; 8500000}]
+  r.get-value("pop") is 8500000
+  r["pop"] is 850000
+end
+}
+
+@row-method["get"
+  #:contract (a-arrow Row S (O-of "Col"))
+  #:args '((self #f) ("col-name" #f))
+  #:return (O-of "Col")]
+
+Consumes the name of a column, and produces a @pyret-id["some" "option"]
+containing the corresponding value if it's present, or @pyret-id["none"
+"option"] if it isn't.
+
+
+@type-spec["Table" (list)]
+
+The type of all tables.
+
+
+@table-method["row"
+  #:contract (a-arrow Table "Col1" "Col2" "..." "ColN" Row)
+  #:args '(("self" #f) ("col-1" #f) ("col-2" #f) ("..." #f) ("col-n" #f))
+  #:return Row]
+
+Consumes one value for each column in the table, and produces a
+@pyret-id["Row"] value where each provided value is associated with the
+appropriate column.
+
+@examples{
+check:
+  t = table: city, pop
+    row: "NYC", 8.5 * 1000000
+    row: "SD", 1.4 * 1000000
+  end
+  r = t.row("Houston", 2.3 * 1000000)
+  r is [raw-row: {"city"; "Houston"}, {"pop"; 2.3 * 1000000}]
+end
+}
+
+
+@table-method["build-column"
+  #:contract (a-arrow Table S (a-arrow Row "Col") Table)
+  #:args '(("self" #f) ("colname" #f) ("compute-new-val" #f))
+  #:return Table]
+
+Consumes an existing table, and produces a new
+table containing an additional column with the given @tt{colname}, using
+@tt{compute-new-val} to produce the values for that column, once for each row.
+
+Here, @tt{Col} is the type of the new column, determined by the type of value
+the @tt{compute-new-val} function returns.
+
+@examples{
+check:
+  foods = table: name, grams, calories
+    row: "Fries", 200, 500
+    row: "Milkshake", 400, 600
+  end
+  foods-with-cpg = table: name, grams, calories, cal-per-gram
+    row: "Fries", 200, 500, 500/200
+    row: "Milkshake", 400, 600, 600/400
+  end
+
+  fun add-cpg(r :: Row) -> Number:
+    r["calories"] / r["grams"]
+  end
+
+  foods.build-column("cal-per-gram", add-cpg) is foods-with-cpg
+end
+}
+
+@examples{
+fun add-index(t):
+  var ix = -1
+  t.build-column("index", lam(_) block:
+    ix := ix + 1
+    ix
+  end)
+where:
+  before = table: name
+      row: "Joe"
+      row: "Shriram"
+      row: "Kathi"
+    end
+  after = table: name, index
+      row: "Joe", 0
+      row: "Shriram", 1
+      row: "Kathi", 2
+    end
+  add-index(before) is after
+end
+}
+
+@table-method["add-column"
+  #:contract (a-arrow Table S (L-of "Col") Table)
+  #:args '(("self" #f) ("colname" #f) ("new-vals" #f))
+  #:return Table]
+
+Consumes a column name and a list of values, and produces a new table with a
+columng of the given name added, containing the values from @tt{new-vals}.
+
+It is an error if the length of @tt{new-vals} is different than the length of
+the table.
+
+@table-method["add-row"
+  #:contract (a-arrow Table Row Table)
+  #:args '(("self" #f) ("r" #f))
+  #:return Table]
+
+@table-method["row-n"
+  #:contract (a-arrow Table N Row)
+  #:args '(("self" #f) ("index" #f))
+  #:return Row]
+
+@table-method["column"
+  #:contract (a-arrow Table S (L-of "Col"))
+  #:args '(("self" #f) ("colname" #f))
+  #:return (L-of "Col")]
+
+@table-method["column-n"
+  #:contract (a-arrow Table N (L-of "Col"))
+  #:args '(("self" #f) ("index" #f))
+  #:return (L-of "Col")]
+
+@table-method["column-names"
+  #:contract (a-arrow Table (L-of S))
+  #:args '(("self" #f))
+  #:return (L-of S)]
+
+@table-method["all-rows"
+  #:contract (a-arrow Table (L-of Row))
+  #:args '(("self" #f))
+  #:return (L-of Row)]
+
+@table-method["all-columns"
+  #:contract (a-arrow Table (L-of (L-of "Col")))
+  #:args '(("self" #f))
+  #:return (L-of (L-of "Col"))]
+
+@table-method["filter"
+  #:contract (a-arrow Table (a-arrow Row B) Table)
+  #:args '(("self" #f))
+  #:return Table]
+
+@table-method["sort-by-column"
+  #:contract (a-arrow Table S B Table)
+  #:args '(("self" #f) ("colname" #f) ("ascending" #f))
+  #:return Table]
+
+@table-method["sort-by-columns"
+  #:contract (a-arrow Table (L-of (a-tuple S B)) Table)
+  #:args '(("self" #f) ("colnames" #f))
+  #:return Table]
+
+@table-method["select-columns"
+  #:contract (a-arrow Table (L-of S) Table)
+  #:args '(("self" #f) ("colnames" #f))
+  #:return Table]
+
+@;{
+@table-method["sort-by-compare"
+  #:contracts (a-arrow Table (a-arrow Row Row N) Table)
+  #:args '(("self" #f) ("compare" #f))
+  #:return Table]
+}
+
+@;{
+@table-method["join"
+  #:contract (a-arrow Table S Table S Table)
+  #:args '(("self" #f) ("col1" #f) ("t2" #f) ("col2" #f))
+  #:return Table]
+  
+Creates a new table containing all the rows from the tables where the column
+@tt{col1} in @tt{t1} is equal to the column @tt{col2} in @tt{t2}. If the column 
+
+
+@examples{
+check:
+  t1 = table: city, pop
+    row: "Houston", 2400000
+    row: "NYC", 8400000
+  end
+  t2 = table: city-name, latitude
+    row: "Houston", 29.7604
+    row: "NYC", 40.7128
+  end
+
+  result = table: city, pop, city-name, latitude
+    row: "Houston", 240000, "Houston", 29.7604
+    row: "NYC", 240000, "NYC", 40.7128
+  end
+
+  t1.join("city", t2, "city-name")  is result
+end
+}
+}
 
 }
+
