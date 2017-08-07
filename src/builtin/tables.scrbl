@@ -929,12 +929,10 @@ the table.
   #:args '(("self" #f) ("colnames" #f))
   #:return Table]
 
-@;{
 @table-method["sort-by-compare"
   #:contracts (a-arrow Table (a-arrow Row Row N) Table)
   #:args '(("self" #f) ("compare" #f))
   #:return Table]
-}
 
 @;{
 @table-method["join"
@@ -969,3 +967,5 @@ end
 
 }
 
+AKIAJCZRUMDWN3NXBQJQ
+nMg4F+8tzFYYoHaGd1+ImnsbX0Adyu30FfS99AOP Hide 
