@@ -35,6 +35,7 @@
         (method-spec (name "filter"))
         (method-spec (name "sort-by-column"))
         (method-spec (name "sort-by-columns"))
+        (method-spec (name "sort-by-compare"))
         (method-spec (name "select-columns"))
       )))
     (data-spec
@@ -924,14 +925,15 @@ the table.
   #:args '(("self" #f) ("colnames" #f))
   #:return Table]
 
-@table-method["select-columns"
-  #:contract (a-arrow Table (L-of S) Table)
-  #:args '(("self" #f) ("colnames" #f))
-  #:return Table]
-
 @table-method["sort-by-compare"
   #:contracts (a-arrow Table (a-arrow Row Row N) Table)
   #:args '(("self" #f) ("compare" #f))
+  #:return Table]
+
+
+@table-method["select-columns"
+  #:contract (a-arrow Table (L-of S) Table)
+  #:args '(("self" #f) ("colnames" #f))
   #:return Table]
 
 @;{
