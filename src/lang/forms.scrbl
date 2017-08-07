@@ -364,8 +364,6 @@ Example:
 
 @section{Provide Statements}
 
-A provide statement comes in one of two forms:
-
 @bnf['Pyret]{
 PROVIDE: "provide"
 END: "end"
@@ -373,7 +371,15 @@ STAR: "*"
 provide-stmt: PROVIDE stmt END | PROVIDE STAR
 }
 
-@pyret{provide} statements specify which bindings and declarations in the
+@bnf['Pyret]{
+PROVIDE-TYPES: "provide-types"
+END: "end"
+STAR: "*"
+provide-types-stmt: PROVIDE-TYPES stmt END | PROVIDE-TYPES STAR
+}
+
+@pyret{provide} and @pyret{provide-types} statements specify which
+bindings and declarations in the
 program are available to other Pyret programs via @pyret{import} statements. 
 
 @pyret{provide} statements must be the first non-comment code in the
