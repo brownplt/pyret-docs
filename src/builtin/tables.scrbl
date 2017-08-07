@@ -926,7 +926,7 @@ the table.
   #:return Table]
 
 @table-method["sort-by-compare"
-  #:contracts (a-arrow Table (a-arrow Row Row N) Table)
+  #:contract (a-arrow Table (a-arrow Row Row N) Table)
   #:args '(("self" #f) ("compare" #f))
   #:return Table]
 
