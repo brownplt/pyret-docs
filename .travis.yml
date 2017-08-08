@@ -22,7 +22,7 @@ script:
 deploy:
   provider: s3
   bucket: pyret-docs
-  local_dir: build
+  local_dir: build/docs
   upload-dir: docs/horizon
   skip_cleanup: true
   on:
