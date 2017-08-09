@@ -1957,9 +1957,9 @@ end
     }
   ]
   @function["distinct"
-    #:contract (a-arrow (L-of N) N)
+    #:contract (a-arrow (L-of "a") (L-of "a"))
     #:args '(("lst" #f))
-    #:return N
+    #:return (L-of "a")
   ]{
 
   Given a @pyret{List}, returns a new @pyret{List} containing only one copy of each element
@@ -1971,7 +1971,7 @@ end
 
 @examples{
 import lists as L
-  check:
+check:
   L.distinct([list: 3, 1, 2, 2, 3, 2]) is [list: 1, 3, 2]
   L.distinct([list: ~1, ~1]) is-roughly [list: ~1, ~1]
   L.distinct([list: ~1, ~1, 1]) is-roughly [list: ~1, ~1, 1]

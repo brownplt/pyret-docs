@@ -40,8 +40,11 @@
   contains at least one RoughNum, then the output will be a RoughNum.
 
   @examples{
-  sum([list: 0, 2, 4])
-  sum([list: -1, 1, ~2])
+    check:
+      sum([list: ]) raises "Empty List"
+      sum([list: 0, 2, 4]) is 6
+      sum([list: -1, 1, ~2]) is-roughly ~2
+    end
   }
   }
 
@@ -56,7 +59,11 @@
   Calculates the maximal element of the set of Numbers in @pyret{l}.
   
   @examples{
-  max([list: 2.1, 2, 4.5, ~1.5, -1, 1])
+    check:
+      max([list: ]) raises "Empty List"
+      max([list: 10]) is 10
+      max([list: 2.1, 2, 4.5, ~1.5, -1, 1]) is-roughly 4.5
+    end
   }
   }
   
@@ -68,7 +75,11 @@
   Calculates the minimal element of the set of Numbers in @pyret{l}.
 
   @examples{
-  min([list: -1, 0, ~1, 2, 5])
+    check:
+      min([list: ]) raises "Empty List"
+      min([list: 2]) is 2
+      min([list: -1, 0, ~1, 2, 5]) is-roughly -1
+    end
   }
   }
 
@@ -80,7 +91,11 @@
   Calculates the index of the maximal element within @pyret{l}.
   
   @examples{
-  arg-max([list: -1, 0, ~1, 2, 5])
+    check:
+      arg-max([list: ]) raises "Empty List"
+      arg-max([list: 2]) is 0
+      arg-max([list: -1, 0, ~1, 5, 2]) is 3
+    end
   }
   }
   @function["arg-min"
@@ -91,7 +106,11 @@
   Calculates the index of the minimal element within @pyret{l}.
   
   @examples{
-  arg-max([list: -1, 0, ~1, 2, 5])
+    check:
+      arg-max([list: ]) raises "Empty List"
+      arg-max([list: 8]) is 0
+      arg-max([list: -1, 0, ~1, -3, 5]) is 3
+    end
   }
   }
 }
