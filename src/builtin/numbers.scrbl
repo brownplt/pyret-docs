@@ -1,5 +1,5 @@
 #lang scribble/base
-@(require "../../scribble-api.rkt" "../abbrevs.rkt")
+@(require "../../scribble-api.rkt" "../abbrevs.rkt" scribble/html-properties)
 
 @(append-gen-docs
   '(module "numbers"
@@ -89,6 +89,11 @@
     (name "num-atan")
     (arity 1)
     (args ("n"))
+    (doc ""))
+  (fun-spec
+    (name "num-atan2")
+    (arity 2)
+    (args ("dy" "dx"))
     (doc ""))
   (fun-spec
     (name "num-modulo")
@@ -493,8 +498,10 @@ end
 
   }
   @function["num-asin" #:contract (a-arrow N N) #:return N]{
-Returns the arc sine of the argument, usually as a @pyret{Roughnum}. If
-the argument is @pyret{Exactnum} 0, the result is @pyret{Exactnum} 0.
+  
+Returns the arcsine of the argument as an angle in radians in the range [-pi/2,
+pi/2], usually as a @pyret{Roughnum}. If the argument is @pyret{Exactnum} 0, the
+result is @pyret{Exactnum} 0.
 
 @examples{
 check:
@@ -506,8 +513,9 @@ end
   }
   @function["num-acos" #:contract (a-arrow N N) #:return N]{
 
-Returns the arc cosine of the argument, usually as a @pyret{Roughnum}. However, if
-the argument is @pyret{Exactnum} 1, the result is @pyret{Exactnum} 0.
+Returns the arccosine of the argument as an angle in radians in the range [0,
+pi], usually as a @pyret{Roughnum}. However, if the argument is
+@pyret{Exactnum} 1, the result is @pyret{Exactnum} 0.
 
 @examples{
 check:
@@ -518,16 +526,55 @@ end
   }
   @function["num-atan" #:contract (a-arrow N N) #:return N]{
 
-Returns the arc tangent of the argument, usually as a @pyret{Roughnum}. However, if
-the argument is @pyret{Exactnum} 0, the result is @pyret{Exactnum} 0.
+Returns the arctangent of the argument as an angle in radians in the range
+(-pi/2, pi/2), usually as a @pyret{Roughnum}. However, if the argument is
+@pyret{Exactnum} 0, the result is @pyret{Exactnum} 0.
 
 @examples{
 check:
   num-atan(0) is 0
-  num-atan(1.56) is%(within-abs(0.01)) 1
+  num-atan(1) is-roughly (3.141592 * 1/4) # 45 degrees = pi/4 radians
+  num-atan(-1) is-roughly (-3.141592 * 1/4) # 315 degrees = -pi/4 radians
+  num-atan(100000000000) is-roughly (3.141592 / 2) # 90 degrees = pi/2 radians
+  num-atan(-100000000000) is-roughly (-3.141592 / 2) # 270 degrees = -pi/2 radians
 end
 }
   }
+
+  @function["num-atan2" #:contract (a-arrow N N N) #:return N]{
+
+The @pyret{num-atan} function takes a tangent value and returns @emph{a}
+corresponding angle, but it is not clear which angle to return: for example,
+both @pyret{num-tan(3.141592 * 1/4)} and @pyret{num-tan(3.141592 * 5/4)} have a
+tangent of @pyret{~1}.  The @pyret{num-atan2} function produces an angle in
+radians in the range [0, 2pi], where the tangent value is the @emph{ratio} of
+the two arguments: the two arguments represent the (signed)
+@emph{height} and @emph{width} of a triangle whose angle is unknown (i.e.,
+their ratio is the "rise over run", defining the tangent of that angle).  The
+return value of @pyret{num-atan2} chooses which angle to return based on the
+following table:
+
+@tabular[
+  #:column-properties (list (list (attributes '((style . "padding: 5px;")))))
+(list
+  (list "If..."         @pyret{dx < 0} @pyret{dx > 0})
+  (list @pyret{dy > 0}  "Quadrant II"   "Quadrant I")
+  (list @pyret{dy < 0}  "Quadrant III"  "Quadrant IV"))
+  ]
+
+@examples{
+check:
+  num-atan2(0, 1) is 0
+  num-atan2(1, 1) is-roughly (3.141592 * 1/4) # 45 degrees
+  num-atan2(-1, 1) is-roughly (3.141592 * 3/4) # 135 degrees 
+  num-atan2(-1, -1) is-roughly (3.141592 * 5/4) # 225 degrees
+  num-atan2(1, -1) is-roughly (3.141592 * 7/4) # 315 degrees
+  num-atan2(1, 0) is-roughly (3.141592 * 1/2) # 90 degrees
+  num-atan2(-1, 0) is-roughly (3.141592 * 3/2) # 270 degrees
+end
+}
+  }
+
   @function["num-modulo" #:contract (a-arrow N N N) #:return N]{
 Returns the modulus of the first argument with respect to the
 second, i.e. the remainder when dividing the first number by the second.
