@@ -566,9 +566,9 @@ following table:
 check:
   num-atan2(0, 1) is 0
   num-atan2(1, 1) is-roughly (3.141592 * 1/4) # 45 degrees
-  num-atan2(-1, 1) is-roughly (3.141592 * 3/4) # 135 degrees 
+  num-atan2(1, -1) is-roughly (3.141592 * 3/4) # 135 degrees 
   num-atan2(-1, -1) is-roughly (3.141592 * 5/4) # 225 degrees
-  num-atan2(1, -1) is-roughly (3.141592 * 7/4) # 315 degrees
+  num-atan2(-1, 1) is-roughly (3.141592 * 7/4) # 315 degrees
   num-atan2(1, 0) is-roughly (3.141592 * 1/2) # 90 degrees
   num-atan2(-1, 0) is-roughly (3.141592 * 3/2) # 270 degrees
 end
