@@ -405,12 +405,12 @@ provide {
   draw-character : draw-character
   external-funct-name : internal-funct-name
 }
+end
 }
 
-Types -- but not subtypes -- can only be @pyret{provide}d by
-@pyret{provide-types} statements.  If types are included in a
-@pyret{provide} statement they are ignored.  In practice, types
-shared via @pyret{provide-types} also need to share detector
+Types can only be @pyret{provide}d by @pyret{provide-types} statements.  If
+types are included in a @pyret{provide} statement they are ignored.  In
+practice, types shared via @pyret{provide-types} also need to share detector
 functions to fully work as anticipated in @pyret{import}ing programs.
 
 The second wildcard @bold{*} form is syntactic sugar for sharing
@@ -428,7 +428,7 @@ provide-types *
 which names are to be shared explicitly through the object literal
 syntax can prevent namespace pollution, especially if you expect
 programmers (students) to use @pyret{include} to add the
-commands directly to their top level namespace.}
+names directly to their top level namespace.}
 
 Programmers working through @url{http://code.pyret.org} can @pyret{provide}
 and @pyret{import} code via Google Drive sharing integrated into the
