@@ -32,6 +32,12 @@
   ))
 
 @docmodule["plot"]{
+  @margin-note{Note that the plot library is being completely rewritten
+  to use Google Charts, which would allow us to support more features and more
+  types of charts easily. The interface therefore will be changed.
+  The current plot library will still be here for a period of time for those who
+  still use it, but we do not plan to support it further.}
+
   The Pyret Plot library. It consists of plot, chart, and data visualization tools.
   The visualization will appear in a separate dialog window, and/or be returned
   as an @pyret-id["Image" "image"].
@@ -45,8 +51,8 @@
   Every function in this library is available on the @tt{plot} module object.
   For example, if you used @pyret{import plot as P}, you would write
   @pyret{P.display-function} to access @pyret{display-function} below. If you used
-  @pyret{include}, then you can refer to identifiers without needing to prefix 
-  with @pyret{P.} 
+  @pyret{include}, then you can refer to identifiers without needing to prefix
+  with @pyret{P.}
 
   @;############################################################################
   @section{The Plot Type}
@@ -104,7 +110,7 @@
   }
 
   @examples{
-    my-plot = function-plot(lam(x): num-sqrt(x + 1) end, plot-options)
+    my-plot = function-plot(lam(x): num-sqrt(x + 1) end, default-options)
   }
 
   @;############################################################################
@@ -153,7 +159,7 @@
     end, _.{color: I.green})
   display-multi-plot(
     [list: p1, p2],
-    _.{ 
+    _.{
       title: 'quadratic function and a scatter plot',
       x-min: 0,
       x-max: 20,
@@ -266,12 +272,11 @@
 
   @function["bar-chart"
     #:contract (a-arrow TA S (link "PlotWindowOptions") Image)
-    #:args '(("tab" #f) ("legend" #f) ("options" #f))
+    #:args '(("tab" #f) ("options" #f))
     #:return Image
   ]{
   Display a bar chart using data from @pyret{tab} which is a table with two columns:
-  @t-field["label" S] and @t-field["value" N]. @pyret{legend} indicates the legend
-  of the data.
+  @t-field["label" S] and @t-field["value" N].
 
   @examples{
   bar-chart(
@@ -282,9 +287,7 @@
       row: 'D', 4
       row: 'E', 9
       row: 'F', 3
-    end, 'Letter', _.{
-      title: 'Frequency of letters',
-    })
+    end, _.{title: 'Frequency of letters'})
   }
   }
 
@@ -316,21 +319,19 @@
       '25 to 44 Years',
       '45 to 64 Years',
       '65 Years and Over'],
-    _.{title: 'Populations of different states by age group'}
-    )
+    _.{title: 'Populations of different states by age group'})
   }
 
   @;############################################################################
   @section{The Options Types and Default Values}
 
-  The PlotOptions and PlotWindowOptions type is actually a function type
+  The @pyret{PlotOptions} and @pyret{PlotWindowOptions} type is actually a function type
   which consumes a default config and produces a desired config.
 
   To use a default config, you could construct
   @pyret-block{lam(default-configs): default-configs end}
   which consumes a default config and merely returns it. We provide a value
-  @pyret{default-options} and @pyret{default-window-options} which are the
-  identity function above for convenience.
+  @pyret{default-options} which is the polymorphic identity function for convenience, which has both type @pyret{PlotOptions} and @pyret{PlotWindowOptions}
 
   A new Options can be constructed by the using @secref["s:extend-expr"] on
   the default config.
@@ -394,5 +395,4 @@
   @pyret{interact}, when @pyret{true} (the default) shows a separate window
   containing the plot.  When @pyret{false}, the window does not appear; this is
   useful for simply getting an @pyret-id["Image" "image"] from the plot.
-  
 }
