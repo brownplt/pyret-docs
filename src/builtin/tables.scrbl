@@ -33,9 +33,11 @@
         (method-spec (name "all-rows"))
         (method-spec (name "all-columns"))
         (method-spec (name "filter"))
-        (method-spec (name "sort-by-column"))
-        (method-spec (name "sort-by-columns"))
-        (method-spec (name "sort-by-compare"))
+        (method-spec (name "filter-by"))
+        (method-spec (name "order-by"))
+        (method-spec (name "order-by-columns"))
+        (method-spec (name "increasing-by"))
+        (method-spec (name "decreasing-by"))
         (method-spec (name "select-columns"))
       )))
     (data-spec
@@ -880,61 +882,124 @@ the table.
   #:args '(("self" #f) ("r" #f))
   #:return Table]
 
+Consumes a table and a row to add, and produces a new table with the given row
+at the end.
+
 @table-method["row-n"
   #:contract (a-arrow Table N Row)
   #:args '(("self" #f) ("index" #f))
   #:return Row]
+
+Consumes an index, and returns the row at that index. The first row has index
+0.
 
 @table-method["column"
   #:contract (a-arrow Table S (L-of "Col"))
   #:args '(("self" #f) ("colname" #f))
   #:return (L-of "Col")]
 
+Consumes the name of a column, and returns the values in that column as a list.
+
 @table-method["column-n"
   #:contract (a-arrow Table N (L-of "Col"))
   #:args '(("self" #f) ("index" #f))
   #:return (L-of "Col")]
+
+Consumes an index, and returns the values in the column at that index as a
+list. The first column has index 0.
 
 @table-method["column-names"
   #:contract (a-arrow Table (L-of S))
   #:args '(("self" #f))
   #:return (L-of S)]
 
+Consumes no arguments, and produces the names of the columns of the table as a
+list.
+
 @table-method["all-rows"
   #:contract (a-arrow Table (L-of Row))
   #:args '(("self" #f))
   #:return (L-of Row)]
+
+Consumes no arguments, and produces a list containing all the rows in the
+table, in the same order they appear in the table.
 
 @table-method["all-columns"
   #:contract (a-arrow Table (L-of (L-of "Col")))
   #:args '(("self" #f))
   #:return (L-of (L-of "Col"))]
 
+Consumes no arguments, and produces a list of lists of the column values. The
+columns and values appear in the same order they appeared in the table.
+
 @table-method["filter"
   #:contract (a-arrow Table (a-arrow Row B) Table)
-  #:args '(("self" #f))
+  #:args '(("self" #f) ("predicate" #f))
   #:return Table]
 
-@table-method["sort-by-column"
+Consumes a predicate over rows, and produces a new table containing only the
+rows for which the predicate returned @pyret{true}.
+
+@table-method["filter-by"
+  #:contract (a-arrow Table S (a-arrow Row B) Table)
+  #:args '(("self" #f) ("colname" #f) ("predicate" #f))
+  #:return Table]
+
+Consumes a column name and a predicate over the values of that column, and
+produces a new table containing only the rows for which the predicate returned
+@pyret{true} for that column.
+
+
+@table-method["order-by"
   #:contract (a-arrow Table S B Table)
   #:args '(("self" #f) ("colname" #f) ("ascending" #f))
   #:return Table]
 
-@table-method["sort-by-columns"
+Consumes a column name and whether to order ascending or descending, and
+produces a new table with the rows ordered by the given column.
+
+If @pyret{true} is given for @tt{ascending}, the rows are ordered lowest to
+highest by the given column (e.g. using @pyret{<}), and if @pyret{false} is
+given, they are ordered highest to lowest.
+
+@table-method["order-by-columns"
   #:contract (a-arrow Table (L-of (a-tuple S B)) Table)
-  #:args '(("self" #f) ("colnames" #f))
+  #:args '(("self" #f) ("cols" #f))
   #:return Table]
 
-@table-method["sort-by-compare"
-  #:contract (a-arrow Table (a-arrow Row Row N) Table)
-  #:args '(("self" #f) ("compare" #f))
+Consumes a list of tuples describing column orderings, and produces a new table
+according to the given ordering.
+
+Each element of the list must be a two-element tuple, containing a column name
+and a boolean indicating whether to order ascending or not. As with
+@pyret-method["Table" "order-by"], @pyret{true} indicates ascending and
+@pyret{false} indicates descending.
+
+@table-method["increasing-by"
+  #:contract (a-arrow Table S Table)
+  #:args '(("self" #f) ("colname" #f))
   #:return Table]
 
+Like @pyret-method["Table" "order-by"], but @tt{ascending} is always
+@pyret{true}.
+
+@table-method["decreasing-by"
+  #:contract (a-arrow Table S Table)
+  #:args '(("self" #f) ("colname" #f))
+  #:return Table]
+
+Like @pyret-method["Table" "order-by"], but @tt{ascending} is always
+@pyret{false}.
 
 @table-method["select-columns"
   #:contract (a-arrow Table (L-of S) Table)
   #:args '(("self" #f) ("colnames" #f))
   #:return Table]
+
+Consumes a list of column names, and produces a new table containing only those
+columns. The order of the values in the columns is the same as in the input
+table, and the order of the columns themselves is the order they are given in
+the list.
 
 @;{
 @table-method["join"
