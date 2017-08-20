@@ -135,8 +135,10 @@
   @examples{
   check:
     modes([list: ]) is [list: ]
-    modes([list: 1, 2, 3, 4]) is [list: 1]
+    modes([list: 1, 2, 3, 4]) is empty
+    modes([list: 1, 2, 3, 1, 4]) is [list: 1]
     modes([list: 1, 2, 1, 2, 2, 1]) is [list: 1, 2]
+    modes([list: 1, 2, 2, 1, 2, 1]) is [list: 1, 2]
   end
   }
   }
