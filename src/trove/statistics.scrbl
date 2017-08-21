@@ -132,10 +132,19 @@
     Calculates the modes of the numbers in @pyret{l}.  If no number appears
   more than once, returns the empty list.  The modes will be returned in sorted order.
 
+Computing the mode of a list of values is unambiguous when there is a unique
+``most common'' element. Computer scientists and mathematicians agree that when
+two values are equally ``most common'', they are both considered modes of the
+list. The natural generalization of this is that when all values occur equally
+often, they are all modes of the list. However, many high-school textbooks
+assert that when no element appears more than once, no element should be
+considered a mode. To avoid confusing high-school students, we adopt the
+definition they will find in their textbooks.
+
   @examples{
   check:
     modes([list: ]) is [list: ]
-    modes([list: 1, 2, 3, 4]) is empty
+    modes([list: 1, 2, 3, 4]) is [list: ]
     modes([list: 1, 2, 3, 1, 4]) is [list: 1]
     modes([list: 1, 2, 1, 2, 2, 1]) is [list: 1, 2]
     modes([list: 1, 2, 2, 1, 2, 1]) is [list: 1, 2]
