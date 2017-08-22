@@ -6,7 +6,7 @@
 (provide bnf prod-link prod-ref)
 
 (define (prod-tag grammar prod-name) (list 'bnf-prod (list grammar prod-name)))
-(define (prod-ref name) (list "‹" name "›"))
+(define (prod-ref name) (string-append "‹" name "›"))
 (define (prod-link grammar name)
   (elemref (prod-tag grammar name) (prod-ref name)))
 
@@ -16,6 +16,9 @@
   (define names (map (λ(c) (list (lhs-id-val (constant-lhs c)) (pattern-lit-val (constant-val c)))) constants))
   (define (meta s)
     (elem s #:style (make-style #f (list (attributes '((class . "bnf-meta")))))))
+  (define (phantom s)
+    (elem "" #:style (make-style #f (list (attributes `((class . "bnf-phantom")
+                                                        (data-prod . ,s)))))))
   (define (lit s)
     (elem s #:style (make-style #f (list (attributes '((class . "bnf-lit")))))))
   (define (eps)
@@ -43,15 +46,14 @@
          (if (> (pos-line (pattern-start (first choices))) (pos-line (pattern-start p)))
              (cons (first choices) pat-breaks)
              pat-breaks))
-       (define indent (string-append "\n" (make-string (+ 2 (* 2 (string-length (rule-name)))) #\space)))
+       (define indent (list "\n" (phantom (prod-ref (rule-name))) (meta "| ")))
        (define translated
          (map (λ(c)
-                (list (if (member c breaks) indent "")
-                      (meta " | ")
+                (list (if (member c breaks) indent (meta " | "))
                       (render-help c))) choices))
        (if (and start (> (pos-line (pattern-start (first choices))) (pos-line start)))
            (cons indent (flatten translated))
-           (drop (flatten translated) 2))]
+           (drop (flatten translated) 1))]
       [(pattern-token? p)
        (define tok (assoc (pattern-token-val p) names))
        (cond

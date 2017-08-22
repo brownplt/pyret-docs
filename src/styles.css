@@ -81,3 +81,8 @@ pre.pyret-block {
   border: unset;
   font-style: italic;
 }                      
+
+.bnf-phantom::before {
+   content: attr(data-prod);
+   color: transparent;
+}

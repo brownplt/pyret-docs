@@ -327,7 +327,6 @@ END: "end"
 PROVIDE-TYPES: "provide-types"
 program: prelude block
 prelude: [provide-stmt] [provide-types-stmt] import-stmt*
-provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
 }
 
 @section{Import Statements}
@@ -475,7 +474,7 @@ five = num-sqrt((3 * 3) + (4 * 4))
 hw = string-append("Hello", " world")
 }
 
-@subsection{Annotated bindings}
+@subsection[#:tag "s:annotated-binding"]{Annotated bindings}
 Slightly more complicated, a name binding may also specify an
 @seclink["s:annotations"]{annotation}, that will ensure that the
 value being bound has the correct type:
@@ -487,8 +486,9 @@ this-will-fail :: Boolean = 5
 }
 That last line will fail at runtime with an annotation error.
 
-Note that the annotation always comes after a name; this is not allowed, for
-instance:
+Note that the annotation always comes after the name, not the value; this is
+not allowed, for instance:
+
 @pyret-block[#:style "bad-ex"]{
 PI = ~3.14 :: Number
 }
@@ -795,10 +795,11 @@ explicit block or a block-shorthand to fix.
 There are a number of forms that can only appear as statements in @tt{block}s
 (rather than anywhere an expression can appear).  Several of these are
 @emph{declarations}, which define new names within their enclosing block.
-@py-prod{data-decl} is an exception, and can appear only at the top level.
+@py-prod{data-decl} and @py-prod{contract} are exceptions, and can appear only at the top level.
 
 @bnf['Pyret]{
-stmt: let-decl | rec-decl | fun-decl | data-decl | var-decl | type-stmt | newtype-stmt
+stmt: let-decl | rec-decl | fun-decl | var-decl | type-stmt | newtype-stmt
+    | data-decl | contract
 }
 
 @subsection[#:tag "s:let-decl"]{Let Declarations}
@@ -1238,6 +1239,130 @@ newtype MytypeBrander as MyType
 we define both of these components.  See @secref{brands} for more information
 about branders.
 
+@section[#:tag "s:contracts"]{Contracts}
+As part of its support for the systematic design of functions, Pyret allows
+developers to specify an annotation for a name, before that name is defined.
+For example,
+
+@pyret-block[#:style "good-ex"]{
+the-answer :: Number
+the-answer = 42
+
+double :: String -> String
+fun double(s): s + s end
+}
+
+In both of these cases, the definition itself (of @pyret{the-answer} and
+@pyret{double}) is preceded by a @emph{contract} statement, asserting the
+signature of the definition to follow.  Pyret treats these contracts specially,
+and weaves them in to the definitions: the previous examples are equivalent to
+
+@pyret-block[#:style "good-ex"]{
+the-answer :: Number = 42
+
+fun double(s :: String) -> String: s + s end
+}
+
+The grammar for these contracts looks nearly identical to that of
+@py-prod{name-binding}s.  Function annotations are given a slightly more
+relaxed treatment: the outermost set of parentheses are optional.
+
+@bnf['Pyret]{
+COMMA: ","
+THINARROW: "->"
+COLONCOLON: "::"
+LPAREN: "("
+RPAREN: ")"
+contract: NAME COLONCOLON ann | NAME COLONCOLON contract-arrow-ann
+contract-arrow-ann: (ann COMMA)* ann THINARROW ann 
+              | LPAREN (NAME COLONCOLON ann COMMA)* NAME COLONCOLON ann RPAREN THINARROW ann
+}
+
+When weaving function annotations onto functions, Pyret enforces a few
+restrictions:
+@itemlist[
+@item{For a standalone function, the contract must immediately precede the
+function definition, or must immediately precede an
+@seclink["testing-blocks"]{@pyret{examples} or @pyret{check} block} that
+immediately precedes the function definition.  (Whitespace or comments are not
+important; extraneous definitions are.)
+
+@pyret-block[#:style "good-ex"]{
+is-even :: Number -> Boolean
+
+check:
+  is-even(2) is true
+end
+
+fun is-even(n): num-modulo(n, 2) == 0 end
+}
+@pyret-block[#:style "bad-ex"]{
+is-even :: Number -> Boolean
+
+something-irrelevant = 12345
+
+fun is-even(n): num-modulo(n, 2) == 0 end
+}
+}
+@item{For mutually recursive functions, the contracts must be adjacent to the
+functions, and must precede them.
+@pyret-block[#:style "good-ex"]{
+# Contracts
+is-even :: Number -> Boolean
+is-odd :: Number -> Boolean
+# Implementations
+fun is-even(n): if n == 0: true else: is-odd(n - 1) end end
+fun is-odd(n): if n == 0: false else: is-even(n - 1) end end
+}
+@pyret-block[#:style "good-ex"]{
+# Is even?
+is-even :: Number -> Boolean
+fun is-even(n): if n == 0: true else: is-odd(n - 1) end end
+# Is odd?
+is-odd :: Number -> Boolean
+fun is-odd(n): if n == 0: false else: is-even(n - 1) end end
+}
+@pyret-block[#:style "bad-ex"]{
+is-odd :: Number -> Boolean
+fun is-even(n): if n == 0: true else: is-odd(n - 1) end end
+is-even :: Number -> Boolean  ## Does not precede definition of is-even
+fun is-odd(n): if n == 0: false else: is-even(n - 1) end end
+}
+}
+@item{If a contract specifies argument names, then the names must match those
+used by the function.
+@pyret-block[#:style "good-ex"]{
+is-even :: (n :: Number) -> Boolean
+fun is-even(n): num-modulo(n, 2) == 0 end
+}
+@pyret-block[#:style "bad-ex"]{
+is-even :: (x :: Number) -> Boolean # name does not match
+fun is-even(n): ... end
+}
+}
+@item{If a contract is used for a function, then the function must not itself
+be annotated.
+@pyret-block[#:style "good-ex"]{
+is-even :: (n :: Number) -> Boolean
+fun is-even(n): num-modulo(n, 2) == 0 end
+}
+@pyret-block[#:style "bad-ex"]{
+is-even :: (n :: Number) -> Boolean # Redundant argument annotation
+fun is-even(n :: Number): ... end
+}
+@pyret-block[#:style "bad-ex"]{
+is-even :: (n :: Number) -> Boolean # Redundant return annotation
+fun is-even(n) -> Boolean: ... end
+}
+}
+]
+
+Note that using a contract on a function is @emph{more expressive} than using
+an annotated binding for a lambda.  @secref["s:annotated-binding"] do not
+enforce all the components of an @seclink["s:arrow-ann"]{arrow annotation}; they
+merely ensure that the value being bound is in fact a function.  By contrast,
+function contracts ensure the arguments and return values are annotated and
+checked.
 
 @section{Statements}
 
@@ -1419,11 +1544,23 @@ end
 
 Lambda expressions can also be written with a curly-brace shorthand:
 
-@justcode{
-curly-lambda-expr: "{" ty-params [args] return-ann ":"
+@bnf['Pyret]{
+             LBRACE: "{"
+             COLON: ":"
+             RBRACE: "}"
+             BLOCK: "block"
+curly-lam-expr: LBRACE fun-header [BLOCK] COLON
     doc-string
     block
-  "}"
+    where-clause
+  RBRACE
+LANGLE: "<"
+RANGLE: ">"
+COMMA: ","
+LAPREN: "("
+RPAREN: ")"
+THINARROW: "->"
+DOC: "doc:"
 }
 
 @examples{
@@ -2504,19 +2641,20 @@ will make use of this information more fully.
 
 An arrow annotation is used to describe the behavior of functions.  It consists
 of a list of comma-separated argument types followed by an ASCII arrow and
-return type:
+return type.  Optionally, the annotation can specify argument names as well:
 
 @bnf['Pyret]{
              LPAREN: "("
              RPAREN: ")"
              THINARROW: "->"
              COMMA: ","
-arrow-ann: LPAREN arrow-ann-elt* ann THINARROW ann RPAREN
-arrow-ann-elt: ann COMMA
+             COLONCOLON: "::"
+arrow-ann: LPAREN (ann COMMA)* ann THINARROW ann RPAREN
+     | LPAREN LPAREN (NAME COLONCOLON ann COMMA)* NAME COLONCOLON ann RPAREN THINARROW ann RPAREN
 }
 
 When an arrow annotation appears in a binding, that binding position simply
-checks that the value is a function.
+checks that the value is a function.  To enforce a more detailed check, use @seclink["s:contracts"].
 
 @subsection[#:tag "s:pred-ann"]{Predicate Annotations}
 A predicate annotation is used to @emph{refine} the annotations
@@ -2539,7 +2677,7 @@ fun do-something-with<a>(non-empty-list :: List<a>%(is-link)) -> a: ... end
 
 If we want to write customized predicates, we can easily do so.  Those
 predicates must be defined @emph{before} being used in an annotation
-position, and must be refered to by name
+position, and must be refered to by name.
 
 @subsection[#:tag "s:tuple-ann"]{Tuple Annotations}
 Annotating a tuple is syntactically very similar to writing a tuple value:
