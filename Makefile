@@ -1,7 +1,10 @@
+MANUAL_FONTS = $(shell racket -e '(display (collection-file-path "manual-fonts.css" "scribble"))')
+
 all: docs
 
 docs:
 	scribble \
+    ++style $(MANUAL_FONTS) \
     ++style ./node_modules/codemirror/lib/codemirror.css \
     ++extra ./node_modules/codemirror/lib/codemirror.js \
     ++extra ./node_modules/codemirror/addon/runmode/runmode.js \
@@ -13,7 +16,7 @@ docs:
     ++style src/styles.css \
     --prefix src/myprefix.html \
     \
-    --dest ./build/ \
+    --dest build/ \
     --dest-name docs \
     ++arg "$(VERSION)" \
     --htmls src/index.scrbl
