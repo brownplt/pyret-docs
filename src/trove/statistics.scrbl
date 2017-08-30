@@ -20,6 +20,7 @@
     (fun-spec (name "modes") (arity 1))
     (fun-spec (name "has-mode") (arity 1))
     (fun-spec (name "mode-smallest") (arity 1))
+    (fun-spec (name "mode-any") (arity 1))
     (fun-spec (name "mode-largest") (arity 1))
 
     (fun-spec (name "lin-reg-2V") (arity 2))
@@ -204,6 +205,25 @@ definition they will find in their textbooks.
   end
   }
   }
+
+  @function["mode-any"
+    #:contract (a-arrow (L-of N) N)
+    #:args '(("l" #f))
+    #:return N
+    ]{
+    Returns an arbitrary mode of a list of numbers, if any is present.
+
+  @examples{
+  check:
+    mode-smallest([list: ]) raises "empty" 
+    mode-smallest([list: 1]) raises "no duplicate values"
+    mode-smallest([list: 1, 2, 3, 4, 5]) raises "no duplicate values"
+    mode-smallest([list: 1, 1, 2]) is 1
+    mode-smallest([list: 1, 2, 1, 2]) satisfies lam(m): (m == 1) or (m == 2) end
+  end
+  }
+  }
+
   @function["stdev"
     #:contract (a-arrow (L-of N) N)
     #:args '(("l" #f))
