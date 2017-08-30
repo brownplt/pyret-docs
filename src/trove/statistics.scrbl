@@ -215,11 +215,11 @@ definition they will find in their textbooks.
 
   @examples{
   check:
-    mode-smallest([list: ]) raises "empty" 
-    mode-smallest([list: 1]) raises "no duplicate values"
-    mode-smallest([list: 1, 2, 3, 4, 5]) raises "no duplicate values"
-    mode-smallest([list: 1, 1, 2]) is 1
-    mode-smallest([list: 1, 2, 1, 2]) satisfies lam(m): (m == 1) or (m == 2) end
+    mode-any([list: ]) raises "empty" 
+    mode-any([list: 1]) raises "no duplicate values"
+    mode-any([list: 1, 2, 3, 4, 5]) raises "no duplicate values"
+    mode-any([list: 1, 1, 2]) is 1
+    mode-any([list: 1, 2, 1, 2]) satisfies lam(m): (m == 1) or (m == 2) end
   end
   }
   }
