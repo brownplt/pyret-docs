@@ -1,4 +1,4 @@
-MANUAL_FONTS = $(shell racket -e '(display (collection-file-path "manual-fonts.css" "scribble"))')
+MANUAL_FONTS = "$(shell racket -e '(display (collection-file-path "manual-fonts.css" "scribble"))')"
 
 all: docs
 
