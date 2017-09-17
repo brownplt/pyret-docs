@@ -147,14 +147,31 @@ spy:
 end
 }
 
-Note that each value that is spied upon is required to have a name. That is,
-it's an error to write:
+Each value that is spied upon is required to have a name. That is, it's an
+error to write:
 
 @pyret-block[#:style "bad-ex"]{
 spy:
   2 + 2
 end
 }
+
+The message position can contain expressions, not just string constants, so the
+message can be computed: 
+
+@pyret-block{
+fun f(n):
+  n * n
+end
+for each(i from range(0, 10)):
+  result = f(i)
+  spy "iteration " + to-string(i):
+    result
+  end
+  result
+end
+}
+
 
 
 @section{Grammar}
