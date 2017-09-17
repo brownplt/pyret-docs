@@ -135,6 +135,28 @@ Spying "lengths" (at file:///spies.arr:2:2-6:5)
 }
 
 
+@section{Minor Notes and Corner Cases}
+
+Both types of spy fields can be used in a single spy statement:
+
+@pyret-block{
+x = 10
+spy:
+  x,
+  y: 20
+end
+}
+
+Note that each value that is spied upon is required to have a name. That is,
+it's an error to write:
+
+@pyret-block[#:style "bad-ex"]{
+spy:
+  2 + 2
+end
+}
+
+
 @section{Grammar}
 
 The grammar of @tt{spy} statements is:
@@ -150,7 +172,6 @@ spy-field: NAME | NAME COLON binop-expr
 }
 
 
-
 @section[#:tag "s:spies:rationale"]{Rationale}
 
 Often, when debugging or explaining a program, it's useful to display values
@@ -164,7 +185,58 @@ More annoyingly in Pyret, since we often add print statements to
 already-existing code, it becomes a nuisance to add @secref["s:blocky-blocks"]
 just to get a debugging print.
 
-Spies give the compiler the necessary information to print out source
-locations, track static information like names, and know that the @tt{spy}
-statement is allowed on its own line, and doesn't require adding @tt{block:}
-declarations.
+For example, consider the @tt{reverse} example from above:
+
+@pyret-block{
+fun reverse(lst, sofar):
+  cases(List<A>) lst:
+    | empty => sofar
+    | link(first, rest) =>
+      reverse(rest, link(first, sofar))
+  end
+end
+}
+
+We might try to add uses of @pyret-id["print" "<global>"] to do what the spy
+statement did:
+
+@pyret-block[#:style "bad-ex"]{
+fun reverse(lst, sofar):
+  print(lst.length())
+  print(sofar.length())
+  print(lst.length() + sofar.length())
+  cases(List<A>) lst:
+    | empty => sofar
+    | link(first, rest) =>
+      reverse(rest, link(first, sofar))
+  end
+end
+}
+
+This has a few problems. First, because Pyret restricts function bodies to have
+no more than one expression unless @secref["s:blocky-blocks"] is used, this is
+an immediate syntax error. We could change the first line to include
+@tt{block:} to let Pyret know we want to allow multiple statements.
+
+@pyret-block{
+fun reverse(lst, sofar) block:
+}
+
+Second, the uses of @pyret-id["print" "<global>"] lack context. With this
+version, we'd simply see sequences of numbers print out, and it would be
+difficult to discern which came from which print statement, or what the values
+meant. We could add more string information into the output to label the
+outputs, which leads to clunky string concatenation expressions like
+
+@pyret-block{
+print("lst-length: " + to-string(lst.length()))
+}
+
+This ends up being onerous and error prone. In addition, for rich values like
+tables and images, the string representation isn't as useful as the rich
+rendering that Pyret provides in an interface like code.pyret.org.
+
+The @tt{spy} statement is designed to make it natural and useful to add printed
+observations to the program, supporting and enhancing the practice of
+“printf-debugging”.
+
