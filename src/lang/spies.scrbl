@@ -249,9 +249,11 @@ outputs, which leads to clunky string concatenation expressions like
 print("lst-length: " + to-string(lst.length()))
 }
 
-This ends up being onerous and error prone. In addition, for rich values like
-tables and images, the string representation isn't as useful as the rich
-rendering that Pyret provides in an interface like code.pyret.org.
+This ends up being onerous and error prone.
+
+Finally, for rich values like tables and images, the string representation
+produced by @pyret-id["print" "<global>"] isn't as useful as the rich rendering
+that Pyret provides in an interface like code.pyret.org.
 
 The @tt{spy} statement is designed to make it natural and useful to add printed
 observations to the program, supporting and enhancing the practice of
