@@ -22,7 +22,7 @@
     (fun-spec (name "display-scatter") (arity 2))
     (fun-spec (name "display-line") (arity 2))
 
-    (fun-spec (name "display-multi-plot") (arity 3))
+    (fun-spec (name "display-multi-plot") (arity 2))
 
     (type-spec (name "PlotOptions"))
     (type-spec (name "PlotWindowOptions"))
@@ -45,8 +45,8 @@
   Every function in this library is available on the @tt{plot} module object.
   For example, if you used @pyret{import plot as P}, you would write
   @pyret{P.display-function} to access @pyret{display-function} below. If you used
-  @pyret{include}, then you can refer to identifiers without needing to prefix 
-  with @pyret{P.} 
+  @pyret{include}, then you can refer to identifiers without needing to prefix
+  with @pyret{P.}
 
   @;############################################################################
   @section{The Plot Type}
@@ -131,11 +131,10 @@
   causing from, for example, discontinuity of the function, or a function which oscillates infinitely.
 
   @function["display-multi-plot"
-    #:contract (a-arrow S
-                        (L-of (link "Plot"))
+    #:contract (a-arrow (L-of (link "Plot"))
                         (link "PlotWindowOptions")
                         Image)
-    #:args '(("title" #f) ("lst" #f) ("options" #f))
+    #:args '(("lst" #f) ("options" #f))
     #:return Image
   ]{
 
@@ -153,7 +152,7 @@
     end, _.{color: I.green})
   display-multi-plot(
     [list: p1, p2],
-    _.{ 
+    _.{
       title: 'quadratic function and a scatter plot',
       x-min: 0,
       x-max: 20,
@@ -394,5 +393,5 @@
   @pyret{interact}, when @pyret{true} (the default) shows a separate window
   containing the plot.  When @pyret{false}, the window does not appear; this is
   useful for simply getting an @pyret-id["Image" "image"] from the plot.
-  
+
 }

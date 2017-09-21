@@ -157,7 +157,7 @@ end
 }
 
 The message position can contain expressions, not just string constants, so the
-message can be computed: 
+message can be computed:
 
 @pyret-block{
 fun f(n):
@@ -197,7 +197,7 @@ during execution. It's common to do this with functions like @pyret-id["print"
 regular function call for debug printing leaves something to be desired. For
 example, just printing doesn't track the line and column something was printed
 at, and when the value of an identifier is printed, its name is lost in the
-ouput, forcing the programmer to add extra string output describing the value.
+output, forcing the programmer to add extra string output describing the value.
 More annoyingly in Pyret, since we often add print statements to
 already-existing code, it becomes a nuisance to add @secref["s:blocky-blocks"]
 just to get a debugging print.
@@ -258,4 +258,3 @@ that Pyret provides in an interface like code.pyret.org.
 The @tt{spy} statement is designed to make it natural and useful to add printed
 observations to the program, supporting and enhancing the practice of
 “printf-debugging”.
-
