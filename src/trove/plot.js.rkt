@@ -22,7 +22,7 @@
     (fun-spec (name "display-scatter") (arity 2))
     (fun-spec (name "display-line") (arity 2))
 
-    (fun-spec (name "display-multi-plot") (arity 3))
+    (fun-spec (name "display-multi-plot") (arity 2))
 
     (type-spec (name "PlotOptions"))
     (type-spec (name "PlotWindowOptions"))
@@ -137,11 +137,10 @@
   causing from, for example, discontinuity of the function, or a function which oscillates infinitely.
 
   @function["display-multi-plot"
-    #:contract (a-arrow S
-                        (L-of (link "Plot"))
+    #:contract (a-arrow (L-of (link "Plot"))
                         (link "PlotWindowOptions")
                         Image)
-    #:args '(("title" #f) ("lst" #f) ("options" #f))
+    #:args '(("lst" #f) ("options" #f))
     #:return Image
   ]{
 

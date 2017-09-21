@@ -48,6 +48,11 @@
     (return (a-id "Nothing" (xref "<global>" "Nothing")))
     (doc "Raises the value as an exception."))
   (fun-spec
+    (name "print")
+    (arity 1)
+    (args ("val"))
+    (doc "Displays the value"))
+  (fun-spec
     (name "torepr")
     (arity 1)
     (args ("val"))
@@ -112,6 +117,11 @@
 @docmodule["<global>" #:noimport #t #:friendly-title "Global Utilities"]{
 
 @section[#:tag "global-builtins"]{Built-in Utility Functions}
+
+@function["print" #:contract (a-arrow "a" "a") #:return "a" #:alt-docstrings ""]
+
+Displays the provided value after first calling @pyret-id["to-repr"] on it,
+then returns the value.
 
 @function["torepr" #:contract (a-arrow A S) #:alt-docstrings ""]
 @function["to-repr" #:contract (a-arrow A S) #:alt-docstrings ""]
