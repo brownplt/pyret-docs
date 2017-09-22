@@ -2,7 +2,7 @@
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 @(require (only-in scribble/core delayed-block))
 
-@(define (link T) (a-id T (xref "plot" T)))
+@(define (in-link T) (a-id T (xref "plot" T)))
 @(define Color (a-id "Color" (xref "image-structs" "Color")))
 @(define Image (a-id "Image" (xref "image" "Image")))
 @(define (t-field name ty) (a-field (tt name) ty))
@@ -62,16 +62,16 @@
 
   @data-spec2["Plot" (list) (list
   @constructor-spec["Plot" "function-plot" `(("f" ("type" "normal") ("contract" ,(a-arrow N N)))
-                                       ("options" ("type" "normal") ("contract" ,(link "PlotOptions"))))]
+                                       ("options" ("type" "normal") ("contract" ,(in-link "PlotOptions"))))]
   @constructor-spec["Plot" "line-plot" `(("points" ("type" "normal") ("contract" ,TA))
-                                         ("options" ("type" "normal") ("contract" ,(link "PlotOptions"))))]
+                                         ("options" ("type" "normal") ("contract" ,(in-link "PlotOptions"))))]
   @constructor-spec["Plot" "scatter-plot" `(("points" ("type" "normal") ("contract" ,TA))
-                                            ("options" ("type" "normal") ("contract" ,(link "PlotOptions"))))])]
+                                            ("options" ("type" "normal") ("contract" ,(in-link "PlotOptions"))))])]
 
   @nested[#:style 'inset]{
 
   @constructor-doc["Plot" "function-plot" (list `("f" ("type" "normal") ("contract" ,(a-arrow N N)))
-                                          `("options" ("type" "normal") ("contract" ,(link "PlotOptions")))) (link "Plot")]{
+                                          `("options" ("type" "normal") ("contract" ,(in-link "PlotOptions")))) (in-link "Plot")]{
     A graph of a function of one variable.
 
     @member-spec["f" #:type "normal" #:contract (a-arrow N N)]{
@@ -79,11 +79,11 @@
       it can yield an error for some @pyret{x} (such as division by zero
       or resulting in an imaginary number).
     }
-    @member-spec["options" #:type "normal" #:contract (link "PlotOptions")]
+    @member-spec["options" #:type "normal" #:contract (in-link "PlotOptions")]
   }
 
   @constructor-doc["Plot" "line-plot" `(("points" ("type" "normal") ("contract" ,TA))
-                                        ("options" ("type" "normal") ("contract" ,(link "PlotOptions")))) (link "Plot")]{
+                                        ("options" ("type" "normal") ("contract" ,(in-link "PlotOptions")))) (in-link "Plot")]{
     A line plot or line chart, used to display "information as a series of data points called `markers'
     connected by straight line segments." (see @url["https://en.wikipedia.org/wiki/Line_chart"])
 
@@ -93,11 +93,11 @@
       Because two consecutive data points will be connected by a line segment as they are,
       the rows of the table should have been sorted by the x-value.
     }
-    @member-spec["options" #:type "normal" #:contract (link "PlotOptions")]
+    @member-spec["options" #:type "normal" #:contract (in-link "PlotOptions")]
   }
 
   @constructor-doc["Plot" "scatter-plot" `(("points" ("type" "normal") ("contract" ,TA))
-                                           ("options" ("type" "normal") ("contract" ,(link "PlotOptions")))) (link "Plot")]{
+                                           ("options" ("type" "normal") ("contract" ,(in-link "PlotOptions")))) (in-link "Plot")]{
     A scatter plot or scatter chart, used "to display values for two variables for a set of data."
     (see @url["https://en.wikipedia.org/wiki/Scatter_plot"])
 
@@ -105,7 +105,7 @@
       A table of two columns: @t-field["x" N] and @t-field["y" N].
       The order of rows in this table does not matter.
     }
-    @member-spec["options" #:type "normal" #:contract (link "PlotOptions")]
+    @member-spec["options" #:type "normal" #:contract (in-link "PlotOptions")]
   }
   }
 
@@ -137,15 +137,15 @@
   causing from, for example, discontinuity of the function, or a function which oscillates infinitely.
 
   @function["display-multi-plot"
-    #:contract (a-arrow (L-of (link "Plot"))
-                        (link "PlotWindowOptions")
+    #:contract (a-arrow (L-of (in-link "Plot"))
+                        (in-link "PlotWindowOptions")
                         Image)
     #:args '(("lst" #f) ("options" #f))
     #:return Image
   ]{
 
   Display all @pyret-id{Plot}s in @pyret{lst} on a window with the configuration
-  from @pyret{options} and with the title @pyret{title}.
+  from @pyret{options}.
 
   @examples{
   import image-structs as I
@@ -177,8 +177,8 @@
     #:args '(("title" #f) ("f" #f))
     #:return Image
   ]{
-  A shorthand to construct an @link{function-plot} with default options and then
-  display it. See @link{function-plot} for more information.
+  A shorthand to construct an @in-link{function-plot} with default options and then
+  display it. See @in-link{function-plot} for more information.
 
   @examples{
   NUM_E = ~2.71828
@@ -191,8 +191,8 @@
     #:args '(("title" #f) ("tab" #f))
     #:return Image
   ]{
-  A shorthand to construct a @link{line-plot} with default options and then
-  display it. See @link{line-plot} for more information.
+  A shorthand to construct a @in-link{line-plot} with default options and then
+  display it. See @in-link{line-plot} for more information.
 
   @examples{
   display-line('My line', table: x, y
@@ -210,8 +210,8 @@
     #:args '(("title" #f) ("tab" #f))
     #:return Image
   ]{
-  A shorthand to construct a @link{scatter-plot} with default options and then
-  display it. See @link{scatter-plot} for more information.
+  A shorthand to construct a @in-link{scatter-plot} with default options and then
+  display it. See @in-link{scatter-plot} for more information.
 
   @examples{
   display-scatter('My scatter plot', table: x, y
@@ -229,7 +229,7 @@
   @section{Visualization Functions}
 
   @function["histogram"
-    #:contract (a-arrow TA N (link "PlotWindowOptions") Image)
+    #:contract (a-arrow TA N (in-link "PlotWindowOptions") Image)
     #:args '(("tab" #f) ("n" #f) ("options" #f))
     #:return Image
   ]{
@@ -252,7 +252,7 @@
   }
 
   @function["pie-chart"
-    #:contract (a-arrow TA (link "PlotWindowOptions") Image)
+    #:contract (a-arrow TA (in-link "PlotWindowOptions") Image)
     #:args '(("tab" #f) ("options" #f))
     #:return Image
   ]{
@@ -270,7 +270,7 @@
   }
 
   @function["bar-chart"
-    #:contract (a-arrow TA S (link "PlotWindowOptions") Image)
+    #:contract (a-arrow TA S (in-link "PlotWindowOptions") Image)
     #:args '(("tab" #f) ("options" #f))
     #:return Image
   ]{
@@ -291,7 +291,7 @@
   }
 
   @function["grouped-bar-chart"
-    #:contract (a-arrow TA (L-of S) (link "PlotWindowOptions") Image)
+    #:contract (a-arrow TA (L-of S) (in-link "PlotWindowOptions") Image)
     #:args '(("tab" #f) ("legends" #f) ("options" #f))
     #:return Image
   ]{
@@ -387,7 +387,7 @@
   and old values will be overwritten.
 
   @pyret{num-samples} is to control the number of sample points for
-  @link{function-plot}s.
+  @in-link{function-plot}s.
 
   @pyret{title} is displayed at the top of the plot window.
 

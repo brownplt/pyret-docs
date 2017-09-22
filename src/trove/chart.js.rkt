@@ -1,0 +1,649 @@
+#lang scribble/manual
+@(require "../../scribble-api.rkt" "../abbrevs.rkt")
+@(require (only-in scribble/core delayed-block))
+
+@(define (in-link T) (a-id T (xref "chart" T)))
+@(define (in-image f) (image (string-append "src/trove/chart-images/" f ".png") #:scale 0.3))
+@(define Self A)
+@(define Color (a-id "Color" (xref "image-structs" "Color")))
+@(define Image (a-id "Image" (xref "image" "Image")))
+@(define DataSeries (in-link "DataSeries"))
+@(define ChartWindow (in-link "ChartWindow"))
+@(define opaque '(("<opaque>" ("type" "normal") ("contract" #f))))
+@(define (method variant name)
+  (method-doc "DataSeries" variant name))
+
+@(define color-meth
+  `(method-spec
+    (name "color")
+    (arity 2)
+    (params ())
+    (args ("self" "color"))
+    (return ,DataSeries)
+    (contract
+      (a-arrow
+        ,Self
+        ,Color
+        ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new " ,Color ". By default, "
+          "the color will be auto-generated."))))
+@(define legend-meth
+  `(method-spec
+    (name "legend")
+    (arity 2)
+    (params ())
+    (args ("self" "legend"))
+    (return ,DataSeries)
+    (contract
+      (a-arrow
+        ,Self
+        ,S
+        ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new legend. By default, "
+          "the legend will be auto-generated in the form `Plot <number>'"))))
+
+@(define point-size-meth
+  `(method-spec
+    (name "point-size")
+    (arity 2)
+    (params ())
+    (args ("self" "point-size"))
+    (return ,DataSeries)
+    (contract
+      (a-arrow
+        ,Self
+        ,N
+        ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new point size. By default, "
+          "the point size is 7"))))
+
+@(define bin-width-meth
+  `(method-spec
+    (name "bin-width")
+    (arity 2)
+    (params ())
+    (args ("self" "bin-width"))
+    (return ,DataSeries)
+    (contract
+      (a-arrow
+        ,Self
+        ,N
+        ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new bin width. By default, "
+          "the bin width will be inferred"))))
+
+@(define max-num-bins-meth
+  `(method-spec
+    (name "max-num-bins")
+    (arity 2)
+    (params ())
+    (args ("self" "max-num-bins"))
+    (return ,DataSeries)
+    (contract
+      (a-arrow
+        ,Self
+        ,N
+        ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new maximum number of "
+          "allowed bins. By default, the number will be inferred"))))
+
+@(define min-num-bins-meth
+  `(method-spec
+    (name "min-num-bins")
+    (arity 2)
+    (params ())
+    (args ("self" "min-num-bins"))
+    (return ,DataSeries)
+    (contract
+      (a-arrow
+        ,Self
+        ,N
+        ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new minimum number of "
+          "allowed bins. By default, the number will be inferred"))))
+
+@(define num-bins-meth
+  `(method-spec
+    (name "num-bins")
+    (arity 2)
+    (params ())
+    (args ("self" "num-bins"))
+    (return ,DataSeries)
+    (contract
+      (a-arrow
+        ,Self
+        ,N
+        ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new number of bins. "
+          "By default, the number will be inferred"))))
+
+@(append-gen-docs
+  `(module "chart"
+    (path "src/arr/trove/chart.arr")
+
+    (fun-spec (name "from-list.function-plot") (arity 1))
+    (fun-spec (name "from-list.line-plot") (arity 1))
+    (fun-spec (name "from-list.scatter-plot") (arity 1))
+    (fun-spec (name "from-list.labeled-scatter-plot") (arity 1))
+    (fun-spec (name "from-list.bar-chart") (arity 2))
+    (fun-spec (name "from-list.grouped-bar-chart") (arity 3))
+    (fun-spec (name "from-list.freq-bar-chart") (arity 1))
+    (fun-spec (name "from-list.pie-chart") (arity 2))
+    (fun-spec (name "from-list.exploding-pie-chart") (arity 3))
+    (fun-spec (name "from-list.histogram") (arity 2))
+    (fun-spec (name "from-list.labeled-histogram") (arity 3))
+    (fun-spec (name "render-chart") (arity 1))
+    (fun-spec (name "render-charts") (arity 1))
+    (constr-spec
+      (name "function-plot-series")
+      (with-members (,color-meth ,legend-meth)))
+    (constr-spec
+      (name "line-plot-series")
+      (with-members (,color-meth ,legend-meth)))
+    (constr-spec
+      (name "scatter-plot-series")
+      (with-members (,color-meth ,legend-meth ,point-size-meth)))
+    (constr-spec
+      (name "bar-chart-series")
+      (with-members ()))
+    (constr-spec
+      (name "pie-chart-series")
+      (with-members ()))
+    (constr-spec
+      (name "histogram-series")
+      (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
+                     ,num-bins-meth)))
+  ))
+
+@docmodule["chart"]{
+  The Pyret Chart library. It consists of chart, plot, and data visualization tools,
+  using @link["https://developers.google.com/chart/" "Google Charts"] as a backend.
+
+  This documentation assumes that you @pyret{include} the chart library,
+  and has imported @pyret{image-structs} as @pyret{I} (@pyret{import image-structs as I}).
+
+  @;############################################################################
+  @section{Creating a DataSeries}
+
+  Given data, before you visualize them as a chart, you need to choose what @emph{type}
+  of chart do you want. For example, you could either choose to visualize the data as
+  a bar chart or as a pie chart.
+
+  The data along with the type of chart and chart-specific configuration is
+  called a @|DataSeries|. As an example,
+  you might have data about English native speakers in several countries and would like
+  to visualize them using bar chart. The data could be represented by a list of
+  strings (country names) and a list of numbers (number of English native speakers) as follows:
+
+  @pyret-block{
+countries =    [list: "US",      "India",   "Pakistan", "Philippines", "Nigeria"]
+num-speakers = [list: 251388301, 125344736, 110041604,  89800800,      79000000]
+  }
+
+  Then, you can use a @emph{chart constructor} -- here, the bar chart constructor
+  @pyret{from-list.bar-chart} -- to create a @|DataSeries|:
+
+  @pyret-block{
+a-pie-chart-series = from-list.bar-chart(countries, num-speakers)
+  }
+
+  As another example, say we have a function in Pyret @pyret{fun f(x): num-sin(2 * x) end}.
+  We can use the chart constructor @pyret{from-list.function-plot} to create a
+  @|DataSeries|. Furthermore, we can specify the color of the function by using
+  the method @pyret{color} on the @|DataSeries| to obtain a new @|DataSeries|
+  with the desired color.
+
+  @pyret-block{
+import image-structs as I
+
+fun f(x): num-sin(2 * x) end
+intermediate-series = from-list.function-plot(f)
+a-series = intermediate-series.color(I.purple)
+  }
+
+  If you prefer, you can chain methods to avoid naming the intermediate series:
+
+  @pyret-block{
+a-series = from-list.function-plot(f)
+  .color(I.purple)
+  }
+
+  @margin-note{We plan that the chart library should support the @pyret-id["Table" "tables"] inferface too.
+  Hence, each chart constructor will be provided under both @pyret{from-list}
+  and @pyret{from-table} object. However, currently only the list forms (@pyret{from-list})
+  are supported.}
+
+  @;############################################################################
+  @section{Creating a ChartWindow}
+
+  Given a @|DataSeries|, we can render the chart on a window using
+  the function @in-link{render-chart}. The function constructs a @in-link{ChartWindow}.
+  From the example in the previous section:
+
+  @pyret-block{
+include chart
+import image-structs as I
+
+fun f(x): num-sin(2 * x) end
+a-series = from-list.function-plot(f)
+  .color(I.purple)
+a-chart-window = render-chart(a-series)
+  }
+
+  Then, you can use the method @in-link{display} to open up an interactive
+  visualization dialog. The method returns an @pyret-id["Image" "image"] of
+  the chart.
+
+  @pyret-block{
+a-chart-window.display()
+  }
+
+  The interactive dialog's display looks like:
+
+  @(in-image "dialog")
+
+  Or, if you wish to only obtain the @pyret-id["Image" "image"] of the chart,
+  you can use the method @in-link{get-image} directly.
+
+  @pyret-block{
+an-image = a-chart-window.get-image()
+  }
+
+  Like @|DataSeries|, a @in-link{ChartWindow} can be additionally configured.
+  As an example, all charts should have title and should have axes labeled.
+  Instead of calling @in-link{display} immediately after constructing @pyret{a-chart-window},
+  we can do the following:
+
+  @pyret-block{
+    a-chart-window
+      .title("a sine function plot")
+      .x-axis("this is x-axis")
+      .y-axis("this is y-axis")
+      .display()
+  }
+
+  The chart now has a title, and axes are labeled.
+
+  @(in-image "window-config")
+
+  @;############################################################################
+  @section{Chart Constructors for List Interface}
+
+  @function["from-list.function-plot"
+    #:contract (a-arrow (a-arrow N N) DataSeries)
+    #:args '(("f" #f))
+    #:return (a-pred DataSeries (in-link "function-plot-series"))
+  ]{
+
+    Constructing a function plot series from @pyret{f}. See more details a
+    @(in-link "function-plot-series").
+
+    @examples{
+NUM_E = ~2.71828
+f-series = from-list.function-plot(lam(x): 1 - num-expt(NUM_E, 0 - x) end)
+    }
+  }
+
+  @function["from-list.line-plot"
+    #:contract (a-arrow (L-of N) (L-of N) DataSeries)
+    #:args '(("xs" #f) ("ys" #f))
+    #:return (a-pred DataSeries (in-link "line-plot-series"))
+  ]{
+
+    Constructing a line plot series from @pyret{xs} and @pyret{ys}, representing x and y
+    coordinates of points. See more details at @(in-link "line-plot-series").
+
+    @examples{
+a-series = from-list.line-plot(
+  [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
+  [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
+    }
+  }
+
+  @function["from-list.scatter-plot"
+    #:contract (a-arrow (L-of N) (L-of N) DataSeries)
+    #:args '(("xs" #f) ("ys" #f))
+    #:return (a-pred DataSeries (in-link "scatter-plot-series"))
+  ]{
+
+    Constructing a scatter plot series from @pyret{xs} and @pyret{ys}, representing x and y
+    coordinates of points. See more details at @(in-link "scatter-plot-series").
+
+    @examples{
+a-series = from-list.scatter-plot(
+  [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
+  [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
+    }
+  }
+
+  @function["from-list.labeled-scatter-plot"
+    #:contract (a-arrow (L-of N) (L-of N) (L-of S) DataSeries)
+    #:args '(("labels" #f) ("xs" #f) ("ys" #f))
+    #:return (a-pred DataSeries (in-link "scatter-plot-series"))
+  ]{
+
+    Constructing a scatter plot series from @pyret{xs} and @pyret{ys}, representing x and y
+    coordinates of points, and @pyret{labels} whose element representing a label for each point.
+    See more details at @(in-link "scatter-plot-series").
+
+    @examples{
+a-series = from-list.labeled-scatter-plot(
+  [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+  [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
+  [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
+    }
+  }
+
+  @function["from-list.bar-chart"
+    #:contract (a-arrow (L-of S) (L-of N) DataSeries)
+    #:args '(("labels" #f) ("values" #f))
+    #:return (a-pred DataSeries (in-link "bar-chart-series"))
+  ]{
+
+    Constructing a bar chart series from @pyret{labels} and @pyret{values},
+    representing the label and value of bars. See more details at
+    @(in-link "bar-chart-series").
+
+    @examples{
+a-series = from-list.bar-chart(
+  [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
+  [list: 10,       6,       1,   3,     5,       8,        9])
+# This data is obtained by randomization. They have no meaning whatsoever.
+# (though we did run a few trials so that the result doesn't look egregious)
+    }
+  }
+
+  @function["from-list.grouped-bar-chart"
+    #:contract (a-arrow (L-of S) (L-of (L-of N)) (L-of S) DataSeries)
+    #:args '(("labels" #f) ("value-lists" #f) ("legends" #f))
+    #:return (a-pred DataSeries (in-link "bar-chart-series"))
+  ]{
+
+    Constructing a bar chart series. A @pyret{value-list} in @pyret{value-lists} is
+    a list of numbers, representing bars in a label but with different legends. The length
+    of @pyret{value-lists} must match the length of @pyret{labels}, and the length of each
+    @pyret{value-list} must match the length of @pyret{legends}. See more details at
+    @(in-link "bar-chart-series").
+
+    @examples{
+a-series = from-list.grouped-bar-chart(
+  [list: 'CA', 'TX', 'NY', 'FL', 'IL', 'PA'],
+  [list:
+    [list: 2704659,4499890,2159981,3853788,10604510,8819342,4114496],
+    [list: 2027307,3277946,1420518,2454721,7017731,5656528,2472223],
+    [list: 1208495,2141490,1058031,1999120,5355235,5120254,2607672],
+    [list: 1140516,1938695,925060,1607297,4782119,4746856,3187797],
+    [list: 894368,1558919,725973,1311479,3596343,3239173,1575308],
+    [list: 737462,1345341,679201,1203944,3157759,3414001,1910571]],
+  [list:
+    'Under 5 Years',
+    '5 to 13 Years',
+    '14 to 17 Years',
+    '18 to 24 Years',
+    '25 to 44 Years',
+    '45 to 64 Years',
+    '65 Years and Over'])
+    }
+  }
+
+  @function["from-list.freq-bar-chart"
+    #:contract (a-arrow (L-of S) DataSeries)
+    #:args '(("values" #f))
+    #:return (a-pred DataSeries (in-link "bar-chart-series"))
+  ]{
+    Constructing a bar chart series based on the frequencies of elements in
+    @pyret{values}. See more details at @(in-link "bar-chart-series").
+
+    @examples{
+a-series = from-list.freq-bar-chart(
+  [list: "Pyret", "OCaml", "Pyret", "Java", " Pyret", "Racket", "Coq", "Coq"])
+    }
+  }
+
+  @function["from-list.pie-chart"
+    #:contract (a-arrow (L-of S) (L-of N) DataSeries)
+    #:args '(("labels" #f) ("values" #f))
+    #:return (a-pred DataSeries (in-link "pie-chart-series"))
+  ]{
+    Constructing a pie chart series from @pyret{labels} and @pyret{values},
+    representing the label and value of slices. See more details at
+    @(in-link "pie-chart-series").
+
+    @examples{
+a-series = from-list.pie-chart(
+  [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
+  [list: 10,       6,       1,   3,     5,       8,        9])
+    }
+  }
+
+  @function["from-list.exploding-pie-chart"
+    #:contract (a-arrow (L-of S) (L-of N) (L-of N) DataSeries)
+    #:args '(("labels" #f) ("values" #f) ("offsets" #f))
+    #:return (a-pred DataSeries (in-link "pie-chart-series"))
+  ]{
+    Constructing a pie chart series from @pyret{labels} and @pyret{values},
+    representing the label and value of slices. @pyret{offsets}
+    indicates the offset from the center of the chart for each slice. Each offset
+    must be in range 0 and 1. See more details at @(in-link "pie-chart-series").
+
+    @examples{
+a-series = from-list.exploding-pie-chart(
+  [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
+  [list: 10,       6,       1,   3,     5,       8,        9],
+  [list: 0.2,      0,       0,   0,     0,       0.1,      0])
+    }
+  }
+
+  @function["from-list.histogram"
+    #:contract (a-arrow (L-of N) DataSeries)
+    #:args '(("values" #f))
+    #:return (a-pred DataSeries (in-link "histogram-series"))
+  ]{
+    Constructing a histogram series, grouping @pyret{values} into bins.
+    See more details at @(in-link "histogram-series").
+
+    @examples{
+a-series = from-list.labeled-histogram(range(1, 100).map(lam(_): num-random(1000) end))
+    }
+  }
+
+  @function["from-list.labeled-histogram"
+    #:contract (a-arrow (L-of S) (L-of N) DataSeries)
+    #:args '(("labels" #f) ("values" #f))
+    #:return (a-pred DataSeries (in-link "histogram-series"))
+  ]{
+    Constructing a histogram series, grouping @pyret{values} into bins.
+    Each element of @pyret{labels} is attached to the corresponding value in
+    the bin. See more details at @(in-link "histogram-series").
+
+    @examples{
+a-series = from-list.labeled-histogram(
+  range(1, 100).map(lam(x): "foo " + num-to-string(x) end),
+  range(1, 100).map(lam(_): num-random(1000) end))
+    }
+  }
+
+  @;############################################################################
+  @section{DataSeries}
+
+  @data-spec2["DataSeries" (list) (list
+  @constructor-spec["DataSeries" "function-plot-series" opaque]
+  @constructor-spec["DataSeries" "line-plot-series" opaque]
+  @constructor-spec["DataSeries" "scatter-plot-series" opaque]
+  @constructor-spec["DataSeries" "bar-chart-series" opaque]
+  @constructor-spec["DataSeries" "pie-chart-series" opaque]
+  @constructor-spec["DataSeries" "histogram-series" opaque]
+  )]
+
+  @;################################
+  @subsection{Function Plot Series}
+
+  @constructor-doc["DataSeries" "function-plot-series" opaque DataSeries]{
+    A function plot series. When it is rendered, the function will be sampled
+    on different x values. The library intentionally does @emph{not} draw lines
+    between sample points because it is possible that the function will be
+    discontinuous, and drawing lines between sample points would mislead users
+    that the function is continuous (for example, the stepping function
+    @pyret{num-floor} should not have vertical lines in each step). Instead,
+    we let users increase sample sizes, allowing the function to be rendered
+    more accurately.
+  }
+
+  @method["function-plot-series" "color"]
+  @method["function-plot-series" "legend"]
+
+  @examples{
+NUM_E = ~2.71828
+f-series = from-list.function-plot(lam(x): 1 - num-expt(NUM_E, 0 - x) end)
+  .color(I.orange)
+  .legend("My legend")
+render-chart(f-series).display()
+  }
+  @(in-image "function-plot")
+
+  @;################################
+  @subsection{Line Plot Series}
+
+  @constructor-doc["DataSeries" "line-plot-series" opaque DataSeries]{
+    A line plot series
+  }
+
+  @method["line-plot-series" "color"]
+  @method["line-plot-series" "legend"]
+
+  @examples{
+a-series = from-list.line-plot(
+  [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
+  [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
+  .color(I.orange)
+  .legend("My legend")
+render-chart(a-series).display()
+  }
+  @(in-image "line-plot")
+
+  @;################################
+  @subsection{Scatter Plot Series}
+
+  @constructor-doc["DataSeries" "scatter-plot-series" opaque DataSeries]{
+    A scatter plot series. If a data point has a label, then hovering over the
+    point in the interactive dialog will show the label.
+  }
+
+  @method["scatter-plot-series" "color"]
+  @method["scatter-plot-series" "legend"]
+  @method["scatter-plot-series" "point-size"]
+
+  @examples{
+a-series = from-list.labeled-scatter-plot(
+  [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+  [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
+  [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
+  .color(I.orange)
+  .legend("My legend")
+render-chart(a-series).display()
+  }
+  @(in-image "scatter-plot")
+
+  @;################################
+  @subsection{Bar Chart Series}
+
+  @constructor-doc["DataSeries" "bar-chart-series" opaque DataSeries]{
+    A bar chart series. In a label, there could be several bars.
+  }
+
+  @examples{
+a-series = from-list.grouped-bar-chart(
+  [list: 'CA', 'TX', 'NY', 'FL', 'IL', 'PA'],
+  [list:
+    [list: 2704659,4499890,2159981,3853788,10604510,8819342,4114496],
+    [list: 2027307,3277946,1420518,2454721,7017731,5656528,2472223],
+    [list: 1208495,2141490,1058031,1999120,5355235,5120254,2607672],
+    [list: 1140516,1938695,925060,1607297,4782119,4746856,3187797],
+    [list: 894368,1558919,725973,1311479,3596343,3239173,1575308],
+    [list: 737462,1345341,679201,1203944,3157759,3414001,1910571]],
+  [list:
+    'Under 5 Years',
+    '5 to 13 Years',
+    '14 to 17 Years',
+    '18 to 24 Years',
+    '25 to 44 Years',
+    '45 to 64 Years',
+    '65 Years and Over'])
+render-chart(a-series).display()
+  }
+  @(in-image "grouped-bar-chart")
+
+  @;################################
+  @subsection{Pie Chart Series}
+
+  @constructor-doc["DataSeries" "pie-chart-series" opaque DataSeries]{
+    A pie chart series. Each slice could be offset from the center.
+  }
+
+  @examples{
+a-series = from-list.exploding-pie-chart(
+  [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
+  [list: 10,       6,       1,   3,     5,       8,        9]
+  [list: 0.2,      0,       0,   0,     0,       0.1,      0])
+render-chart(a-series).display()
+  }
+  @(in-image "exploding-pie-chart")
+
+
+  @;################################
+  @subsection{Histogram Series}
+
+  @constructor-doc["DataSeries" "histogram-series" opaque DataSeries]{
+    A histogram series.
+  }
+
+  @method["histogram-series" "bin-width"]
+  @method["histogram-series" "max-num-bins"]
+  @method["histogram-series" "min-num-bins"]
+  @method["histogram-series" "num-bins"]
+
+  @examples{
+a-series = from-list.labeled-histogram(
+  range(1, 100).map(lam(x): "foo " + num-to-string(x) end),
+  range(1, 100).map(lam(_): num-random(1000) end))
+render-chart(a-series).display()
+  }
+  @(in-image "labeled-histogram")
+
+  @;############################################################################
+  @section{Renderers}
+
+  @function["render-chart"
+    #:contract (a-arrow DataSeries ChartWindow)
+    #:args '(("series" #f))
+    #:return ChartWindow
+  ]{
+    Constructing a chart window from one @|DataSeries|.
+
+    @examples{
+a-series = from-list.function-plot(lam(x): x * x end)
+a-chart-window = render-chart(a-series)
+    }
+  }
+
+  @function["render-charts"
+    #:contract (a-arrow (L-of DataSeries) ChartWindow)
+    #:args '(("lst" #f))
+    #:return ChartWindow
+  ]{
+    Constructing a chart window from several @|DataSeries| and draw them together
+    in the same window. All @|DataSeries| in @pyret{lst} must be either
+    a @in-link{function-plot-series}, @in-link{line-plot-series}, or
+    @in-link{scatter-plot-series}.
+
+    @examples{
+series-1 = from-list.function-plot(lam(x): x end)
+series-2 = from-list.scatter-plot(
+  [list: 1, 2, 3,  4.1, 4.1, 4.5],
+  [list: 2, 1, 3.5, 3.9, 3.8, 4.9])
+a-chart-window = render-charts([list: series-1, series-2])
+    }
+
+    @(in-image "render-charts")
+  }
+}
