@@ -33,7 +33,7 @@
          py-prod
          prod-link
          prod-ref
-  
+
          docmodule
          function
          value
@@ -337,8 +337,8 @@
     (list (title #:version #f #:tag (tag-name name) (or friendly-title name))
           (if noimport ""
                        (list (para "Usage:")
-                             (nested #:style (pre-style "code") "include " name)
-                             (nested #:style (pre-style "code") "import " name " as ...")))
+                             (para (pyret "include " name))
+                             (para (pyret "import " name " as ..."))))
           defs))
 
 @(define (lod . assocLst)
@@ -429,8 +429,8 @@
     (define name (first m))
     (define type (cdr (assoc "type" (rest m))))
     (define contract (cdr (assoc "contract" (rest m))))
-    (define modifier (if (equal? type "mutable") "mutable " ""))
-    (if contract (tt modifier name " :: " contract) (tt modifier name))) members))
+    (define modifier (if (equal? type "ref") "ref " ""))
+    (if (car contract) (tt modifier name " :: " contract) (tt modifier name))) members))
   (define name (seclink (xref processing-module variant-name) (tt variant-name)))
   (list (dt-indent (tt "| " name "(" (add-between args ", ") ")"))))
 
@@ -499,7 +499,7 @@
    (let* ([members (get-defn-field 'members (curr-var-spec))]
           [member (if (list? members) (assoc name members) #f)]
           [contract (or contract-in (interp (get-defn-field 'contract member)))]
-          [modifier (if (equal? type-in "mutable") "mutable " "")])
+          [modifier (if (equal? type-in "ref") "ref " "")])
      (list (dt (if contract (tt modifier name " :: " contract) (tt modifier name)))
            (dd body))))
 
@@ -632,7 +632,7 @@
 @(define (render-singleline-args names types)
   (define args
    (map (lambda (name type)
-          (cond [(and name type)
+          (cond [(and name type (or (not (list? type)) (car type)))
                  (list (tt name " :: " type))]
                 [else (list (tt name))]))
         names types))
