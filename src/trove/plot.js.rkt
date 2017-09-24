@@ -32,11 +32,10 @@
   ))
 
 @docmodule["plot"]{
-  @margin-note{Note that the plot library is being completely rewritten
-  to use Google Charts, which would allow us to support more features and more
-  types of charts easily. The interface therefore will be changed.
-  The current plot library will still be here for a period of time for those who
-  still use it, but we do not plan to support it further.}
+  @margin-note{Note that the plot library has been completely rewritten as the @secref["chart"]
+  library to use Google Charts, which would allow us to support more features and more
+  types of charts easily. The current plot library will still be here for a period of time for those who
+  still use it, but we will not support it further.}
 
   The Pyret Plot library. It consists of plot, chart, and data visualization tools.
   The visualization will appear in a separate dialog window, and/or be returned

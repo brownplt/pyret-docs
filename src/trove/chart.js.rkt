@@ -3,7 +3,7 @@
 @(require (only-in scribble/core delayed-block))
 
 @(define (in-link T) (a-id T (xref "chart" T)))
-@(define (in-image f) (image (string-append "src/trove/chart-images/" f ".png") #:scale 0.3))
+@(define (in-image f) (image (string-append "src/trove/chart-images/" f ".png") #:scale 0.4))
 @(define Self A)
 @(define Color (a-id "Color" (xref "image-structs" "Color")))
 @(define Image (a-id "Image" (xref "image" "Image")))
@@ -377,6 +377,19 @@ an-image = a-chart-window.get-image()
   The chart now has a title, and axes are labeled.
 
   @(in-image "window-config")
+
+  @;############################################################################
+  @subsection{Interactive Dialog}
+
+  To close the dialog, you can either click the close button on the top left
+  corner, or press esc.
+
+  In addition to being able to obtain the chart as a Pyret @|Image|, you can
+  also save the chart image as a png file from the interactive dialog by
+  clicking the save button which is next to the close button.
+
+  For some kind of charts, like function plot which you have seen above, there
+  will be a controller panel for you to adjust options interactively.
 
   @;############################################################################
   @section{Chart Constructors for List Interface}
