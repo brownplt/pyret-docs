@@ -10,7 +10,7 @@
 @(define DataSeries (in-link "DataSeries"))
 @(define ChartWindow (in-link "ChartWindow"))
 @(define opaque '(("<opaque>" ("type" "normal") ("contract" #f))))
-@(define (method variant name)
+@(define (method-data-series variant name)
   (method-doc "DataSeries" variant name))
 
 @(define color-meth
@@ -20,11 +20,7 @@
     (params ())
     (args ("self" "color"))
     (return ,DataSeries)
-    (contract
-      (a-arrow
-        ,Self
-        ,Color
-        ,DataSeries))
+    (contract (a-arrow ,Self ,Color ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with a new " ,Color ". By default, "
           "the color will be auto-generated."))))
 @(define legend-meth
@@ -34,13 +30,9 @@
     (params ())
     (args ("self" "legend"))
     (return ,DataSeries)
-    (contract
-      (a-arrow
-        ,Self
-        ,S
-        ,DataSeries))
+    (contract (a-arrow ,Self ,S ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with a new legend. By default, "
-          "the legend will be auto-generated in the form `Plot <number>'"))))
+          "the legend will be auto-generated in the form `Plot <number>'."))))
 
 @(define point-size-meth
   `(method-spec
@@ -49,13 +41,9 @@
     (params ())
     (args ("self" "point-size"))
     (return ,DataSeries)
-    (contract
-      (a-arrow
-        ,Self
-        ,N
-        ,DataSeries))
+    (contract (a-arrow ,Self ,N ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with a new point size. By default, "
-          "the point size is 7"))))
+          "the point size is 7."))))
 
 @(define bin-width-meth
   `(method-spec
@@ -64,13 +52,9 @@
     (params ())
     (args ("self" "bin-width"))
     (return ,DataSeries)
-    (contract
-      (a-arrow
-        ,Self
-        ,N
-        ,DataSeries))
+    (contract (a-arrow ,Self ,N ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with a new bin width. By default, "
-          "the bin width will be inferred"))))
+          "the bin width will be inferred."))))
 
 @(define max-num-bins-meth
   `(method-spec
@@ -79,13 +63,9 @@
     (params ())
     (args ("self" "max-num-bins"))
     (return ,DataSeries)
-    (contract
-      (a-arrow
-        ,Self
-        ,N
-        ,DataSeries))
+    (contract (a-arrow ,Self ,N ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with a new maximum number of "
-          "allowed bins. By default, the number will be inferred"))))
+          "allowed bins. By default, the number will be inferred."))))
 
 @(define min-num-bins-meth
   `(method-spec
@@ -94,13 +74,9 @@
     (params ())
     (args ("self" "min-num-bins"))
     (return ,DataSeries)
-    (contract
-      (a-arrow
-        ,Self
-        ,N
-        ,DataSeries))
+    (contract (a-arrow ,Self ,N ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with a new minimum number of "
-          "allowed bins. By default, the number will be inferred"))))
+          "allowed bins. By default, the number will be inferred."))))
 
 @(define num-bins-meth
   `(method-spec
@@ -109,13 +85,87 @@
     (params ())
     (args ("self" "num-bins"))
     (return ,DataSeries)
-    (contract
-      (a-arrow
-        ,Self
-        ,N
-        ,DataSeries))
+    (contract (a-arrow ,Self ,N ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with a new number of bins. "
-          "By default, the number will be inferred"))))
+          "By default, the number will be inferred."))))
+
+@(define x-axis-meth
+  `(method-spec
+    (name "x-axis")
+    (arity 2)
+    (params ())
+    (args ("self" "x-axis"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,S ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new x-axis label. "
+          "By default, the label is empty."))))
+
+@(define y-axis-meth
+  `(method-spec
+    (name "y-axis")
+    (arity 2)
+    (params ())
+    (args ("self" "y-axis"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,S ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new y-axis label. "
+          "By default, the label is empty."))))
+
+@(define x-min-meth
+  `(method-spec
+    (name "x-min")
+    (arity 2)
+    (params ())
+    (args ("self" "x-min"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "x-min is changed. By default, the value will be inferred."))))
+
+@(define x-max-meth
+  `(method-spec
+    (name "x-max")
+    (arity 2)
+    (params ())
+    (args ("self" "x-max"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "x-max is changed. By default, the value will be inferred."))))
+
+@(define y-min-meth
+  `(method-spec
+    (name "y-min")
+    (arity 2)
+    (params ())
+    (args ("self" "y-min"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "y-min is changed. By default, the value will be inferred."))))
+
+@(define y-max-meth
+  `(method-spec
+    (name "y-max")
+    (arity 2)
+    (params ())
+    (args ("self" "y-max"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "y-max is changed. By default, the value will be inferred."))))
+
+@(define num-samples-meth
+  `(method-spec
+    (name "num-samples")
+    (arity 2)
+    (params ())
+    (args ("self" "num-samples"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new number of samples "
+          "configuration to be used when rendering all "
+          ,(in-link "function-plot-series") "s in the chart."))))
 
 @(append-gen-docs
   `(module "chart"
@@ -153,6 +203,68 @@
       (name "histogram-series")
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
                      ,num-bins-meth)))
+    (data-spec
+      (name "ChartWindow")
+      (type-vars ())
+      (variants ("bar-chart-window"))
+      (shared
+        ((method-spec
+          (name "title")
+          (arity 2)
+          (params ())
+          (contract (a-arrow ,Self ,S ,ChartWindow))
+          (args ("self" "tiltle"))
+          (return ,ChartWindow)
+          (doc ("Construct a new " ,ChartWindow " with a new title. "
+                "By default, the title will empty")))
+        (method-spec
+          (name "width")
+          (arity 2)
+          (params ())
+          (contract (a-arrow ,Self ,N ,ChartWindow))
+          (args ("self" "width"))
+          (return ,ChartWindow)
+          (doc ("Construct a new " ,ChartWindow " with a new width. "
+                "By default, the width will be 800")))
+        (method-spec
+          (name "height")
+          (arity 2)
+          (params ())
+          (contract (a-arrow ,Self ,N ,ChartWindow))
+          (args ("self" "height"))
+          (return ,ChartWindow)
+          (doc ("Construct a new " ,ChartWindow " with a new height. "
+                "By default, the height will 600")))
+        (method-spec
+          (name "display")
+          (arity 1)
+          (params ())
+          (contract (a-arrow ,Self ,Image))
+          (args ("self"))
+          (return ,Image)
+          (doc ("Display the chart on an interactive dialog, "
+                "and produce an " ,Image " after the dialog is closed.")))
+        (method-spec
+          (name "get-image")
+          (arity 1)
+          (params ())
+          (contract (a-arrow ,Self ,Image))
+          (args ("self"))
+          (return ,Image)
+          (doc ("Produce an " ,Image " of the chart"))))))
+    (constr-spec
+      (name "plot-chart-window")
+      (with-members (,x-min-meth ,x-max-meth ,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth
+                     ,num-samples-meth)))
+    (constr-spec
+      (name "histogram-chart-window")
+      (with-members (,x-min-meth ,x-max-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
+    (constr-spec
+      (name "bar-chart-window")
+      (with-members (,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
+    (constr-spec
+      (name "pie-chart-window")
+      (with-members ()))
   ))
 
 @docmodule["chart"]{
@@ -230,7 +342,7 @@ a-series = from-list.function-plot(f)
 a-chart-window = render-chart(a-series)
   }
 
-  Then, you can use the method @in-link{display} to open up an interactive
+  Then, you can use the method @pyret-method["ChartWindow" "display"] to open up an interactive
   visualization dialog. The method returns an @pyret-id["Image" "image"] of
   the chart.
 
@@ -243,7 +355,7 @@ a-chart-window.display()
   @(in-image "dialog")
 
   Or, if you wish to only obtain the @pyret-id["Image" "image"] of the chart,
-  you can use the method @in-link{get-image} directly.
+  you can use the method @pyret-method["ChartWindow" "get-image"] directly.
 
   @pyret-block{
 an-image = a-chart-window.get-image()
@@ -251,7 +363,7 @@ an-image = a-chart-window.get-image()
 
   Like @|DataSeries|, a @in-link{ChartWindow} can be additionally configured.
   As an example, all charts should have title and should have axes labeled.
-  Instead of calling @in-link{display} immediately after constructing @pyret{a-chart-window},
+  Instead of calling @pyret-method["ChartWindow" "display"] immediately after constructing @pyret{a-chart-window},
   we can do the following:
 
   @pyret-block{
@@ -317,7 +429,7 @@ a-series = from-list.scatter-plot(
   }
 
   @function["from-list.labeled-scatter-plot"
-    #:contract (a-arrow (L-of N) (L-of N) (L-of S) DataSeries)
+    #:contract (a-arrow (L-of S) (L-of N) (L-of N) DataSeries)
     #:args '(("labels" #f) ("xs" #f) ("ys" #f))
     #:return (a-pred DataSeries (in-link "scatter-plot-series"))
   ]{
@@ -489,8 +601,8 @@ a-series = from-list.labeled-histogram(
     more accurately.
   }
 
-  @method["function-plot-series" "color"]
-  @method["function-plot-series" "legend"]
+  @method-doc["DataSeries" "function-plot-series" "color"]
+  @method-doc["DataSeries" "function-plot-series" "legend"]
 
   @examples{
 NUM_E = ~2.71828
@@ -508,8 +620,8 @@ render-chart(f-series).display()
     A line plot series
   }
 
-  @method["line-plot-series" "color"]
-  @method["line-plot-series" "legend"]
+  @method-doc["DataSeries" "line-plot-series" "color"]
+  @method-doc["DataSeries" "line-plot-series" "legend"]
 
   @examples{
 a-series = from-list.line-plot(
@@ -529,9 +641,9 @@ render-chart(a-series).display()
     point in the interactive dialog will show the label.
   }
 
-  @method["scatter-plot-series" "color"]
-  @method["scatter-plot-series" "legend"]
-  @method["scatter-plot-series" "point-size"]
+  @method-doc["DataSeries" "scatter-plot-series" "color"]
+  @method-doc["DataSeries" "scatter-plot-series" "legend"]
+  @method-doc["DataSeries" "scatter-plot-series" "point-size"]
 
   @examples{
 a-series = from-list.labeled-scatter-plot(
@@ -597,10 +709,10 @@ render-chart(a-series).display()
     A histogram series.
   }
 
-  @method["histogram-series" "bin-width"]
-  @method["histogram-series" "max-num-bins"]
-  @method["histogram-series" "min-num-bins"]
-  @method["histogram-series" "num-bins"]
+  @method-doc["DataSeries" "histogram-series" "bin-width"]
+  @method-doc["DataSeries" "histogram-series" "max-num-bins"]
+  @method-doc["DataSeries" "histogram-series" "min-num-bins"]
+  @method-doc["DataSeries" "histogram-series" "num-bins"]
 
   @examples{
 a-series = from-list.labeled-histogram(
@@ -619,6 +731,15 @@ render-chart(a-series).display()
     #:return ChartWindow
   ]{
     Constructing a chart window from one @|DataSeries|.
+
+    @itemlist[
+    @item{@in-link{function-plot-series} creates a @in-link{plot-chart-window}}
+    @item{@in-link{line-plot-series} creates a @in-link{plot-chart-window}}
+    @item{@in-link{scatter-plot-series} creates a @in-link{plot-chart-window}}
+    @item{@in-link{bar-chart-series} creates a @in-link{bar-chart-window}}
+    @item{@in-link{pie-chart-series} creates a @in-link{pie-chart-window}}
+    @item{@in-link{histogram-series} creates a @in-link{histogram-chart-window}}
+    ]
 
     @examples{
 a-series = from-list.function-plot(lam(x): x * x end)
@@ -646,4 +767,69 @@ a-chart-window = render-charts([list: series-1, series-2])
 
     @(in-image "render-charts")
   }
+
+  @;############################################################################
+  @section{ChartWindow}
+
+  @data-spec2["ChartWindow" (list) (list
+  @constructor-spec["ChartWindow" "pie-chart-window" opaque]
+  @constructor-spec["ChartWindow" "bar-chart-window" opaque]
+  @constructor-spec["ChartWindow" "histogram-chart-window" opaque]
+  @constructor-spec["ChartWindow" "plot-chart-window" opaque]
+  )]
+
+  @;################################
+  @subsection{Shared Methods}
+
+  @method-doc["ChartWindow" "bar-chart-window" "title"]
+  @method-doc["ChartWindow" "bar-chart-window" "width"]
+  @method-doc["ChartWindow" "bar-chart-window" "height"]
+  @method-doc["ChartWindow" "bar-chart-window" "display"]
+  @method-doc["ChartWindow" "bar-chart-window" "get-image"]
+
+  @;################################
+  @subsection{Plot Chart Window}
+
+  @constructor-doc["ChartWindow" "plot-chart-window" opaque ChartWindow]{
+    A plot chart window. For this type of chart window, when it is displayed in
+    an interactive dialog, there will be a controller panel to control @pyret{x-min},
+    @pyret{x-max}, @pyret{y-min}, @pyret{y-max}, and possibly @pyret{num-samples} (if the chart contains @in-link{function-plot-series})
+  }
+  @method-doc["ChartWindow" "plot-chart-window" "x-min"]
+  @method-doc["ChartWindow" "plot-chart-window" "x-max"]
+  @method-doc["ChartWindow" "plot-chart-window" "y-min"]
+  @method-doc["ChartWindow" "plot-chart-window" "y-max"]
+  @method-doc["ChartWindow" "plot-chart-window" "num-samples"]
+  @method-doc["ChartWindow" "plot-chart-window" "x-axis"]
+  @method-doc["ChartWindow" "plot-chart-window" "y-axis"]
+
+  @;################################
+  @subsection{Bar Chart Window}
+
+  @constructor-doc["ChartWindow" "bar-chart-window" opaque ChartWindow]{
+    A bar chart window.
+  }
+  @method-doc["ChartWindow" "bar-chart-window" "y-min"]
+  @method-doc["ChartWindow" "bar-chart-window" "y-max"]
+  @method-doc["ChartWindow" "bar-chart-window" "x-axis"]
+  @method-doc["ChartWindow" "bar-chart-window" "y-axis"]
+
+  @;################################
+  @subsection{Pie Chart Window}
+
+  @constructor-doc["ChartWindow" "pie-chart-window" opaque ChartWindow]{
+    A pie chart window.
+  }
+
+  @;################################
+  @subsection{Histogram Chart Window}
+
+  @constructor-doc["ChartWindow" "histogram-chart-window" opaque ChartWindow]{
+    A histogram chart window.
+  }
+  @method-doc["ChartWindow" "histogram-chart-window" "x-min"]
+  @method-doc["ChartWindow" "histogram-chart-window" "x-max"]
+  @method-doc["ChartWindow" "histogram-chart-window" "y-max"]
+  @method-doc["ChartWindow" "histogram-chart-window" "x-axis"]
+  @method-doc["ChartWindow" "histogram-chart-window" "y-axis"]
 }
