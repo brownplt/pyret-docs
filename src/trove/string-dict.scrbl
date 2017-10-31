@@ -246,7 +246,7 @@ frozen to produce an immutable @pyret-id{StringDict} (see above).
 
 @section{MutableStringDict Constructor}
 
-@collection-doc["mutable-string-dict" #:contract `(a-arrow ("elt" "a") ,(SD-of "a"))]
+@collection-doc["mutable-string-dict" #:contract `(a-arrow ("elt" "a") ,(MSD-of "a"))]
 
 Creates an mutable string-dict with the given @pyret{elt}s.
 
