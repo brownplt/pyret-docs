@@ -30,6 +30,11 @@
         (method-spec (name "has-key"))
         (method-spec (name "count"))
         (method-spec (name "unfreeze"))
+        (method-spec (name "merge"))
+        (method-spec (name "keys-list"))
+        (method-spec (name "map-keys"))
+        (method-spec (name "fold-keys"))
+        (method-spec (name "each-key"))
         )))
     (data-spec
       (name "MutableStringDict")
@@ -44,7 +49,13 @@
         (method-spec (name "has-key-now"))
         (method-spec (name "count-now"))
         (method-spec (name "freeze"))
-        (method-spec (name "seal")))))
+        (method-spec (name "seal"))
+        (method-spec (name "merge-now"))
+        (method-spec (name "keys-list-now"))
+        (method-spec (name "map-keys-now"))
+        (method-spec (name "fold-keys-now"))
+        (method-spec (name "each-key-now"))
+        )))
   ))
 
 @docmodule["string-dict"]{
@@ -222,6 +233,102 @@ check:
   msd1 = sd1.unfreeze()
   msd1.set-now("a", 0)
   msd1.get-value-now("a") is 0
+end
+}
+
+@sd-method["merge"
+  #:contract (a-arrow (SD-of "a") (SD-of "a") (SD-of "a"))
+  #:args (list (list "self" #f) (list "other" #f))
+  #:return (SD-of "a")
+]
+
+Returns a new immutable string-dict that has the keys of both
+the original string-dict and the @pyret{other} string-dict. Choose a key's
+value to be the one it has in the @pyret{other} string-dict, if it has one;
+otherwise it has the value from the original string-dict.
+
+@examples{
+check:
+  sd1 = [string-dict: "a", 5, "c", 4]
+  sd2 = [string-dict: "a", 10, "b", 6]
+  sd3 = sd1.merge(sd2)
+  sd3 is [string-dict: "a", 10, "b", 6, "c", 4]
+  sd4 = sd2.merge(sd1)
+  sd4 is [string-dict: "a", 5, "b", 6, "c", 4]
+  sd2.merge(sd1).merge(sd1) is sd2.merge(sd1)
+end
+}
+
+@sd-method["keys-list"
+  #:contract (a-arrow (SD-of "a") (L-of S))
+  #:args (list (list "self" #f))
+  #:return (L-of S)
+]
+
+Returns the list of keys in the immutable string-dict, in some order.
+
+@examples{
+check:
+  sd2 = [string-dict: "a", 10, "b", 6]
+  sd2.keys-list() is [list: "a", "b"]
+end
+}
+
+@sd-method["map-keys"
+  #:contract (a-arrow (SD-of "a") (a-arrow "a" "b") (L-of "b"))
+  #:args (list (list "self" #f) (list "f" #f))
+  #:return (L-of "b")
+]
+
+Applies the function @pyret{f} to each key in the immutable string-dict, and
+returns a list of the returned values in some order.
+
+@examples{
+fun one-of(ans, elts):
+  is-some(for find(elt from elts):
+    ans == elt
+  end)
+end
+
+check:
+  sd2 = [string-dict: "a", 10, "b", 6]
+  sd2.map-keys(lam(x): string-append(x, x) end) is%(one-of)
+    [list: [list: "aa", "bb"], [list: "bb", "aa"]]
+end
+}
+
+@sd-method["fold-keys"
+  #:contract (a-arrow (SD-of "a") (a-arrow S "b") "b")
+  #:args (list (list "self" #f) (list "f" #f) (list "init" #f))
+  #:return "b"
+]
+
+Returns the result of folding the function @pyret{f} across the keys in the
+immutable string-dict, in some order, starting with @pyret{init} as the base value.
+
+@examples{
+check:
+  sd2 = [string-dict: "a", 10, "b", 6]
+  sd2.fold-keys(lam(x, acc): acc + string-length(x) end, 0) is 2
+end
+}
+
+@sd-method["each-key"
+  #:contract (a-arrow (SD-of "a") (a-arrow S No) No)
+  #:args (list (list "self" #f) (list "f" #f))
+  #:return No
+]
+
+Calls the function @pyret{f} on each key in the immutable string-dict,
+returning nothing.
+
+@examples{
+var numkeys = 0
+
+check:
+  sd2 = [string-dict: "a", 10, "b", 6]
+  sd2.each-key(lam(x): numkeys := numkeys + 1 end) is nothing
+  numkeys is 2
 end
 }
 
@@ -423,4 +530,102 @@ check:
 end
 }
 
+@msd-method["merge-now"
+  #:contract (a-arrow (MSD-of "a") (MSD-of "a") No)
+  #:args (list (list "self" #f) (list "other" #f))
+  #:return No
+]
+
+Modifies the mutable string-dict to include the keys from the @pyret{other}
+mutable-string-dict. Choose a key's value to be the one it has in the @pyret{other}
+string-dict, if it has one; otherwise it keeps the value it originally had.
+Returns nothing.
+
+@examples{
+check:
+  msd1 = [mutable-string-dict: "a", 5, "c", 4]
+  msd2 = [mutable-string-dict: "a", 10, "b", 6]
+  msd1.get-value-now("a") is 5
+  msd1.get-value-now("b") raises "Key b not found"
+  msd1.get-value-now("c") is 4
+  msd1.merge-now(msd2) is nothing
+  msd1.get-value-now("a") is 10
+  msd1.get-value-now("b") is 6
+  msd1.get-value-now("c") is 4
+end
+}
+
+@msd-method["keys-list-now"
+  #:contract (a-arrow (MSD-of "a") (L-of S))
+  #:args (list (list "self" #f))
+  #:return (L-of S)
+]
+
+Returns the list of keys in the mutable string-dict, in some order.
+
+@examples{
+check:
+  msd2 = [mutable-string-dict: "a", 10, "b", 6]
+  msd2.keys-list-now() is [list: "a", "b"]
+end
+}
+
+@msd-method["map-keys-now"
+  #:contract (a-arrow (MSD-of "a") (a-arrow "a" "b") (L-of "b"))
+  #:args (list (list "self" #f) (list "f" #f))
+  #:return (L-of "b")
+]
+
+Modify the mutable string-dict so that each key is now
+associated with the result of applying
+the function @pyret{f} to its original value.
+
+@examples{
+fun one-of(ans, elts):
+  is-some(for find(elt from elts):
+    ans == elt
+  end)
+end
+
+check:
+  msd2 = [mutable-string-dict: "a", 10, "b", 6]
+  msd2.map-keys-now(lam(x): string-append(x, x) end) is%(one-of)
+    [list: [list: "aa", "bb"], [list: "bb", "aa"]]
+end
+}
+
+@msd-method["fold-keys-now"
+  #:contract (a-arrow (MSD-of "a") (a-arrow S "b") "b")
+  #:args (list (list "self" #f) (list "f" #f) (list "init" #f))
+  #:return "b"
+]
+
+Returns the result of folding the function @pyret{f} across the keys in the
+mutable string-dict, in some order, starting with @pyret{init} as the base value.
+
+@examples{
+check:
+  msd2 = [mutable-string-dict: "a", 10, "b", 6]
+  msd2.fold-keys-now(lam(x, acc): acc + string-length(x) end, 0) is 2
+end
+}
+
+@msd-method["each-key-now"
+  #:contract (a-arrow (MSD-of "a") (a-arrow S No) No)
+  #:args (list (list "self" #f) (list "f" #f))
+  #:return No
+]
+
+Calls the function @pyret{f} on each key in the mutable string-dict,
+returning nothing.
+
+@examples{
+var numkeys = 0
+
+check:
+  msd2 = [mutable-string-dict: "a", 10, "b", 6]
+  msd2.each-key-now(lam(x): numkeys := numkeys + 1 end) is nothing
+  numkeys is 2
+end
+}
 }
