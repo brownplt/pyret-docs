@@ -242,10 +242,11 @@ end
   #:return (SD-of "a")
 ]
 
-Returns a new immutable string-dict that has the keys of both
-the original string-dict and the @pyret{other} string-dict. Choose a key's
-value to be the one it has in the @pyret{other} string-dict, if it has one;
-otherwise it has the value from the original string-dict.
+Returns a new immutable string-dict that has the keys of both the original
+string-dict and the @pyret{other} string-dict. If a key in the resulting
+string-dict occurs in only one of the input string-dicts, its value is taken
+from that string-dict. If the key occurs in both input string-dicts, its value
+is taken from the @pyret{other} string-dict.
 
 @examples{
 check:
@@ -255,6 +256,9 @@ check:
   sd3 is [string-dict: "a", 10, "b", 6, "c", 4]
   sd4 = sd2.merge(sd1)
   sd4 is [string-dict: "a", 5, "b", 6, "c", 4]
+  # sd3 is different from sd4
+  sd3 is-not sd4
+  # merging the same dict a second time has no additional effect
   sd2.merge(sd1).merge(sd1) is sd2.merge(sd1)
 end
 }
@@ -265,12 +269,12 @@ end
   #:return (L-of S)
 ]
 
-Returns the list of keys in the immutable string-dict, in some order.
+Returns the list of keys in the immutable string-dict, in some unspecified order.
 
 @examples{
 check:
   sd2 = [string-dict: "a", 10, "b", 6]
-  sd2.keys-list() is [list: "a", "b"]
+  sd2.keys-list().sort() is [list: "a", "b"]
 end
 }
 
@@ -281,18 +285,12 @@ end
 ]
 
 Applies the function @pyret{f} to each key in the immutable string-dict, and
-returns a list of the returned values in some order.
+returns a list of the returned values in some unspecified order.
 
 @examples{
-fun one-of(ans, elts):
-  is-some(for find(elt from elts):
-    ans == elt
-  end)
-end
-
 check:
   sd2 = [string-dict: "a", 10, "b", 6]
-  sd2.map-keys(lam(x): string-append(x, x) end) is%(one-of)
+  sd2.map-keys(lam(x): string-append(x, x) end) is%(lam(lft, rt): rt.member(lft) end)
     [list: [list: "aa", "bb"], [list: "bb", "aa"]]
 end
 }
@@ -304,7 +302,8 @@ end
 ]
 
 Returns the result of folding the function @pyret{f} across the keys in the
-immutable string-dict, in some order, starting with @pyret{init} as the base value.
+immutable string-dict, in some unspecified order, starting with @pyret{init} as
+the base value.
 
 @examples{
 check:
@@ -320,7 +319,8 @@ end
 ]
 
 Calls the function @pyret{f} on each key in the immutable string-dict,
-returning nothing.
+returning nothing. Use @pyret{each-key} instead of @pyret{map-keys}
+when the function @pyret{f} is used only for its side-effects.
 
 @examples{
 var numkeys = 0
@@ -537,9 +537,10 @@ end
 ]
 
 Modifies the mutable string-dict to include the keys from the @pyret{other}
-mutable-string-dict. Choose a key's value to be the one it has in the @pyret{other}
-string-dict, if it has one; otherwise it keeps the value it originally had.
-Returns nothing.
+mutable-string-dict. If a key occurs originally in only of the string-dicts, its final 
+value is taken from that string-dict. If a key occurs originally in both
+the string-dicts, its value is taken from the @pyret{other} string-dict.
+@pyret{merge-now} returns nothing.
 
 @examples{
 check:
@@ -549,8 +550,11 @@ check:
   msd1.get-value-now("b") raises "Key b not found"
   msd1.get-value-now("c") is 4
   msd1.merge-now(msd2) is nothing
+  # msd1 already had key "a", but updates its new value from msd2
   msd1.get-value-now("a") is 10
+  # msd1 did not have key "b", so gets it from msd2
   msd1.get-value-now("b") is 6
+  # msd2 doesn't have key "c", so msd1 keeps its value for "c"
   msd1.get-value-now("c") is 4
 end
 }
@@ -561,12 +565,12 @@ end
   #:return (L-of S)
 ]
 
-Returns the list of keys in the mutable string-dict, in some order.
+Returns the list of keys in the mutable string-dict, in some unspeicified order.
 
 @examples{
 check:
   msd2 = [mutable-string-dict: "a", 10, "b", 6]
-  msd2.keys-list-now() is [list: "a", "b"]
+  msd2.keys-list-now().sort() is [list: "a", "b"]
 end
 }
 
@@ -576,20 +580,13 @@ end
   #:return (L-of "b")
 ]
 
-Modify the mutable string-dict so that each key is now
-associated with the result of applying
-the function @pyret{f} to its original value.
+Applies the function @pyret{f} to each key in the mutable-string-dict,
+and returns a list of the returned values in some unspecified order.
 
 @examples{
-fun one-of(ans, elts):
-  is-some(for find(elt from elts):
-    ans == elt
-  end)
-end
-
 check:
   msd2 = [mutable-string-dict: "a", 10, "b", 6]
-  msd2.map-keys-now(lam(x): string-append(x, x) end) is%(one-of)
+  msd2.map-keys-now(lam(x): string-append(x, x) end) is%(lam(lft, rt): rt.member(lft) end)
     [list: [list: "aa", "bb"], [list: "bb", "aa"]]
 end
 }
@@ -601,7 +598,8 @@ end
 ]
 
 Returns the result of folding the function @pyret{f} across the keys in the
-mutable string-dict, in some order, starting with @pyret{init} as the base value.
+mutable string-dict, in some unspecified order, starting with @pyret{init} as
+the base value.
 
 @examples{
 check:
@@ -617,7 +615,8 @@ end
 ]
 
 Calls the function @pyret{f} on each key in the mutable string-dict,
-returning nothing.
+returning nothing. Use @pyret{each-key-now} instead of @pyret{map-keys-now}
+when the function @pyret{f} is used only for its side-effects.
 
 @examples{
 var numkeys = 0
