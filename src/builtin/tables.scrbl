@@ -15,6 +15,7 @@
       (variants ("row"))
       (shared (
         (method-spec (name "get-value")) 
+        (method-spec (name "get-column-names")) 
         (method-spec (name "get")) 
       )))
     (data-spec
@@ -25,6 +26,7 @@
         (method-spec (name "add-column"))
         (method-spec (name "add-row"))
         (method-spec (name "row"))
+        (method-spec (name "length"))
         (method-spec (name "add-row"))
         (method-spec (name "row-n"))
         (method-spec (name "column"))
@@ -742,6 +744,7 @@ a different set of operations than the query syntax. These table manipulation
 operations are useful for building abstractions over tables and for creating
 tables programmatically.
 
+
 @type-spec["Row" (list)]
 
 The type of all row values.
@@ -758,6 +761,19 @@ It is often preferable to construct rows for an existing table by using the
 column for each created row, and provides built-in checking for the count of
 columns.
 
+@row-method["get-column-names"
+  #:contract (a-arrow Row (L-of S))
+  #:args '((self #f))
+  #:return (L-of S)]
+
+Produces a list of strings containing the names of the columns in the row.
+
+@examples{
+check:
+  r = [raw-row: {"city"; "NYC"}, {"pop"; 8500000}]
+  r.get-column-names() is [list: "NYC", "pop"]
+end
+}
 
 @row-method["get-value"
   #:contract (a-arrow Row S "Col")
@@ -791,6 +807,29 @@ containing the corresponding value if it's present, or @pyret-id["none"
 
 The type of all tables.
 
+@collection-doc["table-from-rows" #:contract `(a-arrow ("elt" ,Row) ,Table)]
+
+A collection constructor that creates tables from @pyret-id["Row"] values.
+
+@examples{
+check:
+  t = [table-from-rows:
+    [raw-row: {"A"; 5}, {"B"; 7}, {"C"; 8}],
+    [raw-row: {"A"; 1}, {"B"; 2}, {"C"; 3}]
+  ]
+
+  t.length() is 2
+  t.column("A") is [list: 5, 1]
+  t.row-n(0) is [raw-row: {"A"; 5}, {"B"; 7}, {"C"; 8}]
+end
+}
+
+@table-method["length"
+  #:contract (a-arrow Table N)
+  #:args '(("self" #f))
+  #:return N]
+
+Evaluates to the number of rows in the table.
 
 @table-method["row"
   #:contract (a-arrow Table "Col1" "Col2" "..." "ColN" Row)
