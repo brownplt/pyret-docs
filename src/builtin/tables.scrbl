@@ -64,19 +64,6 @@
 
 @docmodule["tables" #:noimport #t #:friendly-title "Tables"]{
 
-@margin-note{Note that as of Summer 2017, the @pyret{tables} implementation in
-is rather minimal.  It meets the basic requirements of the curricula that
-use it, but lacks many features that one might reasonably expect from a
-complete table library.
-
-Additionally, after the first year of using @pyret{tables}, the Pyret team
-is considering a new table design and interface that will make it easier
-to add features in the future, but in the meantime puts small changes
-to the current design on hold.
-
-Tabular data is here to stay in Pyret and Pyret-related curricula, so
-count on further development of @pyret{tables}.}
-
 There are many examples of tables in computing, with
 spreadsheets being the most obvious.
                                                              
