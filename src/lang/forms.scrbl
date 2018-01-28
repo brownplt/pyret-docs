@@ -372,9 +372,8 @@ provide-stmt: PROVIDE stmt END | PROVIDE STAR
 
 @bnf['Pyret]{
 PROVIDE-TYPES: "provide-types"
-END: "end"
 STAR: "*"
-provide-types-stmt: PROVIDE-TYPES stmt END | PROVIDE-TYPES STAR
+provide-types-stmt: PROVIDE-TYPES record-ann | PROVIDE-TYPES STAR
 }
 
 @pyret{provide} and @pyret{provide-types} statements specify which
@@ -400,8 +399,8 @@ the value after the colon is the local identifier.
 
 @examples{
 provide {
-  x : x
-  draw-character : draw-character
+  x : x,
+  draw-character : draw-character,
   external-funct-name : internal-funct-name
 }
 end
