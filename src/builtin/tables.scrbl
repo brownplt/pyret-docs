@@ -992,13 +992,13 @@ type of values in the specified column.
 
 @table-method["order-by"
   #:contract (a-arrow Table S B Table)
-  #:args '(("self" #f) ("colname" #f) ("ascending" #f))
+  #:args '(("self" #f) ("colname" #f) ("asc" #f))
   #:return Table]
 
 Consumes a column name and whether to order ascending or descending, and
 produces a new table with the rows ordered by the given column.
 
-If @pyret{true} is given for @tt{ascending}, the rows are ordered lowest to
+If @pyret{true} is given for @tt{asce}, the rows are ordered lowest to
 highest by the given column (e.g. using @pyret{<}), and if @pyret{false} is
 given, they are ordered highest to lowest.
 
