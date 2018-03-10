@@ -917,7 +917,6 @@
                  (define group-name (first (third (first group))))
                  (cons (make-element #f (list group-name br))
                        (map (lambda (i)
-                              (eprintf "Index entry: ~a~n" i)
                               (let ([e (list (hspace 4)
                                              "From "
                                              (make-link-element
