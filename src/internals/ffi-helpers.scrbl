@@ -13,7 +13,7 @@ runtime, but are often used in JavaScript code that interacts with the runtime.
 Some of the most commonly used ones are documented here; this list is often
 growing.
 
-@section{Equality}
+@section[#:tag "ffi:equality"]{Equality}
 
 The ffi exposes several utilities related to @secref["equality"].
 

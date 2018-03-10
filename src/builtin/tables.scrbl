@@ -429,7 +429,7 @@ analogous to the @pyret{fold} function for @seclink{lists}.
 
 The simplest examples of reducing use reducers built into Pyret.
 
-FOr each reducer below, you will need to specify
+For each reducer below, you will need to specify
 a name for the new column and which existing column new value
 will be based on.  You will also need to
 @pyret{import} or @pyret{include} @pyret{tables}.
@@ -647,7 +647,7 @@ While the reducers found in the @tt{tables} module should cover most all
 use cases, there may be times when one would like to create a reducer of their
 own. To do so, one must construct an object of the following type:                                          
 
-@type-spec["Reducer" (list "Acc" "InVal" "OutVal")]
+@type-spec["Reducer" (list "Acc" "InVal" "OutVal")]{
 @red-method["one"
   #:contract (a-arrow (apply Red-of Red-params) "InVal" (a-tuple "Acc" "OutVal"))
   #:args '(("self" #f) ("value-from-column" #f))
@@ -680,7 +680,7 @@ running-mean :: T.Reducer<{Number; Number}, Number, Number> = {
   end
 }
 }
-
+}
 
 
   @section[#:tag "s:tables:comparing"]{Comparing Tables}
@@ -732,19 +732,19 @@ operations are useful for building abstractions over tables and for creating
 tables programmatically.
 
 
-@type-spec["Row" (list)]
+@type-spec["Row" (list)]{
 
 The type of all row values.
-
+}
 @collection-doc["raw-row" #:contract `(a-arrow ("elt" ,(a-tuple S "Col")) ,Row)]
 
 Takes a sequence of tuples and constructs a @pyret-id["Row"] value. Note that
 the type for each column may be different. The constructed row can be added to
-appropriate tables by using the table methods like @pyret-method["Table"
+appropriate tables by using the table methods like @pyret-method["Table" "table"
 "add-row"].
 
 It is often preferable to construct rows for an existing table by using the
-@pyret-method["Table" "row"] method, which avoids typing out the names of each
+@pyret-method["Table" "table" "row"] method, which avoids typing out the names of each
 column for each created row, and provides built-in checking for the count of
 columns.
 
@@ -790,10 +790,10 @@ containing the corresponding value if it's present, or @pyret-id["none"
 "option"] if it isn't.
 
 
-@type-spec["Table" (list)]
+@type-spec["Table" (list)]{
 
 The type of all tables.
-
+}
 @collection-doc["table-from-rows" #:contract `(a-arrow ("elt" ,Row) ,Table)]
 
 A collection constructor that creates tables from @pyret-id["Row"] values.
@@ -999,7 +999,7 @@ according to the given ordering.
 
 Each element of the list must be a two-element tuple, containing a column name
 and a boolean indicating whether to order ascending or not. As with
-@pyret-method["Table" "order-by"], @pyret{true} indicates ascending and
+@pyret-method["Table" "table" "order-by"], @pyret{true} indicates ascending and
 @pyret{false} indicates descending.
 
 @table-method["increasing-by"
@@ -1007,7 +1007,7 @@ and a boolean indicating whether to order ascending or not. As with
   #:args '(("self" #f) ("colname" #f))
   #:return Table]
 
-Like @pyret-method["Table" "order-by"], but @tt{ascending} is always
+Like @pyret-method["Table" "table" "order-by"], but @tt{ascending} is always
 @pyret{true}.
 
 @table-method["decreasing-by"
@@ -1015,7 +1015,7 @@ Like @pyret-method["Table" "order-by"], but @tt{ascending} is always
   #:args '(("self" #f) ("colname" #f))
   #:return Table]
 
-Like @pyret-method["Table" "order-by"], but @tt{ascending} is always
+Like @pyret-method["Table" "table" "order-by"], but @tt{ascending} is always
 @pyret{false}.
 
 @table-method["select-columns"

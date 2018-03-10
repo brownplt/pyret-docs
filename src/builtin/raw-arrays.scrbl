@@ -47,7 +47,7 @@
 
 
 @docmodule["raw-arrays" #:noimport #t #:friendly-title "RawArray"]{
-   @type-spec["RawArray" (list "a")]
+   @type-spec["RawArray" (list "a")]{
 
    A @pyret{RawArray} is a mutable, fixed-length collection indexed
    by non-negative intgers.  They are a very thin wrapper around native
@@ -57,7 +57,7 @@
 
    @pyret{RawArray}s are widely used internally in Pyret
    language development.
- 
+ }
 
      @section{RawArray Functions}
 

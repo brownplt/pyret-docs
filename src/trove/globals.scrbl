@@ -172,7 +172,7 @@ blocks}.
 
 @section{Built-in Types}
 
-@type-spec["Any" (list)]
+@type-spec["Any" (list)]{
 
 A type specification that permits all values.  This is mainly useful 
 in built-in language forms, like in @secref["equality"] or 
@@ -183,25 +183,25 @@ restructured to use a specific type declaration to be more clear about
 what data they are working with.
 
 Specifying @pyret{Any} will prevent Pyret from attempting to infer types, as
-it will if no type specification is provided.
+it will if no type specification is provided.}
 
-@type-spec["Boolean" (list)]
+@type-spec["Boolean" (list)]{
 
-The type of @seclink["booleans"].
+The type of @seclink["booleans"].}
 
-@type-spec["Number" (list)]
+@type-spec["Number" (list)]{
 
-The type of @seclink["numbers"].
+The type of @seclink["numbers"].}
 
-@type-spec["String" (list)]
+@type-spec["String" (list)]{
 
-The type of @seclink["strings"].
+The type of @seclink["strings"].}
 
-@type-spec["RawArray" (list)]
+@type-spec["RawArray" (list)]{
 
-The type of @seclink["raw-arrays"].
+The type of @seclink["raw-arrays"].}
 
-@type-spec["Nothing" (list)]
+@type-spec["Nothing" (list)]{
 
 The type of the special value @pyret{nothing}, used in contexts where the
 program evaluates but has no meaningful answer by design (see, for example
@@ -212,19 +212,20 @@ check:
   [list: nothing, nothing, nothing].length() is 3
 end
 }
+}
 
-@type-spec["Function" (list)]
+@type-spec["Function" (list)]{
 
-The type of all @seclink["functions-tour" "function values"].
+The type of all @seclink["functions-tour" "function values"].}
 
-@type-spec["Object" (list)]
+@type-spec["Object" (list)]{
 
 The type of all values constructed from @pyret{data} @seclink["s:data-decl" "constructors and
-singletons"], and by @seclink["s:obj-expr" "object literals"].
+singletons"], and by @seclink["s:obj-expr" "object literals"].}
 
-@type-spec["Table" (list)]
+@type-spec["Table" (list)]{
 
-The type of @seclink["tables"].
+The type of @seclink["tables"].}
 
 @section{Type Predicates}
 

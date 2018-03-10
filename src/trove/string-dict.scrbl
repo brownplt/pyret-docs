@@ -54,12 +54,7 @@
 
 @section{The StringDict Type}
 
-@type-spec["StringDict" (list "a")]
-
-There are no variants for @pyret-id{StringDict}s, and programs cannot use
-@pyret{cases} statements with @pyret-id{StringDict}s.  Instead, they can be
-created with the constructors below, and manipulated with the methods and
-functions below.
+@type-spec["StringDict" (list "a")]{
 
 @pyret-id{StringDict}s keep track of a mapping from @pyret-id["String"
 "strings"]s to any Pyret value. A @pyret-id{StringDict} is
@@ -67,10 +62,16 @@ immutable, i.e., a mapping cannot be changed; however, a new
 @pyret-id{StringDict} can be fashioned from an existing
 @pyret-id{StringDict} with a new, omitted, or changed mapping.
 
-A @pyret{StringDict} can unfrozen, i.e.,  used as the basis for
+A @pyret{StringDict} can be unfrozen, i.e.,  used as the basis for
 @pyret{MutableStringDict}, which does allow modification (see
 below).
 
+There are no variants for @pyret-id{StringDict}s, and programs cannot use
+@pyret{cases} statements with @pyret-id{StringDict}s.  Instead, they can be
+created with the constructors below, and manipulated with the methods and
+functions below.
+
+}
 @section{StringDict Constructor}
 
 @collection-doc["string-dict" #:contract `(a-arrow ("key" ,S) ("elt" "a") ,(SD-of "a"))]
@@ -227,13 +228,7 @@ end
 
 @section{The MutableStringDict Type}
 
-@type-spec["MutableStringDict" (list "a")]
-
-There are no variants for @pyret-id{MutableStringDict}s, and
-programs cannot use @pyret{cases} statements with
-@pyret-id{MutableStringDict}s. Instead, they can be created with
-the constructors below, and manipulated with the methods and
-functions below.
+@type-spec["MutableStringDict" (list "a")]{
 
 @pyret-id{MutableStringDict}s keep track of a mapping from
 @pyret-id["String" "strings"]s to any Pyret value. In contrast to
@@ -244,6 +239,12 @@ A @pyret-id{MutableStringDict} can be sealed to produce a variant
 that is read-only. A @pyret-id{MutableStringDict} can also be
 frozen to produce an immutable @pyret-id{StringDict} (see above).
 
+There are no variants for @pyret-id{MutableStringDict}s, and
+programs cannot use @pyret{cases} statements with
+@pyret-id{MutableStringDict}s. Instead, they can be created with
+the constructors below, and manipulated with the methods and
+functions below.
+}
 @section{MutableStringDict Constructor}
 
 @collection-doc["mutable-string-dict" #:contract `(a-arrow ("elt" "a") ,(SD-of "a"))]

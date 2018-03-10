@@ -99,26 +99,26 @@
   }
 
   @section[#:tag "image_DataTypes"]{Data Types}
-  @type-spec["Image" (list)]
+  @type-spec["Image" (list)]{
 
     This is the return type of many of the functions in this module; it
     includes simple shapes, like circles and squares, and also combinations
     or transformations of existing shapes, like rotations, overlays, and
     scaling.
-
-  @type-spec["Scene" (list)]
+    }
+  @type-spec["Scene" (list)]{
 
     Like an @pyret-id["Image"] but with a few special functions that crop any
     overhanging parts of images that are placed atop them, instead of
     stretching to accommodate.
-
-  @type-spec["ImageColor" (list)]
+    }
+  @type-spec["ImageColor" (list)]{
 
     An @tt{ImageColor} is either a string from the list in
     @secref["s:color-constants"], or a @pyret-id["Color" "image-structs"],
     which you can use to construct colors other than the predefined ones,
     including making colors partially transparent by controlling their opacity.
-
+    }
   @function[
     "name-to-color"
             #:contract (a-arrow S Color)
@@ -127,11 +127,11 @@
 
   Looks up the given string in the list of predefined colors.
 
-  @type-spec["Mode" (list)]
+  @type-spec["Mode" (list)]{
 
     A @pyret-id["String" "<global>"] that describes a style for a shape.  Either the string
     @pyret{"outline"} or the string @pyret{"solid"}.
-
+    }
 
   @section{Basic Images}
   @function[
@@ -224,7 +224,7 @@
     string, but makes use of a complete font specification.  The various style
     options are described below.  
   }
-  @type-spec["FontFamily" (list)]
+  @type-spec["FontFamily" (list)]{
 
     A @pyret-id["String" "<global>"] that describes a family of fonts.  The
     following strings are options:
@@ -239,17 +239,17 @@
       @item{@pyret{"symbol"}}
       @item{@pyret{"system"}}
     ]
-
-  @type-spec["FontStyle" (list)]
+    }
+  @type-spec["FontStyle" (list)]{
 
     A @pyret-id["String" "<global>"] that describes the style of a font.  One
     of @pyret{"normal"}, @pyret{"italic"}, or @pyret{"slant"}.
-
-  @type-spec["FontWeight" (list)]
+    }
+  @type-spec["FontWeight" (list)]{
 
     A @pyret-id["String" "<global>"] that describes the weight of a font.  One
     of @pyret{"normal"}, @pyret{"bold"}, or @pyret{"light"}.
-
+    }
   @section{Polygons}
   @function[
     "triangle"
@@ -537,7 +537,7 @@
     @secref[(tag-name "image" "overlay")], but uses @pyret["place-x"] and
     @pyret["place-y"] to determine where the images should line up.
   }
-  @type-spec["XPlace" (list)]
+  @type-spec["XPlace" (list)]{
 
     A @pyret-id["String" "<global>"] that represents a place to align an image
     on the x-axis.  One of
@@ -545,8 +545,8 @@
     @pyret{"center"}, 
     @pyret{"middle"}, or
     @pyret{"right"}.
-
-  @type-spec["YPlace" (list)]
+    }
+  @type-spec["YPlace" (list)]{
 
     A @pyret-id["String" "<global>"] that represents a place to align an image
     on the y-axis.  One of
@@ -555,7 +555,7 @@
     @pyret{"baseline"},
     @pyret{"center"}, or
     @pyret{"middle"}.
-
+    }
   @function[
     "overlay-xy"
             #:contract (a-arrow Image

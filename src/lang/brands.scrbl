@@ -35,9 +35,8 @@
 
 @docmodule["brands" #:friendly-title "Brands"]{
 
-Brands are a mostly internal language concept, useful for implementing custom datatypes.
-
-@type-spec["Brand" (list "a")]
+@type-spec["Brand" (list "a")]{
+Brands are a mostly internal language concept, useful for implementing custom datatypes.}
 
 @function["brander" #:contract (a-arrow (a-app BR (list "a")))]
 

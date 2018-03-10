@@ -18,6 +18,11 @@
 @(append-gen-docs
   `(module "equality"
     (path "src/js/base/runtime-anf.js")
+    (data-spec
+      (name "EqualityResult")
+      (type-vars ())
+      (variants ("Equal" "NotEqual" "Unknown"))
+      (shared))
     (fun-spec
       (name "is-Equal")
       (arity 1)
@@ -1199,7 +1204,7 @@ is @pyret{_equals}, and it has the following signature:
 
 @(render-fun-helper '(method-spec)
   "_equals"
-  (list 'part (tag-name (curr-module-name) "_equal"))
+  (list 'part (tag-name (curr-module-name) "_equals"))
   (a-arrow "a" "a" (a-arrow A A EQ) EQ)
   EQ
   (list (list "self" "") (list "other" "") (list "equal-rec" ""))

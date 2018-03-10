@@ -9,11 +9,11 @@
 @(define (Graph-of typ1 typ2) (a-app (a-id "Graph" (xref "graph" "Graph")) typ1 typ2))
 @(define (Vertex-of typ) (a-app (a-id "Vertex" (xref "graph" "Vertex")) typ))
 @(define (Edge-of typ1 typ2) (a-app (a-id "Edge" (xref "graph" "Edge")) typ1 typ2))
-@(define (no-variant T v) @list{@type-spec[T (list)]
+@(define (no-variant T v) @list{@type-spec[T (list)]{
   There are no variants for @pyret-id[T], and programs cannot use @pyret{cases} statements with @pyret-id[T].
   Instead, a @pyret-id[T] value named @tt[v] is provided, and a new @pyret-id[T]
   can be constructed via the @;@secref{"s:extend-expr"}
-  Extend Expression.})
+  Extend Expression.}})
 
 @(append-gen-docs
   `(module "graph"

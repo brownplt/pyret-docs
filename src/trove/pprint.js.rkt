@@ -180,6 +180,13 @@
     (return "Any")
     (contract (a-arrow "Any" "Any")))
   (fun-spec
+    (name "align-spaces")
+    (arity 3)
+    (params [list: ])
+    (args ("d"))
+    (return "Any")
+    (contract (a-arrow "Any" "Any" "Any" "Any")))
+  (fun-spec
     (name "hang")
     (arity 2)
     (params [list: ])
@@ -328,7 +335,7 @@
 
 @docmodule["pprint"]{
   @; Ignored type testers
-  @ignore[(list "is-mt-doc")]
+  @ignore[(list "is-mt-doc" "align-spaces")]
   @; Unknown: PLEASE DOCUMENT
   @ignore[
     (list

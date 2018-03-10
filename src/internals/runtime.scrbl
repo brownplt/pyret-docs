@@ -171,7 +171,7 @@ a particular type, and throw an exception if not:
 
 @doc-internal["Runtime" "checkPyretVal" (list "Any") "Undefined"]
 
-@subsection{Equality}
+@subsection[#:tag "runtime:equality"]{Equality}
 
 @doc-internal["Runtime" "combineEquality" (list "EqualityResult" "EqualityResult") "EqualityResult"]
 

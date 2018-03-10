@@ -238,14 +238,14 @@ big-bang(10, on-tick(increment))
     Tests if two key events are equals to each other.
   }
 
-    @section[#:tag "image_DataTypes"]{Data Types}
+    @section[#:tag "world_DataTypes"]{Data Types}
 
-  @type-spec["WorldConfig" (list "a")]
+  @type-spec["WorldConfig" (list "a")]{
 
   This type includes the values that can be passed to @pyret-id{big-bang} as
   event handlers (e.g. @pyret-id{on-tick} and @pyret-id{on-key}), renderers
   (e.g. @pyret-id{to-draw}), and other configuration options (e.g.
-  @pyret-id{stop-when}).
+  @pyret-id{stop-when}).}
 }
 
 

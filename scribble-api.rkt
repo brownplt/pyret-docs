@@ -24,6 +24,7 @@
          racket/path
          racket/string
          racket/runtime-path
+         scheme/class
          "scribble-helpers.rkt"
          "ragged.rkt"
          "ebnf.rkt"
@@ -33,6 +34,7 @@
          py-prod
          prod-link
          prod-ref
+         custom-index-block
 
          docmodule
          function
@@ -267,8 +269,14 @@
   (elem #:style (span-style real-style) (apply tt body)))
 (define (pyret-id id (mod (curr-module-name)))
   (seclink (xref mod id) (tt id)))
-(define (pyret-method datatype id (mod (curr-module-name)))
-  (seclink (xref mod datatype id) (tt (string-append "." id))))
+(define pyret-method
+  (case-lambda
+    [(datatype id)
+     (seclink (xref (curr-module-name) datatype "" id) (tt (string-append "." id)))]
+    [(datatype varname id)
+     (seclink (xref (curr-module-name) datatype varname id) (tt (string-append "." id)))]
+    [(datatype varname id mod)
+     (seclink (xref mod datatype varname id) (tt (string-append "." id)))]))
 
 ;;;;;;;;;; Cross-Reference Infrastructure ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -356,12 +364,24 @@
 @(define (tag-name . args)
    (apply string-append (add-between args "_")))
 
-@(define (type-spec type-name tyvars)
+@(define (type-spec type-name tyvars . body)
   (set-documented! (curr-module-name) type-name)
   (define name-part (make-header-elt-for (seclink (xref (curr-module-name) type-name) (tt type-name)) type-name))
   (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ",") (list ">")) ""))
-    (para #:style (div-style "boxed")
-      (list name-part (tt vars))))
+  ;;(define content-text (string-split (string-trim (content->string body)) "\n"))
+  (define index-tags (list (pyret type-name) (curr-module-name)))
+  ;;(define blurb (first content-text))
+  (list
+     (let ((tag (make-generated-tag)))
+       (make-index-element #f
+                           (list (make-target-element #f '() `(idx ,tag)))
+                           `(idx ,tag)
+                           (cons type-name (rest index-tags))
+                           index-tags
+                           #f))
+     (para #:style (div-style "boxed")
+           (list name-part (tt vars)))
+     body))
 
 @(define-syntax (data-spec2 stx)
   (syntax-case stx()
@@ -406,7 +426,7 @@
     (list
       (render-fun-helper
        '(fun) variant-name
-       (list 'part (tag-name (curr-module-name) variant-name))
+       (list 'part (curr-module-name) variant-name)
        (apply a-arrow (append member-types (list return)))
        return members-as-args '() '() '())
       #;(render-fun-helper
@@ -478,7 +498,7 @@
                   name data-name var-name (curr-module-name))))
       (render-fun-helper
         spec name
-        (list 'part (tag-name (curr-module-name) data-name name))
+        (list 'part (curr-module-name) data-name var-name name)
         contract return args alt-docstrings examples body)))
 @(define (method-spec name
                       #:params (params #f)
@@ -493,7 +513,7 @@
           [spec (find-defn 'name name methods)])
      (render-fun-helper
       spec name
-      (list 'part (tag-name (curr-module-name) var-name name))
+      (list 'part (curr-module-name) var-name name)
       contract return args alt-docstrings examples body)))
 @(define (member-spec name #:type (type-in #f) #:contract (contract-in #f) . body)
    (let* ([members (get-defn-field 'members (curr-var-spec))]
@@ -639,7 +659,7 @@
   (add-between args ", "))
 
 ;; render documentation for a function
-@(define (render-fun-helper spec name part-tag contract-in return-in args alt-docstrings examples contents)
+@(define (render-fun-helper spec name part-tags contract-in return-in args alt-docstrings examples contents)
    (when (not (cons? spec))
     (error (format "Could not find spec for ~a" name)))
    (when (and (cons? args) (not (cons? (first args))))
@@ -679,9 +699,17 @@
      ;  wasn't getting bound properly -- don't know why
      (let ([processing-module (curr-module-name)])
        (define name-tt (if is-method (tt "." name) (seclink (xref processing-module name) (tt name))))
-       (define name-elt (toc-target-element code-style (list name-tt) part-tag))
+       (define index-tags (cons (pyret name) (filter (lambda(e) (not (or (equal? e name) (equal? e "")))) (rest part-tags))))
+       (define name-elt (toc-target-element code-style (list name-tt) (list 'part (apply tag-name (rest part-tags)))))
        (interleave-parbreaks/all
         (list ;;(drop-anchor name)
+         (let ((tag (make-generated-tag)))
+           (make-index-element #f
+                               (list (make-target-element #f '() `(idx ,tag)))
+                               `(idx ,tag)
+                               (cons name (rest index-tags))
+                               index-tags
+                               #f))
           (traverse-block ; use this to build xrefs on an early pass through docs
            (lambda (get set!)
              (set! 'doc-xrefs (cons (list name processing-module)
@@ -769,7 +797,7 @@
    (let* ([ans
           (render-fun-helper
            (find-doc (curr-module-name) name) name
-           (list 'part (tag-name (curr-module-name) name))
+           (list 'part (curr-module-name) name)
            contract return args alt-docstrings examples contents)])
           ; error checking complete, record name as documented
      (set-documented! (curr-module-name) name)
@@ -826,3 +854,87 @@
   '())
 
 (define (py-prod name) (prod-link 'Pyret name))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Customized version of index-block ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (custom-index-block)
+  (define alpha (string->list "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+  (define (rows . rows)
+    (make-table (make-style 'index null)
+                (map (lambda (row)
+                       (list (make-paragraph plain row)))
+                     rows)))
+  (define contents
+    (lambda (renderer sec ri)
+      (define raw-index-entries (get-index-entries sec ri))
+      (define index-groups (group-by (lambda(i) (list (first (first i)) (first (second i))))
+                                     raw-index-entries
+                                     (lambda(i1 i2) (and (not (or (equal? (first i1) 'part)
+                                                             (equal? (first i2) 'part)))
+                                                    (equal? i1 i2)))))
+      (define manual-newlines? (send renderer index-manual-newlines?))
+      (define alpha-starts (make-hasheq))
+      (define alpha-row
+        (let loop ([i raw-index-entries] [alpha alpha])
+          (define (add-letter let l)
+            (list* (make-element "nonavigation" (list (string let))) " " l))
+          (cond [(null? alpha) null]
+                [(null? i) (add-letter (car alpha) (loop i (cdr alpha)))]
+                [else
+                 (let* ([strs (cadr (car i))]
+                        [letter (if (or (null? strs) (string=? "" (car strs)))
+                                  #f
+                                  (char-upcase (string-ref (car strs) 0)))])
+                   (cond [(not letter) (loop (cdr i) alpha)]
+                         [(char-ci>? letter (car alpha))
+                          (add-letter (car alpha) (loop i (cdr alpha)))]
+                         [(char-ci=? letter (car alpha))
+                          (hash-set! alpha-starts (car i) letter)
+                          (list* (make-element
+                                  (make-style #f (list (make-target-url (format "#alpha:~a" letter))))
+                                  (list (string (car alpha))))
+                                 " "
+                                 (loop (cdr i) (cdr alpha)))]
+                         [else (loop (cdr i) alpha)]))])))
+      (define br (if manual-newlines? (make-element 'newline '("\n")) ""))
+      (define body
+        (map (lambda(group)
+               (cond
+                [(empty? (rest group)) ;; is actually a single item
+                 (let ([e (make-link-element
+                           "indexlink"
+                           `(,@(add-between (caddr (first group)) ", ") ,br)
+                           (car (first group)))])
+                   (cond [(hash-ref alpha-starts (first group) #f)
+                          => (lambda (let)
+                               (make-element
+                                (make-style #f (list
+                                                (make-url-anchor
+                                                 (format "alpha:~a" (char-upcase let)))))
+                                (list e)))]
+                         [else e]))]
+                [else ;; multiple items with a common term
+                 (define group-name (first (third (first group))))
+                 (cons (make-element #f (list group-name br))
+                       (map (lambda (i)
+                              (eprintf "Index entry: ~a~n" i)
+                              (let ([e (list (hspace 4)
+                                             "From "
+                                             (make-link-element
+                                              "indexlink"
+                                              `(,@(add-between (cdaddr i) ", ") ,br)
+                                              (car i)))])
+                                (cond [(hash-ref alpha-starts i #f)
+                                       => (lambda (let)
+                                            (make-element
+                                             (make-style #f (list
+                                                             (make-url-anchor
+                                                              (format "alpha:~a" (char-upcase let)))))
+                                             (list e)))]
+                                      [else e])))
+                          group))]))
+               index-groups))
+      (if manual-newlines?
+        (rows alpha-row '(nbsp) body)
+        (apply rows alpha-row '(nbsp) (map list body)))))
+  (make-delayed-block contents))

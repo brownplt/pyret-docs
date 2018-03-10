@@ -153,12 +153,7 @@ the future.
 
 @section{The Set Type}
 
-@type-spec["Set" (list "a")]
-
-There are no variants for @pyret-id{Set}s, and programs cannot use
-@pyret{cases} statements with @pyret-id{Set}s.  Instead, they can be created
-with the constructors below, and manipulated with the methods and functions
-below.
+@type-spec["Set" (list "a")]{
 
 There are two underlying representations that sets may have.  List-based sets
 work on all values that can be compared with the @pyret-id["equal-always"
@@ -172,7 +167,13 @@ comparisons, and guarantee that only up to log(n) less-than comparisons will be
 performed for a set with n elements on removal, addition, and membership
 testing.
 
-Some methods, like @pyret-method["Set" "union"], combine multiple sets.  The
+There are no variants for @pyret-id{Set}s, and programs cannot use
+@pyret{cases} statements with @pyret-id{Set}s.  Instead, they can be created
+with the constructors below, and manipulated with the methods and functions
+below.
+
+
+Some methods, like @pyret-method["Set" "set" "union"], combine multiple sets.  The
 set on the left-hand side is the representation of the result.  For example, in
 
 @pyret-block{
@@ -180,7 +181,7 @@ set on the left-hand side is the representation of the result.  For example, in
 }
 
 the result will be a @pyret{list-set}.
-
+}
 @section{Set Constructors}
 
 @collection-doc["list-set" #:contract `(a-arrow ("elt" "a") ,(S-of "a"))]
@@ -307,8 +308,8 @@ check:
 end
 }
 
-Note that the order of elements returned from @pyret-method["Set" "pick"] is
-non-deterministic, so multiple calls to @pyret-method["Set" "pick"] may not
+Note that the order of elements returned from @pyret-method["Set" "set" "pick"] is
+non-deterministic, so multiple calls to @pyret-method["Set" "set" "pick"] may not
 produce the same result for the same set.
 
 @set-method["union"]

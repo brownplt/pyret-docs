@@ -35,11 +35,6 @@ documentation.
 
 @subsection{Names}
 
-@bnf['Pyret]{
-id-expr: NAME
-key: NAME
-}
-
 Names in Pyret match the following regular expression:
 
 @justcode{
@@ -131,7 +126,7 @@ Multi-line string literals strip all whitespace before the first non-whitespace
 character and after the last non-whitespace character.  All whitespace at the
 beginning of intermediate lines is preserved.
 
-@subsection{Number Literals}
+@subsection[#:tag "f:number_literals"]{Number Literals}
 
 @bnf['Pyret]{
 num-expr: NUMBER
@@ -789,7 +784,7 @@ fine, as is any block containing even a single template-expression, or
 trigger the multiple-expressions warning and require either an
 explicit block or a block-shorthand to fix.
 
-@section{Declarations}
+@section[#:tag "s:declarations"]{Declarations}
 
 There are a number of forms that can only appear as statements in @tt{block}s
 (rather than anywhere an expression can appear).  Several of these are
