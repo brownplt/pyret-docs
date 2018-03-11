@@ -16,17 +16,7 @@
   (data-spec
     (name "PPrintDoc")
     (type-vars ())
-    (variants
-      ("mt-doc"
-      "str"
-      "hardline"
-      "blank"
-      "concat"
-      "nest"
-      "if-flat"
-      "align"
-      "align-spaces"
-      "group"))
+    (variants)
     (shared
       ((method-spec
         (name "_plus")
@@ -365,113 +355,113 @@
   @seclink[#:tag-prefixes '("pprint_Functions") "Functions"]{easier-to-use
   helper functions} that are exported instead.
   @data-spec2["PPrintDoc" '() (list
-    @constructor-spec["Either" "mt-doc" `(,(make-arg "flat-width" N)
-                                          ,(make-arg "has-hardline" B))]
-    @constructor-spec["Either" "str" `(,(make-arg "s" S)
-                                       ,(make-arg "flat-width" N)
-                                       ,(make-arg "has-hardline" B))]
-    @constructor-spec["Either" "hardline" `(,(make-arg "has-hardline" B))]
-    @constructor-spec["Either" "blank" `(,(make-arg "n" N)
-                                         ,(make-arg "flat-width" N)
-                                         ,(make-arg "has-hardline" B))]
-    @constructor-spec["Either" "concat" `(,(make-arg "fst" PPD)
-                                          ,(make-arg "snd" PPD)
+    @constructor-spec["PPrintDoc" "mt-doc" `(,(make-arg "flat-width" N)
+                                             ,(make-arg "has-hardline" B))]
+    @constructor-spec["PPrintDoc" "str" `(,(make-arg "s" S)
                                           ,(make-arg "flat-width" N)
                                           ,(make-arg "has-hardline" B))]
+    @constructor-spec["PPrintDoc" "hardline" `(,(make-arg "has-hardline" B))]
+    @constructor-spec["PPrintDoc" "blank" `(,(make-arg "n" N)
+                                            ,(make-arg "flat-width" N)
+                                            ,(make-arg "has-hardline" B))]
+    @constructor-spec["PPrintDoc" "concat" `(,(make-arg "fst" PPD)
+                                             ,(make-arg "snd" PPD)
+                                             ,(make-arg "flat-width" N)
+                                             ,(make-arg "has-hardline" B))]
                                           
-    @constructor-spec["Either" "nest" `(,(make-arg "indent" N)
-                                        ,(make-arg "d" PPD)
-                                        ,(make-arg "flat-width" N)
-                                        ,(make-arg "has-hardline" B))]
-    @constructor-spec["Either" "if-flat" `(,(make-arg "flat" PPD)
-                                           ,(make-arg "vert" PPD)
+    @constructor-spec["PPrintDoc" "nest" `(,(make-arg "indent" N)
+                                           ,(make-arg "d" PPD)
                                            ,(make-arg "flat-width" N)
                                            ,(make-arg "has-hardline" B))]
-    @constructor-spec["Either" "align" `(,(make-arg "d" PPD)
-                                         ,(make-arg "flat-width" N)
-                                         ,(make-arg "has-hardline" B))]
-    @constructor-spec["Either" "align-spaces" `(,(make-arg "n" N)
-                                                ,(make-arg "flat-width" N)
-                                                ,(make-arg "has-hardline" B))]
-    @constructor-spec["Either" "group" `(,(make-arg "D" PPD)
-                                         ,(make-arg "flat-width" N)
-                                         ,(make-arg "has-hardline" B))]
+    @constructor-spec["PPrintDoc" "if-flat" `(,(make-arg "flat" PPD)
+                                              ,(make-arg "vert" PPD)
+                                              ,(make-arg "flat-width" N)
+                                              ,(make-arg "has-hardline" B))]
+    @constructor-spec["PPrintDoc" "align" `(,(make-arg "d" PPD)
+                                            ,(make-arg "flat-width" N)
+                                            ,(make-arg "has-hardline" B))]
+    @constructor-spec["PPrintDoc" "align-spaces" `(,(make-arg "n" N)
+                                                   ,(make-arg "flat-width" N)
+                                                   ,(make-arg "has-hardline" B))]
+    @constructor-spec["PPrintDoc" "group" `(,(make-arg "D" PPD)
+                                            ,(make-arg "flat-width" N)
+                                            ,(make-arg "has-hardline" B))]
   )]
 
   @nested[#:style 'inset]{
     Each of the raw constructors for @pyret-id{PPrintDoc} contains two
          fields that memoize how wide the document is when printed
          flat, and whether the document contains a hard linebreak.
-    @constructor-doc["Either" "mt-doc" `(,(make-arg "flat-width" N)
-                                         ,(make-arg "has-hardline" B))
+    @constructor-doc["PPrintDoc" "mt-doc" `(,(make-arg "flat-width" N)
+                                            ,(make-arg "has-hardline" B))
                      PPD #:private #t]{
     Represents an empty document.
     }
-    @constructor-doc["Either" "str" `(,(make-arg "s" S)
-                                      ,(make-arg "flat-width" N)
-                                      ,(make-arg "has-hardline" B)) PPD #:private #t]{
+    @constructor-doc["PPrintDoc" "str" `(,(make-arg "s" S)
+                                         ,(make-arg "flat-width" N)
+                                         ,(make-arg "has-hardline" B)) PPD #:private #t]{
     Represents a simple string, that cannot be broken into smaller
     pieces.  Any whitespace in this string is treated as a normal,
     unbreakable character.
     }
-    @constructor-doc["Either" "hardline" `(,(make-arg "has-hardline" B)) PPD #:private #t]{
+    @constructor-doc["PPrintDoc" "hardline" `(,(make-arg "has-hardline" B)) PPD #:private #t]{
     Forces a line break: no group containing this document can print
     flat.
     }
-    @constructor-doc["Either" "blank" `(,(make-arg "n" N)
-                                        ,(make-arg "flat-width" N)
-                                        ,(make-arg "has-hardline" B)) PPD #:private #t]{
+    @constructor-doc["PPrintDoc" "blank" `(,(make-arg "n" N)
+                                           ,(make-arg "flat-width" N)
+                                           ,(make-arg "has-hardline" B)) PPD #:private #t]{
     Represents @math{n} spaces.  (This is
     simply a memory optimization over storing a @pyret{str} of the
     actual whitespace string.)
     }
-    @constructor-doc["Either" "concat" `(,(make-arg "fst" PPD)
-                                         ,(make-arg "snd" PPD)
-                                         ,(make-arg "flat-width" N)
-                                         ,(make-arg "has-hardline" B))
+    @constructor-doc["PPrintDoc" "concat" `(,(make-arg "fst" PPD)
+                                            ,(make-arg "snd" PPD)
+                                            ,(make-arg "flat-width" N)
+                                            ,(make-arg "has-hardline" B))
                      PPD #:private #t]{
-    Represents printing two documents, one after another.  Either both
+    Represents printing two documents, one after another.  PPrintDoc both
     documents will be printed in flat mode, or neither will.
     }
-    @constructor-doc["Either" "nest" `(,(make-arg "indent" N)
-                                       ,(make-arg "d" PPD)
-                                       ,(make-arg "flat-width" N)
-                                       ,(make-arg "has-hardline" B)) PPD #:private #t]{
+    @constructor-doc["PPrintDoc" "nest" `(,(make-arg "indent" N)
+                                          ,(make-arg "d" PPD)
+                                          ,(make-arg "flat-width" N)
+                                          ,(make-arg "has-hardline" B)) PPD #:private #t]{
     Adds @math{n} spaces to any line breaks that result from printing the
     given document in vertical mode.  This forms an indented paragraph.
     }
-    @constructor-doc["Either" "if-flat" `(,(make-arg "flat" PPD)
-                                          ,(make-arg "vert" PPD)
-                                          ,(make-arg "flat-width" N)
-                                          ,(make-arg "has-hardline" B)) PPD #:private #t]{
+    @constructor-doc["PPrintDoc" "if-flat" `(,(make-arg "flat" PPD)
+                                             ,(make-arg "vert" PPD)
+                                             ,(make-arg "flat-width" N)
+                                             ,(make-arg "has-hardline" B)) PPD #:private #t]{
     Allows choosing between two documents, depending on whether the document
     is being printed flat or not.  This can be used to implement soft line
     breaks, which turn into whitespace when flat.
     }
-    @constructor-doc["Either" "align" `(,(make-arg "d" PPD)
-                                        ,(make-arg "flat-width" N)
-                                        ,(make-arg "has-hardline" B)) PPD #:private #t]{
+    @constructor-doc["PPrintDoc" "align" `(,(make-arg "d" PPD)
+                                           ,(make-arg "flat-width" N)
+                                           ,(make-arg "has-hardline" B)) PPD #:private #t]{
     This aligns its nested content to the current column.  (Unlike
     @pyret-id{nest}, which adds or removes indentation relative to the current
     indentation, this aligns to the current position regardless of current
     indentation.) 
     }
-    @constructor-doc["Either" "align-spaces" `(,(make-arg "n" N)
-                                               ,(make-arg "flat-width" N)
-                                               ,(make-arg "has-hardline" B)) PPD #:private #t]{
+    @constructor-doc["PPrintDoc" "align-spaces" `(,(make-arg "n" N)
+                                                  ,(make-arg "flat-width" N)
+                                                  ,(make-arg "has-hardline" B)) PPD #:private #t]{
     In flat mode, this vanishes, but in vertical mode it adds a linebreak and a
     given number of spaces to the next line.
     }
-    @constructor-doc["Either" "group" `(,(make-arg "D" PPD)
-                                        ,(make-arg "flat-width" N)
-                                        ,(make-arg "has-hardline" B)) PPD #:private #t]{
+    @constructor-doc["PPrintDoc" "group" `(,(make-arg "D" PPD)
+                                           ,(make-arg "flat-width" N)
+                                           ,(make-arg "has-hardline" B)) PPD #:private #t]{
     This applies ``scoping'' to the current nesting level or flatness mode.  If
     a group can be typeset  in flat mode, it will, regardless of the
     surrounding mode.
     }
   }
   
-@section{PPrintDoct Methods}
+@section{PPrintDoc Methods}
 
 These methods are available on all @pyret-id{PPrintDoc}s.
 

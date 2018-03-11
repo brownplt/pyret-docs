@@ -908,11 +908,15 @@
         (map (lambda(group)
                (cond
                 [(empty? (rest group)) ;; is actually a single item
-                 (let ([e (make-link-element
-                           "indexlink"
-                           `(,@(add-between (caddr (first group)) ", ") ,br)
-                           (car (first group)))])
-                   (cond [(hash-ref alpha-starts (first group) #f)
+                 (let* ([item (first group)]
+                        [tag-path (caddr item)]
+                        [name (first tag-path)]
+                        [path (rest tag-path)]
+                        [link-content
+                         (if (empty? path) (list name)
+                             (list name " (from " (add-between path " » ") ")"))]
+                        [e (make-link-element "indexlink" `(,link-content ,br) (car item))])
+                   (cond [(hash-ref alpha-starts item #f)
                           => (lambda (let)
                                (make-element
                                 (make-style #f (list
@@ -923,14 +927,15 @@
                 [else ;; multiple items with a common term
                  (define group-name (first (third (first group))))
                  (cons (make-element #f (list group-name br))
-                       (map (lambda (i)
-                              (let ([e (list (hspace 4)
-                                             "From "
-                                             (make-link-element
-                                              "indexlink"
-                                              `(,@(add-between (cdaddr i) ", ") ,br)
-                                              (car i)))])
-                                (cond [(hash-ref alpha-starts i #f)
+                       (map (lambda (item)
+                              (let* ([tag-path (caddr item)]
+                                     [name (first tag-path)]
+                                     [path (rest tag-path)]
+                                     [link-content (add-between path " » ")]
+                                     [e (list (hspace 4)
+                                             "from "
+                                             (make-link-element "indexlink" `(,link-content ,br) (car item)))])
+                                (cond [(hash-ref alpha-starts item #f)
                                        => (lambda (let)
                                             (make-element
                                              (make-style #f (list
