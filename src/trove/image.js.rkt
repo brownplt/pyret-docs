@@ -72,6 +72,15 @@
   (fun-spec (name "image-height") (arity 1))
   (fun-spec (name "image-baseline") (arity 1))
   (fun-spec (name "name-to-color") (arity 1))
+  (data-spec (name "Image") (variants) (shared))
+  (data-spec (name "Scene") (variants) (shared))
+  (data-spec (name "ImageColor") (variants) (shared))
+  (data-spec (name "Mode") (variants) (shared))
+  (data-spec (name "FontFamily") (variants) (shared))
+  (data-spec (name "FontStyle") (variants) (shared))
+  (data-spec (name "FontWeight") (variants) (shared))
+  (data-spec (name "XPlace") (variants) (shared))
+  (data-spec (name "YPlace") (variants) (shared))
 ))
 
 

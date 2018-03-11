@@ -2,8 +2,8 @@
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 @(require (only-in scribble/core delayed-block))
 
-@(define (set-method name)
-  (method-doc "Set" "set" name #:alt-docstrings ""))
+@(define (set-method name #:alt-docstrings (docs "") #:contract (contract #f) #:return (return #f))
+  (method-doc "Set" #f name #:alt-docstrings docs #:contract contract #:return return))
 
 @(define s-of-a '(a-app (a-id "Set" (xref "sets" "Set")) "a"))
 @(define l-of-a '(a-app (a-id "List" (xref "lists" "List")) "a"))
@@ -24,6 +24,8 @@
     (fun-spec
       (name "list-to-tree-set")
       (arity 1))
+    (fun-spec (name "list-set"))
+    (fun-spec (name "tree-set"))
     (data-spec
       (name "Set")
       (type-vars (a-id "a"))
@@ -173,7 +175,7 @@ with the constructors below, and manipulated with the methods and functions
 below.
 
 
-Some methods, like @pyret-method["Set" "set" "union"], combine multiple sets.  The
+Some methods, like @pyret-method["Set" "union"], combine multiple sets.  The
 set on the left-hand side is the representation of the result.  For example, in
 
 @pyret-block{
@@ -267,7 +269,7 @@ Another name for @pyret-id["list-to-list-set"].
 @set-method["add"]
 @set-method["remove"]
 
-@(method-doc "Set" "set" "size" #:alt-docstrings "" #:contract (a-arrow (S-of "a") N) #:return N)
+@set-method["size" #:alt-docstrings "" #:contract (a-arrow (S-of "a") N) #:return N]
 
 Get the number of elements in the set.
 
@@ -284,7 +286,7 @@ end
 Checks if @pyret{elt} is contained within this set (checking membership with
 @pyret-id["equal-always" "equality"]).
 
-@(method-doc "Set" "set" "pick" #:alt-docstrings "" #:contract (a-arrow (S-of "a") (P-of "a" (S-of "a"))) #:return (P-of "a" (S-of "a")))
+@set-method["pick" #:alt-docstrings "" #:contract (a-arrow (S-of "a") (P-of "a" (S-of "a"))) #:return (P-of "a" (S-of "a"))]
 
 @emph{Picks} an arbitrary element out of the set, and returns a
 @pyret-id["Pick" "pick"] data structure.  If the set is empty, a
@@ -308,8 +310,8 @@ check:
 end
 }
 
-Note that the order of elements returned from @pyret-method["Set" "set" "pick"] is
-non-deterministic, so multiple calls to @pyret-method["Set" "set" "pick"] may not
+Note that the order of elements returned from @pyret-method["Set" "pick"] is
+non-deterministic, so multiple calls to @pyret-method["Set" "pick"] may not
 produce the same result for the same set.
 
 @set-method["union"]

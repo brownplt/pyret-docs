@@ -1,6 +1,8 @@
 #lang scribble/base
 
 @(require "../../scribble-api.rkt")
+@(append-gen-docs
+  `(module "op-precedence" (path "src/js/base/runtime.js")))
 
 @docmodule["op-precedence" #:noimport #t #:friendly-title "Operator Precedence"]
 

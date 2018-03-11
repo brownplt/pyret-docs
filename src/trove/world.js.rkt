@@ -13,10 +13,9 @@
   (unknown-item (name "stop-when"))
   (unknown-item (name "on-key"))
   (unknown-item (name "on-mouse"))
-  (unknown-item (name "on-particle"))
-  (unknown-item (name "to-particle"))
   (fun-spec (name "is-world-config") (arity 1))
   (fun-spec (name "is-key-equal") (arity 2))
+  (data-spec (name "WorldConfig") (variants) (shared))
 ))
 
 @docmodule["world"]{

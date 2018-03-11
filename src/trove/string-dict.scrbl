@@ -49,8 +49,7 @@
 
 @docmodule["string-dict"]{
 
-@ignore[(list "string-dict" "make-string-dict"
-"mutable-string-dict" "make-mutable-string-dict")]
+@ignore[(list "make-string-dict" "make-mutable-string-dict")]
 
 @section{The StringDict Type}
 

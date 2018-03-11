@@ -14,6 +14,8 @@
 @(define numeqfun `(a-arrow ,N ,N ,B))
 @(define eq3fun `(a-arrow ,A ,A ,eq))
 @(define T (a-id "EqualityResult" (xref "equality" "EqualityResult")))
+@(define (make-arg name type)
+   `(,name ("type" "normal") ("contract" ,type)))
 
 @(append-gen-docs
   `(module "equality"
@@ -23,6 +25,15 @@
       (type-vars ())
       (variants ("Equal" "NotEqual" "Unknown"))
       (shared))
+    (singleton-spec
+      (name "Equal")
+      (with-members))
+    (constr-spec
+      (name "NotEqual")
+      (members (,(make-arg "reason" S) ,(make-arg "value1" "Any") ,(make-arg "value2" "Any"))))
+    (constr-spec
+      (name "Unknown")
+      (members (,(make-arg "reason" S) ,(make-arg "value1" "Any") ,(make-arg "value2" "Any"))))
     (fun-spec
       (name "is-Equal")
       (arity 1)
@@ -1010,13 +1021,22 @@ unknown, we define the result of a total equality check with a new datatype:
 
   @data-spec2["EqualityResult" (list) (list
   @singleton-spec2["EqualityResult" "Equal"]
-  @constructor-spec["EqualityResult" "NotEqual" (list `("reason" ("type" "normal") ("contract" ,S)))]
-  @singleton-spec2["EqualityResult" "Unknown"])]
+  @constructor-spec["EqualityResult" "NotEqual" `(,(make-arg "reason" S)
+                                                  ,(make-arg "value1" "Any")
+                                                  ,(make-arg "value2" "Any"))]
+  @constructor-spec["EqualityResult" "Unknown" `(,(make-arg "reason" S)
+                                                 ,(make-arg "value1" "Any")
+                                                 ,(make-arg "value2" "Any"))]
+  )]
 
   @nested[#:style 'inset]{
   @singleton-doc["EqualityResult" "Equal" T]
-  @constructor-doc["EqualityResult" "NotEqual" (list `("reason" ("type" "normal") ("contract" ,S))) T]
-  @singleton-doc["EqualityResult" "Unknown" T]
+  @constructor-doc["EqualityResult" "NotEqual" `(,(make-arg "reason" S)
+                                                 ,(make-arg "value1" "Any")    
+                                                 ,(make-arg "value2" "Any")) T]
+  @constructor-doc["EqualityResult" "Unknown" `(,(make-arg "reason" S)
+                                                ,(make-arg "value1" "Any")
+                                                ,(make-arg "value2" "Any")) T]
 
   @function["is-Equal" #:alt-docstrings ""]
   @function["is-NotEqual" #:alt-docstrings ""]

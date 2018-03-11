@@ -800,11 +800,11 @@ a-chart-window = render-charts([list: series-1, series-2])
   @;################################
   @subsection{Shared Methods}
 
-  @method-doc["ChartWindow" "" "title"]
-  @method-doc["ChartWindow" "" "width"]
-  @method-doc["ChartWindow" "" "height"]
-  @method-doc["ChartWindow" "" "display"]
-  @method-doc["ChartWindow" "" "get-image"]
+  @method-doc["ChartWindow" #f "title"]
+  @method-doc["ChartWindow" #f "width"]
+  @method-doc["ChartWindow" #f "height"]
+  @method-doc["ChartWindow" #f "display"]
+  @method-doc["ChartWindow" #f "get-image"]
 
   @;################################
   @subsection{Plot Chart Window}

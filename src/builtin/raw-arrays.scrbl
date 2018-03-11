@@ -7,7 +7,7 @@
   `(module "raw-arrays"
     (path "src/js/base/runtime-anf.js")
     (data-spec
-      (name "RawArrays")
+      (name "RawArray")
       (variants)
       (shared))
     (fun-spec
@@ -43,6 +43,10 @@
       (arity 4)
       (args ("f" "init" "array" "start-index"))
       (doc ""))
+    (unknown-item
+      (name "raw-array")
+      ;; { maker of raw-arrays ... }
+      )
 ))
 
 

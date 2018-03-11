@@ -169,6 +169,17 @@ check:
 end
 }
 
+@function["array-from-list"
+  #:contract (a-arrow (L-of "a") (A-of "a"))
+  #:args (list (list "l" #f))
+  #:return (A-of "a")]
+
+Converts a list of items into an array of items.
+@examples{
+check:
+  array-from-list([list: 1, 2, 3]) is=~ [array: 1, 2, 3]
+end
+}
 @section{Array Methods}
 
 @a-method["get-now"

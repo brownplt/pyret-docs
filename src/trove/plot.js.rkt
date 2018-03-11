@@ -29,6 +29,9 @@
     (data-spec
       (name "Plot")
       (variants ("line-plot" "scatter-plot" "function-plot")))
+    (constr-spec (name "line-plot"))
+    (constr-spec (name "scatter-plot"))
+    (constr-spec (name "function-plot"))
   ))
 
 @docmodule["plot"]{

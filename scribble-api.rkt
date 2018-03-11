@@ -272,7 +272,7 @@
 (define pyret-method
   (case-lambda
     [(datatype id)
-     (seclink (xref (curr-module-name) datatype "" id) (tt (string-append "." id)))]
+     (seclink (xref (curr-module-name) datatype "shared methods" id) (tt (string-append "." id)))]
     [(datatype varname id)
      (seclink (xref (curr-module-name) datatype varname id) (tt (string-append "." id)))]
     [(datatype varname id mod)
@@ -364,8 +364,8 @@
 @(define (tag-name . args)
    (apply string-append (add-between args "_")))
 
-@(define (type-spec type-name tyvars . body)
-  (set-documented! (curr-module-name) type-name)
+@(define (type-spec type-name tyvars #:private (private #f) . body)
+  (when (not private) (set-documented! (curr-module-name) type-name))
   (define name-part (make-header-elt-for (seclink (xref (curr-module-name) type-name) (tt type-name)) type-name))
   (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ",") (list ">")) ""))
   ;;(define content-text (string-split (string-trim (content->string body)) "\n"))
@@ -395,7 +395,8 @@
   (define tag (list 'part (tag-name (curr-module-name) name)))
   (toc-target-element code-style elt tag))
 
-@(define (data-spec-internal2 data-name tyvars variants)
+@(define (data-spec-internal2 data-name tyvars variants #:private (private #f))
+  (when (not private) (set-documented! (curr-module-name) data-name))
   (define name-part (make-header-elt-for (seclink (xref (curr-module-name) data-name) (tt data-name)) data-name))
   (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ",") (list ">")) ""))
     (nested #:style (div-style "boxed")
@@ -417,7 +418,8 @@
        (a-id "Boolean" (xref "<global>" "Boolean")) (list (list "value" #f)) '() '() '()))
     body))
 
-@(define (constructor-doc data-name variant-name members return . body)
+@(define (constructor-doc data-name variant-name members return #:private (private #f) . body)
+  (when (not private) (set-documented! (curr-module-name) variant-name))
   (define name-part (make-header-elt-for variant-name variant-name))
   (define member-types (map (lambda (m) (cdr (assoc "contract" (rest m)))) members))
   (define members-as-args (map (lambda (m) `(,(first m) #f)) members))
@@ -436,8 +438,8 @@
        (a-id "Boolean" (xref "<global>" "Boolean")) (list (list "value" #f)) '() '() '()))
     body))
 
-@(define (singleton-spec2 data-name variant-name)
-  (set-documented! (curr-module-name) variant-name)
+@(define (singleton-spec2 data-name variant-name #:private (private #f))
+  (when (not private) (set-documented! (curr-module-name) variant-name))
   (define processing-module (curr-module-name))
   (define name (seclink (xref processing-module variant-name) (tt variant-name)))
   (list (dt-indent (tt "| " name))))
@@ -464,8 +466,8 @@
         (parameterize ([curr-data-spec (find-doc (curr-module-name) name)])
          (let ([contents (data-spec-internal name args ...)])
            contents)))]))
-@(define (data-spec-internal name #:params (params #f) . members)
-   (set-documented! (curr-module-name) name)
+@(define (data-spec-internal name #:params (params #f) #:private (private #f) . members)
+   (when (not private) (set-documented! (curr-module-name) name))
    (let ([processing-module (curr-module-name)])
      (interleave-parbreaks/all
       (list (drop-anchor name)
@@ -484,10 +486,13 @@
                       #:alt-docstrings (alt-docstrings #f)
                       #:examples (examples '())
                       . body)
-  (let* ([spec (or (find-defn/nowarn 'name name
-                      (get-defn-field 'with-members (find-doc/nowarn (curr-module-name) var-name)))
+  (let* ([spec (and var-name
+                    (find-defn/nowarn 'name name
+                      (get-defn-field 'with-members (find-doc/nowarn (curr-module-name) var-name))))]
+         [spec (or spec
                    (find-defn/nowarn 'name name
-                      (get-defn-field 'shared (find-doc/nowarn (curr-module-name) data-name)))
+                      (get-defn-field 'shared (find-doc/nowarn (curr-module-name) data-name))))]
+         [spec (or spec
                    (find-defn/nowarn 'name name
                       (get-defn-field 'with-members
                          (find-defn/nowarn 'name var-name
@@ -495,10 +500,10 @@
       (unless spec
         (warning 'method-doc
           (format "No definition for method ~a for data ~a and variant ~a in module ~s"
-                  name data-name var-name (curr-module-name))))
+                  name data-name (or var-name "shared methods") (curr-module-name))))
       (render-fun-helper
         spec name
-        (list 'part (curr-module-name) data-name var-name name)
+        (list 'part (curr-module-name) data-name (or var-name "shared methods") name)
         contract return args alt-docstrings examples body)))
 @(define (method-spec name
                       #:params (params #f)
@@ -749,7 +754,8 @@
                                     (para (bold "Examples:"))
                                     (apply pyret-block examples)))))))))))))))
 
-@(define (collection-doc name #:contract contract)
+@(define (collection-doc name #:contract contract #:private (private #f))
+  (when (not private) (set-documented! (curr-module-name) name))
   (define name-part (make-header-elt-for (seclink (xref (curr-module-name) name) (tt name)) name))
   (define (arrow-args arr) (reverse (rest (reverse (rest arr)))))
   (define (arrow-ret arr) (last arr))
@@ -792,6 +798,7 @@
                    #:args (args #f)
                    #:alt-docstrings (alt-docstrings #f)
                    #:examples (examples '())
+                   #:private (private #f)
                    . contents
                    )
    (let* ([ans
@@ -800,11 +807,11 @@
            (list 'part (curr-module-name) name)
            contract return args alt-docstrings examples contents)])
           ; error checking complete, record name as documented
-     (set-documented! (curr-module-name) name)
+     (when (not private) (set-documented! (curr-module-name) name))
      ans))
 
-(define (value name ann . contents)
-  (set-documented! (curr-module-name) name)
+(define (value name ann #:private (private #f) . contents)
+  (when (not private) (set-documented! (curr-module-name) name))
    (let ([processing-module (curr-module-name)])
      (define part-tag (list 'part (tag-name (curr-module-name) name)))
      (define name-tt (seclink (xref processing-module name) (tt name)))

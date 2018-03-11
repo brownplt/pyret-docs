@@ -8,12 +8,16 @@
   (data-spec
     (name "Event")
     (type-vars ())
-    (variants ("time-tick") ("mouse") ("keypress") (shared ())))
+    (variants ("time-tick") ("mouse") ("keypress")
+    (shared ())))
   (data-spec
     (name "Reactor")
     (type-vars ("a"))
     (variants ("reactor"))
     (shared ()))
+  (constr-spec (name "time-tick"))
+  (constr-spec (name "mouse"))
+  (constr-spec (name "keypress"))
 
   (fun-spec (name "get-value"))
   (fun-spec (name "draw"))

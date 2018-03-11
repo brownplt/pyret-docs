@@ -5,11 +5,25 @@
   '(module "tables"
     (path "src/js/base/runtime-anf.js")
     (fun-spec
+      (name "difference"))
+    (fun-spec
       (name "difference-from"))
+    (fun-spec
+      (name "running-sum"))
+    (fun-spec
+      (name "running-mean"))
+    (fun-spec
+      (name "running-max"))
+    (fun-spec
+      (name "running-min"))
     (fun-spec
       (name "running-fold"))
     (fun-spec
       (name "running-reduce"))
+    (fun-spec
+      (name "raw-row"))
+    (fun-spec
+      (name "table-from-rows"))
     (data-spec
       (name "Row")
       (variants ("row"))

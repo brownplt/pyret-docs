@@ -1,8 +1,12 @@
 #lang scribble/base
 @(require "../../scribble-api.rkt" "../abbrevs.rkt" scribble/html-properties)
 
+@(define eq '(a-id "EqualityResult" (xref "equality" "EqualityResult")))
+@(define eqfun `(a-arrow ,A ,A ,B))
+@(define eq3fun `(a-arrow ,A ,A ,eq))
+
 @(append-gen-docs
-  '(module "numbers"
+  `(module "numbers"
     (path "src/js/base/runtime-anf.js")
     (data-spec
       (name "Number")
@@ -40,205 +44,212 @@
       (name "NumNonNegative")
       (variants)
       (shared))
-  (fun-spec
-    (name "num-equal")
-    (arity 2)
-    (args ("n1" "n2"))
-    (doc ""))
-  (fun-spec
-    (name "num-max")
-    (arity 2)
-    (args ("n1" "n2"))
-    (doc ""))
-  (fun-spec
-    (name "num-min")
-    (arity 2)
-    (args ("n1" "n2"))
-    (doc ""))
-  (fun-spec
-    (name "num-abs")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-sin")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-cos")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-tan")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-asin")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-acos")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-atan")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-atan2")
-    (arity 2)
-    (args ("dy" "dx"))
-    (doc ""))
-  (fun-spec
-    (name "num-modulo")
-    (arity 2)
-    (args ("n" "divisor"))
-    (doc ""))
-  (fun-spec
-    (name "num-truncate")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-sqrt")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-sqr")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-ceiling")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-floor")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-round")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-round-even")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-log")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-exp")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-expt")
-    (arity 2)
-    (args ("base" "exponent"))
-    (doc ""))
-  (fun-spec
-    (name "num-to-rational")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-to-roughnum")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-is-integer")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-is-rational")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-is-roughnum")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-is-positive")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-is-negative")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-is-non-positive")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-is-non-negative")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-to-string")
-    (arity 1)
-    (args ("n"))
-    (doc ""))
-  (fun-spec
-    (name "num-to-string-digits")
-    (arity 2)
-    (args ("n" "digits"))
-    (doc ""))
-  (fun-spec
-    (name "num-within-abs")
-    (arity 1)
-    (args ("tol"))
-    (doc ""))
-  (fun-spec
-    (name "num-within-rel")
-    (arity 1)
-    (args ("tol"))
-    (doc ""))
+    (fun-spec
+      (name "num-equal")
+      (arity 2)
+      (args ("n1" "n2"))
+      (doc ""))
+    (fun-spec
+      (name "num-max")
+      (arity 2)
+      (args ("n1" "n2"))
+      (doc ""))
+    (fun-spec
+      (name "num-min")
+      (arity 2)
+      (args ("n1" "n2"))
+      (doc ""))
+    (fun-spec
+      (name "num-abs")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-sin")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-cos")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-tan")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-asin")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-acos")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-atan")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-atan2")
+      (arity 2)
+      (args ("dy" "dx"))
+      (doc ""))
+    (fun-spec
+      (name "num-modulo")
+      (arity 2)
+      (args ("n" "divisor"))
+      (doc ""))
+    (fun-spec
+      (name "num-truncate")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-sqrt")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-sqr")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-ceiling")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-floor")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-round")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-round-even")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-log")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-exp")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-expt")
+      (arity 2)
+      (args ("base" "exponent"))
+      (doc ""))
+    (fun-spec
+      (name "num-to-rational")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-to-roughnum")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-is-integer")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-is-rational")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-is-roughnum")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-is-positive")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-is-negative")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-is-non-positive")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-is-non-negative")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-to-string")
+      (arity 1)
+      (args ("n"))
+      (doc ""))
+    (fun-spec
+      (name "num-to-string-digits")
+      (arity 2)
+      (args ("n" "digits"))
+      (doc ""))
+    (fun-spec
+      (name "num-within-abs")
+      (arity 1)
+      (args ("tol"))
+      (return ,eqfun)
+      (doc ""))
+    (fun-spec
+      (name "num-within-rel")
+      (arity 1)
+      (args ("tol"))
+      (return ,eqfun)
+      (doc ""))
     (fun-spec
       (name "within-abs")
       (arity 1)
       (args ("tol"))
+      (return ,eqfun)
       (doc ""))
     (fun-spec
       (name "within-abs-now")
       (arity 1)
       (args ("tol"))
+      (return ,eqfun)
       (doc ""))
     (fun-spec
       (name "within")
       (arity 1)
       (args ("tol"))
+      (return ,eqfun)
       (doc ""))
     (fun-spec
       (name "within-rel")
       (arity 1)
       (args ("tol"))
+      (return ,eqfun)
       (doc ""))
     (fun-spec
       (name "within-rel-now")
       (arity 1)
       (args ("tol"))
+      (return ,eqfun)
       (doc ""))
     (fun-spec
       (name "within-abs3")
@@ -914,7 +925,7 @@ check:
 end
 }
   }
-  @function["num-within-abs" #:contract (a-arrow N A)]{
+  @function["num-within-abs" #:contract (a-arrow N eqfun)]{
 
 Returns a predicate that checks if the difference of its two
 arguments is less than @pyret{tol}.
@@ -935,7 +946,7 @@ end
 }
 
   }
-  @function["num-within-rel" #:contract (a-arrow N A)]{
+  @function["num-within-rel" #:contract (a-arrow N eqfun)]{
 
 Returns a predicate that checks that its first number argument
 is no more than the fraction @pyret{tol} off from its second
@@ -951,14 +962,22 @@ end
 }
   }
 
-  @function["within" #:contract (a-arrow N A)]
-  @function["within-abs" #:contract (a-arrow N A)]
-  @function["within-rel" #:contract (a-arrow N A)]
-  @function["within-abs-now" #:contract (a-arrow N A)]
-  @function["within-rel-now" #:contract (a-arrow N A)]
+  @function["within" #:contract (a-arrow N eqfun)]
+  @function["within-abs" #:contract (a-arrow N eqfun)]
+  @function["within-rel" #:contract (a-arrow N eqfun)]
+  @function["within-abs-now" #:contract (a-arrow N eqfun)]
+  @function["within-rel-now" #:contract (a-arrow N eqfun)]
 
   These comparison functions compare both numbers and structures, and are
   documented in @seclink["s:bounded-equalities"].
+
+  @function["within-abs3" #:contract (a-arrow N eq3fun)]
+  @function["within-rel3" #:contract (a-arrow N eq3fun)]
+  @function["within-abs-now3" #:contract (a-arrow N eq3fun)]
+  @function["within-rel-now3" #:contract (a-arrow N eq3fun)]
+
+  These comparison functions are like the ones above, but return
+  @pyret-id["EqualityResult" "equality"]s, and are documented in @seclink["s:total-equality-predicates"].
 
 @section{Random Numbers}
 

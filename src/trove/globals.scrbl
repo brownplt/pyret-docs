@@ -38,6 +38,10 @@
     (variants)
     (shared))
   (data-spec
+    (name "Table")
+    (variants)
+    (shared))
+  (data-spec
     (name "Object")
     (variants)
     (shared))
@@ -217,6 +221,10 @@ end
 @type-spec["Function" (list)]{
 
 The type of all @seclink["functions-tour" "function values"].}
+
+@type-spec["Method" (list)]{
+
+The type of all method values.}
 
 @type-spec["Object" (list)]{
 
