@@ -116,7 +116,8 @@
 
     An @tt{ImageColor} is either a string from the list in
     @secref["s:color-constants"], or a @pyret-id["Color" "image-structs"],
-    which you can use to construct colors other than the predefined ones.
+    which you can use to construct colors other than the predefined ones,
+    including making colors partially transparent by controlling their opacity.
 
   @function[
     "name-to-color"

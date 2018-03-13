@@ -40,4 +40,7 @@ examples in Pyret.}
 
 @include-section["libraries.scrbl"]
 
+@include-section["style-guide.scrbl"]
+
 @include-section["internal.scrbl"]
+
