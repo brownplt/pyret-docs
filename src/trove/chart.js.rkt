@@ -204,6 +204,12 @@
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
                      ,num-bins-meth)))
     (data-spec
+      (name "DataSeries")
+      (type-vars ())
+      (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
+                 "bar-chart-series" "pie-chart-series" "histogram-series"))
+      (shared))
+    (data-spec
       (name "ChartWindow")
       (type-vars ())
       (variants ("bar-chart-window"))
@@ -794,11 +800,11 @@ a-chart-window = render-charts([list: series-1, series-2])
   @;################################
   @subsection{Shared Methods}
 
-  @method-doc["ChartWindow" "bar-chart-window" "title"]
-  @method-doc["ChartWindow" "bar-chart-window" "width"]
-  @method-doc["ChartWindow" "bar-chart-window" "height"]
-  @method-doc["ChartWindow" "bar-chart-window" "display"]
-  @method-doc["ChartWindow" "bar-chart-window" "get-image"]
+  @method-doc["ChartWindow" #f "title"]
+  @method-doc["ChartWindow" #f "width"]
+  @method-doc["ChartWindow" #f "height"]
+  @method-doc["ChartWindow" #f "display"]
+  @method-doc["ChartWindow" #f "get-image"]
 
   @;################################
   @subsection{Plot Chart Window}

@@ -19,6 +19,7 @@
 
 @docmodule["s-exp"]{
 @ignore[(list "s-sym" "s-str" "s-num" "s-list")]
+@ignore[(list "is-s-list" "is-s-num" "is-s-str" "is-s-sym")]
   @para{
   This module re-exports the constructors from @sref["S-Exp"],
   which defines the result of parsing an s-exp.

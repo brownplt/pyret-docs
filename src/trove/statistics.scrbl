@@ -24,7 +24,7 @@
     (fun-spec (name "mode-largest") (arity 1))
 
     (fun-spec (name "lin-reg-2V") (arity 2))
-
+    (constr-spec (name "simple-linear-model"))
     (data-spec
       (name "StatModel")
       (variants ("simple-linear-model"))

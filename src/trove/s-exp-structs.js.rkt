@@ -84,7 +84,6 @@
 
 @docmodule["s-exp-structs"]{
   @section[#:tag "S-Exp_DataTypes"]{The S-Exp Datatype}
-  @ignore[(list "is-s-list" "is-s-num" "is-s-str" "is-s-sym")]
   @para{
     This datatype defines the result of parsing s-expressions.  See
     @a-id["read-s-exp" @xref["s-exp" "read-s-exp"]] for more details and examples.

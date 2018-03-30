@@ -8,12 +8,16 @@
   (data-spec
     (name "Event")
     (type-vars ())
-    (variants ("time-tick") ("mouse") ("keypress") (shared ())))
+    (variants ("time-tick") ("mouse") ("keypress")
+    (shared ())))
   (data-spec
     (name "Reactor")
     (type-vars ("a"))
     (variants ("reactor"))
     (shared ()))
+  (constr-spec (name "time-tick"))
+  (constr-spec (name "mouse"))
+  (constr-spec (name "keypress"))
 
   (fun-spec (name "get-value"))
   (fun-spec (name "draw"))
@@ -62,7 +66,7 @@ move to @pyret{reactors} if you need their advanced features.
                        
 @section[#:tag "s:reactors"]{Creating Reactors}
 
-@type-spec["Reactor" (list "a")]
+@type-spec["Reactor" (list "a")]{Reactors are values enabling the creation of time-based animations, simulations, and interactive programs.}
 
 @pyret{reactor}s are created with special syntax:
 

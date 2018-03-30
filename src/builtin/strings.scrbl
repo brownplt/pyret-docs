@@ -117,9 +117,9 @@
 
 @docmodule["strings" #:noimport #t #:friendly-title "Strings"]{
 
-@type-spec["String" (list)]
+@type-spec["String" (list)]{
 
-The type of string values.
+The type of string values.}
                                                                
 A @pyret{String} is a fixed-length array of characters.  This includes not only letters in
 the Latin alphabet and numerals, but any Unicode character, including languages

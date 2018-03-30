@@ -44,3 +44,4 @@ examples in Pyret.}
 
 @include-section["internal.scrbl"]
 
+@include-section["glossary.scrbl"]

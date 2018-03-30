@@ -6,7 +6,7 @@
 @(define (a-method name #:args args #:return ret #:contract contract)
   (method-doc "Array" "array" name #:alt-docstrings "" #:args args #:return ret #:contract contract))
 @(define (a-ref name)
-  (pyret-method "Array" name "arrays"))
+  (pyret-method "Array" "array" name "arrays"))
 
 @(append-gen-docs
   '(module "arrays"
@@ -71,13 +71,13 @@
 
 
 @docmodule["arrays" #:noimport #t]{
-   @type-spec["Array" (list)]
+   @type-spec["Array" (list)]{
 
 An @pyret{Array} is a mutable, fixed-length collection indexed
 by non-negative intgers.  These arrays are implemented using
-@seclink{raw-arrays}, but provide an easier-to-use, more Pyret-like API.
+@seclink{raw-arrays}, but provide an easier-to-use, more Pyret-like API.}
 
-@section{Array Functions}
+@section{Array Creation Functions}
 
 @collection-doc["array" #:contract `(a-arrow ("elt" "a") ,(A-of "a"))]
 
@@ -169,6 +169,17 @@ check:
 end
 }
 
+@function["array-from-list"
+  #:contract (a-arrow (L-of "a") (A-of "a"))
+  #:args (list (list "l" #f))
+  #:return (A-of "a")]
+
+Converts a list of items into an array of items.
+@examples{
+check:
+  array-from-list([list: 1, 2, 3]) is=~ [array: 1, 2, 3]
+end
+}
 @section{Array Methods}
 
 @a-method["get-now"

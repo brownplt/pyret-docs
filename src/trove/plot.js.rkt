@@ -29,6 +29,9 @@
     (data-spec
       (name "Plot")
       (variants ("line-plot" "scatter-plot" "function-plot")))
+    (constr-spec (name "line-plot"))
+    (constr-spec (name "scatter-plot"))
+    (constr-spec (name "function-plot"))
   ))
 
 @docmodule["plot"]{
@@ -345,7 +348,7 @@
     new-options = _.{val1: ..., val2: ...}
   }
 
-  @type-spec["PlotOptions" '()]
+  @type-spec["PlotOptions" '()]{
 
   A config associated with @pyret-id{PlotOptions} consists of the following fields:
   @a-record[(t-field "color" Color)]
@@ -357,8 +360,9 @@
     my-plot-options-1 = _.{color: I.red}
     my-plot-options-2 = default-options
   }
+  }
 
-  @type-spec["PlotWindowOptions" '()]
+  @type-spec["PlotWindowOptions" '()]{
 
   A config associated with @pyret-id{PlotWindowOptions} consists of the following fields:
   @a-record[(t-field "x-min" N)
@@ -393,4 +397,5 @@
   @pyret{interact}, when @pyret{true} (the default) shows a separate window
   containing the plot.  When @pyret{false}, the window does not appear; this is
   useful for simply getting an @pyret-id["Image" "image"] from the plot.
+  }
 }

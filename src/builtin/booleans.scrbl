@@ -16,9 +16,9 @@
       (doc "Negates the boolean value"))))
 
 @docmodule["booleans" #:noimport #t #:friendly-title "Booleans"]{
-  @type-spec["Boolean" (list)]
+  @type-spec["Boolean" (list)]{
 
-  The type of the values @pyret{true} and @pyret{false}.
+  The type of the values @pyret{true} and @pyret{false}.}
 
   @section{Boolean Functions}
 

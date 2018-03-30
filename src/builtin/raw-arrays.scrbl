@@ -7,7 +7,7 @@
   `(module "raw-arrays"
     (path "src/js/base/runtime-anf.js")
     (data-spec
-      (name "RawArrays")
+      (name "RawArray")
       (variants)
       (shared))
     (fun-spec
@@ -43,11 +43,15 @@
       (arity 4)
       (args ("f" "init" "array" "start-index"))
       (doc ""))
+    (unknown-item
+      (name "raw-array")
+      ;; { maker of raw-arrays ... }
+      )
 ))
 
 
 @docmodule["raw-arrays" #:noimport #t #:friendly-title "RawArray"]{
-   @type-spec["RawArray" (list "a")]
+   @type-spec["RawArray" (list "a")]{
 
    A @pyret{RawArray} is a mutable, fixed-length collection indexed
    by non-negative intgers.  They are a very thin wrapper around native
@@ -57,7 +61,7 @@
 
    @pyret{RawArray}s are widely used internally in Pyret
    language development.
- 
+ }
 
      @section{RawArray Functions}
 
