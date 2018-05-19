@@ -277,54 +277,55 @@
   The Pyret Chart library. It consists of chart, plot, and data visualization tools,
   using @link["https://developers.google.com/chart/" "Google Charts"] as a backend.
 
-  This documentation assumes that you @pyret{include} the chart library,
-  and has imported @pyret{image-structs} as @pyret{I} (@pyret{import image-structs as I}).
+  This documentation assumes that your program begins with including the @pyret{chart} library and importing the @pyret{image-structs} library as follows:
+
+  @pyret-block{
+include chart
+import image-structs as I
+  }
+
+  There are two steps to create a chart: first, creating @emph{@|DataSeries|} representing the information to be charted, and second, rendering @|DataSeries| into a @emph{@|ChartWindow|}. We give examples of both steps below.
 
   @;############################################################################
   @section{Creating a DataSeries}
 
-  Given data, before you visualize them as a chart, you need to choose what @emph{type}
-  of chart do you want. For example, you could either choose to visualize the data as
-  a bar chart or as a pie chart.
+  In order to visualize data as a chart, you must decide what @emph{type} of chart (e.g., bar charts or pie charts; there are others detailed below) you want.
 
-  The data along with the type of chart and chart-specific configuration is
-  called a @|DataSeries|. As an example,
-  you might have data about English native speakers in several countries and would like
-  to visualize them using bar chart. The data could be represented by a list of
-  strings (country names) and a list of numbers (number of English native speakers) as follows:
+  The combination of data with a chart type and (optional) chart-specific configurations is called a @emph{@|DataSeries|}. For example, your program might have population data about English native speakers in several countries, and your goal is to visualize that data as a bar chart. One reasonable starting point is to represent the data as a list of strings (country names) and a list of numbers (number of English native speakers):
 
   @pyret-block{
 countries =    [list: "US",      "India",   "Pakistan", "Philippines", "Nigeria"]
 num-speakers = [list: 251388301, 125344736, 110041604,  89800800,      79000000]
   }
 
-  Then, you can use a @emph{chart constructor} -- here, the bar chart constructor
-  @pyret{from-list.bar-chart} -- to create a @|DataSeries|:
+  Getting from this data to a data series is simple: use a @emph{chart constructor} -- here, the bar chart constructor @pyret{from-list.bar-chart} -- to create a @|DataSeries|:
 
   @pyret-block{
 a-pie-chart-series = from-list.bar-chart(countries, num-speakers)
   }
 
-  As another example, say we have a function in Pyret @pyret{fun f(x): num-sin(2 * x) end}.
-  We can use the chart constructor @pyret{from-list.function-plot} to create a
-  @|DataSeries|. Furthermore, we can specify the color of the function by using
-  the method @pyret{color} on the @|DataSeries| to obtain a new @|DataSeries|
-  with the desired color.
+  As another example, consider the typical high-school math task of ``graphing a function'', that is, plotting the values of a function for some range of inputs. Another chart constructor, @pyret{from-list.function-plot}, would create the relevant @|DataSeries|:
 
   @pyret-block{
-import image-structs as I
-
-fun f(x): num-sin(2 * x) end
-intermediate-series = from-list.function-plot(f)
-a-series = intermediate-series.color(I.purple)
+fun some-fun(x): num-sin(2 * x) end # some arbitrary function
+a-function-series = from-list.function-plot(f)
   }
 
-  If you prefer, you can chain methods to avoid naming the intermediate series:
+  So far, we have only constructed @|DataSeries| without any additionnal configuration. @|DataSeries| also exist to allow customizing individual plots. As a simple first example of this, suppose the function plot should be in a specific color. You might write:
 
   @pyret-block{
-a-series = from-list.function-plot(f)
-  .color(I.purple)
+colorful-function-series = a-function-series.color(I.purple)
   }
+
+  You can also combine @|DataSeries| creation and @|DataSeries| customization together via chaining to avoid an intermediate variable:
+
+  @pyret-block{
+fun some-fun(x): num-sin(2 * x) end # some arbitrary function
+colorful-function-series = from-list.function-plot(f)
+                                    .color(I.purple)
+  }
+
+  There are also other customization options, described below, that can be chained onto the end of this expression to successively customize other details of the @|DataSeries|.
 
   @margin-note{We plan that the chart library should support the @pyret-id["Table" "tables"] inferface too.
   Hence, each chart constructor will be provided under both @pyret{from-list}
@@ -334,43 +335,28 @@ a-series = from-list.function-plot(f)
   @;############################################################################
   @section{Creating a ChartWindow}
 
-  Given a @|DataSeries|, we can render the chart on a window using
-  the function @in-link{render-chart}. The function constructs a @in-link{ChartWindow}.
+  Given @|DataSeries|, we can render it/them on a window using
+  the function @in-link{render-charts} or @in-link{render-chart}. The functions construct a @in-link{ChartWindow}.
   From the example in the previous section:
 
   @pyret-block{
-include chart
-import image-structs as I
-
 fun f(x): num-sin(2 * x) end
 a-series = from-list.function-plot(f)
   .color(I.purple)
 a-chart-window = render-chart(a-series)
   }
 
-  Then, you can use the method @pyret-method["ChartWindow" "display"] to open up an interactive
-  visualization dialog. The method returns an @pyret-id["Image" "image"] of
-  the chart.
+  Once you have a @|ChartWindow|, you can use its @pyret-method["ChartWindow" "display"] method to actually open up an interactive dialog: @pyret{a-chart-window.display()} will produce a dialog like this:
 
-  @pyret-block{
-a-chart-window.display()
-  }
+@(in-image "dialog")
 
-  The interactive dialog's display looks like:
-
-  @(in-image "dialog")
-
-  Or, if you wish to only obtain the @pyret-id["Image" "image"] of the chart,
-  you can use the method @pyret-method["ChartWindow" "get-image"] directly.
+  In addition to displaying the interactive dialog, the @pyret-method["ChartWindow" "display"] method will also return the rendered chart as an @pyret-id["Image" "image"]. If you only need the @pyret-id["Image" "image"] but not the interactive dialog, you should use the method @pyret-method["ChartWindow" "get-image"] instead of @pyret-method["ChartWindow" "display"].
 
   @pyret-block{
 an-image = a-chart-window.get-image()
   }
 
-  Like @|DataSeries|, a @in-link{ChartWindow} can be additionally configured.
-  As an example, all charts should have title and should have axes labeled.
-  Instead of calling @pyret-method["ChartWindow" "display"] immediately after constructing @pyret{a-chart-window},
-  we can do the following:
+  Just as @|DataSeries| is an intermediate value allowing for the customization of individual plots, @in-link{ChartWindow} is an intermediate value allowing for the customization of the @emph{entire chart window}. For example, charts ought to have titles and axis labels. These options do not make sense on individual plots; they are properties of the chart window as a whole. So we might write:
 
   @pyret-block{
     a-chart-window
@@ -380,22 +366,21 @@ an-image = a-chart-window.get-image()
       .display()
   }
 
-  The chart now has a title, and axes are labeled.
+  These customizations change the output from the previous image to the following:
 
   @(in-image "window-config")
 
   @;############################################################################
   @subsection{Interactive Dialog}
 
-  To close the dialog, you can either click the close button on the top left
-  corner, or press esc.
+  To close an interactive dialog, you can either click the close button on the top left corner, or press esc.
 
   In addition to being able to obtain the chart as a Pyret @|Image|, you can
-  also save the chart image as a png file from the interactive dialog by
+  also save the chart image as a @pyret{png} file from the interactive dialog by
   clicking the save button which is next to the close button.
 
-  For some kind of charts, like function plot which you have seen above, there
-  will be a controller panel for you to adjust options interactively.
+  For some kind of charts (e.g., function plot) there
+  will be a controller panel for you to adjust configurations of the chart window interactively.
 
   @;############################################################################
   @section{Chart Constructors for List Interface}
@@ -406,7 +391,7 @@ an-image = a-chart-window.get-image()
     #:return (a-pred DataSeries (in-link "function-plot-series"))
   ]{
 
-    Constructing a function plot series from @pyret{f}. See more details a
+    Constructing a function plot series from @pyret{f}. See more details at
     @(in-link "function-plot-series").
 
     @examples{

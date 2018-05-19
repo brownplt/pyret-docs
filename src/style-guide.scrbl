@@ -319,7 +319,5 @@ instead. In particular, if you have prior experience in a language
 like JavaScript, you might think this is @emph{good} practice. It's
 not: @emph{don't do this}! In Pyret, adding @code{var} turns each name
 into a @emph{mutable variable}, i.e., one that you can modify using an
-assignment statement. This is virtually never intended in our courses,
-and is usually a bad programming practice. Therefore, do not use
-@code{var} unless you absolutely meant to create a mutable variable
-and have been told to do so.
+assignment statement. Therefore, do not use @code{var} unless you
+absolutely mean to create a mutable variable.
