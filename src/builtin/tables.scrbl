@@ -44,6 +44,7 @@
         (method-spec (name "add-row"))
         (method-spec (name "row-n"))
         (method-spec (name "column"))
+        (method-spec (name "get-column"))
         (method-spec (name "column-n"))
         (method-spec (name "column-names"))
         (method-spec (name "all-rows"))
@@ -933,12 +934,21 @@ at the end.
 Consumes an index, and returns the row at that index. The first row has index
 0.
 
+@table-method["get-column"
+  #:contract (a-arrow Table S (L-of "Col"))
+  #:args '(("self" #f) ("colname" #f))
+  #:return (L-of "Col")]
+
+Consumes the name of a column, and returns the values in that column as a
+list.
+
 @table-method["column"
   #:contract (a-arrow Table S (L-of "Col"))
   #:args '(("self" #f) ("colname" #f))
   #:return (L-of "Col")]
 
-Consumes the name of a column, and returns the values in that column as a list.
+This method is no longer used (use @pyret-method["Table" "table" "get-column"]
+instead).
 
 @table-method["column-n"
   #:contract (a-arrow Table N (L-of "Col"))
