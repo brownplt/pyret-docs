@@ -14,12 +14,12 @@
       (type-vars)
       (variants)
       (shared (
-        (method-spec (name "sheet-list"))
+        (method-spec (name "sheet-names"))
         (method-spec (name "sheet-by-name"))
         (method-spec (name "sheet-by-index"))
-        (method-spec (name "delete-sheet-by-name"))
-        (method-spec (name "delete-sheet-by-index"))
-        (method-spec (name "add-sheet"))
+        @; (method-spec (name "delete-sheet-by-name"))
+        @; (method-spec (name "delete-sheet-by-index"))
+        @; (method-spec (name "add-sheet"))
         )))
     (data-spec
       (name "Worksheet")
@@ -109,15 +109,16 @@ load them into tables.
   }
 
 @section{Spreadsheet Methods}
-@ss-method["sheet-list"
+@ss-method["sheet-names"
   #:contract (a-arrow SS (L-of S))
   #:args (list (list "self" #f))
   #:return (L-of S)
 ]
-XXX: This is not a method.  Contains the list of worksheet names in this
-@pyret-id{Spreadsheet},  in order from left to right.  The names in this list
-can be used with @pyret-method["Spreadsheet" "sheet-by-name"], and the indices
-of names in this list can be used with @pyret-method["Spreadsheet" "sheet-by-index"].
+
+Returns the list of worksheet names in this @pyret-id{Spreadsheet}, in order
+from left to right.  The names in this list can be used with
+@pyret-method["Spreadsheet" "sheet-by-name"], and the indices of names in this
+list can be used with @pyret-method["Spreadsheet" "sheet-by-index"].
 
 @ss-method["sheet-by-name"
   #:contract (a-arrow SS S B WS)
@@ -139,29 +140,29 @@ given worksheet.  The @pyret{skipHeaders} argument specifies whether to ignore
 the first row of the sheet when extracting its contents as a table (i.e. to
 treat the first row as a header row rather than a data row).
 
-@ss-method["delete-sheet-by-name"
-  #:contract (a-arrow SS N No)
-  #:args '(("self" #f) ("name" ""))
-  #:return No
-]
-Deletes the worksheet of the given name from the Google Sheets document
-corresponding to this @pyret-id{Spreadsheet}.
+@; @ss-method["delete-sheet-by-name"
+@;   #:contract (a-arrow SS N No)
+@;   #:args '(("self" #f) ("name" ""))
+@;   #:return No
+@; ]
+@; Deletes the worksheet of the given name from the Google Sheets document
+@; corresponding to this @pyret-id{Spreadsheet}.
 
-@ss-method["delete-sheet-by-index"
-  #:contract (a-arrow SS N No)
-  #:args '(("self" #f) ("index" ""))
-  #:return No
-]
-Deletes the worksheet of the given index from the Google Sheets document
-corresponding to this @pyret-id{Spreadsheet}.
+@; @ss-method["delete-sheet-by-index"
+@;   #:contract (a-arrow SS N No)
+@;   #:args '(("self" #f) ("index" ""))
+@;   #:return No
+@; ]
+@; Deletes the worksheet of the given index from the Google Sheets document
+@; corresponding to this @pyret-id{Spreadsheet}.
 
-@ss-method["add-sheet"
-  #:contract (a-arrow SS S WS)
-  #:args '(("self" #f) ("name" ""))
-  #:return WS
-]
-Creates and inserts a new @pyret-id{Worksheet} into the Google Sheets document
-corresponding to this @pyret-id{Spreadsheet}.
+@; @ss-method["add-sheet"
+@;   #:contract (a-arrow SS S WS)
+@;   #:args '(("self" #f) ("name" ""))
+@;   #:return WS
+@; ]
+@; Creates and inserts a new @pyret-id{Worksheet} into the Google Sheets document
+@; corresponding to this @pyret-id{Spreadsheet}.
 
 
 }
