@@ -82,15 +82,20 @@
       (return (a-id "Boolean" (xref "<global>" "Boolean")))
       (contract (a-arrow "Any" (a-id "Boolean" (xref "<global>" "Boolean"))))
       (doc "Checks whether the provided argument is in fact a c-custom"))
+    @; (data-spec
+    @;   (name "DataSourceLoaderOption")
+    @;   (type-vars (A B))
+    @;   (variants ("sanitize-col"))
+    @;   (shared ()))
     (data-spec
       (name "Sanitizer")
       (type-vars (A B))
       (variants ())
       (shared ()))
-    (constr-spec
-      (name "sanitize-col")
-      (members (("col" (type normal) (contract S))
-                ("sanitizer" (type normal) (contract (a-app "Sanitizer" "A" "B"))))))
+    @; (constr-spec
+    @;   (name "sanitize-col")
+    @;   (members (("col" (type normal) (contract S))
+    @;             ("sanitizer" (type normal) (contract (a-app "Sanitizer" "A" "B"))))))
   ))
 
 
