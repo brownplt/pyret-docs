@@ -1118,7 +1118,7 @@ end
     
 @table-method["empty"
   #:contract (a-arrow Table Table)
-  #:args '()
+  #:args '(("self" #f))
   #:return Table]
 
 Returns a new table with the same columns as this table, but with all rows
