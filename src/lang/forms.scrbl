@@ -577,7 +577,7 @@ bound has tuples nested inside it:
 @examples{
 check:
   {{w; x}; {y; z}} = {{~5; true}; {"hello"; 4}}
-  w is ~5
+  w is-roughly ~5
   x is true
   y is "hello"
   z is 4
@@ -595,12 +595,12 @@ nested tuple itself:
 @examples{
 check:
   {{w; x} as wx; {y; z} as yz} as wxyz = {{~5; true}; {"hello"; 4}}
-  w is ~5
+  w is-roughly ~5
   x is true
   y is "hello"
   z is 4
-  wx is {~5; true}
-  yz is {"hello", 4}
+  wx is-roughly {~5; true}
+  yz is {"hello"; 4}
   wxyz is {wx; yz}
 end
 }
@@ -614,14 +614,14 @@ permitted styles of annotation below:
 check:
   {
     {w :: Number; x :: Boolean} as wx;
-    {y; z} as yz :: {String, Number}
+    {y; z} as yz :: {String; Number}
   } as wxyz = {{~5; true}; {"hello"; 4}}
-  w is ~5
+  w is-roughly ~5
   x is true
   y is "hello"
   z is 4
-  wx is {~5; true}
-  yz is {"hello", 4}
+  wx is-roughly {~5; true}
+  yz is {"hello"; 4}
   wxyz is {wx; yz}
 end
 }
