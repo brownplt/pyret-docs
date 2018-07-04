@@ -49,6 +49,12 @@
         (method-spec (name "increasing-by"))
         (method-spec (name "decreasing-by"))
         (method-spec (name "select-columns"))
+        (method-spec (name "transform-column"))
+        (method-spec (name "rename-column"))
+        (method-spec (name "stack"))
+        (method-spec (name "empty"))
+        (method-spec (name "drop"))
+        ;; What about new-row?
       )))
     (data-spec
       (name "Reducer")
@@ -1049,6 +1055,110 @@ Consumes a list of column names, and produces a new table containing only those
 columns. The order of the values in the columns is the same as in the input
 table, and the order of the columns themselves is the order they are given in
 the list.
+
+@table-method["transform-column"
+  #:contract (a-arrow Table S (a-arrow "ColIn" "ColOut") Table)
+  #:args '(("self" #f) ("colname" "") ("f" ""))
+  #:return Table]
+
+Consumes a column name and a transformation function, and produces a new table
+where the given function has been applied to all values in the specified
+column of the original table.
+
+@table-method["rename-column"
+  #:contract (a-arrow Table S S Table)
+  #:args '(("self" #f) ("old-colname" "") ("new-colname" ""))
+  #:return Table]
+
+Produces a new table where the specified column name in the original table has
+been renamed to the new name.  The new name must not already be present in the
+table's columns.
+
+This operation is essentially the following:
+@pyret-block{
+fun rename-column(t :: Table, old-colname :: String, new-colname :: String):
+  new-t = t.build-column(new-colname, lam(r): r["old-colname"] end)
+  new-t.drop("old-colname")
+end
+}
+except that in this code, the renamed column will appear as the rightmost column of
+the result, whereas using @pyret-method["Table" "table" "rename-column"], the renamed
+column will stay in its original place.
+
+@table-method["stack"
+  #:contract (a-arrow Table Table Table)
+  #:args '(("self" #f) ("bot-table" ""))
+  #:return Table]
+
+Returns a new table containing all the rows of this table, followed by all the
+rows of the @pyret{bot-table}.  The column names must all match, but the order
+is not required to match.
+
+@examples{
+check:
+  t1 = table: city, pop
+    row: "Houston", 2400000
+    row: "NYC", 8400000
+  end
+  t2 = table: pop, city # deliberately reversed column order for this example
+    row: 1400000, "San Diego"
+  end
+  t1.stack(t2) is table: city, pop
+    row: "Houston", 2400000
+    row: "NYC", 8400000
+    row: "San Diego", 1400000
+  end
+  t2.stack(t1) is table: pop, city
+    row: 1400000, "San Diego"
+    row: 2400000, "Houston"
+    row: 8400000, "NYC"
+  end
+end
+}
+    
+@table-method["empty"
+  #:contract (a-arrow Table Table)
+  #:args '()
+  #:return Table]
+
+Returns a new table with the same columns as this table, but with all rows
+removed.
+
+@examples{
+check:
+  t1 = table: city, pop
+    row: "Houston", 2400000
+    row: "NYC", 8400000
+  end
+  t1.empty() is table: city, pop end
+end
+}
+
+@table-method["drop"
+  #:contract (a-arrow Table S Table)
+  #:args '(("self" #f) ("colname" ""))
+  #:return Table]
+
+Returns a new table that contains all the data from this table except the
+specified column.
+
+@examples{
+check:
+  t1 = table: city, pop
+    row: "Houston", 2400000
+    row: "NYC", 8400000
+  end
+  t1.drop("city") is table: pop
+    row: 2400000
+    row: 8400000
+  end
+  t1.drop("pop") is table: city
+    row: "Houston"
+    row: "NYC"
+  end
+end
+}
+
 
 @;{
 @table-method["join"
