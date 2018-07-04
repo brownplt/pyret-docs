@@ -1,29 +1,22 @@
 #lang scribble/base
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 
+@(define (g-id name) (seclink (xref "<global>" name)))
+
 @(append-gen-docs
   '(module "tables"
     (path "src/js/base/runtime-anf.js")
-    (fun-spec
-      (name "difference"))
-    (fun-spec
-      (name "difference-from"))
-    (fun-spec
-      (name "running-sum"))
-    (fun-spec
-      (name "running-mean"))
-    (fun-spec
-      (name "running-max"))
-    (fun-spec
-      (name "running-min"))
-    (fun-spec
-      (name "running-fold"))
-    (fun-spec
-      (name "running-reduce"))
-    (fun-spec
-      (name "raw-row"))
-    (fun-spec
-      (name "table-from-rows"))
+    (fun-spec (name "difference"))
+    (fun-spec (name "difference-from"))
+    (fun-spec (name "running-sum"))
+    (fun-spec (name "running-mean"))
+    (fun-spec (name "running-max"))
+    (fun-spec (name "running-min"))
+    (fun-spec (name "running-fold"))
+    (fun-spec (name "running-reduce"))
+    (fun-spec (name "raw-row"))
+    (fun-spec (name "table-from-rows"))
+    
     (data-spec
       (name "Row")
       (variants ("row"))
@@ -77,20 +70,25 @@
   (method-doc "Reducer" "reducer" name #:alt-docstrings "" #:args args #:return ret #:contract contract))
 @(define Red-params (list "Acc" "InVal" "OutVal"))
 
-@docmodule["tables" #:noimport #t #:friendly-title "Tables"]{
+@docmodule["tables" #:friendly-title "Tables"]{
 
 There are many examples of tables in computing, with
 spreadsheets being the most obvious.
                                                              
-A @pyret{Table} is made up of @bold{rows} and @bold{columns}. All rows have the
+A @pyret-id{Table} is made up of @bold{rows} and @bold{columns}. All rows have the
 same number of columns, in the same order. Each column has a name.  Each column
 may also be assigned a type via an annotation; if so, all entries in a column
 will then be checked against the annotation.  Unsurprisingly, they are useful
 for representing tabular data from sources like spreadsheets or CSV files.
-  
+
+@bold{Note:} The @pyret-id{Table} data type and the syntax for manipulating
+tables is built in to Pyret without needing any imports; however, using the
+@secref{Reducers} or the functions in @secref{s:tables:methods} require the
+@pyret{import} line above.
+
   @section[#:tag "s:tables"]{Creating Tables}
 
-A simple @pyret{Table} can be directly created with a @pyret{table:}
+A simple @pyret-id{Table} can be directly created with a @pyret{table:}
 expression, which lists any number of
 columns, with optional annotations, and then any number of rows.  For example,
 this expression creates a table with three columns, @pyret{name}, @pyret{age},
@@ -195,19 +193,19 @@ supported sanitizers are imported from the @pyret{data-source} module.
 
 The sanitizers currently provided by Pyret are:
 
-@itemlist[@item{@bold{string-sanitizer} tries to convert anything to a @pyret{String}}
-@item{@bold{num-sanitizer} tries to convert  numbers, strings and booleans to @pyret{Number}s}
-@item{@bold{bool-sanitizer} tries to convert numbers, strings and booleans to @pyret{Boolean}s} 
-@item{@bold{strict-num-sanitizer} tries to convert numbers and strings (not booleans) to @pyret{Number}s}
-@item{@bold{strings-only} converts only strings to @pyret{String}s}
-@item{@bold{numbers-only} converts only numbers to @pyret{Number}s}
-@item{@bold{booleans-only} converts only booleans to @pyret{Booleans}s}
-@item{@bold{empty-only} converts only empty cells to @pyret{none}s}]
+@itemlist[@item{@bold{string-sanitizer} tries to convert anything to a @g-id{String}}
+@item{@bold{num-sanitizer} tries to convert  numbers, strings and booleans to @g-id{Number}s}
+@item{@bold{bool-sanitizer} tries to convert numbers, strings and booleans to @g-id{Boolean}s} 
+@item{@bold{strict-num-sanitizer} tries to convert numbers and strings (not booleans) to @g-id{Number}s}
+@item{@bold{strings-only} converts only strings to @g-id{String}s}
+@item{@bold{numbers-only} converts only numbers to @g-id{Number}s}
+@item{@bold{booleans-only} converts only booleans to @g-id{Boolean}s}
+@item{@bold{empty-only} converts only empty cells to @pyret-id["none" "option"]s}]
 
 @margin-note{While the @tt{data-source} library provides sanitizers which should cover
 most use cases, there may be times when one would like to create a custom
 data sanitizer. To do so, one must simply create a function which conforms
-to the @pyret{Sanitizer<A,B>} type in the @tt{data-source} module.}
+to the @pyret-id["Sanitizer" "data-source"] type in the @tt{data-source} module.}
 
 Use the @pyret{load-table:} expression to create a table from an
 imported sheet.
@@ -287,7 +285,7 @@ end
 }
 
 Note that the @pyret{sieve} block must explicitly list the columns used to
-filter out values with @tt{using}.  The following would signal an undefined
+filter out values with @pyret{using}.  The following would signal an undefined
 name error for @pyret{age}, because names being used in the expression body
 must be listed:
 
@@ -302,7 +300,7 @@ end
 
 To arrange the rows of a table in some particular order, use an @pyret{order}
 expression.  This can be done with any column whose
-type supports the use of @pyret{<} and @pyret{>}, including @pyret{String}s. 
+type supports the use of @pyret{<} and @pyret{>}, including @g-id{String}s. 
 
 @examples{
 name-ordered = order my-table:
@@ -337,8 +335,8 @@ each remaining group will be sorted in increasing order by @tt{column3}.
   @section{Transforming Tables}
 
 The @pyret{transform} expression allows the changing of columns within a
-table, similar to the @pyret{map} function over lists (and, just like
-@pyret{map}, @pyret{transform} expressions do not mutate the table, but
+table, similar to the @pyret-id["map" "lists"] function over lists (and, just like
+@pyret-id["map" "lists"], @pyret{transform} expressions do not mutate the table, but
 instead return a new one).
 
 Suppose we find out that @pyret{my-table} is wrong and everyone is actually
@@ -440,7 +438,7 @@ value in the
 A "reducing" column is one whose information is computed from the
 row it is being added to @italic{and one or more of the rows above}
 that row.  This is
-analogous to the @pyret{fold} function for @seclink{lists}.
+analogous to the @pyret-id["fold" "lists"] function for @seclink{lists}.
 
 The simplest examples of reducing use reducers built into Pyret.
 
@@ -483,7 +481,7 @@ the current row (of the selected column) minus the value in @italic{only}
 the row directly above.  In the first row, the value is unchanged.
 Since there's no value before the first row, Pyret behaves as if it were zero.
 
-@margin-note{Both @pyret{difference} and @pyret{difference-from} do
+@margin-note{Both @pyret{difference} and @pyret-id{difference-from} do
 @italic{not} calculate a running difference, only the difference between
 the selected row and the single row above.}
 
@@ -509,7 +507,7 @@ end
   #:args '(("start-value" #f))
   #:return (Red-of N N N)]{
 
-Like @pyret{difference}, except the starting value is specified, instead
+Like @pyret-id{difference}, except the starting value is specified, instead
 of defaulting to 0.
 
 @examples{
@@ -673,14 +671,14 @@ own. To do so, one must construct an object of the following type:
   #:return (a-tuple "Acc" "OutVal")]
 
 
-Reducers are essentially descriptions of folds (in the list @pyret{fold}
+Reducers are essentially descriptions of folds (in the list @pyret-id["fold" "lists"]
 sense) over table columns. The way reducers are called by the language
 runtime is as follows: the value(s) from the first row are passed to the
-reducer's @pyret{.one} method, which should return a tuple containing both
+reducer's @pyret-method["Reducer" "reducer" "one"] method, which should return a tuple containing both
 any accumulated information needed for the fold and the value which should
 be placed in the new column in that row. The remaining rows are then
-sequentially populated using the reducer's @pyret{.reduce} method, which is
-identical to the @pyret{.one} method except that it receives an additional
+sequentially populated using the reducer's @pyret-method["Reducer" "reducer" "reduce"] method, which is
+identical to the @pyret-method["Reducer" "reducer" "one"] method except that it receives an additional
 argument which is the previously mentioned accumulated information from the
 previous row.
 

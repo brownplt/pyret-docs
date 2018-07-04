@@ -367,7 +367,7 @@
 @(define (type-spec type-name tyvars #:private (private #f) . body)
   (when (not private) (set-documented! (curr-module-name) type-name))
   (define name-part (make-header-elt-for (seclink (xref (curr-module-name) type-name) (tt type-name)) type-name))
-  (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ",") (list ">")) ""))
+  (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ", ") (list ">")) ""))
   ;;(define content-text (string-split (string-trim (content->string body)) "\n"))
   (define index-tags (list (pyret type-name) (curr-module-name)))
   ;;(define blurb (first content-text))
@@ -398,7 +398,7 @@
 @(define (data-spec-internal2 data-name tyvars variants #:private (private #f))
   (when (not private) (set-documented! (curr-module-name) data-name))
   (define name-part (make-header-elt-for (seclink (xref (curr-module-name) data-name) (tt data-name)) data-name))
-  (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ",") (list ">")) ""))
+  (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ", ") (list ">")) ""))
     (nested #:style (div-style "boxed")
       (list
         (tt "data " name-part vars ":")
