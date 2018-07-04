@@ -218,7 +218,7 @@ working with the data in an imported spreadsheet, you need to indentify
 which sheet you are using as the data source.
 
 The @pyret{source:} expression should be followed by the imported spreadsheet,
-calling the @pyret{.sheet-by-name()} method with two arguments, the sheet name and
+calling the @pyret-method["Spreadsheet" #f "sheet-by-name" "gdrive-sheets"] method with two arguments, the sheet name and
 a boolean flag indicating whether or not there is a header row in the sheet
 that should be ignored.  In our example above,  @tt{imported-my-table} contains
 one sheet, called @tt{3-rows},

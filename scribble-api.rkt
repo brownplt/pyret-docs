@@ -276,7 +276,7 @@
     [(datatype varname id)
      (seclink (xref (curr-module-name) datatype varname id) (tt (string-append "." id)))]
     [(datatype varname id mod)
-     (seclink (xref mod datatype varname id) (tt (string-append "." id)))]))
+     (seclink (xref mod datatype (or varname "shared methods") id) (tt (string-append "." id)))]))
 
 ;;;;;;;;;; Cross-Reference Infrastructure ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
