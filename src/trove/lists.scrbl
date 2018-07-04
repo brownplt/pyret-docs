@@ -25,30 +25,6 @@
 '(module
   "lists"
   (path "src/arr/base/lists.arr")
-  (unknown-item
-    (name "none")
-    ;; O9.none
-    )
-  (unknown-item
-    (name "is-none")
-    ;; O9.is-none
-    )
-  (unknown-item
-    (name "some")
-    ;; O9.some
-    )
-  (unknown-item
-    (name "is-some")
-    ;; O9.is-some
-    )
-  (unknown-item
-    (name "left")
-    ;; E11.left
-    )
-  (unknown-item
-    (name "right")
-    ;; E11.right
-    )
   (data-spec
     (name "List")
     (type-vars (a74))
@@ -296,7 +272,7 @@
         (name "join-str")
         (arity 2)
         (params ())
-        (args ("self" "str"))
+        (args ("self" "sep"))
         (return (a-id "String" (xref "<global>" "String")))
         (contract
           (a-arrow
@@ -305,6 +281,20 @@
             (a-id "String" (xref "<global>" "String"))))
         (doc
           "Returns a string containing the tostring() forms of the elements of this list,\n            joined by the provided separator string"))
+      (method-spec
+        (name "join-str-last")
+        (arity 3)
+        (params ())
+        (args ("self" "sep" "last-sep"))
+        (return (a-id "String" (xref "<global>" "String")))
+        (contract
+          (a-arrow
+            (a-id "is-List" (xref "lists" "is-List"))
+            (a-id "String" (xref "<global>" "String"))
+            (a-id "String" (xref "<global>" "String"))
+            (a-id "String" (xref "<global>" "String"))))
+        (doc
+          "Returns a string containing the tostring() forms of the elements of this list,\n            joined by the provided separator string, and the provided last separator before the last string"))
       (method-spec
         (name "_output")
         (arity 1)
@@ -1180,52 +1170,7 @@
         (a-app (a-id "List" (xref "lists" "List")) "a")
         (a-app (a-id "List" (xref "lists" "List")) "a"))))
   (fun-spec
-    (name "get-help")
-    (arity 2)
-    (params [list: leaf("a")])
-    (args ("lst" "n"))
-    (return "a")
-    (contract
-      (a-arrow
-        (a-app (a-id "List" (xref "lists" "List")) "a")
-        (a-id "Number" (xref "<global>" "Number"))
-        "a"))
-    (doc
-      "Returns the nth element of the given list, or raises an error if n is out of range"))
-  (fun-spec
-    (name "set-help")
-    (arity 3)
-    (params [list: leaf("a")])
-    (args ("lst" "n" "v"))
-    (return "a")
-    (contract
-      (a-arrow
-        (a-app (a-id "List" (xref "lists" "List")) "a")
-        (a-id "Number" (xref "<global>" "Number"))
-        "Any"
-        "a"))
-    (doc
-      "Returns a new list with the same values as the given list but with the nth element\n        set to the given value, or raises an error if n is out of range"))
-  (fun-spec
     (name "length")
-    (arity 1))
-  (fun-spec
-    (name "max")
-    (arity 1))
-  (fun-spec
-    (name "min")
-    (arity 1))
-  (fun-spec
-    (name "sum")
-    (arity 1))
-  (fun-spec
-    (name "mean")
-    (arity 1))
-  (fun-spec
-    (name "median")
-    (arity 1))
-  (fun-spec
-    (name "stdev")
     (arity 1))
   (fun-spec
     (name "distinct")
@@ -1239,7 +1184,7 @@
   (method-doc "List" #f name #:alt-docstrings ""))
 
 @docmodule["lists"]{
-  @ignore[(list "get-help" "set-help" "is-none" "is-some" "some" "none" "left" "right")]
+  @ignore[(list)]
 
   @section{The List Datatype}
 
@@ -1593,7 +1538,7 @@ end
 
 @list-method["join-str"]
 Combines the values of the current @pyret{List} by converting them to strings
-with @pyret{tostring} and joining them with the given string.
+with @pyret{tostring} and joining them with the given separator @pyret{sep}.
 @examples{
 check:
   [list: 1, 2, 3].join-str("; ") is "1; 2; 3"
@@ -1602,6 +1547,20 @@ check:
 end
 }
 
+
+@list-method["join-str-last"]
+Combines the values of the current @pyret{List} by converting them to strings
+with @pyret{tostring} and joining them with the given separator @pyret{sep}.
+If the list has more than one element, the function will use @pyret{last-sep}
+to join the last element instead of the regular @pyret{sep}.
+@examples{
+check:
+  [list: 1, 2, 3].join-str-last("; ", "$ ") is "1; 2$ 3"
+  [list: "a", true, ~5.3].join-str-last(" : ", " # ") is "a : true # ~5.3"
+  empty.join-str-last("nothing at all", "really nothing") is ""
+  [list: 1, 2].join-str-last("a", "b") is "1b2"
+end
+}
 
 @section{List Functions}
 
