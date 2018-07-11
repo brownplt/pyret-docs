@@ -207,6 +207,13 @@
       (contract
         (a-arrow ,Tensor ,Tensor ,Tensor)))
     (fun-spec
+      (name "strict-subtract-tensors")
+      (arity 2)
+      (args ("a" "b"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor ,Tensor)))
+    (fun-spec
       (name "multiply-tensors")
       (arity 2)
       (args ("a" "b"))
@@ -214,7 +221,21 @@
       (contract
         (a-arrow ,Tensor ,Tensor ,Tensor)))
     (fun-spec
+      (name "strict-multiply-tensors")
+      (arity 2)
+      (args ("a" "b"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor ,Tensor)))
+    (fun-spec
       (name "divide-tensors")
+      (arity 2)
+      (args ("a" "b"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor ,Tensor)))
+    (fun-spec
+      (name "strict-divide-tensors")
       (arity 2)
       (args ("a" "b"))
       (return ,Tensor)
@@ -235,7 +256,21 @@
       (contract
         (a-arrow ,Tensor ,Tensor ,Tensor)))
     (fun-spec
+      (name "strict-tensor-max")
+      (arity 2)
+      (args ("a" "b"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor ,Tensor)))
+    (fun-spec
       (name "tensor-min")
+      (arity 2)
+      (args ("a" "b"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor ,Tensor)))
+    (fun-spec
+      (name "strict-tensor-min")
       (arity 2)
       (args ("a" "b"))
       (return ,Tensor)
@@ -249,14 +284,35 @@
       (contract
         (a-arrow ,Tensor ,Tensor ,Tensor)))
     (fun-spec
-      (name "tensor-expt")
+      (name "strict-tensor-modulo")
       (arity 2)
       (args ("a" "b"))
       (return ,Tensor)
       (contract
         (a-arrow ,Tensor ,Tensor ,Tensor)))
     (fun-spec
-      (name "tensor-squared-difference")
+      (name "tensor-expt")
+      (arity 2)
+      (args ("base" "exponent"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor ,Tensor)))
+    (fun-spec
+      (name "strict-tensor-expt")
+      (arity 2)
+      (args ("a" "b"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor ,Tensor)))
+    (fun-spec
+      (name "squared-difference")
+      (arity 2)
+      (args ("a" "b"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor ,Tensor)))
+    (fun-spec
+      (name "strict-squared-difference")
       (arity 2)
       (args ("a" "b"))
       (return ,Tensor)
@@ -820,25 +876,125 @@
 
   Adds two @pyret{Tensor}s element-wise, A + B.
 
-  @function["strict-add-tensors"]
+  To assert that @pyret{a} and @pyret{b} are the same shape, use
+  @pyret-id["strict-add-tensors"].
 
   @function["subtract-tensors"]
 
+  Subtracts two @pyret{Tensor}s element-wise, A – B.
+
+  To assert that @pyret{a} and @pyret{b} are the same shape, use
+  @pyret-id["strict-subtract-tensors"].
+
   @function["multiply-tensors"]
+
+  Multiplies two @pyret{Tensor}s element-wise, A * B.
+
+  To assert that @pyret{a} and @pyret{b} are the same shape, use
+  @pyret-id["strict-multiply-tensors"].
 
   @function["divide-tensors"]
 
+  Divides two @pyret{Tensor}s element-wise, A / B.
+
+  To assert that @pyret{a} and @pyret{b} are the same shape, use
+  @pyret-id["strict-divide-tensors"].
+
   @function["floor-divide-tensors"]
+
+  Divides two @pyret{Tensor}s element-wise, A / B, with the result rounded
+  with the floor function.
 
   @function["tensor-max"]
 
+  Returns a @pyret{Tensor} containing the maximum of @pyret{a} and @pyret{b},
+  element-wise.
+
+  To assert that @pyret{a} and @pyret{b} are the same shape, use
+  @pyret-id["strict-tensor-max"].
+
   @function["tensor-min"]
+
+  Returns a @pyret{Tensor} containing the minimum of @pyret{a} and @pyret{b},
+  element-wise.
+
+  To assert that @pyret{a} and @pyret{b} are the same shape, use
+  @pyret-id["strict-tensor-min"].
 
   @function["tensor-modulo"]
 
+  Computes the modulo of @pyret{a} and @pyret{b}, element-wise.
+
+  To assert that @pyret{a} and @pyret{b} are the same shape, use
+  @pyret-id["strict-tensor-modulo"].
+
   @function["tensor-expt"]
 
-  @function["tensor-squared-difference"]
+  Computes the power of @pyret{base} to @pyret{exponent}, element-wise.
+
+  To ensure that @pyret{a} and @pyret{b} are the same shape, use
+  @pyret-id["strict-tensor-expt"].
+
+  @function["squared-difference"]
+
+  Computes @pyret{(a - b) * (a - b)}, element-wise.
+
+  To assert that @pyret{a} and @pyret{b} are the same shape, use
+  @pyret-id["strict-squared-difference"].
+
+  @function["strict-add-tensors"]
+
+  Same as @pyret-id["add-tensors"], but raises an error if @pyret{a} and
+  @pyret{b} are not the same shape (as determined by
+  @pyret-method["Tensor" "shape"]).
+
+  @function["strict-subtract-tensors"]
+
+  Same as @pyret-id["subtract-tensors"], but raises an error if @pyret{a} and
+  @pyret{b} are not the same shape (as determined by
+  @pyret-method["Tensor" "shape"]).
+
+  @function["strict-multiply-tensors"]
+
+  Same as @pyret-id["multiply-tensors"], but raises an error if @pyret{a} and
+  @pyret{b} are not the same shape (as determined by
+  @pyret-method["Tensor" "shape"]).
+
+  @function["strict-divide-tensors"]
+
+  Same as @pyret-id["divide-tensors"], but raises an error if @pyret{a} and
+  @pyret{b} are not the same shape (as determined by
+  @pyret-method["Tensor" "shape"]).
+
+  @function["strict-tensor-max"]
+
+  Same as @pyret-id["tensor-max"], but raises an error if @pyret{a} and
+  @pyret{b} are not the same shape (as determined by
+  @pyret-method["Tensor" "shape"]).
+
+  @function["strict-tensor-min"]
+
+  Same as @pyret-id["tensor-min"], but raises an error if @pyret{a} and
+  @pyret{b} are not the same shape (as determined by
+  @pyret-method["Tensor" "shape"]).
+
+  @function["strict-tensor-expt"]
+
+  Same as @pyret-id["tensor-expt"], but raises an error if @pyret{a} and
+  @pyret{b} are not the same shape (as determined by
+  @pyret-method["Tensor" "shape"]).
+
+  @function["strict-tensor-modulo"]
+
+  Same as @pyret-id["tensor-modulo"], but raises an error if @pyret{a} and
+  @pyret{b} are not the same shape (as determined by
+  @pyret-method["Tensor" "shape"]).
+
+  @function["strict-squared-difference"]
+
+  Same as @pyret-id["squared-difference"], but raises an error if @pyret{a} and
+  @pyret{b} are not the same shape (as determined by
+  @pyret-method["Tensor" "shape"]).
 
   @;#########################################################################
   @section{Basic Math Operations}
