@@ -115,7 +115,7 @@
           (name "as-type")
           (arity 2)
           (params ())
-          (args ("self" "dataType"))
+          (args ("self" "data-type"))
           (return ,Tensor)
           (contract
             (a-arrow ,Tensor ,S ,Tensor)))
@@ -163,7 +163,7 @@
           (name "reshape")
           (arity 2)
           (params ())
-          (args ("self" "newShape"))
+          (args ("self" "new-shape"))
           (return ,Tensor)
           (contract
             (a-arrow ,Tensor ,(L-of N) ,Tensor)))
@@ -489,11 +489,11 @@
         (a-arrow ,Tensor ,Tensor)))
     (fun-spec
       (name "parametric-relu")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "alpha"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,N ,Tensor)))
     (fun-spec
       (name "tensor-reciprocal")
       (arity 1)
@@ -682,6 +682,13 @@
     @pyret-method["Tensor" "data-sync"] always returns a
     @pyret{List<Roughnum>}.
 
+    Since @pyret{Tensor}s are immutable, all operations always return new
+    @pyret{Tensor}s and never modify the input @pyret{Tensor}s. The exception
+    to this is when a @pyret{Tensor} is transformed into a mutable
+    @pyret{Tensor} using the @pyret-id["make-variable"] function or the
+    @pyret-method["Tensor" "to-variable"] method. These "variable tensors"
+    can be modified by @pyret{Optimizer}s.
+
   }
 
   @;#########################################################################
@@ -810,27 +817,55 @@
   Constructs a new, rank-1 @pyret{Tensor} from the values of the original
   @pyret{Tensor}.
 
+  The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
+  but it's recommended to use @pyret-method["Tensor" "as-1d"] as it makes the
+  code more readable.
+
   @tensor-method["as-2d"]
 
   Constructs a new, rank-2 @pyret{Tensor} with the input dimensions from the
   values of the original @pyret{Tensor}.
+
+  The number of elements implied by the input dimensions must be the same as the
+  number of elements in the calling @pyret{Tensor}. Otherwise, the method
+  raises an error.
+
+  The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
+  but it's recommended to use @pyret-method["Tensor" "as-2d"] as it makes the
+  code more readable.
 
   @tensor-method["as-3d"]
 
   Constructs a new, rank-3 @pyret{Tensor} with the input dimensions from the
   values of the original @pyret{Tensor}.
 
+  The number of elements implied by the input dimensions must be the same as the
+  number of elements in the calling @pyret{Tensor}. Otherwise, the method
+  raises an error.
+
+  The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
+  but it's recommended to use @pyret-method["Tensor" "as-3d"] as it makes the
+  code more readable.
+
   @tensor-method["as-4d"]
 
   Constructs a new, rank-4 @pyret{Tensor} with the input dimensions from the
   values of the original @pyret{Tensor}.
+
+  The number of elements implied by the input dimensions must be the same as the
+  number of elements in the calling @pyret{Tensor}. Otherwise, the method
+  raises an error.
+
+  The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
+  but it's recommended to use @pyret-method["Tensor" "as-4d"] as it makes the
+  code more readable.
 
   @tensor-method["as-type"]
 
   Constructs a new @pyret{Tensor} from the values of the original
   @pyret{Tensor} with all of the values cast to the input datatype.
 
-  The possible @pyret{dataType}s are @pyret{"float32"}, @pyret{"int32"}, or
+  The possible @pyret{data-type}s are @pyret{"float32"}, @pyret{"int32"}, or
   @pyret{"bool"}. Any other @pyret{dataType} will raise an error.
 
   @tensor-method["data-sync"]
@@ -862,8 +897,17 @@
 
   @tensor-method["reshape"]
 
-  Constructs a new @pyret{Tensor} with the input dimensions @pyret{newShape}
+  Constructs a new @pyret{Tensor} with the input dimensions @pyret{new-shape}
   from the values of the original @pyret{Tensor}.
+
+  The number of elements implied by @pyret{new-shape} must be the same as the
+  number of elements in the calling @pyret{Tensor}. Otherwise, the method
+  raises an error.
+
+  When reshaping a @pyret{Tensor} to be 0-, 1-, 2-, 3-, or 4-dimensional,
+  use @pyret-method["Tensor" "as-scalar"], @pyret-method["Tensor" "as-1d"],
+  @pyret-method["Tensor" "as-2d"], @pyret-method["Tensor" "as-3d"], or
+  @pyret-method["Tensor" "as-4d"] for readability.
 
   @tensor-method["clone"]
 
@@ -1000,44 +1044,192 @@
   @section{Basic Math Operations}
 
   @function["tensor-abs"]
+
+  Computes the absolute value of the @pyret{Tensor}, element-wise.
+
   @function["tensor-acos"]
+
+  Computes the inverse cosine of the @pyret{Tensor}, element-wise.
+
   @function["tensor-acosh"]
+
+  Computes the inverse hyperbolic cosine of the @pyret{Tensor}, element-wise.
+
   @function["tensor-asin"]
+
+  Computes the inverse sine of the @pyret{Tensor}, element-wise.
+
   @function["tensor-asinh"]
+
+  Computes the inverse hyperbolic sine of the @pyret{Tensor}, element-wise.
+
   @function["tensor-atan"]
+
+  Computes the inverse tangent of the @pyret{Tensor}, element-wise.
+
   @function["tensor-atan2"]
+
+  Computes the @link["https://en.wikipedia.org/wiki/Atan2"
+  "four-quadrant inverse tangent"] of @pyret{a} and @pyret{b}, element-wise.
+
   @function["tensor-atanh"]
+
+  Computes the inverse hyperbolic tangent of the @pyret{Tensor}, element-wise.
+
   @function["tensor-ceil"]
+
+  Computes the ceiling of the @pyret{Tensor}, element-wise.
+
   @function["clip-by-value"]
+
+  Clips the values of the @pyret{Tensor}, element-wise, such that every element
+  in the resulting @pyret{Tensor} is at least @pyret{min-value} and is at most
+  @pyret{max-value}.
+
   @function["tensor-cos"]
+
+  Computes the cosine of the @pyret{Tensor}, element-wise.
+
   @function["tensor-cosh"]
+
+  Computes the hyperbolic cosine of the @pyret{Tensor}, element-wise.
+
   @function["exponential-linear-units"]
+
+  Applies the @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#ELUs"
+  "exponential linear units"] function to the @pyret{Tensor}, element-wise.
+
   @function["elu"]
-  @function["erf"]
+
+  Alias for @pyret-id["exponential-linear-units"].
+
   @function["gauss-error"]
+
+  Applies the @link["http://mathworld.wolfram.com/Erf.html" "gauss error function"]
+  to the @pyret{Tensor}, element-wise.
+
+  @function["erf"]
+
+  Alias for @pyret-id["gauss-error"].
+
   @function["tensor-exp"]
+
+  Computes the equivalent of @pyret{num-exp(tensor)}, element-wise.
+
   @function["tensor-exp-min1"]
+
+  Computes the equivalent of @pyret{num-exp(tensor - 1)}, element-wise.
+
   @function["tensor-floor"]
+
+  Computes the floor of the @pyret{Tensor}, element-wise.
+
   @function["leaky-relu"]
+
+  Applies a @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Leaky_ReLUs"
+  "leaky rectified linear units"] function to the @pyret{Tensor}, element-wise.
+
+  @pyret{alpha} is the scaling factor for negative values. The default in
+  TensorFlow.js is @pyret{0.2}, but the argument has been exposed here for more
+  flexibility.
+
   @function["tensor-log"]
+
+  Computes the natural logarithm of the @pyret{Tensor}, element-wise; that is,
+  it computes the equivalent of @pyret{num-log(tensor)}.
+
   @function["tensor-log-plus1"]
+
+  Computes the natural logarithm of the @pyret{Tensor} plus 1, element-wise;
+  that is, it computes the equivalent of @pyret{num-log(tensor + 1)}.
+
   @function["log-sigmoid"]
+
+  Applies the @link["https://en.wikibooks.org/wiki/Artificial_Neural_Networks/
+  Activation_Functions#Continuous_Log-Sigmoid_Function" "log sigmoid"] function
+  to the @pyret{Tensor}, element-wise.
+
   @function["tensor-negate"]
+
+  Multiplies each element in the @pyret{Tensor} by @pyret{-1}.
+
   @function["parametric-relu"]
+
+  Applies a @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Leaky_ReLUs"
+  "leaky rectified linear units"] function to the @pyret{Tensor}, element-wise,
+  using parametric alphas.
+
+  @pyret{alpha} is the scaling factor for negative values.
+
   @function["tensor-reciprocal"]
+
+  Computes the reciprocal of the @pyret{Tensor}, element-wise; that is, it
+  computes the equivalent of @pyret{1 / tensor}.
+
   @function["relu"]
+
+  Applies a @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)"
+  "rectified linear units"] function to the @pyret{Tensor}, element-wise.
+
   @function["tensor-round"]
+
+  Computes the equivalent of @pyret{num-round(tensor)}, element-wise.
+
   @function["reciprocal-sqrt"]
+
+  Computes the recriprocal of the square root of the @pyret{Tensor},
+  element-wise.
+
+  The resulting @pyret{Tensor} is roughly equivalent to
+  @pyret{tensor-reciprocal(tensor-sqrt(tensor))}.
+
   @function["scaled-elu"]
+
+  Applies a scaled, exponential linear units function to the @pyret{Tensor},
+  element-wise.
+
   @function["sigmoid"]
+
+  Applies the sigmoid function to the @pyret{Tensor}, element-wise.
+
   @function["signed-ones"]
+
+  Returns an element-wise indication of the sign of each number in the
+  @pyret{Tensor}; that is, every value in the original tensor is represented
+  in the resulting tensor as @pyret{~+1} if the value is positive, @pyret{~-1}
+  if the value was negative, or @pyret{~0} if the value was zero or not a
+  number.
+
   @function["tensor-sin"]
+
+  Computes the sine of the @pyret{Tensor}, element-wise.
+
   @function["softplus"]
+
+  Applies the softplus function to the @pyret{Tensor}, element-wise.
+
   @function["tensor-sqrt"]
+
+  Computes the square root of the @pyret{Tensor}, element-wise.
+
   @function["tensor-square"]
+
+  Computes the square of the @pyret{Tensor}, element-wise.
+
   @function["step"]
+
+  Returns an element-wise indication of the sign of each number in the
+  @pyret{Tensor}; that is, every value in the original tensor is represented
+  in the resulting tensor as @pyret{~+1} if the value is positive; otherwise,
+  it is represented as @pyret{~0}.
+
   @function["tensor-tan"]
+
+  Computes the tangent of the @pyret{Tensor}, element-wise.
+
   @function["tensor-tanh"]
+
+  Computes the hyperbolic tangent of the @pyret{Tensor}, element-wise.
 
   @;#########################################################################
   @section{Reduction Operations}
