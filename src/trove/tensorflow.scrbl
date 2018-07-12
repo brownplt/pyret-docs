@@ -610,6 +610,13 @@
       (contract
         (a-arrow ,Tensor ,Tensor)))
     (fun-spec
+      (name "any")
+      (arity 1)
+      (args ("tensor"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor)))
+    (fun-spec
       (name "arg-max")
       (arity 1)
       (args ("tensor"))
@@ -638,7 +645,7 @@
       (contract
         (a-arrow ,Tensor ,Tensor)))
     (fun-spec
-      (name "mean")
+      (name "reduce-mean")
       (arity 1)
       (args ("tensor"))
       (return ,Tensor)
@@ -1349,10 +1356,10 @@
 
   @function["step"]
 
-  Returns an element-wise indication of the sign of each number in the
-  @pyret{Tensor}; that is, every value in the original tensor is represented
-  in the resulting tensor as @pyret{~+1} if the value is positive; otherwise,
-  it is represented as @pyret{~0}.
+  Applies the unit step function to the @pyret{Tensor}, element-wise; that is,
+  that is, every value in the original tensor is represented
+  in the resulting tensor as @pyret{~0} if the value is negative; otherwise,
+  it is represented as @pyret{~+1}.
 
   @function["tensor-tan"]
 
@@ -1366,13 +1373,56 @@
   @section{Reduction Operations}
 
   @function["all"]
+
+  Reduces the input @pyret{Tensor} across all dimensions by computing the
+  logical "and" of its elements.
+
+  @pyret{tensor} must be of type @pyret{"bool"}; otherwise, the function raises
+  an error.
+
+  @function["any"]
+
+  Reduces the input @pyret{Tensor} across all dimensions by computing the
+  logical "or" of its elements.
+
+  @pyret{tensor} must be of type @pyret{"bool"}; otherwise, the function raises
+  an error.
+
   @function["arg-max"]
+
+  Returns a new @pyret{Tensor} where each element is the index of the maximum
+  values along the outermost dimension of @pyret{tensor}.
+
   @function["arg-min"]
+
+  Returns a new @pyret{Tensor} where each element is the index of the minimum
+  values along the outermost dimension of @pyret{tensor}.
+
   @function["log-sum-exp"]
+
+  Computes the @pyret{log(sum(exp(elements along the outermost dimension))}.
+
+  Reduces the input along the outermost dimension.
+
   @function["reduce-max"]
-  @function["mean"]
+
+  Returns a @pyret{Tensor} containing the maximum value of all entries in
+  the input @pyret{tensor}.
+
   @function["reduce-min"]
+
+  Returns a @pyret{Tensor} containing the minimum value of all entries in
+  the input @pyret{tensor}.
+
+  @function["reduce-mean"]
+
+  Returns a @pyret{Tensor} containing the mean value of all entries in
+  the input @pyret{tensor}.
+
   @function["reduce-sum"]
+
+  Returns a @pyret{Tensor} containing the sum of all entries in the input
+  @pyret{tensor}.
 
   @;#########################################################################
   @section{Models}
