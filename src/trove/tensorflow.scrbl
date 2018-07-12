@@ -7,8 +7,19 @@
 @(define Layer (a-id "Layer" (xref "tensorflow" "Layer")))
 @(define Optimizer (a-id "Optimizer" (xref "tensorflow" "Optimizer")))
 
+@(define Object (a-id "Object" (xref "<global>" "Object")))
+@(define Nothing (a-id "Nothing" (xref "<global>" "Nothing")))
+
 @(define (tensor-method name)
   (method-doc "Tensor" #f name #:alt-docstrings ""))
+@(define (model-method name)
+  (method-doc "Model" #f name #:alt-docstrings ""))
+@(define (sequential-method name)
+  (method-doc "Sequential" #f name #:alt-docstrings ""))
+@(define (layer-method name)
+  (method-doc "Layer" #f name #:alt-docstrings ""))
+@(define (optimizer-method name)
+  (method-doc "Optimizer" #f name #:alt-docstrings ""))
 
 @(append-gen-docs
   `(module "tensorflow"
@@ -717,13 +728,53 @@
       (variants)
       (shared
         ((method-spec
-          (name "size")
-          (arity 1)
+          (name "add")
+          (arity 2)
           (params ())
-          (args ("self"))
-          (return ,N)
+          (args ("self" "layer"))
+          (return ,Nothing)
           (contract
-            (a-arrow ,Tensor ,N)))
+            (a-arrow ,Sequential ,Layer ,Nothing)))
+        (method-spec
+          (name "compile")
+          (arity 2)
+          (params ())
+          (args ("self" "layer"))
+          (return ,Nothing)
+          (contract
+            (a-arrow ,Sequential ,Object ,Nothing)))
+        (method-spec
+          (name "evaluate")
+          (arity 4)
+          (params ())
+          (args ("self" "x" "y" "config"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Sequential ,Tensor ,Tensor ,Object ,Tensor)))
+        (method-spec
+          (name "predict")
+          (arity 3)
+          (params ())
+          (args ("self" "x" "config"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Sequential ,Tensor ,Object ,Tensor)))
+        (method-spec
+          (name "predict-on-batch")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Sequential ,Tensor ,Tensor)))
+        (method-spec
+          (name "fit")
+          (arity 5)
+          (params ())
+          (args ("self" "x" "y" "config" "epoch-callback"))
+          (return ,Nothing)
+          (contract
+            (a-arrow ,Sequential ,Tensor ,Tensor ,Object (a-arrow ,N ,Object ,Nothing) ,Nothing)))
             )))
 
     (fun-spec
@@ -766,10 +817,55 @@
     (fun-spec
       (name "train-sgd")
       (arity 1)
-      (args ("values"))
+      (args ("learning-rate"))
       (return ,Optimizer)
       (contract
-        (a-arrow ,(L-of N) ,Optimizer)))
+        (a-arrow ,N ,Optimizer)))
+    (fun-spec
+      (name "train-momentum")
+      (arity 2)
+      (args ("learning-rate" "momentum"))
+      (return ,Optimizer)
+      (contract
+        (a-arrow ,N ,N ,Optimizer)))
+    (fun-spec
+      (name "train-adagrad")
+      (arity 2)
+      (args ("learning-rate" "initial-accumulator"))
+      (return ,Optimizer)
+      (contract
+        (a-arrow
+          ,N
+          ,(O-of (a-id "NumPositive" (xref "numbers" "NumPositive")))
+          ,Optimizer)))
+    (fun-spec
+      (name "train-adadelta")
+      (arity 3)
+      (args ("learning-rate" "rho" "epsilon"))
+      (return ,Optimizer)
+      (contract
+        (a-arrow ,(O-of N) ,(O-of N) ,(O-of N) ,Optimizer)))
+    (fun-spec
+      (name "train-adam")
+      (arity 4)
+      (args ("learning-rate" "beta-1" "beta-2" "epsilon"))
+      (return ,Optimizer)
+      (contract
+        (a-arrow ,(O-of N) ,(O-of N) ,(O-of N) ,(O-of N) ,Optimizer)))
+    (fun-spec
+      (name "train-adamax")
+      (arity 5)
+      (args ("learning-rate" "beta-1" "beta-2" "epsilon" "decay"))
+      (return ,Optimizer)
+      (contract
+        (a-arrow ,(O-of N) ,(O-of N) ,(O-of N) ,(O-of N) ,(O-of N) ,Optimizer)))
+    (fun-spec
+      (name "train-rmsprop")
+      (arity 5)
+      (args ("learning-rate" "decay" "momentum" "epsilon" "is-centered"))
+      (return ,Optimizer)
+      (contract
+        (a-arrow ,N ,(O-of N) ,(O-of N) ,(O-of N) ,B ,Optimizer)))
 
     (data-spec
       (name "Optimizer")
@@ -1519,6 +1615,14 @@
 
   }
 
+  @nested[#:style 'inset]{
+
+    @function["is-model"]
+
+    @function["make-model"]
+
+  }
+
   @type-spec["Sequential"]{
 
     A @pyret{Sequential} model is a model where the outputs of one
@@ -1527,6 +1631,21 @@
 
     As a result, the first layer passed to a @pyret{Sequential} model must
     have a defined input shape.
+
+  }
+
+  @nested[#:style 'inset]{
+
+    @function["is-sequential"]
+
+    @function["make-sequential"]
+
+    @sequential-method["add"]
+    @sequential-method["compile"]
+    @sequential-method["evaluate"]
+    @sequential-method["predict"]
+    @sequential-method["predict-on-batch"]
+    @sequential-method["fit"]
 
   }
 
@@ -1544,19 +1663,128 @@
 
   }
 
+  @function["is-dense-layer"]
+
+  @function["make-dense-layer"]
+
   @;#########################################################################
-  @section{Optimizers}
+  @section{The Optimizer Datatype}
 
   @type-spec["Optimizer"]{
 
-    Layers are the primary building block for constructing a @pyret{Model}. Each
-    layer will typically perform some computation to transform its input to its
-    output.
+    @pyret{Optimizer}s are used to perform training operations and compute
+    gradients.
 
-    Layers will automatically take care of creating and initializing the various
-    internal variables/weights they need to function.
+    @pyret{Optimizer}s eagerly compute gradients. This means that when a user
+    provides a function that is a combination of TensorFlow operations
+    to an @pyret{Optimizer}, the @pyret{Optimizer} automatically differentiates
+    that function's output with respect to its inputs.
 
   }
+
+  @function["is-optimizer"]
+
+  Returns @pyret{true} if @pyret{val} is an @pyret{Optimizer}; otherwise,
+  returns @pyret{false}.
+
+  @;#########################################################################
+  @section{Optimizer Constructors}
+
+  There are many different types of @pyret{Optimizer}s that use different
+  formulas to compute gradients.
+
+  @function["train-sgd"]
+
+  Constructs an @pyret{Optimizer} that uses a stochastic gradient descent
+  algorithm, where @pyret{learning-rate} is the learning rate to use for the
+  algorithm.
+
+  @function["train-momentum"]
+
+  Constructs an @pyret{Optimizer} that uses a momentum gradient descent
+  algorithm, where @pyret{learning-rate} is the learning rate to use for the
+  algorithm and @pyret{momentum} is the momentum to use for the algorithm.
+
+  See @link["http://proceedings.mlr.press/v28/sutskever13.pdf"
+  "http://proceedings.mlr.press/v28/sutskever13.pdf"].
+
+  @function["train-adagrad"]
+
+  Constructs an @pyret{Optimizer} that uses the Adagrad algorithm, where
+  @pyret{learning-rate} is the learning rate to use for the Adagrad gradient
+  descent algorithm.
+
+  If not @pyret{none}, @pyret{initial-accumulator} is the positive, starting
+  value for the accumulators in the Adagrad algorithm. If
+  @pyret{initial-accumulator} is specified but is not positive, the function
+  raises an error.
+
+  See @link["http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf"
+  "http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf"] or
+  @link["http://ruder.io/optimizing-gradient-descent/index.html#adagrad"
+  "http://ruder.io/optimizing-gradient-descent/index.html#adagrad"].
+
+  @function["train-adadelta"]
+
+  Constructs an @pyret{Optimizer} that uses the Adadelta algorithm.
+
+  If not @pyret{none}, @pyret{learning-rate} is the learning rate to use for
+  the Adamax gradient descent algorithm, @pyret{rho} is the learning rate
+  decay over each update, and @pyret{epsilon} is a constant used to better
+  condition the gradient updates.
+
+  See @link["https://arxiv.org/abs/1212.5701" "https://arxiv.org/abs/1212.5701"].
+
+  @function["train-adam"]
+
+  Constructs an @pyret{Optimizer} that uses the Adam algorithm.
+
+  If not @pyret{none}, @pyret{learning-rate} is the learning rate to use for
+  the Adamax gradient descent algorithm, @pyret{beta-1} is the exponential
+  decay rate for the first moment estimates, @pyret{beta-2} is the
+  exponential decay rate for the second moment estimates, and
+  @pyret{epsilon} is a small constant for numerical stability.
+
+  See @link["https://arxiv.org/abs/1412.6980" "https://arxiv.org/abs/1412.6980"].
+
+  @function["train-adamax"]
+
+  Constructs an @pyret{Optimizer} that uses the Adamax algorithm.
+
+  If not @pyret{none}, @pyret{learning-rate} is the learning rate to use for
+  the Adamax gradient descent algorithm, @pyret{beta-1} is the exponential
+  decay rate for the first moment estimates, @pyret{beta-2} is the
+  exponential decay rate for the second moment estimates, @pyret{epsilon} is
+  a small constant for numerical stability, and @pyret{decay} is the learning
+  rate decay over each update.
+
+  See @link["https://arxiv.org/abs/1412.6980" "https://arxiv.org/abs/1412.6980"].
+
+  @function["train-rmsprop"]
+
+  Constructs an @pyret{Optimizer} that uses RMSProp gradient descent, where
+  @pyret{learning-rate} is the learning rate to use for the RMSProp gradient
+  descent algorithm.
+
+  If not @pyret{none}, @pyret{decay} represents the discounting factor for the
+  history/coming gradient, @pyret{momentum} represents the momentum to use for
+  the RMSProp gradient descent algorithm, and @pyret{epsilon} is a small value
+  to avoid division-by-zero errors.
+
+  If @pyret{is-centered} is @pyret{true}, gradients are normalized by the
+  estimated varience of the gradient.
+
+  See @link["http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf"
+  "these slides from the University of Toronto"] for a primer on RMSProp.
+
+  @bold{Note:} This TensorFlow.js implementation uses plain momentum and is
+  not the "centered" version of RMSProp.
+
+  @;#########################################################################
+  @section{Usage Examples}
+
+  The below program demonstrates how to use @pyret{tensorflow} to perform
+  linear regression operations on a dataset.
 
   @examples{
     import tensorflow as TF
