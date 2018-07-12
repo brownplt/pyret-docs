@@ -687,10 +687,10 @@
     (fun-spec
       (name "make-model")
       (arity 1)
-      (args ("values"))
+      (args ("config"))
       (return ,Model)
       (contract
-        (a-arrow ,(L-of N) ,Model)))
+        (a-arrow ,Object ,Model)))
 
     (data-spec
       (name "Model")
@@ -717,10 +717,10 @@
     (fun-spec
       (name "make-sequential")
       (arity 1)
-      (args ("values"))
+      (args ("config"))
       (return ,Sequential)
       (contract
-        (a-arrow ,(L-of N) ,Sequential)))
+        (a-arrow ,Object ,Sequential)))
 
     (data-spec
       (name "Sequential")
@@ -778,19 +778,110 @@
             )))
 
     (fun-spec
-      (name "is-dense-layer")
+      (name "is-layer")
       (arity 1)
       (args ("val"))
       (return ,B)
       (contract
         (a-arrow ,A ,B)))
     (fun-spec
-      (name "make-dense-layer")
+      (name "activation-layer")
       (arity 1)
-      (args ("values"))
+      (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,(L-of N) ,Layer)))
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "dense-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "dropout-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "embedding-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "flatten-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "repeat-vector-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "reshape-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "conv-1d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "conv-2d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "conv-2d-transpose-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "cropping-2d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "depthwise-conv-2d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "separable-conv-2d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "up-sampling-2d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
 
     (data-spec
       (name "Layer")
@@ -1663,9 +1754,22 @@
 
   }
 
-  @function["is-dense-layer"]
+  @function["is-layer"]
 
-  @function["make-dense-layer"]
+  @function["activation-layer"]
+  @function["dense-layer"]
+  @function["dropout-layer"]
+  @function["embedding-layer"]
+  @function["flatten-layer"]
+  @function["repeat-vector-layer"]
+  @function["reshape-layer"]
+  @function["conv-1d-layer"]
+  @function["conv-2d-layer"]
+  @function["conv-2d-transpose-layer"]
+  @function["cropping-2d-layer"]
+  @function["depthwise-conv-2d-layer"]
+  @function["separable-conv-2d-layer"]
+  @function["up-sampling-2d-layer"]
 
   @;#########################################################################
   @section{The Optimizer Datatype}
@@ -1800,7 +1904,7 @@
     # Create a tiny helper function:
     fun positive-rand() -> Number:
       doc: "Generates a positive Number between 0 and 1"
-      num-random(10000000) / 1000000
+      num-random(10000000) / 10000000
     end
 
     # `train-x` and `train-y` represent random points in a dataset, plotted
