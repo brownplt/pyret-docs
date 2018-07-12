@@ -3,7 +3,9 @@
 
 @(define Tensor (a-id "Tensor" (xref "tensorflow" "Tensor")))
 @(define Model (a-id "Model" (xref "tensorflow" "Model")))
+@(define Sequential (a-id "Sequential" (xref "tensorflow" "Sequential")))
 @(define Layer (a-id "Layer" (xref "tensorflow" "Layer")))
+@(define Optimizer (a-id "Optimizer" (xref "tensorflow" "Optimizer")))
 
 @(define (tensor-method name)
   (method-doc "Tensor" #f name #:alt-docstrings ""))
@@ -13,6 +15,13 @@
     (path "src/arr/trove/tensorflow.arr")
 
     (fun-spec (name "tensor"))
+    (fun-spec
+      (name "is-tensor")
+      (arity 1)
+      (args ("val"))
+      (return ,B)
+      (contract
+        (a-arrow ,A ,B)))
     (fun-spec
       (name "list-to-tensor")
       (arity 1)
@@ -649,6 +658,126 @@
       (return ,Tensor)
       (contract
         (a-arrow ,Tensor ,Tensor)))
+
+    (fun-spec
+      (name "is-model")
+      (arity 1)
+      (args ("val"))
+      (return ,B)
+      (contract
+        (a-arrow ,A ,B)))
+    (fun-spec
+      (name "make-model")
+      (arity 1)
+      (args ("values"))
+      (return ,Model)
+      (contract
+        (a-arrow ,(L-of N) ,Model)))
+
+    (data-spec
+      (name "Model")
+      (type-vars ())
+      (variants)
+      (shared
+        ((method-spec
+          (name "size")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,N)
+          (contract
+            (a-arrow ,Tensor ,N)))
+            )))
+
+    (fun-spec
+      (name "is-sequential")
+      (arity 1)
+      (args ("val"))
+      (return ,B)
+      (contract
+        (a-arrow ,A ,B)))
+    (fun-spec
+      (name "make-sequential")
+      (arity 1)
+      (args ("values"))
+      (return ,Sequential)
+      (contract
+        (a-arrow ,(L-of N) ,Sequential)))
+
+    (data-spec
+      (name "Sequential")
+      (type-vars ())
+      (variants)
+      (shared
+        ((method-spec
+          (name "size")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,N)
+          (contract
+            (a-arrow ,Tensor ,N)))
+            )))
+
+    (fun-spec
+      (name "is-dense-layer")
+      (arity 1)
+      (args ("val"))
+      (return ,B)
+      (contract
+        (a-arrow ,A ,B)))
+    (fun-spec
+      (name "make-dense-layer")
+      (arity 1)
+      (args ("values"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,(L-of N) ,Layer)))
+
+    (data-spec
+      (name "Layer")
+      (type-vars ())
+      (variants)
+      (shared
+        ((method-spec
+          (name "size")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,N)
+          (contract
+            (a-arrow ,Tensor ,N)))
+            )))
+
+    (fun-spec
+      (name "is-optimizer")
+      (arity 1)
+      (args ("val"))
+      (return ,B)
+      (contract
+        (a-arrow ,A ,B)))
+    (fun-spec
+      (name "train-sgd")
+      (arity 1)
+      (args ("values"))
+      (return ,Optimizer)
+      (contract
+        (a-arrow ,(L-of N) ,Optimizer)))
+
+    (data-spec
+      (name "Optimizer")
+      (type-vars ())
+      (variants)
+      (shared
+        ((method-spec
+          (name "size")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,N)
+          (contract
+            (a-arrow ,Tensor ,N)))
+            )))
    ))
 
 @docmodule["tensorflow"]{
@@ -905,9 +1034,10 @@
   raises an error.
 
   When reshaping a @pyret{Tensor} to be 0-, 1-, 2-, 3-, or 4-dimensional,
-  use @pyret-method["Tensor" "as-scalar"], @pyret-method["Tensor" "as-1d"],
-  @pyret-method["Tensor" "as-2d"], @pyret-method["Tensor" "as-3d"], or
-  @pyret-method["Tensor" "as-4d"] for readability.
+  it's recommended to use @pyret-method["Tensor" "as-scalar"],
+  @pyret-method["Tensor" "as-1d"], @pyret-method["Tensor" "as-2d"],
+  @pyret-method["Tensor" "as-3d"], or @pyret-method["Tensor" "as-4d"] as
+  they make the code more readable.
 
   @tensor-method["clone"]
 
@@ -1206,7 +1336,8 @@
 
   @function["softplus"]
 
-  Applies the softplus function to the @pyret{Tensor}, element-wise.
+  Applies the @link["https://sefiks.com/2017/08/11/softplus-as-a-neural-networks-activation-function/"
+  "softplus"] function to the @pyret{Tensor}, element-wise.
 
   @function["tensor-sqrt"]
 
@@ -1246,35 +1377,60 @@
   @;#########################################################################
   @section{Models}
 
-  @type-spec["Model"]{
-    Models are one of the primary abstractions used in TensorFlow. Models can be
-    trained, evaluated, and used for prediction.
+  @pyret{Model}s represent a collection of @pyret{Layers}, and define a series
+  of inputs and outputs. They are one of the primary abstractions used in
+  TensorFlow, and can be trained, evaluated, and used for prediction.
 
-    Models represent a collection of @pyret{Layers}.
+  There are two types of models in TensorFlow: @pyret{Sequential}, where
+  the outputs of one @pyret{Layer} are the inputs to the next @pyret{Layer},
+  and @pyret{Model}, which is more generic and supports arbitrary, non-cyclic
+  graphs of @pyret{Layer}s.
+
+  @type-spec["Model"]{
+
+    A @pyret{Model} is a data structure that consists of @pyret{Layer}s and
+    defines inputs and outputs. It is more generic than @pyret{Sequential}
+    models as it supports arbitrary, non-cyclic graphs of @pyret{Layer}s.
+
+  }
+
+  @type-spec["Sequential"]{
+
+    A @pyret{Sequential} model is a model where the outputs of one
+    @pyret{Layer} are the inputs to the next @pyret{Layer}. That is, the model
+    topology is a simple "stack" of layers, with no branching or skipping.
+
+    As a result, the first layer passed to a @pyret{Sequential} model must
+    have a defined input shape.
+
   }
 
   @;#########################################################################
   @section{Layers}
 
   @type-spec["Layer"]{
+
     Layers are the primary building block for constructing a @pyret{Model}. Each
     layer will typically perform some computation to transform its input to its
     output.
 
     Layers will automatically take care of creating and initializing the various
     internal variables/weights they need to function.
+
   }
 
   @;#########################################################################
   @section{Optimizers}
 
   @type-spec["Optimizer"]{
+
     Layers are the primary building block for constructing a @pyret{Model}. Each
     layer will typically perform some computation to transform its input to its
     output.
 
     Layers will automatically take care of creating and initializing the various
     internal variables/weights they need to function.
+
   }
 
   @examples{
