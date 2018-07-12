@@ -943,12 +943,12 @@
 
   @examples{
     check:
-      one-dim = [TF.tensor: 1]
-      one-dim.as-scalar().shape() is empty
-      one-dim.shape() is [list: 1] # doesn't modify shape of original tensor
+      size-one = [TF.tensor: 1]
+      size-one.as-scalar().shape() is empty
+      size-one.shape() is [list: 1] # doesn't modify shape of original tensor
 
-      two-dim = [TF.tensor: 1, 2]
-      two-dim.as-scalar() raises
+      size-two = [TF.tensor: 1, 2]
+      size-two.as-scalar() raises
         "Tensor was size-2 but `as-scalar` requires the tensor to be size-1"
     end
   }
@@ -961,6 +961,23 @@
   The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
   but it's recommended to use @pyret-method["Tensor" "as-1d"] as it makes the
   code more readable.
+
+  @examples{
+    check:
+      one-dim = [TF.tensor: 1]
+      two-dim = [TF.tensor: 4, 3, 2, 1].as-2d(2, 2)
+      three-dim = [TF.tensor: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9].as-3d(3, 1, 3)
+
+      one-dim.shape() is [list: 1]
+      one-dim.as-1d().shape() is [list: 1]
+
+      two-dim.shape() is [list: 2, 2]
+      two-dim.as-1d().shape() is [list: 4]
+
+      three-dim.shape() is [list: 3, 1, 3]
+      three-dim.as-1d().shape() is [list: 9]
+    end
+  }
 
   @tensor-method["as-2d"]
 
@@ -975,6 +992,27 @@
   but it's recommended to use @pyret-method["Tensor" "as-2d"] as it makes the
   code more readable.
 
+  @examples{
+    check:
+      one-dim = [TF.tensor: 1]
+      two-dim = [TF.tensor: 0, 1, 2, 3, 4, 5].as-2d(3, 2)
+      three-dim = [TF.tensor: 4, 3, 2, 1, 0, -1, -2, -3].as-3d(2, 2, 2)
+
+      one-dim.shape() is [list: 1]
+      one-dim.as-2d(1, 1).shape() is [list: 1, 1]
+
+      two-dim.shape() is [list: 3, 2]
+      two-dim.as-2d(2, 3).shape() is [list: 2, 3]
+
+      three-dim.shape() is [list: 2, 2, 2]
+      three-dim.as-2d(4, 2).shape() is [list: 4, 2]
+
+      one-dim.as-2d(2, 1) raises "Cannot reshape"
+      two-dim.as-2d(3, 3) raises "Cannot reshape"
+      three-dim.as-2d(5, 4) raises "Cannot reshape"
+    end
+  }
+
   @tensor-method["as-3d"]
 
   Constructs a new, rank-3 @pyret{Tensor} with the input dimensions from the
@@ -988,6 +1026,22 @@
   but it's recommended to use @pyret-method["Tensor" "as-3d"] as it makes the
   code more readable.
 
+  @examples{
+    check:
+      one-dim = [TF.tensor: 1]
+      two-dim = [TF.tensor: 0, 1, 2, 3, 4, 5, 6, 7].as-2d(4, 2)
+
+      one-dim.shape() is [list: 1]
+      one-dim.as-3d(1, 1, 1).shape() is [list: 1, 1, 1]
+
+      two-dim.shape() is [list: 4, 2]
+      two-dim.as-3d(2, 2, 2).shape() is [list: 2, 2, 2]
+
+      one-dim.as-3d(2, 1, 1) raises "Cannot reshape"
+      two-dim.as-3d(4, 3, 2) raises "Cannot reshape"
+    end
+  }
+
   @tensor-method["as-4d"]
 
   Constructs a new, rank-4 @pyret{Tensor} with the input dimensions from the
@@ -1000,6 +1054,22 @@
   The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
   but it's recommended to use @pyret-method["Tensor" "as-4d"] as it makes the
   code more readable.
+
+  @examples{
+    check:
+      one-dim = [TF.tensor: 1]
+      two-dim = [TF.tensor: 0, 1, 2, 3, 4, 5, 6, 7].as-2d(4, 2)
+
+      one-dim.shape() is [list: 1]
+      one-dim.as-4d(1, 1, 1, 1).shape() is [list: 1, 1, 1, 1]
+
+      two-dim.shape() is [list: 4, 2]
+      two-dim.as-4d(2, 2, 1, 2).shape() is [list: 2, 2, 1, 2]
+
+      one-dim.as-4d(2, 1, 1, 1) raises "Cannot reshape"
+      two-dim.as-4d(2, 2, 2, 2) raises "Cannot reshape"
+    end
+  }
 
   @tensor-method["as-type"]
 
