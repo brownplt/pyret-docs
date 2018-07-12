@@ -69,7 +69,7 @@
           (arity 1)
           (params ())
           (args ("self"))
-          (return ,N)
+          (return ,(L-of N))
           (contract
             (a-arrow ,Tensor ,(L-of N))))
         (method-spec
@@ -846,6 +846,11 @@
     [tensor: 9, 4, 0, -32, 23, 1, 3, 2].as-3d(2, 2, 2) # a 2 x 2 x 2 tensor
   }
 
+  @function["is-tensor"]
+
+  Returns @pyret{true} if @pyret{val} is a @pyret{Tensor}; otherwise, returns
+  @pyret{false}.
+
   @function["list-to-tensor"]
 
   Creates a new @pyret{Tensor} with the values in the input @pyret{List}.
@@ -1406,23 +1411,23 @@
 
   @function["reduce-max"]
 
-  Returns a @pyret{Tensor} containing the maximum value of all entries in
-  the input @pyret{tensor}.
+  Returns a @pyret{Tensor} containing a single value that is the maximum value
+  of all entries in the input @pyret{tensor}.
 
   @function["reduce-min"]
 
-  Returns a @pyret{Tensor} containing the minimum value of all entries in
-  the input @pyret{tensor}.
+  Returns a @pyret{Tensor} containing a single value that is the minimum value
+  of all entries in the input @pyret{tensor}.
 
   @function["reduce-mean"]
 
-  Returns a @pyret{Tensor} containing the mean value of all entries in
-  the input @pyret{tensor}.
+  Returns a @pyret{Tensor} containing a single value that is the mean value
+  of all entries in the input @pyret{tensor}.
 
   @function["reduce-sum"]
 
-  Returns a @pyret{Tensor} containing the sum of all entries in the input
-  @pyret{tensor}.
+  Returns a @pyret{Tensor} containing a single value that is the sum
+  of all entries in the input @pyret{tensor}.
 
   @;#########################################################################
   @section{Models}
