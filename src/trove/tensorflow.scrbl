@@ -882,6 +882,111 @@
       (return ,Layer)
       (contract
         (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "add-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "average-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "concatenate-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "maximum-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "minimum-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "multiply-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "batch-normalization-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "average-pooling-1d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "average-pooling-2d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "global-average-pooling-1d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "global-average-pooling-2d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "global-max-pooling-1d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "global-max-pooling-2d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "max-pooling-1d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "max-pooling-2d-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
 
     (data-spec
       (name "Layer")
@@ -1741,7 +1846,7 @@
   }
 
   @;#########################################################################
-  @section{Layers}
+  @section{The Layer Datatype}
 
   @type-spec["Layer"]{
 
@@ -1756,6 +1861,9 @@
 
   @function["is-layer"]
 
+  @;#########################################################################
+  @section{Basic Layers}
+
   @function["activation-layer"]
   @function["dense-layer"]
   @function["dropout-layer"]
@@ -1763,6 +1871,10 @@
   @function["flatten-layer"]
   @function["repeat-vector-layer"]
   @function["reshape-layer"]
+
+  @;#########################################################################
+  @section{Convolutional Layers}
+
   @function["conv-1d-layer"]
   @function["conv-2d-layer"]
   @function["conv-2d-transpose-layer"]
@@ -1770,6 +1882,33 @@
   @function["depthwise-conv-2d-layer"]
   @function["separable-conv-2d-layer"]
   @function["up-sampling-2d-layer"]
+
+  @;#########################################################################
+  @section{Convolutional Layers}
+
+  @function["add-layer"]
+  @function["average-layer"]
+  @function["concatenate-layer"]
+  @function["maximum-layer"]
+  @function["minimum-layer"]
+  @function["multiply-layer"]
+
+  @;#########################################################################
+  @section{Normalization Layers}
+
+  @function["batch-normalization-layer"]
+
+  @;#########################################################################
+  @section{Pooling Layers}
+
+  @function["average-pooling-1d-layer"]
+  @function["average-pooling-2d-layer"]
+  @function["global-average-pooling-1d-layer"]
+  @function["global-average-pooling-2d-layer"]
+  @function["global-max-pooling-1d-layer"]
+  @function["global-max-pooling-2d-layer"]
+  @function["max-pooling-1d-layer"]
+  @function["max-pooling-2d-layer"]
 
   @;#########################################################################
   @section{The Optimizer Datatype}
