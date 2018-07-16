@@ -203,15 +203,86 @@
           (contract
             (a-arrow ,Tensor ,Tensor)))
         (method-spec
-          (name "placeholder")
+          (name "add")
           (arity 2)
           (params ())
-          (args ("self" "width"))
-          (return ,(L-of S))
+          (args ("self" "x"))
+          (return ,Tensor)
           (contract
-            (a-arrow ,Tensor ,N ,(L-of S))))
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
+        (method-spec
+          (name "subtract")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
+        (method-spec
+          (name "multiply")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
+        (method-spec
+          (name "divide")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
+        (method-spec
+          (name "floor-divide")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
+        (method-spec
+          (name "max")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
+        (method-spec
+          (name "min")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
+        (method-spec
+          (name "modulo")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
+        (method-spec
+          (name "expt")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
+        (method-spec
+          (name "squared-difference")
+          (arity 2)
+          (params ())
+          (args ("self" "x"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,Tensor ,Tensor)))
             )))
-
     (fun-spec
       (name "add-tensors")
       (arity 2)
@@ -1076,13 +1147,13 @@
       (variants)
       (shared
         ((method-spec
-          (name "size")
-          (arity 1)
+          (name "minimize")
+          (arity 3)
           (params ())
-          (args ("self"))
-          (return ,N)
+          (args ("self" "f", "variables"))
+          (return ,Tensor)
           (contract
-            (a-arrow ,Tensor ,N)))
+            (a-arrow ,Optimizer (a-arrow "" ,Tensor) ,(L-of Tensor) ,Tensor)))
             )))
    ))
 
@@ -1173,14 +1244,24 @@
   @function["random-normal"]
 
   Creates a new @pyret{Tensor} with the given shape (represented as values in
-  the input @pyret{List}) where all of the values are sampled from a normal
-  distribution.
+  the input @pyret{List<Number> shape}) where all of the values are sampled
+  from a normal distribution.
+
+  @pyret{mean} is the mean of the normal distribution and
+  @pyret{standard-deviation} is the standard deviation of the normal
+  distribution. If @pyret{none}, the respective parameters are set to the
+  TensorFlow.js defaults.
 
   @function["random-uniform"]
 
   Creates a new @pyret{Tensor} with the given shape (represented as values in
   the input @pyret{List}) where all of the values are sampled from a uniform
   distribution.
+
+  @pyret{min-val} is the lower bound on the range of random values to generate
+  and @pyret{max-val} is the upper bound on the range of random values to
+  generate. If @pyret{none}, the respective parameters are set to the
+  TensorFlow.js defaults.
 
   @function["make-variable"]
 
@@ -1429,6 +1510,57 @@
   @tensor-method["clone"]
 
   Constructs a new @pyret{Tensor} that is a copy of the original @pyret{Tensor}.
+
+  @tensor-method["add"]
+
+  Adds @pyret{x} to the @pyret{Tensor}. This is equivalent to
+  @pyret-id["add-tensors"]@pyret{(self, x)}.
+
+  @tensor-method["subtract"]
+
+  Subtracts @pyret{x} from the @pyret{Tensor}. This is equivalent to
+  @pyret-id["subtract-tensors"]@pyret{(self, x)}.
+
+  @tensor-method["multiply"]
+
+  Multiplies the @pyret{Tensor} by @pyret{x}. This is equivalent to
+  @pyret-id["multiply-tensors"]@pyret{(self, x)}.
+
+  @tensor-method["divide"]
+
+  Divides the @pyret{Tensor} by @pyret{x}. This is equivalent to
+  @pyret-id["divide-tensors"]@pyret{(self, x)}.
+
+  @tensor-method["floor-divide"]
+
+  Divides the @pyret{Tensor} by @pyret{x}, with the result rounded
+  with the floor function. This is equivalent to
+  @pyret-id["floor-divide-tensors"]@pyret{(self, x)}.
+
+  @tensor-method["max"]
+
+  Returns the maximum of the @pyret{Tensor} and @pyret{x}. This is equivalent to
+  @pyret-id["tensor-max"]@pyret{(self, x)}.
+
+  @tensor-method["min"]
+
+  Returns the minimum of the @pyret{Tensor} and @pyret{x}. This is equivalent to
+  @pyret-id["tensor-min"]@pyret{(self, x)}.
+
+  @tensor-method["modulo"]
+
+  Computes the modulo of the @pyret{Tensor} and @pyret{x}. This is equivalent to
+  @pyret-id["tensor-modulo"]@pyret{(self, x)}.
+
+  @tensor-method["expt"]
+
+  Computes the power of the @pyret{Tensor} to @pyret{exponent}. This is
+  equivalent to @pyret-id["tensor-expt"]@pyret{(self, x)}.
+
+  @tensor-method["squared-difference"]
+
+  Computes @pyret{(self - x) * (self - x)}, element-wise. This is
+  equivalent to @pyret-id["squared-difference"]@pyret{(self, x)}.
 
   @;#########################################################################
   @section{Arithmetic Operations}
@@ -2037,6 +2169,21 @@
   not the "centered" version of RMSProp.
 
   @;#########################################################################
+  @section{Optimizer Methods}
+
+  @optimizer-method["minimize"]
+
+  Executes @pyret{f} and minimizes the scalar output of @pyret{f} by computing
+  gradients of @pyret{y} with with respect to the list of trainable, variable
+  @pyret{Tensor}s provided by @pyret{variables}.
+
+  @pyret{f} must be a thunk that returns a scalar @pyret{Tensor}.
+  The method then returns the scalar @pyret{Tensor} produced by @pyret{f}.
+
+  If @pyret{variables} is @pyret{empty}, the @pyret{Optimizer} will default
+  to training all trainable variables that have been instantiated.
+
+  @;#########################################################################
   @section{Usage Examples}
 
   The below program demonstrates how to use @pyret{tensorflow} to perform
@@ -2137,84 +2284,102 @@
     import tensorflow as TF
     import chart as C
     import image as I
-    import lists as L
 
     type Tensor = TF.Tensor
-    type Optimizer = TF.Optimizer
-    type ChartWindow = C.ChartWindow
-    type Image = I.Image
+    type DataSeries = C.DataSeries
 
-    # Create a tiny helper function:
     fun positive-rand() -> Number:
-      doc: "Generates a positive Number between 0 and 1"
       num-random(10000000) / 10000000
     end
 
-    # `train-x` and `train-y` represent random points in a dataset, plotted
-    # on `scatter-plot`:
-    train-x = [list:
-      3.3, 4.4, 5.5, 6.71, 6.93, 4.168, 9.779, 6.182, 7.59, 2.167, 7.042,
-      10.791, 5.313, 7.997, 5.654, 9.27, 3.1]
+    fun generate-data(num-points :: Number, coefficients :: Object, sigma :: Number) -> Object:
+      a = TF.make-scalar(coefficients.a)
+      b = TF.make-scalar(coefficients.b)
+      c = TF.make-scalar(coefficients.c)
+      d = TF.make-scalar(coefficients.d)
 
-    train-y = [list:
-      1.7, 2.76, 2.09, 3.19, 1.694, 1.573, 3.366, 2.596, 2.53, 1.221,
-      2.827, 3.465, 1.65, 2.904, 2.42, 2.94, 1.3]
+      xs = TF.random-uniform([list: num-points], some(-1), some(1))
 
-    scatter-plot = C.from-list.scatter-plot(train-x, train-y)
+      # The below represents ax^3 + bx^2 + cx + d:
+      ys = a.multiply(xs.expt(TF.make-scalar(3)))
+        .add(b.multiply(TF.tensor-square(xs)))
+        .add(c.multiply(xs))
+        .add(d)
+        .add(TF.random-normal([list: num-points], some(0), some(sigma)))
 
-    # Create two scalar Tensors `m` and `b` that are variables:
-    m = TF.make-scalar(positive-rand()).to-variable()
-    b = TF.make-scalar(positive-rand()).to-variable()
+      # Normalize the y values to the range 0 to 1:
+      y-min = TF.reduce-min(ys)
+      y-max = TF.reduce-max(ys)
+      y-range = TF.subtract-tensors(y-max, y-min)
+      ys-normalized = TF.subtract-tensors(ys, y-min) ^ TF.divide-tensors(_, y-range)
 
-    # Setup a few helper functions before training:
-    fun predict(x :: Tensor) -> Tensor:
-      doc: ```Uses the current values of m and b to predict what Y-values will
-           be generated given a Tensor `x` representing X-values```
+      {xs: xs, ys: ys-normalized}
+    end
 
-      temp = TF.multiply-tensors(m, x)
-      TF.add-tensors(temp, b)
+    fun predict(a :: Tensor, b :: Tensor, c :: Tensor, d :: Tensor, x :: Tensor) -> Tensor:
+      # The below represents ax^3 + bx^2 + cx + d:
+      a.multiply(x.expt(TF.make-scalar(3)))
+        .add(b.multiply(TF.tensor-square(x)))
+        .add(c.multiply(x))
+        .add(d)
     end
 
     fun loss(prediction :: Tensor, actual-values :: Tensor) -> Tensor:
-      doc: ```Used to calculate a measure of difference between the predicted
-           Y-values and the actual Y-values```
-
       TF.subtract-tensors(prediction, actual-values)
         ^ TF.tensor-square(_)
         ^ TF.reduce-mean(_)
     end
 
-    # Train the model by creating an Optimizer. The optimizer will change any
-    # variable tensors used in the function passed into it in an attempt to
-    # minimize the returned loss:
-    fun train():
-      doc: "Trains the model"
-      learning-rate = 0.005
-      optimizer = TF.train-sgd(learning-rate)
+    fun plot(scatter-plot :: DataSeries, a :: Tensor, b :: Tensor, c :: Tensor, d :: Tensor) block:
+      a-val = a.data-sync().first
+      b-val = b.data-sync().first
+      c-val = c.data-sync().first
+      d-val = d.data-sync().first
 
+      print("Equation:")
+      print("y = "
+          + num-to-string(a-val) + "x^3 + "
+          + num-to-string(b-val) + "x^2 + "
+          + num-to-string(c-val) + "x + "
+          + num-to-string(d-val))
+      function-plot = C.from-list.function-plot(
+        lam(x): (a-val * num-expt(x, 3)) + (b-val * num-sqr(x)) + (c-val * x) + d-val end)
+      chart-image = C.render-charts([list: scatter-plot, function-plot]).get-image()
+      I.scale(0.6, chart-image)
+    end
+
+    # Generate synthetic data based on a cubic function
+    test-data = generate-data(100, {a: -0.8, b: -0.2, c: 0.9, d: 0.5}, 0.04)
+    train-x = test-data.xs.data-sync()
+    train-y = test-data.ys.data-sync()
+
+    # Plot the random points ahead of time for better perfomance:
+    scatter-plot = C.from-list.scatter-plot(train-x, train-y)
+
+    # Generate a few variables representing coefficients in the equation,
+    # randomized to some value between 0 and 1
+    a = TF.make-scalar(positive-rand()).to-variable()
+    b = TF.make-scalar(positive-rand()).to-variable()
+    c = TF.make-scalar(positive-rand()).to-variable()
+    d = TF.make-scalar(positive-rand()).to-variable()
+
+    # Plot the random cubic function overlayed on the initial points:
+    plot(scatter-plot, a, b, c, d)
+
+    # Create an optimizer:
+    LEARNING-RATE = 0.5
+    TRAINING-CYCLES = 200
+    optimizer = TF.train-sgd(LEARNING-RATE)
+
+    # Train the model
+    for each(i from range(0, TRAINING-CYCLES)):
       optimizer.minimize(lam() block:
-          prediction = predict(TF.list-to-tensor(train-x).as-1d())
-          step-loss = loss(prediction, TF.list-to-tensor(train-y).as-1d())
-          step-loss
+          prediction = predict(a, b, c, d, test-data.xs)
+          loss(prediction, test-data.ys)
         end, empty)
     end
 
-    fun plot() -> ChartWindow:
-      doc: "Plots the current mx + b function and overlays it on the scatter plot"
-      shadow m = m.data-sync().first
-      shadow b = b.data-sync().first
-
-      function-plot = C.from-list.function-plot(lam(x): (m * x) + b end)
-      C.render-charts([list: scatter-plot, function-plot])
-    end
-
-    fun train-steps(steps :: Number) -> Image block:
-      doc: "Trains the model `steps` times"
-      for L.each(_ from L.range(0, steps)) block:
-        train()
-        print("y = " + num-to-string(m.data-sync().first) + "x + " + num-to-string(b.data-sync().first))
-      end
-      plot().get-image()
-    end
+    # Plot the resulting cubic function overlayed on the initial points:
+    plot(scatter-plot, a, b, c, d)
   }
 }
