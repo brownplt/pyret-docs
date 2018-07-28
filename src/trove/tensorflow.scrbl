@@ -2,20 +2,27 @@
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 
 @(define Tensor (a-id "Tensor" (xref "tensorflow" "Tensor")))
+@(define TensorBuffer (a-id "TensorBuffer" (xref "tensorflow" "TensorBuffer")))
 @(define Model (a-id "Model" (xref "tensorflow" "Model")))
 @(define Sequential (a-id "Sequential" (xref "tensorflow" "Sequential")))
+@(define SymbolicTensor (a-id "SymbolicTensor" (xref "tensorflow" "SymbolicTensor")))
 @(define Layer (a-id "Layer" (xref "tensorflow" "Layer")))
 @(define Optimizer (a-id "Optimizer" (xref "tensorflow" "Optimizer")))
 
 @(define Object (a-id "Object" (xref "<global>" "Object")))
 @(define Nothing (a-id "Nothing" (xref "<global>" "Nothing")))
+@(define NumInteger (a-id "NumInteger" (xref "numbers" "NumInteger")))
 
 @(define (tensor-method name)
   (method-doc "Tensor" #f name #:alt-docstrings ""))
+@(define (tensor-buffer-method name)
+  (method-doc "TensorBuffer" #f name #:alt-docstrings ""))
 @(define (model-method name)
   (method-doc "Model" #f name #:alt-docstrings ""))
 @(define (sequential-method name)
   (method-doc "Sequential" #f name #:alt-docstrings ""))
+@(define (symbolic-tensor-method name)
+  (method-doc "SymbolicTensor" #f name #:alt-docstrings ""))
 @(define (layer-method name)
   (method-doc "Layer" #f name #:alt-docstrings ""))
 @(define (optimizer-method name)
@@ -48,19 +55,54 @@
       (contract
         (a-arrow ,N ,Tensor)))
     (fun-spec
+      (name "fill")
+      (arity 2)
+      (args ("shape" "value"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,(L-of NumInteger) ,N ,Tensor)))
+    (fun-spec
+      (name "linspace")
+      (arity 3)
+      (args ("start" "stop" "num-values"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,N ,N, N ,Tensor)))
+    (fun-spec
+      (name "ones")
+      (arity 1)
+      (args ("shape"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,(L-of NumInteger) ,Tensor)))
+    (fun-spec
+      (name "zeros")
+      (arity 1)
+      (args ("shape"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,(L-of NumInteger) ,Tensor)))
+    (fun-spec
+      (name "multinomial")
+      (arity 4)
+      (args ("logits" "num-samples" "seed" "is-normalized"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,N ,(O-of N) ,B ,Tensor)))
+    (fun-spec
       (name "random-normal")
       (arity 3)
       (args ("shape" "mean" "standard-deviation"))
       (return ,Tensor)
       (contract
-        (a-arrow ,(L-of N) ,(O-of N) ,(O-of N) ,Tensor)))
+        (a-arrow ,(L-of NumInteger) ,(O-of N) ,(O-of N) ,Tensor)))
     (fun-spec
       (name "random-uniform")
       (arity 3)
       (args ("shape" "min-val" "max-val"))
       (return ,Tensor)
       (contract
-        (a-arrow ,(L-of N) ,(O-of N) ,(O-of N) ,Tensor)))
+        (a-arrow ,(L-of NumInteger) ,(O-of N) ,(O-of N) ,Tensor)))
     (fun-spec
       (name "make-variable")
       (arity 1)
@@ -179,6 +221,14 @@
           (contract
             (a-arrow ,Tensor ,Tensor)))
         (method-spec
+          (name "to-buffer")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,TensorBuffer)
+          (contract
+            (a-arrow ,Tensor ,TensorBuffer)))
+        (method-spec
           (name "to-variable")
           (arity 1)
           (params ())
@@ -194,6 +244,22 @@
           (return ,Tensor)
           (contract
             (a-arrow ,Tensor ,(L-of N) ,Tensor)))
+        (method-spec
+          (name "expand-dims")
+          (arity 2)
+          (params ())
+          (args ("self" "axis"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,(O-of N) ,Tensor)))
+        (method-spec
+          (name "squeeze")
+          (arity 2)
+          (params ())
+          (args ("self" "axes"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
         (method-spec
           (name "clone")
           (arity 1)
@@ -281,8 +347,62 @@
           (args ("self" "x"))
           (return ,Tensor)
           (contract
-            (a-arrow ,Tensor ,Tensor ,Tensor)))
-            )))
+            (a-arrow ,Tensor ,Tensor ,Tensor))))))
+
+    (fun-spec
+      (name "make-buffer")
+      (arity 1)
+      (args ("shape"))
+      (return ,TensorBuffer)
+      (contract
+        (a-arrow ,(L-of NumInteger) ,TensorBuffer)))
+    (fun-spec
+      (name "is-tensor-buffer")
+      (arity 1)
+      (args ("shape"))
+      (return ,A)
+      (contract
+        (a-arrow ,A ,B)))
+
+    (data-spec
+      (name "TensorBuffer")
+      (type-vars ())
+      (variants)
+      (shared
+        ((method-spec
+          (name "get-now")
+          (arity 2)
+          (params ())
+          (args ("self" "indices"))
+          (return ,N)
+          (contract
+            (a-arrow ,TensorBuffer ,(L-of NumInteger) ,N)))
+        (method-spec
+          (name "set-now")
+          (arity 3)
+          (params ())
+          (args ("self" "value" "indices"))
+          (return ,Nothing)
+          (contract
+            (a-arrow ,TensorBuffer ,N ,(L-of NumInteger) ,Nothing)))
+        (method-spec
+          (name "get-all-now")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,(L-of RN))
+          (contract
+            (a-arrow ,TensorBuffer ,(L-of RN))))
+        (method-spec
+          (name "to-tensor")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,Tensor)
+          (contract
+            (a-arrow ,TensorBuffer ,Tensor))))))
+
+
     (fun-spec
       (name "add-tensors")
       (arity 2)
@@ -649,6 +769,13 @@
       (contract
         (a-arrow ,Tensor ,Tensor)))
     (fun-spec
+      (name "tensor-sinh")
+      (arity 1)
+      (args ("tensor"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor)))
+    (fun-spec
       (name "softplus")
       (arity 1)
       (args ("tensor"))
@@ -693,67 +820,133 @@
 
     (fun-spec
       (name "all")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,(O-of N) ,Tensor)))
     (fun-spec
       (name "any")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,(O-of N) ,Tensor)))
     (fun-spec
       (name "arg-max")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,(O-of N) ,Tensor)))
     (fun-spec
       (name "arg-min")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,(O-of N) ,Tensor)))
     (fun-spec
       (name "log-sum-exp")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,(O-of N) ,Tensor)))
     (fun-spec
       (name "reduce-max")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,(O-of N) ,Tensor)))
     (fun-spec
       (name "reduce-mean")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,(O-of N) ,Tensor)))
     (fun-spec
       (name "reduce-min")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,(O-of N) ,Tensor)))
     (fun-spec
       (name "reduce-sum")
-      (arity 1)
-      (args ("tensor"))
+      (arity 2)
+      (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor)))
+        (a-arrow ,Tensor ,(O-of N) ,Tensor)))
+
+
+
+    (fun-spec
+      (name "concatenate")
+      (arity 2)
+      (args ("tensors" "axis"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,(L-of Tensor) ,(O-of N) ,Tensor)))
+    (fun-spec
+      (name "gather")
+      (arity 3)
+      (args ("tensor" "indices" "axis"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,Tensor ,(O-of N) ,Tensor)))
+    (fun-spec
+      (name "reverse")
+      (arity 2)
+      (args ("tensor" "axes"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+    (fun-spec
+      (name "slice")
+      (arity 3 )
+      (args ("tensor" "begin" "size"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,(L-of N) ,(O-of (L-of N)) ,Tensor)))
+    (fun-spec
+      (name "split")
+      (arity 2)
+      (args ("tensor" "axes"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+    (fun-spec
+      (name "stack")
+      (arity 2)
+      (args ("tensor" "axes"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+    (fun-spec
+      (name "tile")
+      (arity 2)
+      (args ("tensor" "axes"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+    (fun-spec
+      (name "unstack")
+      (arity 2)
+      (args ("tensor" "axes"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+    (fun-spec
+      (name "strided-slice")
+      (arity 4)
+      (args ("tensor" "begin" "end" "strides"))
+      (return ,Tensor)
+      (contract
+        (a-arrow ,Tensor ,(L-of N) ,(L-of N) ,(L-of N) ,Tensor)))
 
     (fun-spec
       (name "is-model")
@@ -817,7 +1010,7 @@
           (name "compile")
           (arity 2)
           (params ())
-          (args ("self" "layer"))
+          (args ("self" "config"))
           (return ,Nothing)
           (contract
             (a-arrow ,Sequential ,Object ,Nothing)))
@@ -854,6 +1047,35 @@
           (contract
             (a-arrow ,Sequential ,Tensor ,Tensor ,Object (a-arrow ,N ,Object ,Nothing) ,Nothing)))
             )))
+
+    (fun-spec
+      (name "make-input")
+      (arity 1)
+      (args ("shape"))
+      (return ,SymbolicTensor)
+      (contract
+        (a-arrow ,(L-of (O-of N)) ,SymbolicTensor)))
+    (fun-spec
+      (name "make-batch-input")
+      (arity 1)
+      (args ("batch-shape"))
+      (return ,SymbolicTensor)
+      (contract
+        (a-arrow ,(L-of (O-of N)) ,SymbolicTensor)))
+
+    (data-spec
+      (name "SymbolicTensor")
+      (type-vars ())
+      (variants)
+      (shared
+        ((method-spec
+          (name "shape")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,(L-of (O-of N)))
+          (contract
+            (a-arrow ,SymbolicTensor ,(L-of (O-of N))))))))
 
     (fun-spec
       (name "is-layer")
@@ -1065,6 +1287,76 @@
       (return ,Layer)
       (contract
         (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "gru-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "gru-cell-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "lstm-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "lstm-cell-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "rnn-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "simple-rnn-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "simple-rnn-cell-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "stacked-rnn-cells-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "bidirectional-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
+    (fun-spec
+      (name "time-distributed-layer")
+      (arity 1)
+      (args ("config"))
+      (return ,Layer)
+      (contract
+        (a-arrow ,Object ,Layer)))
 
     (data-spec
       (name "Layer")
@@ -1161,8 +1453,10 @@
   A module that provides a Pyret interface for TensorFlow, a
   symbolic math library for machine learning applications.
 
+  @(table-of-contents)
+
   @;#########################################################################
-  @section{The Tensor Datatype}
+  @section{Tensors}
 
   @type-spec["Tensor"]{
 
@@ -1198,7 +1492,7 @@
   }
 
   @;#########################################################################
-  @section{Tensor Constructors}
+  @subsection{Tensor Constructors}
 
   @collection-doc["tensor" #:contract `(a-arrow ("value" ,N) ,Tensor)]
 
@@ -1221,6 +1515,15 @@
   Returns @pyret{true} if @pyret{val} is a @pyret{Tensor}; otherwise, returns
   @pyret{false}.
 
+  @examples{
+    check:
+      is-tensor([tensor: 1, 2, 3]) is true
+      is-tensor(true) is false
+      is-tensor(0) is false
+      is-tensor([list: 1, 2, 3]) is false
+    end
+  }
+
   @function["list-to-tensor"]
 
   Creates a new @pyret{Tensor} with the values in the input @pyret{List}.
@@ -1232,6 +1535,11 @@
   @pyret-method["Tensor" "reshape"] to change the shape of a @pyret{Tensor}
   after instantiating it.
 
+  @examples{
+    list-to-tensor([list: 5, 3, 4, 7]) # a size-4 tensor
+    list-to-tensor([list: 9, 3, 2, 3]).as-2d(2, 2) # a 2 x 2 tensor
+  }
+
   @function["make-scalar"]
 
   Creates a new @pyret{Tensor} of rank-0 with the given @pyret{value}.
@@ -1240,6 +1548,96 @@
   constructor and the @pyret-method["Tensor" "as-scalar"] method, but it's
   recommended to use @pyret-id["make-scalar"] as it makes the code more
   readable.
+
+  @examples{
+    check:
+      make-scalar(1).size() is 0
+      make-scalar(~12.3).shape() is empty
+      make-scalar(2.34).data-sync() is [list: 1]
+    end
+  }
+
+  @function["fill"]
+
+  Creates a @pyret{Tensor} with the input @pyret{shape} where all of the
+  entries are @pyret{value}.
+
+  @examples{
+    check:
+      fill([list: 0], 1).data-sync()
+        is-roughly [list: ]
+      fill([list: 3], 5).data-sync()
+        is-roughly [list: ~5, ~5, ~5]
+      fill([list: 3, 2], -3).data-sync()
+        is-roughly [list: ~-3, ~-3, ~-3, ~-3, ~-3, ~-3]
+    end
+  }
+
+  @function["linspace"]
+
+  Returns a @pyret{Tensor} whose values are an evenly spaced sequence of
+  numbers over the range @pyret{[start, stop]}. @pyret{num-values} is the
+  number of entries in the output @pyret{Tensor}.
+
+  @examples{
+    check:
+      linspace(0, 0, 1).data-sync()
+        is-roughly [list: ~0]
+      linspace(10, 11, 1).data-sync()
+        is-roughly [list: ~10]
+      linspace(5, 1, 5).data-sync()
+        is-roughly [list: ~5, ~4, ~3, ~2, ~1]
+      linspace(0, 9, 10).data-sync()
+        is-roughly [list: ~0, ~1, ~2, ~3, ~4, ~5, ~6, ~7, ~8, ~9]
+      linspace(0, 4, 9).data-sync()
+        is-roughly [list: ~0, ~0.5, ~1, ~1.5, ~2, ~2.5, ~3, ~3.5, ~4]
+    end
+  }
+
+  @function["ones"]
+
+  Returns a @pyret{Tensor} with the given @pyret{shape} where all of the
+  entries are ones.
+
+  @examples{
+    check:
+      ones([list: 0]).data-sync() is-roughly [list: ]
+      ones([list: 4]).data-sync() is-roughly [list: ~1, ~1, ~1, ~1]
+      two-dim = ones([list: 3, 2])
+      two-dim.shape() is [list: 3, 2]
+      two-dim.data-sync() is-roughly [list: ~1, ~1, ~1, ~1, ~1, ~1]
+    end
+  }
+
+  @function["zeros"]
+
+  Returns a @pyret{Tensor} with the given @pyret{shape} where all of the
+  entries are zeros.
+
+  @examples{
+    check:
+      zeros([list: 0]).data-sync() is-roughly [list: ]
+      zeros([list: 4]).data-sync() is-roughly [list: ~0, ~0, ~0, ~0]
+      two-dim = zeros([list: 3, 2])
+      two-dim.shape() is [list: 3, 2]
+      two-dim.data-sync() is-roughly [list: ~0, ~0, ~0, ~0, ~0, ~0]
+    end
+  }
+
+  @function["multinomial"]
+
+  Creates a new @pyret{Tensor} where all of the values are sampled from a
+  multinomial distribution.
+
+  @pyret{logits} should be a @pyret{Tensor} representing a one-dimensional
+  array containing with unnormalized log-probabilities, or a two-dimensional
+  array of structure @pyret{[batch-size, num-outcomes]}.
+
+  @pyret{num-samples} is the number of samples to draw for each row slice.
+  @pyret{seed} represents the random seed to use when generating values; if
+  @pyret{none}, the seed is randomly generated. @pyret{normalized} designates
+  whether or not the provided logits are normalized true probabilities (i.e:
+  they sum to 1).
 
   @function["random-normal"]
 
@@ -1271,8 +1669,14 @@
   The same functionality can be achieved with the
   @pyret-method["Tensor" "to-variable"] method.
 
+  @examples{
+    make-variable([tensor: 9, 3, 4.13, 0, 43])
+    make-variable(random-normal([list: 4, 5, 3], some(0), some(1)))
+    make-variable(make-scalar(1))
+  }
+
   @;#########################################################################
-  @section{Tensor Methods}
+  @subsection{Tensor Methods}
 
   @tensor-method["size"]
 
@@ -1329,11 +1733,11 @@
 
   @examples{
     check:
-      size-one = [TF.tensor: 1]
+      size-one = [tensor: 1]
       size-one.as-scalar().shape() is empty
       size-one.shape() is [list: 1] # doesn't modify shape of original tensor
 
-      size-two = [TF.tensor: 1, 2]
+      size-two = [tensor: 1, 2]
       size-two.as-scalar() raises
         "Tensor was size-2 but `as-scalar` requires the tensor to be size-1"
     end
@@ -1350,9 +1754,9 @@
 
   @examples{
     check:
-      one-dim = [TF.tensor: 1]
-      two-dim = [TF.tensor: 4, 3, 2, 1].as-2d(2, 2)
-      three-dim = [TF.tensor: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9].as-3d(3, 1, 3)
+      one-dim = [tensor: 1]
+      two-dim = [tensor: 4, 3, 2, 1].as-2d(2, 2)
+      three-dim = [tensor: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9].as-3d(3, 1, 3)
 
       one-dim.shape() is [list: 1]
       one-dim.as-1d().shape() is [list: 1]
@@ -1380,9 +1784,9 @@
 
   @examples{
     check:
-      one-dim = [TF.tensor: 1]
-      two-dim = [TF.tensor: 0, 1, 2, 3, 4, 5].as-2d(3, 2)
-      three-dim = [TF.tensor: 4, 3, 2, 1, 0, -1, -2, -3].as-3d(2, 2, 2)
+      one-dim = [tensor: 1]
+      two-dim = [tensor: 0, 1, 2, 3, 4, 5].as-2d(3, 2)
+      three-dim = [tensor: 4, 3, 2, 1, 0, -1, -2, -3].as-3d(2, 2, 2)
 
       one-dim.shape() is [list: 1]
       one-dim.as-2d(1, 1).shape() is [list: 1, 1]
@@ -1414,8 +1818,8 @@
 
   @examples{
     check:
-      one-dim = [TF.tensor: 1]
-      two-dim = [TF.tensor: 0, 1, 2, 3, 4, 5, 6, 7].as-2d(4, 2)
+      one-dim = [tensor: 1]
+      two-dim = [tensor: 0, 1, 2, 3, 4, 5, 6, 7].as-2d(4, 2)
 
       one-dim.shape() is [list: 1]
       one-dim.as-3d(1, 1, 1).shape() is [list: 1, 1, 1]
@@ -1443,8 +1847,8 @@
 
   @examples{
     check:
-      one-dim = [TF.tensor: 1]
-      two-dim = [TF.tensor: 0, 1, 2, 3, 4, 5, 6, 7].as-2d(4, 2)
+      one-dim = [tensor: 1]
+      two-dim = [tensor: 0, 1, 2, 3, 4, 5, 6, 7].as-2d(4, 2)
 
       one-dim.shape() is [list: 1]
       one-dim.as-4d(1, 1, 1, 1).shape() is [list: 1, 1, 1, 1]
@@ -1487,6 +1891,11 @@
   Constructs a new @pyret{Tensor} from the values of the original
   @pyret{Tensor} with all of the values cast to the @tt{"bool"} datatype.
 
+  @tensor-method["to-buffer"]
+
+  Constructs a new @pyret-id["TensorBuffer"] from the values of the original
+  @pyret{Tensor}.
+
   @tensor-method["to-variable"]
 
   Constructs a new, mutable @pyret{Tensor} from the values of the original
@@ -1506,6 +1915,21 @@
   @pyret-method["Tensor" "as-1d"], @pyret-method["Tensor" "as-2d"],
   @pyret-method["Tensor" "as-3d"], or @pyret-method["Tensor" "as-4d"] as
   they make the code more readable.
+
+  @tensor-method["expand-dims"]
+
+  Returns a @pyret{Tensor} that has expanded rank, by inserting a dimension
+  into the @pyret{Tensor}'s shape at the given dimension index @pyret{axis}.
+  If @pyret{axis} is @pyret{none}, the method inserts a dimension at index 0
+  by default.
+
+  @tensor-method["squeeze"]
+
+  Returns a @pyret{Tensor} with dimensions of size 1 removed from the shape.
+
+  If @pyret{axis} is not @pyret{none}, the method only squeezes the dimensions
+  listed as indices in @pyret{axis}. The method will raise an error if one of
+  the dimensions specified in @pyret{axis} is not of size 1.
 
   @tensor-method["clone"]
 
@@ -1563,44 +1987,92 @@
   equivalent to @pyret-id["squared-difference"]@pyret{(self, x)}.
 
   @;#########################################################################
-  @section{Arithmetic Operations}
+  @section{TensorBuffers}
+
+  @type-spec["TensorBuffer"]{
+
+    @pyret{TensorBuffer}s are mutable objects that allow users to set values
+    at specific locations before converting the buffer into an immutable
+    @pyret-id["Tensor"].
+
+  }
+
+  @function["is-tensor-buffer"]
+
+  Returns @pyret{true} if @pyret{val} is a @pyret{TensorBuffer}; otherwise,
+  returns @pyret{false}.
+
+  @;#########################################################################
+  @subsection{TensorBuffer Constructors}
+
+  @function["make-buffer"]
+
+  Creates an @pyret{TensorBuffer} with the specified @pyret{shape}. The
+  returned @pyret{TensorBuffer}'s values are initialized to @pyret{~0}.
+
+  @;#########################################################################
+  @subsection{TensorBuffer Methods}
+
+  @tensor-buffer-method["set-now"]
+
+  Sets the value in the @pyret{TensorBuffer} at the specified @pyret{indicies}
+  to @pyret{value}.
+
+  @tensor-buffer-method["get-now"]
+
+  Returns the value in the @pyret{TensorBuffer} at the specified
+  @pyret{indicies}.
+
+  @tensor-buffer-method["get-all-now"]
+
+  Returns all values in the @pyret{TensorBuffer}.
+
+  @tensor-buffer-method["to-tensor"]
+
+  Creates an immutable @pyret-id["Tensor"] from the @pyret{TensorBuffer}.
+
+  @;#########################################################################
+  @section{Operations}
+
+  @;#########################################################################
+  @subsection{Arithmetic Operations}
 
   @function["add-tensors"]
 
-  Adds two @pyret{Tensor}s element-wise, A + B.
+  Adds two @pyret-id["Tensor"]s element-wise, A + B.
 
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-add-tensors"].
 
   @function["subtract-tensors"]
 
-  Subtracts two @pyret{Tensor}s element-wise, A – B.
+  Subtracts two @pyret-id["Tensor"]s element-wise, A – B.
 
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-subtract-tensors"].
 
   @function["multiply-tensors"]
 
-  Multiplies two @pyret{Tensor}s element-wise, A * B.
+  Multiplies two @pyret-id["Tensor"]s element-wise, A * B.
 
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-multiply-tensors"].
 
   @function["divide-tensors"]
 
-  Divides two @pyret{Tensor}s element-wise, A / B.
+  Divides two @pyret-id["Tensor"]s element-wise, A / B.
 
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-divide-tensors"].
 
   @function["floor-divide-tensors"]
 
-  Divides two @pyret{Tensor}s element-wise, A / B, with the result rounded
+  Divides two @pyret-id["Tensor"]s element-wise, A / B, with the result rounded
   with the floor function.
 
   @function["tensor-max"]
 
-  Returns a @pyret{Tensor} containing the maximum of @pyret{a} and @pyret{b},
+  Returns a @pyret-id["Tensor"] containing the maximum of @pyret{a} and @pyret{b},
   element-wise.
 
   To assert that @pyret{a} and @pyret{b} are the same shape, use
@@ -1608,7 +2080,7 @@
 
   @function["tensor-min"]
 
-  Returns a @pyret{Tensor} containing the minimum of @pyret{a} and @pyret{b},
+  Returns a @pyret-id["Tensor"] containing the minimum of @pyret{a} and @pyret{b},
   element-wise.
 
   To assert that @pyret{a} and @pyret{b} are the same shape, use
@@ -1690,31 +2162,31 @@
   @pyret-method["Tensor" "shape"]).
 
   @;#########################################################################
-  @section{Basic Math Operations}
+  @subsection{Basic Math Operations}
 
   @function["tensor-abs"]
 
-  Computes the absolute value of the @pyret{Tensor}, element-wise.
+  Computes the absolute value of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-acos"]
 
-  Computes the inverse cosine of the @pyret{Tensor}, element-wise.
+  Computes the inverse cosine of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-acosh"]
 
-  Computes the inverse hyperbolic cosine of the @pyret{Tensor}, element-wise.
+  Computes the inverse hyperbolic cosine of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-asin"]
 
-  Computes the inverse sine of the @pyret{Tensor}, element-wise.
+  Computes the inverse sine of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-asinh"]
 
-  Computes the inverse hyperbolic sine of the @pyret{Tensor}, element-wise.
+  Computes the inverse hyperbolic sine of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-atan"]
 
-  Computes the inverse tangent of the @pyret{Tensor}, element-wise.
+  Computes the inverse tangent of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-atan2"]
 
@@ -1723,30 +2195,30 @@
 
   @function["tensor-atanh"]
 
-  Computes the inverse hyperbolic tangent of the @pyret{Tensor}, element-wise.
+  Computes the inverse hyperbolic tangent of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-ceil"]
 
-  Computes the ceiling of the @pyret{Tensor}, element-wise.
+  Computes the ceiling of the @pyret-id["Tensor"], element-wise.
 
   @function["clip-by-value"]
 
-  Clips the values of the @pyret{Tensor}, element-wise, such that every element
-  in the resulting @pyret{Tensor} is at least @pyret{min-value} and is at most
+  Clips the values of the @pyret-id["Tensor"], element-wise, such that every element
+  in the resulting @pyret-id["Tensor"] is at least @pyret{min-value} and is at most
   @pyret{max-value}.
 
   @function["tensor-cos"]
 
-  Computes the cosine of the @pyret{Tensor}, element-wise.
+  Computes the cosine of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-cosh"]
 
-  Computes the hyperbolic cosine of the @pyret{Tensor}, element-wise.
+  Computes the hyperbolic cosine of the @pyret-id["Tensor"], element-wise.
 
   @function["exponential-linear-units"]
 
   Applies the @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#ELUs"
-  "exponential linear units"] function to the @pyret{Tensor}, element-wise.
+  "exponential linear units"] function to the @pyret-id["Tensor"], element-wise.
 
   @function["elu"]
 
@@ -1755,7 +2227,7 @@
   @function["gauss-error"]
 
   Applies the @link["http://mathworld.wolfram.com/Erf.html" "gauss error function"]
-  to the @pyret{Tensor}, element-wise.
+  to the @pyret-id["Tensor"], element-wise.
 
   @function["erf"]
 
@@ -1771,12 +2243,13 @@
 
   @function["tensor-floor"]
 
-  Computes the floor of the @pyret{Tensor}, element-wise.
+  Computes the floor of the @pyret-id["Tensor"], element-wise.
 
   @function["leaky-relu"]
 
   Applies a @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Leaky_ReLUs"
-  "leaky rectified linear units"] function to the @pyret{Tensor}, element-wise.
+  "leaky rectified linear units"] function to the @pyret-id["Tensor"],
+  element-wise.
 
   @pyret{alpha} is the scaling factor for negative values. The default in
   TensorFlow.js is @pyret{0.2}, but the argument has been exposed here for more
@@ -1784,41 +2257,42 @@
 
   @function["tensor-log"]
 
-  Computes the natural logarithm of the @pyret{Tensor}, element-wise; that is,
-  it computes the equivalent of @pyret{num-log(tensor)}.
+  Computes the natural logarithm of the @pyret-id["Tensor"], element-wise; that
+  is, it computes the equivalent of @pyret{num-log(tensor)}.
 
   @function["tensor-log-plus1"]
 
-  Computes the natural logarithm of the @pyret{Tensor} plus 1, element-wise;
-  that is, it computes the equivalent of @pyret{num-log(tensor + 1)}.
+  Computes the natural logarithm of the @pyret-id["Tensor"] plus 1,
+  element-wise; that is, it computes the equivalent of
+  @pyret{num-log(tensor + 1)}.
 
   @function["log-sigmoid"]
 
   Applies the @link["https://en.wikibooks.org/wiki/Artificial_Neural_Networks/
   Activation_Functions#Continuous_Log-Sigmoid_Function" "log sigmoid"] function
-  to the @pyret{Tensor}, element-wise.
+  to the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-negate"]
 
-  Multiplies each element in the @pyret{Tensor} by @pyret{-1}.
+  Multiplies each element in the @pyret-id["Tensor"] by @pyret{-1}.
 
   @function["parametric-relu"]
 
   Applies a @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Leaky_ReLUs"
-  "leaky rectified linear units"] function to the @pyret{Tensor}, element-wise,
-  using parametric alphas.
+  "leaky rectified linear units"] function to the @pyret-id["Tensor"],
+  element-wise, using parametric alphas.
 
   @pyret{alpha} is the scaling factor for negative values.
 
   @function["tensor-reciprocal"]
 
-  Computes the reciprocal of the @pyret{Tensor}, element-wise; that is, it
+  Computes the reciprocal of the @pyret-id["Tensor"], element-wise; that is, it
   computes the equivalent of @pyret{1 / tensor}.
 
   @function["relu"]
 
   Applies a @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)"
-  "rectified linear units"] function to the @pyret{Tensor}, element-wise.
+  "rectified linear units"] function to the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-round"]
 
@@ -1826,67 +2300,71 @@
 
   @function["reciprocal-sqrt"]
 
-  Computes the recriprocal of the square root of the @pyret{Tensor},
+  Computes the recriprocal of the square root of the @pyret-id["Tensor"],
   element-wise.
 
-  The resulting @pyret{Tensor} is roughly equivalent to
+  The resulting @pyret-id["Tensor"] is roughly equivalent to
   @pyret{tensor-reciprocal(tensor-sqrt(tensor))}.
 
   @function["scaled-elu"]
 
-  Applies a scaled, exponential linear units function to the @pyret{Tensor},
-  element-wise.
+  Applies a scaled, exponential linear units function to the
+  @pyret-id["Tensor"], element-wise.
 
   @function["sigmoid"]
 
-  Applies the sigmoid function to the @pyret{Tensor}, element-wise.
+  Applies the sigmoid function to the @pyret-id["Tensor"], element-wise.
 
   @function["signed-ones"]
 
   Returns an element-wise indication of the sign of each number in the
-  @pyret{Tensor}; that is, every value in the original tensor is represented
-  in the resulting tensor as @pyret{~+1} if the value is positive, @pyret{~-1}
-  if the value was negative, or @pyret{~0} if the value was zero or not a
-  number.
+  @pyret-id["Tensor"]; that is, every value in the original tensor is
+  represented in the resulting tensor as @pyret{~+1} if the value is positive,
+  @pyret{~-1} if the value was negative, or @pyret{~0} if the value was zero
+  or not a number.
 
   @function["tensor-sin"]
 
-  Computes the sine of the @pyret{Tensor}, element-wise.
+  Computes the sine of the @pyret-id["Tensor"], element-wise.
+
+  @function["tensor-sinh"]
+
+  Computes the hyperbolic sine of the @pyret-id["Tensor"], element-wise.
 
   @function["softplus"]
 
   Applies the @link["https://sefiks.com/2017/08/11/softplus-as-a-neural-networks-activation-function/"
-  "softplus"] function to the @pyret{Tensor}, element-wise.
+  "softplus"] function to the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-sqrt"]
 
-  Computes the square root of the @pyret{Tensor}, element-wise.
+  Computes the square root of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-square"]
 
-  Computes the square of the @pyret{Tensor}, element-wise.
+  Computes the square of the @pyret-id["Tensor"], element-wise.
 
   @function["step"]
 
-  Applies the unit step function to the @pyret{Tensor}, element-wise; that is,
-  that is, every value in the original tensor is represented
-  in the resulting tensor as @pyret{~0} if the value is negative; otherwise,
-  it is represented as @pyret{~+1}.
+  Applies the unit step function to the @pyret-id["Tensor"], element-wise;
+  that is, every value in the original tensor is represented in the resulting
+  tensor as @pyret{~0} if the value is negative; otherwise, it is represented
+  as @pyret{~+1}.
 
   @function["tensor-tan"]
 
-  Computes the tangent of the @pyret{Tensor}, element-wise.
+  Computes the tangent of the @pyret-id["Tensor"], element-wise.
 
   @function["tensor-tanh"]
 
-  Computes the hyperbolic tangent of the @pyret{Tensor}, element-wise.
+  Computes the hyperbolic tangent of the @pyret-id["Tensor"], element-wise.
 
   @;#########################################################################
-  @section{Reduction Operations}
+  @subsection{Reduction Operations}
 
   @function["all"]
 
-  Reduces the input @pyret{Tensor} across all dimensions by computing the
+  Reduces the input @pyret-id["Tensor"] across all dimensions by computing the
   logical "and" of its elements.
 
   @pyret{tensor} must be of type @pyret{"bool"}; otherwise, the function raises
@@ -1894,7 +2372,7 @@
 
   @function["any"]
 
-  Reduces the input @pyret{Tensor} across all dimensions by computing the
+  Reduces the input @pyret-id["Tensor"] across all dimensions by computing the
   logical "or" of its elements.
 
   @pyret{tensor} must be of type @pyret{"bool"}; otherwise, the function raises
@@ -1902,112 +2380,206 @@
 
   @function["arg-max"]
 
-  Returns a new @pyret{Tensor} where each element is the index of the maximum
+  Returns a new @pyret-id["Tensor"] where each element is the index of the maximum
   values along the outermost dimension of @pyret{tensor}.
 
   @function["arg-min"]
 
-  Returns a new @pyret{Tensor} where each element is the index of the minimum
+  Returns a new @pyret-id["Tensor"] where each element is the index of the minimum
   values along the outermost dimension of @pyret{tensor}.
 
   @function["log-sum-exp"]
 
-  Computes the @pyret{log(sum(exp(elements along the outermost dimension))}.
+  Computes @pyret{log(sum(exp(elements along the outermost dimension))}.
 
-  Reduces the input along the outermost dimension.
+  Reduces @pyret{tensor} along the outermost dimension.
 
   @function["reduce-max"]
 
-  Returns a @pyret{Tensor} containing a single value that is the maximum value
-  of all entries in the input @pyret{tensor}.
+  Returns a @pyret-id["Tensor"] containing a single value that is the maximum value
+  of all entries in @pyret{tensor}.
 
   @function["reduce-min"]
 
-  Returns a @pyret{Tensor} containing a single value that is the minimum value
-  of all entries in the input @pyret{tensor}.
+  Returns a @pyret-id["Tensor"] containing a single value that is the minimum value
+  of all entries in @pyret{tensor}.
 
   @function["reduce-mean"]
 
-  Returns a @pyret{Tensor} containing a single value that is the mean value
-  of all entries in the input @pyret{tensor}.
+  Returns a @pyret-id["Tensor"] containing a single value that is the mean value
+  of all entries in @pyret{tensor}.
 
   @function["reduce-sum"]
 
-  Returns a @pyret{Tensor} containing a single value that is the sum
-  of all entries in the input @pyret{tensor}.
+  Returns a @pyret-id["Tensor"] containing a single value that is the sum
+  of all entries in @pyret{tensor}.
+
+  @;#########################################################################
+  @subsection{Slicing and Joining Operations}
+
+  @function["concatenate"]
+
+  Concatenates each @pyret-id["Tensor"] in @pyret{tensors} along the given
+  @pyret{axis}.
+
+  If @pyret{axis} is @pyret{none}, the function defaults to concatenating along
+  axis 0 (the first dimension).
+
+  The @pyret-id["Tensor"]s' ranks and types must match, and their sizes must
+  match in all dimensions except @pyret{axis}.
+
+  @function["gather"]
+
+  Gathers slices from the @pyret-id["Tensor"] at every index in @pyret{indices}
+  along the given @pyret{axis}.
+
+  If @pyret{axis} is @pyret{none}, the function defaults to gathering along
+  axis 0 (the first dimension).
+
+  @examples{
+    check:
+      input-1   = [tensor: 1, 2, 3, 4]
+      indices-1 = [tensor: 1, 3, 3]
+
+      gather(input-1, indices-1).data-sync() is [list: 2, 4, 4]
+
+      input-2   = [tensor: 1, 2, 3, 4].as-2d(2, 2)
+      indices-2 = [tensor: 1, 1, 0]
+
+      gather(input-2, indices-2).data-sync() is [list: 3, 4,
+                                                       3, 4,
+                                                       1, 2]
+    end
+  }
+
+  @function["reverse"]
+
+  Reverses the values in @pyret{tensor} along the specified @pyret{axis}.
+
+  If @pyret{axis} is @pyret{none}, the function defaults to reversing along
+  axis 0 (the first dimension).
+
+  @function["slice"]
+
+  Extracts a slice from @pyret{tensor} starting at the coordinates represented
+  by @pyret{begin}. The resulting slice is of size @pyret{size}.
+
+  A value of @pyret{-1} in @pyret{size} means that the resulting slice will go
+  all the way to the end of the dimensions in the respective axis.
+
+  If the length of @pyret{size} is less than the rank of in @pyret{tensor}, the
+  size of the rest of the axes will be implicitly set to @pyret{-1}. If
+  @pyret{size} is @pyret{none}, the size of all axes will be set to @pyret{-1}.
+
+  @function["split"]
+  @function["stack"]
+  @function["tile"]
+  @function["unstack"]
+  @function["strided-slice"]
+
+  Extracts a strided slice of a @pyret-id["Tensor"].
+
+  Roughly speaking, this operations extracts a slice of size
+  @pyret{(end - begin) / stride} from @pyret{tensor}. Starting at the location
+  specified by @pyret{begin}, the slice continues by adding @pyret{stride} to
+  the index until all dimensions are not less than @pyret{end}. Note that a
+  stride can be negative, which causes a reverse slice.
 
   @;#########################################################################
   @section{Models}
 
-  @pyret{Model}s represent a collection of @pyret{Layers}, and define a series
-  of inputs and outputs. They are one of the primary abstractions used in
-  TensorFlow, and can be trained, evaluated, and used for prediction.
+  @pyret{Model}s represent a collection of @pyret-id["Layer"]s, and define a
+  series of inputs and outputs. They are one of the primary abstractions used
+  in TensorFlow, and can be trained, evaluated, and used for prediction.
 
-  There are two types of models in TensorFlow: @pyret{Sequential}, where
-  the outputs of one @pyret{Layer} are the inputs to the next @pyret{Layer},
-  and @pyret{Model}, which is more generic and supports arbitrary, non-cyclic
-  graphs of @pyret{Layer}s.
+  There are two types of models in TensorFlow: @pyret-id["Sequential"], where
+  the outputs of one @pyret-id["Layer"] are the inputs to the next
+  @pyret-id["Layer"], and @pyret-id["Model"], which is more generic and
+  supports arbitrary, non-cyclic graphs of @pyret-id["Layer"]s.
+
+  @;#########################################################################
+  @subsection{Generic Models}
 
   @type-spec["Model"]{
 
-    A @pyret{Model} is a data structure that consists of @pyret{Layer}s and
-    defines inputs and outputs. It is more generic than @pyret{Sequential}
-    models as it supports arbitrary, non-cyclic graphs of @pyret{Layer}s.
+    A @pyret{Model} is a data structure that consists of @pyret-id["Layer"]s and
+    defines inputs and outputs. It is more generic than @pyret-id["Sequential"]
+    models as it supports arbitrary, non-cyclic graphs of @pyret-id["Layer"]s.
 
   }
 
-  @nested[#:style 'inset]{
+  @function["is-model"]
 
-    @function["is-model"]
+  @function["make-model"]
 
-    @function["make-model"]
-
-  }
+  @;#########################################################################
+  @subsection{Sequential Models}
 
   @type-spec["Sequential"]{
 
     A @pyret{Sequential} model is a model where the outputs of one
-    @pyret{Layer} are the inputs to the next @pyret{Layer}. That is, the model
-    topology is a simple "stack" of layers, with no branching or skipping.
+    @pyret-id["Layer"] are the inputs to the next @pyret-id["Layer"]. That is,
+    the model topology is a simple "stack" of layers, with no branching or
+    skipping.
 
     As a result, the first layer passed to a @pyret{Sequential} model must
     have a defined input shape.
 
   }
 
-  @nested[#:style 'inset]{
+  @function["is-sequential"]
 
-    @function["is-sequential"]
+  @function["make-sequential"]
 
-    @function["make-sequential"]
+  @sequential-method["add"]
+  @sequential-method["compile"]
+  @sequential-method["evaluate"]
+  @sequential-method["predict"]
+  @sequential-method["predict-on-batch"]
+  @sequential-method["fit"]
 
-    @sequential-method["add"]
-    @sequential-method["compile"]
-    @sequential-method["evaluate"]
-    @sequential-method["predict"]
-    @sequential-method["predict-on-batch"]
-    @sequential-method["fit"]
+  @;#########################################################################
+  @section{SymbolicTensors}
+
+  @type-spec["SymbolicTensor"]{
+
+    @pyret{SymbolicTensor}s are placeholders for @pyret-id["Tensor"]s without
+    any concrete value.
+
+    They are most often encountered when building a graph of @pyret-id["Layer"]s
+    for a @pyret-id["Model"] that takes in some kind of unknown input.
 
   }
 
   @;#########################################################################
-  @section{The Layer Datatype}
+  @subsection{SymbolicTensor Constructors}
+
+  @function["make-input"]
+  @function["make-batch-input"]
+
+  @;#########################################################################
+  @subsection{SymbolicTensor Methods}
+
+  @symbolic-tensor-method["shape"]
+
+  @;#########################################################################
+  @section{Layers}
 
   @type-spec["Layer"]{
 
-    Layers are the primary building block for constructing a @pyret{Model}. Each
-    layer will typically perform some computation to transform its input to its
-    output.
+    @pyret{Layer}s are the primary building block for constructing a
+    @pyret-id["Model"]. Each @pyret{Layer} will typically perform some
+    computation to transform its input to its output.
 
-    Layers will automatically take care of creating and initializing the various
-    internal variables/weights they need to function.
+    @pyret{Layer}s will automatically take care of creating and initializing
+    the various internal variables/weights they need to function.
 
   }
 
   @function["is-layer"]
 
   @;#########################################################################
-  @section{Basic Layers}
+  @subsection{Basic Layers}
 
   @function["activation-layer"]
   @function["dense-layer"]
@@ -2018,7 +2590,7 @@
   @function["reshape-layer"]
 
   @;#########################################################################
-  @section{Convolutional Layers}
+  @subsection{Convolutional Layers}
 
   @function["conv-1d-layer"]
   @function["conv-2d-layer"]
@@ -2029,7 +2601,7 @@
   @function["up-sampling-2d-layer"]
 
   @;#########################################################################
-  @section{Convolutional Layers}
+  @subsection{Merge Layers}
 
   @function["add-layer"]
   @function["average-layer"]
@@ -2039,12 +2611,12 @@
   @function["multiply-layer"]
 
   @;#########################################################################
-  @section{Normalization Layers}
+  @subsection{Normalization Layers}
 
   @function["batch-normalization-layer"]
 
   @;#########################################################################
-  @section{Pooling Layers}
+  @subsection{Pooling Layers}
 
   @function["average-pooling-1d-layer"]
   @function["average-pooling-2d-layer"]
@@ -2056,7 +2628,25 @@
   @function["max-pooling-2d-layer"]
 
   @;#########################################################################
-  @section{The Optimizer Datatype}
+  @subsection{Recurrent Layers}
+
+  @function["gru-layer"]
+  @function["gru-cell-layer"]
+  @function["lstm-layer"]
+  @function["lstm-cell-layer"]
+  @function["rnn-layer"]
+  @function["simple-rnn-layer"]
+  @function["simple-rnn-cell-layer"]
+  @function["stacked-rnn-cells-layer"]
+
+  @;#########################################################################
+  @subsection{Wrapper Layers}
+
+  @function["bidirectional-layer"]
+  @function["time-distributed-layer"]
+
+  @;#########################################################################
+  @section{Optimizers}
 
   @type-spec["Optimizer"]{
 
@@ -2076,7 +2666,7 @@
   returns @pyret{false}.
 
   @;#########################################################################
-  @section{Optimizer Constructors}
+  @subsection{Optimizer Constructors}
 
   There are many different types of @pyret{Optimizer}s that use different
   formulas to compute gradients.
@@ -2169,7 +2759,7 @@
   not the "centered" version of RMSProp.
 
   @;#########################################################################
-  @section{Optimizer Methods}
+  @subsection{Optimizer Methods}
 
   @optimizer-method["minimize"]
 
