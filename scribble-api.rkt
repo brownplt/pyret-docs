@@ -913,8 +913,8 @@
                         [name (first tag-path)]
                         [path (rest tag-path)]
                         [link-content
-                         (if (empty? path) (list name)
-                             (list name " (from " (add-between path " » ") ")"))]
+                         (if (empty? path) (list (make-element "single-name" name))
+                             (list name (make-element "origin" (list " (from " (add-between path " » ") ")"))))]
                         [e (make-link-element "indexlink" `(,link-content ,br) (car item))])
                    (cond [(hash-ref alpha-starts item #f)
                           => (lambda (let)
@@ -926,24 +926,26 @@
                          [else e]))]
                 [else ;; multiple items with a common term
                  (define group-name (first (third (first group))))
-                 (cons (make-element #f (list group-name br))
-                       (map (lambda (item)
-                              (let* ([tag-path (caddr item)]
-                                     [name (first tag-path)]
-                                     [path (rest tag-path)]
-                                     [link-content (add-between path " » ")]
-                                     [e (list (hspace 4)
-                                             "from "
-                                             (make-link-element "indexlink" `(,link-content ,br) (car item)))])
-                                (cond [(hash-ref alpha-starts item #f)
-                                       => (lambda (let)
-                                            (make-element
-                                             (make-style #f (list
-                                                             (make-url-anchor
-                                                              (format "alpha:~a" (char-upcase let)))))
-                                             (list e)))]
-                                      [else e])))
-                          group))]))
+                 (make-element
+                  "multi-link"
+                  (cons (make-element #f (list group-name br))
+                        (map (lambda (item)
+                               (let* ([tag-path (caddr item)]
+                                      [name (first tag-path)]
+                                      [path (rest tag-path)]
+                                      [link-content (add-between path " » ")]
+                                      [e (list (hspace 4)
+                                               "from "
+                                               (make-link-element "indexlink" `(,link-content ,br) (car item)))])
+                                 (cond [(hash-ref alpha-starts item #f)
+                                        => (lambda (let)
+                                             (make-element
+                                              (make-style #f (list
+                                                              (make-url-anchor
+                                                               (format "alpha:~a" (char-upcase let)))))
+                                              (list e)))]
+                                       [else e])))
+                             group)))]))
                index-groups))
       (if manual-newlines?
         (rows alpha-row '(nbsp) body)

@@ -75,3 +75,7 @@ pre.pyret-block {
    content: attr(data-prod);
    color: transparent;
 }
+
+.hidelink {
+    display: none;
+}
