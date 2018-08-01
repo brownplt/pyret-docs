@@ -26,7 +26,7 @@ an effect.
 
 Also make sure you have `node` (and `npm`).
 
-When you have everything mentioned above, run `npm install` to download
+When you have everything mentioned above, run `make install` to download
 additional files needed for compilation.
 
 ### Compilation

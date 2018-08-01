@@ -3,7 +3,7 @@ MANUAL_FONTS = "$(shell racket -e '(display (collection-file-path "manual-fonts.
 all: docs
 
 docs:
-	scribble \
+	racket run.rkt \
     ++style $(MANUAL_FONTS) \
     ++style ./node_modules/codemirror/lib/codemirror.css \
     ++extra ./node_modules/codemirror/lib/codemirror.js \
@@ -19,9 +19,14 @@ docs:
     --dest build/ \
     --dest-name docs \
     ++arg "$(VERSION)" \
-    --htmls src/index.scrbl
+    --htmls-search src/index.scrbl
+	mkdir -p build/docs/search
+	cp src/search.html build/docs/search/index.html
 
 release-docs: docs
 	scp -r build/docs/* $(DOCS_TARGET)/$(VERSION)/
 	chmod -R a+rx $(DOCS_TARGET)/$(VERSION)/
 	cd $(DOCS_TARGET) && unlink latest && ln -s $(VERSION) latest
+
+install:
+	npm install
