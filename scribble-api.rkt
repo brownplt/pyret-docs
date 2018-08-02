@@ -971,7 +971,7 @@
 
       (define body
         (list (make-element "content-body"
-                            (flatten (map get-link-and-anchor index-groups)))))
+                            (apply append (map get-link-and-anchor index-groups)))))
       (if manual-newlines?
         (rows wrapped-alpha-row '(nbsp) body)
         (apply rows wrapped-alpha-row '(nbsp) (map list body)))))
