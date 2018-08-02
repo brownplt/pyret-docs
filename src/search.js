@@ -18,7 +18,6 @@ $(function(){
     var inputBox = $('<input/>', {
         'class': 'searchbox large',
         placeholder: '...search manual...',
-        size: "64",
     })
         .val(qs.q ? qs.q : '')
         .on('input', function() {
