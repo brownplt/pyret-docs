@@ -12,6 +12,7 @@ docs:
     ++extra ./node_modules/pyret-codemirror-mode/mode/pyret.js \
     ++style ./node_modules/pyret-codemirror-mode/css/pyret.css \
     ++extra src/hilite.js \
+    ++extra src/search.js \
     \
     ++style src/styles.css \
     --prefix src/myprefix.html \
@@ -22,6 +23,7 @@ docs:
     --htmls-search src/index.scrbl
 	mkdir -p build/docs/search
 	cp src/search.html build/docs/search/index.html
+	patch build/docs/scribble-common.js src/scribble-common.patch
 
 release-docs: docs
 	scp -r build/docs/* $(DOCS_TARGET)/$(VERSION)/

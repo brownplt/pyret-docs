@@ -75,3 +75,11 @@ pre.pyret-block {
    content: attr(data-prod);
    color: transparent;
 }
+
+.hide {
+    display: none;
+}
+
+.searchbox.large {
+    width: 24rem;
+}

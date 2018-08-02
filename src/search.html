@@ -1,18 +1,7 @@
 <html>
 <body>
 <script type="text/javascript">
-// adapted from https://stackoverflow.com/questions/11823784/redirection-to-a-specific-web-page-based-on-url-parameter-using-javascript
-function getQueryStringMap(){
-    var assoc = {};
-    window.location.search.substring(1).split('&').forEach(function(v) {
-        var pair = v.split('=');
-        assoc[pair[0]] = pair[1];
-    });
-    return assoc;
-}
-
-var qs = getQueryStringMap();
-window.location.href = 'https://www.google.com/search?q=site%3Apyret.org%2Fdocs+' + qs.q;
+window.location.href = '../Glossary.html' + window.location.search;
 </script>
 </body>
 </html>

@@ -10,21 +10,18 @@ Program in Pyret at https://code.pyret.org.
 
 ### Installing
 
-Make sure you have [Scribble](https://docs.racket-lang.org/scribble/) runnable.
-The easiest way to install Scribble is to
-[install Racket](https://racket-lang.org/download/) which will install Scribble
-as well.
+Make sure you [install Racket](https://racket-lang.org/download/).
 
-If you are using a Mac, `scribble` will not be runnable automatically.
-If you are using Racket 6.5 and install the program at
-`/Applications/Racket\ v6.5/`, for example, you need to put
+If you are using a Mac, `racket` will not be runnable automatically.
+To make it runnable, say that you are using Racket 6.5 and install the program at
+`/Applications/Racket\ v6.5/`, you need to put
 
     export PATH=$PATH:/Applications/Racket\ v6.5/bin/
 
 to `.bashrc` (if you use Bash) and then restart the shell to make it take
 an effect.
 
-Also make sure you have `node` (and `npm`).
+Also make sure you have `node` and `npm`.
 
 When you have everything mentioned above, run `make install` to download
 additional files needed for compilation.

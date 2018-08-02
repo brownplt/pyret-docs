@@ -25,6 +25,7 @@
          racket/string
          racket/runtime-path
          scheme/class
+         racket/match
          "scribble-helpers.rkt"
          "ragged.rkt"
          "ebnf.rkt"
@@ -903,49 +904,75 @@
                                  " "
                                  (loop (cdr i) (cdr alpha)))]
                          [else (loop (cdr i) alpha)]))])))
+      (define wrapped-alpha-row (make-element "alpha-row" alpha-row))
       (define br (if manual-newlines? (make-element 'newline '("\n")) ""))
+
+      ;; Here, we want to create a list of links. However, since for each datum,
+      ;; there might be an attached anchor too, we will need to flatten the
+      ;; list of results.
+
+      ;; A Link is a node which has either one or two parts (not counting link break).
+      ;; The first one is link-name, and the second one (which might not exist) is origin.
+
+      ;; NOTE: make-element will not create a new node if the style if #f
+      ;; so we need to specify it if we want the node to be created
+
+      ;; get-link : Group -> Link
+      (define (get-link group)
+        (match group
+          [(list item)
+           (let* ([tag-path (caddr item)]
+                  [name (first tag-path)]
+                  [path (rest tag-path)]
+                  [name-element (make-element "link-name" name)]
+                  [link-content
+                   (match path
+                     ['() (list name-element)]
+                     [_ (list name-element
+                              (make-element "origin"
+                                            `(" (from "
+                                              ,(add-between path " » ") ")")))])])
+             (make-link-element "indexlink"
+                                (append link-content (list br))
+                                (car item)))]
+          [_
+           (define group-name (first (third (first group))))
+           (define (get-origin item)
+             (let* ([tag-path (caddr item)]
+                    [name (first tag-path)]
+                    [path (rest tag-path)]
+                    [link-content (add-between path " » ")])
+               (list (hspace 4)
+                     "from "
+                     (make-link-element "indexlink"
+                                        `(,link-content ,br)
+                                        (car item)))))
+           (make-element
+            "indexlinks"
+            (list (make-element "link-name" group-name)
+                  br
+                  (make-element "origin" (map get-origin group))))]))
+
+      ;; get-link-and-anchor : Group -> ([Anchor, Link] | [Link])
+      (define (get-link-and-anchor group)
+        (define link (get-link group))
+        (define first-item
+          (match group
+            [(list item) item]
+            [(list item _ ...) item]))
+        (cond
+          [(hash-ref alpha-starts first-item #f)
+           => (lambda (letter)
+                (define anchor-style
+                  (list (make-url-anchor (format "alpha:~a" (char-upcase letter)))))
+                (define anchor (make-element (make-style "post-anchor" anchor-style) '()))
+                (list anchor link))]
+          [else (list link)]))
+
       (define body
-        (map (lambda(group)
-               (cond
-                [(empty? (rest group)) ;; is actually a single item
-                 (let* ([item (first group)]
-                        [tag-path (caddr item)]
-                        [name (first tag-path)]
-                        [path (rest tag-path)]
-                        [link-content
-                         (if (empty? path) (list name)
-                             (list name " (from " (add-between path " » ") ")"))]
-                        [e (make-link-element "indexlink" `(,link-content ,br) (car item))])
-                   (cond [(hash-ref alpha-starts item #f)
-                          => (lambda (let)
-                               (make-element
-                                (make-style #f (list
-                                                (make-url-anchor
-                                                 (format "alpha:~a" (char-upcase let)))))
-                                (list e)))]
-                         [else e]))]
-                [else ;; multiple items with a common term
-                 (define group-name (first (third (first group))))
-                 (cons (make-element #f (list group-name br))
-                       (map (lambda (item)
-                              (let* ([tag-path (caddr item)]
-                                     [name (first tag-path)]
-                                     [path (rest tag-path)]
-                                     [link-content (add-between path " » ")]
-                                     [e (list (hspace 4)
-                                             "from "
-                                             (make-link-element "indexlink" `(,link-content ,br) (car item)))])
-                                (cond [(hash-ref alpha-starts item #f)
-                                       => (lambda (let)
-                                            (make-element
-                                             (make-style #f (list
-                                                             (make-url-anchor
-                                                              (format "alpha:~a" (char-upcase let)))))
-                                             (list e)))]
-                                      [else e])))
-                          group))]))
-               index-groups))
+        (list (make-element "content-body"
+                            (apply append (map get-link-and-anchor index-groups)))))
       (if manual-newlines?
-        (rows alpha-row '(nbsp) body)
-        (apply rows alpha-row '(nbsp) (map list body)))))
+        (rows wrapped-alpha-row '(nbsp) body)
+        (apply rows wrapped-alpha-row '(nbsp) (map list body)))))
   (make-delayed-block contents))
