@@ -76,6 +76,10 @@ pre.pyret-block {
    color: transparent;
 }
 
-.hidelink {
+.hide {
     display: none;
+}
+
+.searchbox.large {
+    width: 24rem;
 }
