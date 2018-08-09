@@ -12,6 +12,7 @@
 @(define Object (a-id "Object" (xref "<global>" "Object")))
 @(define Nothing (a-id "Nothing" (xref "<global>" "Nothing")))
 @(define NumInteger (a-id "NumInteger" (xref "numbers" "NumInteger")))
+@(define NumPositive (a-id "NumPositive" (xref "numbers" "NumPositive")))
 
 @(define (tensor-method name)
   (method-doc "Tensor" #f name #:alt-docstrings ""))
@@ -88,7 +89,7 @@
       (args ("logits" "num-samples" "seed" "is-normalized"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,N ,(O-of N) ,B ,Tensor)))
+        (a-arrow ,Tensor ,NumPositive ,(O-of N) ,B ,Tensor)))
     (fun-spec
       (name "random-normal")
       (arity 3)
@@ -163,7 +164,7 @@
           (args ("self" "rows" "columns"))
           (return ,Tensor)
           (contract
-            (a-arrow ,Tensor ,N ,N ,Tensor)))
+            (a-arrow ,Tensor ,NumInteger ,NumInteger ,Tensor)))
         (method-spec
           (name "as-3d")
           (arity 4)
@@ -171,7 +172,7 @@
           (args ("self" "rows" "columns" "depth"))
           (return ,Tensor)
           (contract
-            (a-arrow ,Tensor ,N ,N ,N ,Tensor)))
+            (a-arrow ,Tensor ,NumInteger ,NumInteger ,NumInteger ,Tensor)))
         (method-spec
           (name "as-4d")
           (arity 5)
@@ -179,7 +180,7 @@
           (args ("self" "rows" "columns" "depth1" "depth2"))
           (return ,Tensor)
           (contract
-            (a-arrow ,Tensor ,N ,N ,N ,N ,Tensor)))
+            (a-arrow ,Tensor ,NumInteger ,NumInteger ,NumInteger ,NumInteger ,Tensor)))
         (method-spec
           (name "as-type")
           (arity 2)
@@ -189,7 +190,7 @@
           (contract
             (a-arrow ,Tensor ,S ,Tensor)))
         (method-spec
-          (name "data-sync")
+          (name "data-now")
           (arity 1)
           (params ())
           (args ("self" ))
@@ -243,7 +244,7 @@
           (args ("self" "new-shape"))
           (return ,Tensor)
           (contract
-            (a-arrow ,Tensor ,(L-of N) ,Tensor)))
+            (a-arrow ,Tensor ,(L-of NumInteger) ,Tensor)))
         (method-spec
           (name "expand-dims")
           (arity 2)
@@ -251,7 +252,7 @@
           (args ("self" "axis"))
           (return ,Tensor)
           (contract
-            (a-arrow ,Tensor ,(O-of N) ,Tensor)))
+            (a-arrow ,Tensor ,(O-of NumInteger) ,Tensor)))
         (method-spec
           (name "squeeze")
           (arity 2)
@@ -259,7 +260,7 @@
           (args ("self" "axes"))
           (return ,Tensor)
           (contract
-            (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+            (a-arrow ,Tensor ,(O-of (L-of NumInteger)) ,Tensor)))
         (method-spec
           (name "clone")
           (arity 1)
@@ -1479,7 +1480,7 @@
 
     For performance reasons, @pyret{Tensor}s do not support arbitrary
     precision. Retrieving values from a @pyret{Tensor} using
-    @pyret-method["Tensor" "data-sync"] always returns a
+    @pyret-method["Tensor" "data-now"] always returns a
     @pyret{List<Roughnum>}.
 
     Since @pyret{Tensor}s are immutable, all operations always return new
@@ -1536,8 +1537,14 @@
   after instantiating it.
 
   @examples{
-    list-to-tensor([list: 5, 3, 4, 7]) # a size-4 tensor
-    list-to-tensor([list: 9, 3, 2, 3]).as-2d(2, 2) # a 2 x 2 tensor
+    check:
+      is-tensor(list-to-tensor(empty)) is true
+      is-tensor(list-to-tensor([list: 5, 3, 4, 7])) is true
+
+      list-to-tensor(empty).data-now() is empty
+      list-to-tensor([list: 9, 3, 2, 3]).data-now() is-roughly [list: 9, 3, 2, 3]
+      list-to-tensor([list: 3, 2, 1, 0, 4, 9]).as-2d(2, 3).shape() is [list: 2, 3]
+    end
   }
 
   @function["make-scalar"]
@@ -1551,9 +1558,9 @@
 
   @examples{
     check:
-      make-scalar(1).size() is 0
+      make-scalar(1).size() is 1
       make-scalar(~12.3).shape() is empty
-      make-scalar(2.34).data-sync() is [list: 1]
+      make-scalar(2.34).data-now() is-roughly [list: 2.34]
     end
   }
 
@@ -1564,12 +1571,12 @@
 
   @examples{
     check:
-      fill([list: 0], 1).data-sync()
+      fill([list: 0], 1).data-now()
         is-roughly [list: ]
-      fill([list: 3], 5).data-sync()
-        is-roughly [list: ~5, ~5, ~5]
-      fill([list: 3, 2], -3).data-sync()
-        is-roughly [list: ~-3, ~-3, ~-3, ~-3, ~-3, ~-3]
+      fill([list: 3], 5).data-now()
+        is-roughly [list: 5, 5, 5]
+      fill([list: 3, 2], -3).data-now()
+        is-roughly [list: -3, -3, -3, -3, -3, -3]
     end
   }
 
@@ -1581,16 +1588,16 @@
 
   @examples{
     check:
-      linspace(0, 0, 1).data-sync()
-        is-roughly [list: ~0]
-      linspace(10, 11, 1).data-sync()
-        is-roughly [list: ~10]
-      linspace(5, 1, 5).data-sync()
-        is-roughly [list: ~5, ~4, ~3, ~2, ~1]
-      linspace(0, 9, 10).data-sync()
-        is-roughly [list: ~0, ~1, ~2, ~3, ~4, ~5, ~6, ~7, ~8, ~9]
-      linspace(0, 4, 9).data-sync()
-        is-roughly [list: ~0, ~0.5, ~1, ~1.5, ~2, ~2.5, ~3, ~3.5, ~4]
+      linspace(0, 3, 1).data-now()
+        is-roughly [list: 0]
+      linspace(10, 11, 1).data-now()
+        is-roughly [list: 10]
+      linspace(5, 1, 5).data-now()
+        is-roughly [list: 5, 4, 3, 2, 1]
+      linspace(0, 9, 10).data-now()
+        is-roughly [list: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      linspace(0, 4, 9).data-now()
+        is-roughly [list: 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4]
     end
   }
 
@@ -1601,11 +1608,11 @@
 
   @examples{
     check:
-      ones([list: 0]).data-sync() is-roughly [list: ]
-      ones([list: 4]).data-sync() is-roughly [list: ~1, ~1, ~1, ~1]
+      ones([list: 0]).data-now() is-roughly [list: ]
+      ones([list: 4]).data-now() is-roughly [list: 1, 1, 1, 1]
       two-dim = ones([list: 3, 2])
       two-dim.shape() is [list: 3, 2]
-      two-dim.data-sync() is-roughly [list: ~1, ~1, ~1, ~1, ~1, ~1]
+      two-dim.data-now() is-roughly [list: 1, 1, 1, 1, 1, 1]
     end
   }
 
@@ -1616,11 +1623,11 @@
 
   @examples{
     check:
-      zeros([list: 0]).data-sync() is-roughly [list: ]
-      zeros([list: 4]).data-sync() is-roughly [list: ~0, ~0, ~0, ~0]
+      zeros([list: 0]).data-now() is-roughly [list: ]
+      zeros([list: 4]).data-now() is-roughly [list: 0, 0, 0, 0]
       two-dim = zeros([list: 3, 2])
       two-dim.shape() is [list: 3, 2]
-      two-dim.data-sync() is-roughly [list: ~0, ~0, ~0, ~0, ~0, ~0]
+      two-dim.data-now() is-roughly [list: 0, 0, 0, 0, 0, 0]
     end
   }
 
@@ -1639,6 +1646,23 @@
   whether or not the provided logits are normalized true probabilities (i.e:
   they sum to 1).
 
+  @examples{
+    check:
+      three-dim = [tensor: 1, 1, 1, 1, 1, 1, 1, 1].as-3d(2, 2, 2)
+      multinomial(three-dim, 2, none, false)
+        raises "must be a one-dimensional or two-dimensional Tensor"
+
+      multinomial([tensor: ], 1, none, false)
+        raises "must have at least two possible outcomes"
+      multinomial([tensor: 0.8], 7, none, false)
+        raises "must have at least two possible outcomes"
+
+      multinomial([tensor: 1.0, 0.0], 1, none, true).shape() is [list: 1]
+      multinomial([tensor: 1.0, 0.0], 3, none, true).shape() is [list: 3]
+      multinomial([tensor: 0.3, 0.5, 0.7], 10, none, false).shape() is [list: 10]
+    end
+  }
+
   @function["random-normal"]
 
   Creates a new @pyret{Tensor} with the given shape (represented as values in
@@ -1649,6 +1673,15 @@
   @pyret{standard-deviation} is the standard deviation of the normal
   distribution. If @pyret{none}, the respective parameters are set to the
   TensorFlow.js defaults.
+
+  @examples{
+    check:
+      random-normal(empty, none, none).size() is 1
+      random-normal(empty, none, none).shape() is empty
+      random-normal([list: 4, 3], none, none).shape() is [list: 4, 3]
+      random-normal([list: 2, 5, 3], none, none).shape() is [list: 2, 5, 3]
+    end
+  }
 
   @function["random-uniform"]
 
@@ -1661,6 +1694,22 @@
   generate. If @pyret{none}, the respective parameters are set to the
   TensorFlow.js defaults.
 
+  @examples{
+    check:
+      random-uniform(empty, none, none).size() is 1
+      random-uniform(empty, none, none).shape() is empty
+      random-uniform([list: 1, 3], none, none).shape() is [list: 1, 3]
+      random-uniform([list: 5, 4, 8], none, none).shape() is [list: 5, 4, 8]
+
+      lower-bound = 1
+      upper-bound = 10
+      random-data = random-uniform([list: 20], some(lower-bound), some(upper-bound))
+      for each(data-point from random-data.data-now()):
+        data-point satisfies lam(x): (x >= lower-bound) and (x <= upper-bound) end
+      end
+    end
+  }
+
   @function["make-variable"]
 
   Creates a new, mutable @pyret{Tensor} initialized to the values of the input
@@ -1670,9 +1719,17 @@
   @pyret-method["Tensor" "to-variable"] method.
 
   @examples{
-    make-variable([tensor: 9, 3, 4.13, 0, 43])
-    make-variable(random-normal([list: 4, 5, 3], some(0), some(1)))
-    make-variable(make-scalar(1))
+    check:
+      make-variable([tensor: ]).data-now() is-roughly empty
+      make-variable([tensor: 1]).data-now() is-roughly [list: 1]
+
+      # We can perform normal Tensor operations on mutable Tensors:
+      two-dim = [tensor: 4, 5, 3, 9].as-2d(2, 2)
+      make-variable(two-dim).size() is 4
+      make-variable(two-dim).shape() is [list: 2, 2]
+      make-variable(two-dim).data-now() is-roughly [list: 4, 5, 3, 9]
+      make-variable(two-dim).as-3d(4, 1, 1).shape() is [list: 4, 1, 1]
+    end
   }
 
   @;#########################################################################
@@ -1756,7 +1813,7 @@
     check:
       one-dim = [tensor: 1]
       two-dim = [tensor: 4, 3, 2, 1].as-2d(2, 2)
-      three-dim = [tensor: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9].as-3d(3, 1, 3)
+      three-dim = [tensor: 0, 1, 2, 3, 4, 5, 6, 7, 8].as-3d(3, 1, 3)
 
       one-dim.shape() is [list: 1]
       one-dim.as-1d().shape() is [list: 1]
@@ -1869,7 +1926,19 @@
   The possible @pyret{data-type}s are @pyret{"float32"}, @pyret{"int32"}, or
   @pyret{"bool"}. Any other @pyret{dataType} will raise an error.
 
-  @tensor-method["data-sync"]
+  @examples{
+    check:
+      some-tensor = [tensor: 1, 3, 5, 8]
+
+      some-tensor.as-type("float32") does-not-raise
+      some-tensor.as-type("int32") does-not-raise
+      some-tensor.as-type("bool") does-not-raise
+      some-tensor.as-type("invalid")
+        raises "Attempted to cast tensor to invalid type"
+    end
+  }
+
+  @tensor-method["data-now"]
 
   Returns a @pyret{List} containing the data in the @pyret{Tensor}.
 
@@ -1881,15 +1950,54 @@
   Constructs a new @pyret{Tensor} from the values of the original
   @pyret{Tensor} with all of the values cast to the @tt{"float32"} datatype.
 
+  @examples{
+    check:
+      [tensor: 0].to-float().data-now() is-roughly [list: 0]
+      [tensor: 1].to-float().data-now() is-roughly [list: 1]
+      [tensor: 0.42].to-float().data-now() is-roughly [list: 0.42]
+      [tensor: 0.999999].to-float().data-now() is-roughly [list: 0.999999]
+      [tensor: 1.52, 4.12, 5.99].to-float().data-now()
+        is-roughly [list: 1.52, 4.12, 5.99]
+      [tensor: 4, 0.32, 9.40, 8].to-float().data-now()
+        is-roughly [list: 4, 0.32, 9.40, 8]
+    end
+  }
+
   @tensor-method["to-int"]
 
   Constructs a new @pyret{Tensor} from the values of the original
   @pyret{Tensor} with all of the values cast to the @tt{"int32"} datatype.
 
+  @examples{
+    check:
+      [tensor: 0].to-int().data-now() is-roughly [list: 0]
+      [tensor: 1].to-int().data-now() is-roughly [list: 1]
+      [tensor: 0.42].to-int().data-now() is-roughly [list: 0]
+      [tensor: 0.999999].to-int().data-now() is-roughly [list: 0]
+      [tensor: 1.52, 4.12, 5.99].to-int().data-now()
+        is-roughly [list: 1, 4, 5]
+      [tensor: 4, 0.32, 9.40, 8].to-int().data-now()
+        is-roughly [list: 4, 0, 9, 8]
+    end
+  }
+
   @tensor-method["to-bool"]
 
   Constructs a new @pyret{Tensor} from the values of the original
   @pyret{Tensor} with all of the values cast to the @tt{"bool"} datatype.
+
+  @examples{
+    check:
+      [tensor: 0].to-bool().data-now() is-roughly [list: 0]
+      [tensor: 1].to-bool().data-now() is-roughly [list: 1]
+      [tensor: 0.42].to-bool().data-now() is-roughly [list: 1]
+      [tensor: 1, 4, 5].to-bool().data-now() is-roughly [list: 1, 1, 1]
+      [tensor: 4, 7, 0, 9].to-bool().data-now()
+        is-roughly [list: 1, 1, 0, 1]
+      [tensor: 0, 2, 3, 0, 0].to-bool().data-now()
+        is-roughly [list: 0, 1, 1, 0, 0]
+    end
+  }
 
   @tensor-method["to-buffer"]
 
@@ -2441,12 +2549,12 @@
       input-1   = [tensor: 1, 2, 3, 4]
       indices-1 = [tensor: 1, 3, 3]
 
-      gather(input-1, indices-1).data-sync() is [list: 2, 4, 4]
+      gather(input-1, indices-1).data-now() is [list: 2, 4, 4]
 
       input-2   = [tensor: 1, 2, 3, 4].as-2d(2, 2)
       indices-2 = [tensor: 1, 1, 0]
 
-      gather(input-2, indices-2).data-sync() is [list: 3, 4,
+      gather(input-2, indices-2).data-now() is [list: 3, 4,
                                                        3, 4,
                                                        1, 2]
     end
@@ -2847,8 +2955,8 @@
 
     fun plot() -> ChartWindow:
       doc: "Plots the current mx + b function and overlays it on the scatter plot"
-      shadow m = m.data-sync().first
-      shadow b = b.data-sync().first
+      shadow m = m.data-now().first
+      shadow b = b.data-now().first
 
       function-plot = C.from-list.function-plot(lam(x): (m * x) + b end)
       C.render-charts([list: scatter-plot, function-plot])
@@ -2858,7 +2966,7 @@
       doc: "Trains the model `steps` times"
       for L.each(_ from L.range(0, steps)) block:
         train()
-        print("y = " + num-to-string(m.data-sync().first) + "x + " + num-to-string(b.data-sync().first))
+        print("y = " + num-to-string(m.data-now().first) + "x + " + num-to-string(b.data-now().first))
       end
       plot().get-image()
     end
@@ -2921,10 +3029,10 @@
     end
 
     fun plot(scatter-plot :: DataSeries, a :: Tensor, b :: Tensor, c :: Tensor, d :: Tensor) block:
-      a-val = a.data-sync().first
-      b-val = b.data-sync().first
-      c-val = c.data-sync().first
-      d-val = d.data-sync().first
+      a-val = a.data-now().first
+      b-val = b.data-now().first
+      c-val = c.data-now().first
+      d-val = d.data-now().first
 
       print("Equation:")
       print("y = "
@@ -2940,8 +3048,8 @@
 
     # Generate synthetic data based on a cubic function
     test-data = generate-data(100, {a: -0.8, b: -0.2, c: 0.9, d: 0.5}, 0.04)
-    train-x = test-data.xs.data-sync()
-    train-y = test-data.ys.data-sync()
+    train-x = test-data.xs.data-now()
+    train-y = test-data.ys.data-now()
 
     # Plot the random points ahead of time for better perfomance:
     scatter-plot = C.from-list.scatter-plot(train-x, train-y)
