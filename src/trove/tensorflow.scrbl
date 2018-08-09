@@ -1942,9 +1942,6 @@
 
   Returns a @pyret{List} containing the data in the @pyret{Tensor}.
 
-  The "@pyret{-sync}" part of the method name is a remnant of the Tensorflow.js
-  naming scheme.
-
   @tensor-method["to-float"]
 
   Constructs a new @pyret{Tensor} from the values of the original
