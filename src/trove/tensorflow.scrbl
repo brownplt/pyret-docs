@@ -1538,8 +1538,8 @@
 
   @examples{
     check:
-      is-tensor(list-to-tensor(empty)) is true
-      is-tensor(list-to-tensor([list: 5, 3, 4, 7])) is true
+      list-to-tensor(empty) satisfies is-tensor
+      list-to-tensor([list: 5, 3, 4, 7]) satisfies is-tensor
 
       list-to-tensor(empty).data-now() is empty
       list-to-tensor([list: 9, 3, 2, 3]).data-now() is-roughly [list: 9, 3, 2, 3]
@@ -1942,6 +1942,15 @@
 
   Returns a @pyret{List} containing the data in the @pyret{Tensor}.
 
+  @examples{
+    check:
+      [tensor: ].data-now() is-roughly [list: ]
+      [tensor: 1].data-now() is-roughly [list: 1]
+      [tensor: 1.43].data-now() is-roughly [list: 1.43]
+      [tensor: -3.21, 9.4, 0.32].data-now() is-roughly [list: -3.21, 9.4, 0.32]
+    end
+  }
+
   @tensor-method["to-float"]
 
   Constructs a new @pyret{Tensor} from the values of the original
@@ -1952,9 +1961,6 @@
       [tensor: 0].to-float().data-now() is-roughly [list: 0]
       [tensor: 1].to-float().data-now() is-roughly [list: 1]
       [tensor: 0.42].to-float().data-now() is-roughly [list: 0.42]
-      [tensor: 0.999999].to-float().data-now() is-roughly [list: 0.999999]
-      [tensor: 1.52, 4.12, 5.99].to-float().data-now()
-        is-roughly [list: 1.52, 4.12, 5.99]
       [tensor: 4, 0.32, 9.40, 8].to-float().data-now()
         is-roughly [list: 4, 0.32, 9.40, 8]
     end
@@ -1969,12 +1975,9 @@
     check:
       [tensor: 0].to-int().data-now() is-roughly [list: 0]
       [tensor: 1].to-int().data-now() is-roughly [list: 1]
-      [tensor: 0.42].to-int().data-now() is-roughly [list: 0]
       [tensor: 0.999999].to-int().data-now() is-roughly [list: 0]
       [tensor: 1.52, 4.12, 5.99].to-int().data-now()
         is-roughly [list: 1, 4, 5]
-      [tensor: 4, 0.32, 9.40, 8].to-int().data-now()
-        is-roughly [list: 4, 0, 9, 8]
     end
   }
 
@@ -1987,12 +1990,8 @@
     check:
       [tensor: 0].to-bool().data-now() is-roughly [list: 0]
       [tensor: 1].to-bool().data-now() is-roughly [list: 1]
-      [tensor: 0.42].to-bool().data-now() is-roughly [list: 1]
+      [tensor: 0.42].tox-bool().data-now() is-roughly [list: 1]
       [tensor: 1, 4, 5].to-bool().data-now() is-roughly [list: 1, 1, 1]
-      [tensor: 4, 7, 0, 9].to-bool().data-now()
-        is-roughly [list: 1, 1, 0, 1]
-      [tensor: 0, 2, 3, 0, 0].to-bool().data-now()
-        is-roughly [list: 0, 1, 1, 0, 0]
     end
   }
 
@@ -2001,10 +2000,35 @@
   Constructs a new @pyret-id["TensorBuffer"] from the values of the original
   @pyret{Tensor}.
 
+  @examples{
+    check:
+      empty-buffer = [tensor: ].to-buffer()
+      empty-buffer satisfies is-tensor-buffer
+      empty-buffer.get-all-now() is-roughly [list: ]
+
+      some-shape  = [list: 2, 2]
+      some-values = [list: 4, 5, 9, 3]
+      some-tensor = list-to-tensor(some-values).reshape(some-shape)
+      some-buffer = some-tensor.to-buffer()
+      some-buffer satisfies is-tensor-buffer
+      some-buffer.get-all-now() is-roughly some-values
+      some-buffer.to-tensor().shape() is some-shape
+    end
+  }
+
   @tensor-method["to-variable"]
 
   Constructs a new, mutable @pyret{Tensor} from the values of the original
-  @pyret{Tensor}.
+  @pyret{Tensor}. Equivalent to applying @pyret-id["make-variable"] on the
+  calling @pyret{Tensor}.
+
+  @examples{
+    check:
+      [tensor: ].to-variable() does-not-raise
+      [tensor: 4, 5, 1].to-variable() does-not-raise
+      [tensor: 0, 5, 1, 9, 8, 4].as-2d(3, 2).to-variable() does-not-raise
+    end
+  }
 
   @tensor-method["reshape"]
 
@@ -2021,12 +2045,39 @@
   @pyret-method["Tensor" "as-3d"], or @pyret-method["Tensor" "as-4d"] as
   they make the code more readable.
 
+  @examples{
+    check:
+      [tensor: ].reshape([list: ]) raises "Cannot reshape"
+      [tensor: 3, 2].reshape([list: ]) raises "Cannot reshape"
+      [tensor: 3, 2].reshape([list: 6]) raises "Cannot reshape"
+      [tensor: 3, 2, 1].reshape([list: 2, 4]) raises "Cannot reshape"
+
+      [tensor: 1].reshape([list: 1]).shape() is [list: 1]
+      [tensor: 1].reshape([list: 1, 1, 1]).shape() is [list: 1, 1, 1]
+      [tensor: 1].reshape([list: 1, 1, 1, 1, 1]).shape() is [list: 1, 1, 1, 1, 1]
+      [tensor: 1, 4].reshape([list: 2, 1]).shape() is [list: 2, 1]
+      [tensor: 1, 4, 4, 5, 9, 3].reshape([list: 3, 2]).shape() is [list: 3, 2]
+    end
+  }
+
   @tensor-method["expand-dims"]
 
   Returns a @pyret{Tensor} that has expanded rank, by inserting a dimension
   into the @pyret{Tensor}'s shape at the given dimension index @pyret{axis}.
   If @pyret{axis} is @pyret{none}, the method inserts a dimension at index 0
   by default.
+
+  @examples{
+    check:
+      one-dim = [tensor: 1, 2, 3, 4]
+      one-dim.shape() is [list: 4]
+      one-dim.expand-dims(none).shape() is [list: 1, 4]
+      one-dim.expand-dims(some(1)).shape() is [list: 4, 1]
+
+      one-dim.expand-dims(some(2))
+        raises "input axis must be less than or equal to the rank of the tensor"
+    end
+  }
 
   @tensor-method["squeeze"]
 
@@ -2036,9 +2087,35 @@
   listed as indices in @pyret{axis}. The method will raise an error if one of
   the dimensions specified in @pyret{axis} is not of size 1.
 
+  @examples{
+    check:
+      multi-dim = [tensor: 1, 2, 3, 4].reshape([list: 1, 1, 1, 4, 1])
+      multi-dim.shape() is [list: 1, 1, 1, 4, 1]
+      multi-dim.squeeze(none).shape() is [list: 4]
+      multi-dim.squeeze(some([list: 0])).shape() is [list: 1, 1, 4, 1]
+      multi-dim.squeeze(some([list: 4])).shape() is [list: 1, 1, 1, 4]
+      multi-dim.squeeze(some([list: 1, 2])).shape() is [list: 1, 4, 1]
+
+      multi-dim.squeeze(some([list: 7]))
+        raises "Cannot squeeze axis 7 since the axis does not exist"
+      multi-dim.squeeze(some([list: 3]))
+        raises "Cannot squeeze axis 3 since the dimension of that axis is 4, not 1"
+    end
+  }
+
   @tensor-method["clone"]
 
   Constructs a new @pyret{Tensor} that is a copy of the original @pyret{Tensor}.
+
+  @examples{
+    check:
+      some-tensor = [tensor: 1, 2, 3, 4]
+      new-tensor  = some-tensor.clone()
+      new-tensor.size() is some-tensor.size()
+      new-tensor.shape() is some-tensor.shape()
+      new-tensor.data-now() is-roughly some-tensor.data-now()
+    end
+  }
 
   @tensor-method["add"]
 
