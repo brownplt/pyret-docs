@@ -2183,196 +2183,7 @@
   equivalent to @pyret-id["squared-difference"]@pyret{(self, x)}.
 
   @;#########################################################################
-  @section{TensorBuffers}
-
-  @type-spec["TensorBuffer"]{
-
-    @pyret{TensorBuffer}s are mutable objects that allow users to set values
-    at specific locations before converting the buffer into an immutable
-    @pyret-id["Tensor"].
-
-  }
-
-  @function["is-tensor-buffer"]
-
-  Returns @pyret{true} if @pyret{val} is a @pyret{TensorBuffer}; otherwise,
-  returns @pyret{false}.
-
-  @examples{
-    check:
-      is-tensor-buffer(make-buffer([list: 1])) is true
-      is-tensor-buffer(make-buffer([list: 8, 4, 10])) is true
-      is-tensor-buffer(43) is false
-      is-tensor-buffer("not a buffer") is false
-      is-tensor-buffer({some: "thing"}) is false
-    end
-  }
-
-  @;#########################################################################
-  @subsection{TensorBuffer Constructors}
-
-  @function["make-buffer"]
-
-  Creates an @pyret{TensorBuffer} with the specified @pyret{shape}. The
-  returned @pyret{TensorBuffer}'s values are initialized to @pyret{~0}.
-
-  @examples{
-    check:
-      make-buffer([list: 1]).size() is 1
-      make-buffer([list: 1]).shape() is [list: 1]
-      make-buffer([list: 9, 5]).size() is 45
-      make-buffer([list: 9, 5]).shape() is [list: 9, 5]
-
-      # Check for error handling of rank-0 shapes:
-      make-buffer(empty) raises "input shape List had zero elements"
-
-      # Check for error handling of less than zero dimension sizes:
-      make-buffer([list: 0]) raises "Cannot create TensorBuffer"
-      make-buffer([list: -1]) raises "Cannot create TensorBuffer"
-      make-buffer([list: 4, 5, 0, 3]) raises "Cannot create TensorBuffer"
-      make-buffer([list: 2, -5, -1, 4]) raises "Cannot create TensorBuffer"
-    end
-  }
-
-  @;#########################################################################
-  @subsection{TensorBuffer Methods}
-
-  @tensor-buffer-method["size"]
-
-  Returns the size of the @pyret{TensorBuffer} (the number of values stored
-  in the @pyret{TensorBuffer}).
-
-  @examples{
-    check:
-      make-buffer([list: 1]).size() is 1
-      make-buffer([list: 4]).size() is 4
-      make-buffer([list: 3, 2]).size() is 6
-      make-buffer([list: 4, 4]).size() is 16
-      make-buffer([list: 4, 3, 5]).size() is 60
-    end
-  }
-
-  @tensor-buffer-method["shape"]
-
-  Returns a @pyret{List<NumInteger>} representing the shape of the
-  @pyret{TensorBuffer}. Each element in the @pyret{List<NumInteger>}
-  corresponds to the size in each dimension.
-
-  @examples{
-    check:
-      make-buffer([list: 1]).shape() is [list: 1]
-      make-buffer([list: 4, 3]).shape() is [list: 4, 3]
-      make-buffer([list: 2, 4, 1]).shape() is [list: 2, 4, 1]
-      make-buffer([list: 4, 3, 5]).shape() is [list: 4, 3, 5]
-    end
-  }
-
-  @tensor-buffer-method["set-now"]
-
-  Sets the value in the @pyret{TensorBuffer} at the specified @pyret{indicies}
-  to @pyret{value}.
-
-  @examples{
-    check:
-      test-buffer = make-buffer([list: 7])
-      test-buffer.set-now(-45, [list: 0])
-      test-buffer.set-now(9, [list: 2])
-      test-buffer.set-now(0, [list: 4])
-      test-buffer.set-now(-3.42, [list: 6])
-
-      test-buffer.get-all-now() is-roughly [list: -45, 0, 9, 0, 0, 0, -3.42]
-      test-buffer.to-tensor().shape() is [list: 7]
-      test-buffer.to-tensor().data-now() is-roughly [list: -45, 0, 9, 0, 0, 0, -3.42]
-
-      # Check out-of-bounds coordinates:
-      test-buffer.set-now(10, [list: -1])
-        raises "Coordinates must be within the bounds of the TensorBuffer's shape"
-      test-buffer.set-now(10, [list: 8])
-        raises "Coordinates must be within the bounds of the TensorBuffer's shape"
-
-      # Check too little coordinates:
-      test-buffer.set-now(10, [list:])
-        raises "number of supplied coordinates must match the rank"
-
-      # Check too many coordinates:
-      test-buffer.set-now(10, [list: 9, 5])
-        raises "number of supplied coordinates must match the rank"
-    end
-  }
-
-  @tensor-buffer-method["get-now"]
-
-  Returns the value in the @pyret{TensorBuffer} at the specified
-  @pyret{indicies}.
-
-  @examples{
-    check:
-      test-buffer = make-buffer([list: 7])
-      test-buffer.set-now(-45, [list: 0])
-      test-buffer.set-now(9, [list: 2])
-      test-buffer.set-now(0, [list: 4])
-      test-buffer.set-now((4 / 3), [list: 5])
-      test-buffer.set-now(-3.42, [list: 6])
-
-      test-buffer.get-now([list: 0]) is-roughly -45
-      test-buffer.get-now([list: 1]) is-roughly 0
-      test-buffer.get-now([list: 2]) is-roughly 9
-      test-buffer.get-now([list: 3]) is-roughly 0
-      test-buffer.get-now([list: 4]) is-roughly 0
-      test-buffer.get-now([list: 5]) is-roughly (4 / 3)
-      test-buffer.get-now([list: 6]) is-roughly -3.42
-    end
-  }
-
-  @tensor-buffer-method["get-all-now"]
-
-  Returns all values in the @pyret{TensorBuffer}.
-
-  @examples{
-    check:
-      one-dim-buffer = make-buffer([list: 7])
-      one-dim-buffer.set-now(-45, [list: 0])
-      one-dim-buffer.set-now(9, [list: 2])
-      one-dim-buffer.set-now(0, [list: 4])
-      one-dim-buffer.set-now((4 / 3), [list: 5])
-      one-dim-buffer.set-now(-3.42, [list: 6])
-      one-dim-buffer.get-all-now() is-roughly [list: -45, 0, 9, 0, 0, (4 / 3), -3.42]
-
-      two-dim-buffer = make-buffer([list: 2, 2])
-      two-dim-buffer.set-now(4, [list: 0, 0])
-      two-dim-buffer.set-now(3, [list: 0, 1])
-      two-dim-buffer.set-now(2, [list: 1, 0])
-      two-dim-buffer.set-now(1, [list: 1, 1])
-      two-dim-buffer.get-all-now() is-roughly [list: 4, 3, 2, 1]
-    end
-  }
-
-  @tensor-buffer-method["to-tensor"]
-
-  Creates an immutable @pyret-id["Tensor"] from the @pyret{TensorBuffer}.
-
-  @examples{
-    check:
-      one-dim-buffer = make-buffer([list: 7])
-      one-dim-buffer.set-now(-45, [list: 0])
-      one-dim-buffer.set-now(9, [list: 2])
-      one-dim-buffer.set-now(0, [list: 4])
-      one-dim-buffer.set-now(-3.42, [list: 6])
-      one-dim-buffer.to-tensor().shape() is [list: 7]
-      one-dim-buffer.to-tensor().data-now() is-roughly [list: -45, 0, 9, 0, 0, 0, -3.42]
-
-      two-dim-buffer = make-buffer([list: 2, 2])
-      two-dim-buffer.set-now(4, [list: 0, 0])
-      two-dim-buffer.set-now(3, [list: 0, 1])
-      two-dim-buffer.set-now(2, [list: 1, 0])
-      two-dim-buffer.set-now(1, [list: 1, 1])
-      two-dim-buffer.to-tensor().shape() is [list: 2, 2]
-      two-dim-buffer.to-tensor().data-now() is-roughly [list: 4, 3, 2, 1]
-    end
-  }
-
-  @;#########################################################################
-  @section{Operations}
+  @section{Tensor Operations}
 
   @;#########################################################################
   @subsection{Arithmetic Operations}
@@ -3490,6 +3301,195 @@
   specified by @pyret{begin}, the slice continues by adding @pyret{stride} to
   the index until all dimensions are not less than @pyret{end}. Note that a
   stride can be negative, which causes a reverse slice.
+
+  @;#########################################################################
+  @section{TensorBuffers}
+
+  @type-spec["TensorBuffer"]{
+
+    @pyret{TensorBuffer}s are mutable objects that allow users to set values
+    at specific locations before converting the buffer into an immutable
+    @pyret-id["Tensor"].
+
+  }
+
+  @function["is-tensor-buffer"]
+
+  Returns @pyret{true} if @pyret{val} is a @pyret{TensorBuffer}; otherwise,
+  returns @pyret{false}.
+
+  @examples{
+    check:
+      is-tensor-buffer(make-buffer([list: 1])) is true
+      is-tensor-buffer(make-buffer([list: 8, 4, 10])) is true
+      is-tensor-buffer(43) is false
+      is-tensor-buffer("not a buffer") is false
+      is-tensor-buffer({some: "thing"}) is false
+    end
+  }
+
+  @;#########################################################################
+  @subsection{TensorBuffer Constructors}
+
+  @function["make-buffer"]
+
+  Creates an @pyret{TensorBuffer} with the specified @pyret{shape}. The
+  returned @pyret{TensorBuffer}'s values are initialized to @pyret{~0}.
+
+  @examples{
+    check:
+      make-buffer([list: 1]).size() is 1
+      make-buffer([list: 1]).shape() is [list: 1]
+      make-buffer([list: 9, 5]).size() is 45
+      make-buffer([list: 9, 5]).shape() is [list: 9, 5]
+
+      # Check for error handling of rank-0 shapes:
+      make-buffer(empty) raises "input shape List had zero elements"
+
+      # Check for error handling of less than zero dimension sizes:
+      make-buffer([list: 0]) raises "Cannot create TensorBuffer"
+      make-buffer([list: -1]) raises "Cannot create TensorBuffer"
+      make-buffer([list: 4, 5, 0, 3]) raises "Cannot create TensorBuffer"
+      make-buffer([list: 2, -5, -1, 4]) raises "Cannot create TensorBuffer"
+    end
+  }
+
+  @;#########################################################################
+  @subsection{TensorBuffer Methods}
+
+  @tensor-buffer-method["size"]
+
+  Returns the size of the @pyret{TensorBuffer} (the number of values stored
+  in the @pyret{TensorBuffer}).
+
+  @examples{
+    check:
+      make-buffer([list: 1]).size() is 1
+      make-buffer([list: 4]).size() is 4
+      make-buffer([list: 3, 2]).size() is 6
+      make-buffer([list: 4, 4]).size() is 16
+      make-buffer([list: 4, 3, 5]).size() is 60
+    end
+  }
+
+  @tensor-buffer-method["shape"]
+
+  Returns a @pyret{List<NumInteger>} representing the shape of the
+  @pyret{TensorBuffer}. Each element in the @pyret{List<NumInteger>}
+  corresponds to the size in each dimension.
+
+  @examples{
+    check:
+      make-buffer([list: 1]).shape() is [list: 1]
+      make-buffer([list: 4, 3]).shape() is [list: 4, 3]
+      make-buffer([list: 2, 4, 1]).shape() is [list: 2, 4, 1]
+      make-buffer([list: 4, 3, 5]).shape() is [list: 4, 3, 5]
+    end
+  }
+
+  @tensor-buffer-method["set-now"]
+
+  Sets the value in the @pyret{TensorBuffer} at the specified @pyret{indicies}
+  to @pyret{value}.
+
+  @examples{
+    check:
+      test-buffer = make-buffer([list: 7])
+      test-buffer.set-now(-45, [list: 0])
+      test-buffer.set-now(9, [list: 2])
+      test-buffer.set-now(0, [list: 4])
+      test-buffer.set-now(-3.42, [list: 6])
+
+      test-buffer.get-all-now() is-roughly [list: -45, 0, 9, 0, 0, 0, -3.42]
+      test-buffer.to-tensor().shape() is [list: 7]
+      test-buffer.to-tensor().data-now() is-roughly [list: -45, 0, 9, 0, 0, 0, -3.42]
+
+      # Check out-of-bounds coordinates:
+      test-buffer.set-now(10, [list: -1])
+        raises "Coordinates must be within the bounds of the TensorBuffer's shape"
+      test-buffer.set-now(10, [list: 8])
+        raises "Coordinates must be within the bounds of the TensorBuffer's shape"
+
+      # Check too little coordinates:
+      test-buffer.set-now(10, [list:])
+        raises "number of supplied coordinates must match the rank"
+
+      # Check too many coordinates:
+      test-buffer.set-now(10, [list: 9, 5])
+        raises "number of supplied coordinates must match the rank"
+    end
+  }
+
+  @tensor-buffer-method["get-now"]
+
+  Returns the value in the @pyret{TensorBuffer} at the specified
+  @pyret{indicies}.
+
+  @examples{
+    check:
+      test-buffer = make-buffer([list: 7])
+      test-buffer.set-now(-45, [list: 0])
+      test-buffer.set-now(9, [list: 2])
+      test-buffer.set-now(0, [list: 4])
+      test-buffer.set-now((4 / 3), [list: 5])
+      test-buffer.set-now(-3.42, [list: 6])
+
+      test-buffer.get-now([list: 0]) is-roughly -45
+      test-buffer.get-now([list: 1]) is-roughly 0
+      test-buffer.get-now([list: 2]) is-roughly 9
+      test-buffer.get-now([list: 3]) is-roughly 0
+      test-buffer.get-now([list: 4]) is-roughly 0
+      test-buffer.get-now([list: 5]) is-roughly (4 / 3)
+      test-buffer.get-now([list: 6]) is-roughly -3.42
+    end
+  }
+
+  @tensor-buffer-method["get-all-now"]
+
+  Returns all values in the @pyret{TensorBuffer}.
+
+  @examples{
+    check:
+      one-dim-buffer = make-buffer([list: 7])
+      one-dim-buffer.set-now(-45, [list: 0])
+      one-dim-buffer.set-now(9, [list: 2])
+      one-dim-buffer.set-now(0, [list: 4])
+      one-dim-buffer.set-now((4 / 3), [list: 5])
+      one-dim-buffer.set-now(-3.42, [list: 6])
+      one-dim-buffer.get-all-now() is-roughly [list: -45, 0, 9, 0, 0, (4 / 3), -3.42]
+
+      two-dim-buffer = make-buffer([list: 2, 2])
+      two-dim-buffer.set-now(4, [list: 0, 0])
+      two-dim-buffer.set-now(3, [list: 0, 1])
+      two-dim-buffer.set-now(2, [list: 1, 0])
+      two-dim-buffer.set-now(1, [list: 1, 1])
+      two-dim-buffer.get-all-now() is-roughly [list: 4, 3, 2, 1]
+    end
+  }
+
+  @tensor-buffer-method["to-tensor"]
+
+  Creates an immutable @pyret-id["Tensor"] from the @pyret{TensorBuffer}.
+
+  @examples{
+    check:
+      one-dim-buffer = make-buffer([list: 7])
+      one-dim-buffer.set-now(-45, [list: 0])
+      one-dim-buffer.set-now(9, [list: 2])
+      one-dim-buffer.set-now(0, [list: 4])
+      one-dim-buffer.set-now(-3.42, [list: 6])
+      one-dim-buffer.to-tensor().shape() is [list: 7]
+      one-dim-buffer.to-tensor().data-now() is-roughly [list: -45, 0, 9, 0, 0, 0, -3.42]
+
+      two-dim-buffer = make-buffer([list: 2, 2])
+      two-dim-buffer.set-now(4, [list: 0, 0])
+      two-dim-buffer.set-now(3, [list: 0, 1])
+      two-dim-buffer.set-now(2, [list: 1, 0])
+      two-dim-buffer.set-now(1, [list: 1, 1])
+      two-dim-buffer.to-tensor().shape() is [list: 2, 2]
+      two-dim-buffer.to-tensor().data-now() is-roughly [list: 4, 3, 2, 1]
+    end
+  }
 
   @;#########################################################################
   @section{Models}
