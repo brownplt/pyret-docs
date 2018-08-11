@@ -130,9 +130,9 @@
           (arity 1)
           (params ())
           (args ("self"))
-          (return ,(L-of N))
+          (return ,(L-of NumInteger))
           (contract
-            (a-arrow ,Tensor ,(L-of N))))
+            (a-arrow ,Tensor ,(L-of NumInteger))))
         (method-spec
           (name "flatten")
           (arity 1)
@@ -371,6 +371,22 @@
       (variants)
       (shared
         ((method-spec
+          (name "size")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,N)
+          (contract
+            (a-arrow ,TensorBuffer ,N)))
+        (method-spec
+          (name "shape")
+          (arity 1)
+          (params ())
+          (args ("self"))
+          (return ,(L-of NumInteger))
+          (contract
+            (a-arrow ,TensorBuffer ,(L-of NumInteger))))
+        (method-spec
           (name "get-now")
           (arity 2)
           (params ())
@@ -883,8 +899,6 @@
       (contract
         (a-arrow ,Tensor ,(O-of N) ,Tensor)))
 
-
-
     (fun-spec
       (name "concatenate")
       (arity 2)
@@ -915,25 +929,25 @@
         (a-arrow ,Tensor ,(L-of N) ,(O-of (L-of N)) ,Tensor)))
     (fun-spec
       (name "split")
-      (arity 2)
-      (args ("tensor" "axes"))
+      (arity 3)
+      (args ("tensor" "split-sizes" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+        (a-arrow ,Tensor ,(L-of N) ,(O-of N) ,Tensor)))
     (fun-spec
       (name "stack")
       (arity 2)
-      (args ("tensor" "axes"))
+      (args ("tensors" "axes"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+        (a-arrow ,(L-of Tensor) ,(O-of (L-of N)) ,Tensor)))
     (fun-spec
       (name "tile")
       (arity 2)
-      (args ("tensor" "axes"))
+      (args ("tensor" "repetitions"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+        (a-arrow ,Tensor ,(L-of N) ,Tensor)))
     (fun-spec
       (name "unstack")
       (arity 2)
@@ -947,7 +961,7 @@
       (args ("tensor" "begin" "end" "strides"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,(L-of N) ,(L-of N) ,(L-of N) ,Tensor)))
+        (a-arrow ,Tensor ,(L-of NumInteger) ,(L-of NumInteger) ,(L-of N) ,Tensor)))
 
     (fun-spec
       (name "is-model")
@@ -1751,9 +1765,9 @@
 
   @tensor-method["shape"]
 
-  Returns a @pyret{List<Number>} representing the shape of the @pyret{Tensor}.
-  Each element in the @pyret{List<Number>} corresponds to the size in each
-  dimension.
+  Returns a @pyret{List<NumInteger>} representing the shape of the
+  @pyret{Tensor}. Each element in the @pyret{List<NumInteger>} corresponds
+  to the size in each dimension.
 
   @examples{
     check:
@@ -2184,6 +2198,16 @@
   Returns @pyret{true} if @pyret{val} is a @pyret{TensorBuffer}; otherwise,
   returns @pyret{false}.
 
+  @examples{
+    check:
+      is-tensor-buffer(make-buffer([list: 1])) is true
+      is-tensor-buffer(make-buffer([list: 8, 4, 10])) is true
+      is-tensor-buffer(43) is false
+      is-tensor-buffer("not a buffer") is false
+      is-tensor-buffer({some: "thing"}) is false
+    end
+  }
+
   @;#########################################################################
   @subsection{TensorBuffer Constructors}
 
@@ -2192,26 +2216,160 @@
   Creates an @pyret{TensorBuffer} with the specified @pyret{shape}. The
   returned @pyret{TensorBuffer}'s values are initialized to @pyret{~0}.
 
+  @examples{
+    check:
+      make-buffer([list: 1]).size() is 1
+      make-buffer([list: 1]).shape() is [list: 1]
+      make-buffer([list: 9, 5]).size() is 45
+      make-buffer([list: 9, 5]).shape() is [list: 9, 5]
+
+      # Check for error handling of rank-0 shapes:
+      make-buffer(empty) raises "input shape List had zero elements"
+
+      # Check for error handling of less than zero dimension sizes:
+      make-buffer([list: 0]) raises "Cannot create TensorBuffer"
+      make-buffer([list: -1]) raises "Cannot create TensorBuffer"
+      make-buffer([list: 4, 5, 0, 3]) raises "Cannot create TensorBuffer"
+      make-buffer([list: 2, -5, -1, 4]) raises "Cannot create TensorBuffer"
+    end
+  }
+
   @;#########################################################################
   @subsection{TensorBuffer Methods}
+
+  @tensor-buffer-method["size"]
+
+  Returns the size of the @pyret{TensorBuffer} (the number of values stored
+  in the @pyret{TensorBuffer}).
+
+  @examples{
+    check:
+      make-buffer([list: 1]).size() is 1
+      make-buffer([list: 4]).size() is 4
+      make-buffer([list: 3, 2]).size() is 6
+      make-buffer([list: 4, 4]).size() is 16
+      make-buffer([list: 4, 3, 5]).size() is 60
+    end
+  }
+
+  @tensor-buffer-method["shape"]
+
+  Returns a @pyret{List<NumInteger>} representing the shape of the
+  @pyret{TensorBuffer}. Each element in the @pyret{List<NumInteger>}
+  corresponds to the size in each dimension.
+
+  @examples{
+    check:
+      make-buffer([list: 1]).shape() is [list: 1]
+      make-buffer([list: 4, 3]).shape() is [list: 4, 3]
+      make-buffer([list: 2, 4, 1]).shape() is [list: 2, 4, 1]
+      make-buffer([list: 4, 3, 5]).shape() is [list: 4, 3, 5]
+    end
+  }
 
   @tensor-buffer-method["set-now"]
 
   Sets the value in the @pyret{TensorBuffer} at the specified @pyret{indicies}
   to @pyret{value}.
 
+  @examples{
+    check:
+      test-buffer = make-buffer([list: 7])
+      test-buffer.set-now(-45, [list: 0])
+      test-buffer.set-now(9, [list: 2])
+      test-buffer.set-now(0, [list: 4])
+      test-buffer.set-now(-3.42, [list: 6])
+
+      test-buffer.get-all-now() is-roughly [list: -45, 0, 9, 0, 0, 0, -3.42]
+      test-buffer.to-tensor().shape() is [list: 7]
+      test-buffer.to-tensor().data-now() is-roughly [list: -45, 0, 9, 0, 0, 0, -3.42]
+
+      # Check out-of-bounds coordinates:
+      test-buffer.set-now(10, [list: -1])
+        raises "Coordinates must be within the bounds of the TensorBuffer's shape"
+      test-buffer.set-now(10, [list: 8])
+        raises "Coordinates must be within the bounds of the TensorBuffer's shape"
+
+      # Check too little coordinates:
+      test-buffer.set-now(10, [list:])
+        raises "number of supplied coordinates must match the rank"
+
+      # Check too many coordinates:
+      test-buffer.set-now(10, [list: 9, 5])
+        raises "number of supplied coordinates must match the rank"
+    end
+  }
+
   @tensor-buffer-method["get-now"]
 
   Returns the value in the @pyret{TensorBuffer} at the specified
   @pyret{indicies}.
 
+  @examples{
+    check:
+      test-buffer = make-buffer([list: 7])
+      test-buffer.set-now(-45, [list: 0])
+      test-buffer.set-now(9, [list: 2])
+      test-buffer.set-now(0, [list: 4])
+      test-buffer.set-now((4 / 3), [list: 5])
+      test-buffer.set-now(-3.42, [list: 6])
+
+      test-buffer.get-now([list: 0]) is-roughly -45
+      test-buffer.get-now([list: 1]) is-roughly 0
+      test-buffer.get-now([list: 2]) is-roughly 9
+      test-buffer.get-now([list: 3]) is-roughly 0
+      test-buffer.get-now([list: 4]) is-roughly 0
+      test-buffer.get-now([list: 5]) is-roughly (4 / 3)
+      test-buffer.get-now([list: 6]) is-roughly -3.42
+    end
+  }
+
   @tensor-buffer-method["get-all-now"]
 
   Returns all values in the @pyret{TensorBuffer}.
 
+  @examples{
+    check:
+      one-dim-buffer = make-buffer([list: 7])
+      one-dim-buffer.set-now(-45, [list: 0])
+      one-dim-buffer.set-now(9, [list: 2])
+      one-dim-buffer.set-now(0, [list: 4])
+      one-dim-buffer.set-now((4 / 3), [list: 5])
+      one-dim-buffer.set-now(-3.42, [list: 6])
+      one-dim-buffer.get-all-now() is-roughly [list: -45, 0, 9, 0, 0, (4 / 3), -3.42]
+
+      two-dim-buffer = make-buffer([list: 2, 2])
+      two-dim-buffer.set-now(4, [list: 0, 0])
+      two-dim-buffer.set-now(3, [list: 0, 1])
+      two-dim-buffer.set-now(2, [list: 1, 0])
+      two-dim-buffer.set-now(1, [list: 1, 1])
+      two-dim-buffer.get-all-now() is-roughly [list: 4, 3, 2, 1]
+    end
+  }
+
   @tensor-buffer-method["to-tensor"]
 
   Creates an immutable @pyret-id["Tensor"] from the @pyret{TensorBuffer}.
+
+  @examples{
+    check:
+      one-dim-buffer = make-buffer([list: 7])
+      one-dim-buffer.set-now(-45, [list: 0])
+      one-dim-buffer.set-now(9, [list: 2])
+      one-dim-buffer.set-now(0, [list: 4])
+      one-dim-buffer.set-now(-3.42, [list: 6])
+      one-dim-buffer.to-tensor().shape() is [list: 7]
+      one-dim-buffer.to-tensor().data-now() is-roughly [list: -45, 0, 9, 0, 0, 0, -3.42]
+
+      two-dim-buffer = make-buffer([list: 2, 2])
+      two-dim-buffer.set-now(4, [list: 0, 0])
+      two-dim-buffer.set-now(3, [list: 0, 1])
+      two-dim-buffer.set-now(2, [list: 1, 0])
+      two-dim-buffer.set-now(1, [list: 1, 1])
+      two-dim-buffer.to-tensor().shape() is [list: 2, 2]
+      two-dim-buffer.to-tensor().data-now() is-roughly [list: 4, 3, 2, 1]
+    end
+  }
 
   @;#########################################################################
   @section{Operations}
@@ -2226,12 +2384,38 @@
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-add-tensors"].
 
+  @examples{
+    check:
+      add-tensors([tensor: 1], [tensor: 1]).data-now()
+        is-roughly [list: 2]
+      add-tensors([tensor: 1, 3], [tensor: 1]).data-now()
+        is-roughly [list: 2, 4]
+      add-tensors([tensor: 1, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: 6, 4]
+      add-tensors([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
+
   @function["subtract-tensors"]
 
   Subtracts two @pyret-id["Tensor"]s element-wise, A – B.
 
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-subtract-tensors"].
+
+  @examples{
+    check:
+      subtract-tensors([tensor: 1], [tensor: 1]).data-now()
+        is-roughly [list: 0]
+      subtract-tensors([tensor: 1, 3], [tensor: 1]).data-now()
+        is-roughly [list: 0, 2]
+      subtract-tensors([tensor: 1, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: -4, 2]
+      subtract-tensors([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
 
   @function["multiply-tensors"]
 
@@ -2240,6 +2424,19 @@
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-multiply-tensors"].
 
+  @examples{
+    check:
+      multiply-tensors([tensor: 1], [tensor: 1]).data-now()
+        is-roughly [list: 1]
+      multiply-tensors([tensor: 1, 3], [tensor: 1]).data-now()
+        is-roughly [list: 1, 3]
+      multiply-tensors([tensor: 1, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: 5, 3]
+      multiply-tensors([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
+
   @function["divide-tensors"]
 
   Divides two @pyret-id["Tensor"]s element-wise, A / B.
@@ -2247,26 +2444,94 @@
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-divide-tensors"].
 
+  @examples{
+    check:
+      divide-tensors([tensor: 1], [tensor: 1]).data-now()
+        is-roughly [list: 1]
+      divide-tensors([tensor: 1, 3], [tensor: 1]).data-now()
+        is-roughly [list: 1, 3]
+      divide-tensors([tensor: 1, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: 0.2, 3]
+      divide-tensors([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+
+      divide-tensors([tensor: 1], [tensor: 0])
+        raises "The argument Tensor cannot contain 0"
+      divide-tensors([tensor: 4.23], [tensor: 7.65, 1.43, 0, 2.31])
+        raises "The argument Tensor cannot contain 0"
+    end
+  }
+
   @function["floor-divide-tensors"]
 
-  Divides two @pyret-id["Tensor"]s element-wise, A / B, with the result rounded
-  with the floor function.
+  Divides two @pyret-id["Tensor"]s element-wise, A / B, with the result
+  rounded with the floor function.
+
+  @examples{
+    check:
+      floor-divide-tensors([tensor: 1], [tensor: 1]).data-now()
+        is-roughly [list: 1]
+      floor-divide-tensors([tensor: 1, 3], [tensor: 1]).data-now()
+        is-roughly [list: 1, 3]
+      floor-divide-tensors([tensor: 1, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: 0, 3]
+      floor-divide-tensors([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+
+      floor-divide-tensors([tensor: 1], [tensor: 0])
+        raises "The argument Tensor cannot contain 0"
+      floor-divide-tensors([tensor: 4.23], [tensor: 7.65, 1.43, 0])
+        raises "The argument Tensor cannot contain 0"
+    end
+  }
 
   @function["tensor-max"]
 
-  Returns a @pyret-id["Tensor"] containing the maximum of @pyret{a} and @pyret{b},
-  element-wise.
+  Returns a @pyret-id["Tensor"] containing the maximum of @pyret{a} and
+  @pyret{b}, element-wise.
 
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-tensor-max"].
 
+  @examples{
+    check:
+      tensor-max([tensor: 0], [tensor: 1]).data-now()
+        is-roughly [list: 1]
+      tensor-max([tensor: 1, 3], [tensor: 1]).data-now()
+        is-roughly [list: 1, 3]
+      tensor-max([tensor: 1, 3], [tensor: 200]).data-now()
+        is-roughly [list: 200, 200]
+      tensor-max([tensor: 1, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: 5, 3]
+      tensor-max([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
+
   @function["tensor-min"]
 
-  Returns a @pyret-id["Tensor"] containing the minimum of @pyret{a} and @pyret{b},
-  element-wise.
+  Returns a @pyret-id["Tensor"] containing the minimum of @pyret{a} and
+  @pyret{b}, element-wise.
 
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-tensor-min"].
+
+  @examples{
+    check:
+      tensor-min([tensor: 0], [tensor: 1]).data-now()
+        is-roughly [list: 0]
+      tensor-min([tensor: 1, 3], [tensor: 1]).data-now()
+        is-roughly [list: 1, 1]
+      tensor-min([tensor: 1, 3], [tensor: 200]).data-now()
+        is-roughly [list: 1, 3]
+      tensor-min([tensor: 1, 3], [tensor: 0]).data-now()
+        is-roughly [list: 0, 0]
+      tensor-min([tensor: 1, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: 1, 1]
+      tensor-min([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
 
   @function["tensor-modulo"]
 
@@ -2275,12 +2540,42 @@
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-tensor-modulo"].
 
+  @examples{
+    check:
+      tensor-modulo([tensor: 0], [tensor: 1]).data-now()
+        is-roughly [list: 0]
+      tensor-modulo([tensor: 1, 3], [tensor: 1]).data-now()
+        is-roughly [list: 0, 0]
+      tensor-modulo([tensor: 1, 3], [tensor: 200]).data-now()
+        is-roughly [list: 1, 3]
+      tensor-modulo([tensor: 1, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: 1, 0]
+      tensor-modulo([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
+
   @function["tensor-expt"]
 
   Computes the power of @pyret{base} to @pyret{exponent}, element-wise.
 
   To ensure that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-tensor-expt"].
+
+  @examples{
+    check:
+      tensor-expt([tensor: 0], [tensor: 1]).data-now()
+        is-roughly [list: 0]
+      tensor-expt([tensor: 3], [tensor: -3]).data-now()
+        is-roughly [list: 0.03703703]
+      tensor-expt([tensor: 1, 3], [tensor: 4]).data-now()
+        is-roughly [list: 1, 81]
+      tensor-expt([tensor: 3, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: 243, 3]
+      tensor-expt([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
 
   @function["squared-difference"]
 
@@ -2289,11 +2584,40 @@
   To assert that @pyret{a} and @pyret{b} are the same shape, use
   @pyret-id["strict-squared-difference"].
 
+  @examples{
+    check:
+      squared-difference([tensor: 0], [tensor: 1]).data-now()
+        is-roughly [list: 1]
+      squared-difference([tensor: 3], [tensor: -3]).data-now()
+        is-roughly [list: 36]
+      squared-difference([tensor: 1, 3], [tensor: 4]).data-now()
+        is-roughly [list: 9, 1]
+      squared-difference([tensor: 3, 3], [tensor: 5, 1]).data-now()
+        is-roughly [list: 4, 4]
+      squared-difference([tensor: 1, 3, 4], [tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
+
   @function["strict-add-tensors"]
 
   Same as @pyret-id["add-tensors"], but raises an error if @pyret{a} and
   @pyret{b} are not the same shape (as determined by
   @pyret-method["Tensor" "shape"]).
+
+  @examples{
+    check:
+      strict-add-tensors([tensor: 1], [tensor: 0])
+        is-roughly add-tensors([tensor: 1], [tensor: 0])
+      strict-add-tensors([tensor: -4, -1], [tensor: -8, -2])
+        is-roughly add-tensors([tensor: -4, -1], [tensor: -8, -2])
+
+      strict-add-tensors([tensor: 1], [tensor: 1, 2])
+        raises "The first tensor does not have the same shape as the second tensor"
+      strict-add-tensors([tensor: 8, 0].as-2d(2, 1), [tensor: 3, 1])
+        raises "The first tensor does not have the same shape as the second tensor"
+    end
+  }
 
   @function["strict-subtract-tensors"]
 
@@ -2301,11 +2625,39 @@
   @pyret{b} are not the same shape (as determined by
   @pyret-method["Tensor" "shape"]).
 
+  @examples{
+    check:
+      strict-subtract-tensors([tensor: 1], [tensor: 0])
+        is-roughly subtract-tensors([tensor: 1], [tensor: 0])
+      strict-subtract-tensors([tensor: -4, -1], [tensor: -8, -2])
+        is-roughly subtract-tensors([tensor: -4, -1], [tensor: -8, -2])
+
+      strict-subtract-tensors([tensor: 1], [tensor: 1, 2])
+        raises "The first tensor does not have the same shape as the second tensor"
+      strict-subtract-tensors([tensor: 8, 0].as-2d(2, 1), [tensor: 3, 1])
+        raises "The first tensor does not have the same shape as the second tensor"
+    end
+  }
+
   @function["strict-multiply-tensors"]
 
   Same as @pyret-id["multiply-tensors"], but raises an error if @pyret{a} and
   @pyret{b} are not the same shape (as determined by
   @pyret-method["Tensor" "shape"]).
+
+  @examples{
+    check:
+      strict-multiply-tensors([tensor: 1], [tensor: 0])
+        is-roughly multiply-tensors([tensor: 1], [tensor: 0])
+      strict-multiply-tensors([tensor: -4, -1], [tensor: -8, -2])
+        is-roughly multiply-tensors([tensor: -4, -1], [tensor: -8, -2])
+
+      strict-multiply-tensors([tensor: 1], [tensor: 1, 2])
+        raises "The first tensor does not have the same shape as the second tensor"
+      strict-multiply-tensors([tensor: 8, 0].as-2d(2, 1), [tensor: 3, 1])
+        raises "The first tensor does not have the same shape as the second tensor"
+    end
+  }
 
   @function["strict-divide-tensors"]
 
@@ -2313,11 +2665,44 @@
   @pyret{b} are not the same shape (as determined by
   @pyret-method["Tensor" "shape"]).
 
+  @examples{
+    check:
+      strict-divide-tensors([tensor: 1], [tensor: 0])
+        is-roughly divide-tensors([tensor: 1], [tensor: 0])
+      strict-divide-tensors([tensor: -4, -1], [tensor: -8, -2])
+        is-roughly divide-tensors([tensor: -4, -1], [tensor: -8, -2])
+
+      strict-divide-tensors([tensor: 1], [tensor: 1, 2])
+        raises "The first tensor does not have the same shape as the second tensor"
+      strict-divide-tensors([tensor: 8, 0].as-2d(2, 1), [tensor: 3, 1])
+        raises "The first tensor does not have the same shape as the second tensor"
+
+      strict-divide-tensors([tensor: 1], [tensor: 0])
+        raises "The argument Tensor cannot contain 0"
+      strict-divide-tensors([tensor: 1, 1], [tensor: 1, 0])
+        raises "The argument Tensor cannot contain 0"
+    end
+  }
+
   @function["strict-tensor-max"]
 
   Same as @pyret-id["tensor-max"], but raises an error if @pyret{a} and
   @pyret{b} are not the same shape (as determined by
   @pyret-method["Tensor" "shape"]).
+
+  @examples{
+    check:
+      strict-tensor-max([tensor: 1], [tensor: 0])
+        is-roughly tensor-max([tensor: 1], [tensor: 0])
+      strict-tensor-max([tensor: -4, -1], [tensor: -8, -2])
+        is-roughly tensor-max([tensor: -4, -1], [tensor: -8, -2])
+
+      strict-tensor-max([tensor: 1], [tensor: 1, 2])
+        raises "The first tensor does not have the same shape as the second tensor"
+      strict-tensor-max([tensor: 8, 0].as-2d(2, 1), [tensor: 3, 1])
+        raises "The first tensor does not have the same shape as the second tensor"
+    end
+  }
 
   @function["strict-tensor-min"]
 
@@ -2325,11 +2710,39 @@
   @pyret{b} are not the same shape (as determined by
   @pyret-method["Tensor" "shape"]).
 
+  @examples{
+    check:
+      strict-tensor-min([tensor: 1], [tensor: 0])
+        is-roughly tensor-min([tensor: 1], [tensor: 0])
+      strict-tensor-min([tensor: -4, -1], [tensor: -8, -2])
+        is-roughly tensor-min([tensor: -4, -1], [tensor: -8, -2])
+
+      strict-tensor-min([tensor: 1], [tensor: 1, 2])
+        raises "The first tensor does not have the same shape as the second tensor"
+      strict-tensor-min([tensor: 8, 0].as-2d(2, 1), [tensor: 3, 1])
+        raises "The first tensor does not have the same shape as the second tensor"
+    end
+  }
+
   @function["strict-tensor-expt"]
 
   Same as @pyret-id["tensor-expt"], but raises an error if @pyret{a} and
   @pyret{b} are not the same shape (as determined by
   @pyret-method["Tensor" "shape"]).
+
+  @examples{
+    check:
+      strict-tensor-expt([tensor: 1], [tensor: 0])
+        is-roughly tensor-expt([tensor: 1], [tensor: 0])
+      strict-tensor-expt([tensor: -4, -1], [tensor: -8, -2])
+        is-roughly tensor-expt([tensor: -4, -1], [tensor: -8, -2])
+
+      strict-tensor-expt([tensor: 1], [tensor: 1, 2])
+        raises "The first tensor does not have the same shape as the second tensor"
+      strict-tensor-expt([tensor: 8, 0].as-2d(2, 1), [tensor: 3, 1])
+        raises "The first tensor does not have the same shape as the second tensor"
+    end
+  }
 
   @function["strict-tensor-modulo"]
 
@@ -2337,11 +2750,44 @@
   @pyret{b} are not the same shape (as determined by
   @pyret-method["Tensor" "shape"]).
 
+  @examples{
+    check:
+      strict-tensor-modulo([tensor: 1], [tensor: 0])
+        is-roughly tensor-modulo([tensor: 1], [tensor: 0])
+      strict-tensor-modulo([tensor: -4, -1], [tensor: -8, -2])
+        is-roughly tensor-modulo([tensor: -4, -1], [tensor: -8, -2])
+
+      strict-tensor-modulo([tensor: 1], [tensor: 1, 2])
+        raises "The first tensor does not have the same shape as the second tensor"
+      strict-tensor-modulo([tensor: 8, 0].as-2d(2, 1), [tensor: 3, 1])
+        raises "The first tensor does not have the same shape as the second tensor"
+
+      strict-tensor-modulo([tensor: 1], [tensor: 0])
+        raises "The argument Tensor cannot contain 0"
+      strict-tensor-modulo([tensor: 1, 1], [tensor: 1, 0])
+        raises "The argument Tensor cannot contain 0"
+    end
+  }
+
   @function["strict-squared-difference"]
 
-  Same as @pyret-id["squared-difference"], but raises an error if @pyret{a} and
-  @pyret{b} are not the same shape (as determined by
+  Same as @pyret-id["squared-difference"], but raises an error if @pyret{a}
+  and @pyret{b} are not the same shape (as determined by
   @pyret-method["Tensor" "shape"]).
+
+  @examples{
+    check:
+      strict-squared-difference([tensor: 1], [tensor: 0])
+        is-roughly squared-difference([tensor: 1], [tensor: 0])
+      strict-squared-difference([tensor: -4, -1], [tensor: -8, -2])
+        is-roughly squared-difference([tensor: -4, -1], [tensor: -8, -2])
+
+      strict-squared-difference([tensor: 1], [tensor: 1, 2])
+        raises "The first tensor does not have the same shape as the second tensor"
+      strict-squared-difference([tensor: 8, 0].as-2d(2, 1), [tensor: 3, 1])
+        raises "The first tensor does not have the same shape as the second tensor"
+    end
+  }
 
   @;#########################################################################
   @subsection{Basic Math Operations}
@@ -2350,25 +2796,107 @@
 
   Computes the absolute value of the @pyret-id["Tensor"], element-wise.
 
+  @examples{
+    check:
+      tensor-abs([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-abs([tensor: 1]).data-now() is-roughly [list: 1]
+      tensor-abs([tensor: -1]).data-now() is-roughly [list: 1]
+      tensor-abs([tensor: -1, -2, -3]).data-now() is-roughly [list: 1, 2, 3]
+
+      two-dim-abs = tensor-abs([tensor: -4, 5, -6, -7, -8, 9].as-2d(3, 2))
+      two-dim-abs.shape() is [list: 3, 2]
+      two-dim-abs.data-now() is-roughly [list: 4, 5, 6, 7, 8, 9]
+    end
+  }
+
   @function["tensor-acos"]
 
   Computes the inverse cosine of the @pyret-id["Tensor"], element-wise.
 
+  @examples{
+    check:
+      tensor-acos([tensor: 1]).data-now() is-roughly [list: 0]
+      tensor-acos([tensor: 0]).data-now() is-roughly [list: ~1.5707963]
+      tensor-acos([tensor: -1]).data-now() is-roughly [list: ~3.1415927]
+      tensor-acos([tensor: 0.5, 0.2, 0.6]).data-now()
+        is-roughly [list: ~1.0471975, ~1.3694384, ~0.9272952]
+
+      tensor-acos([tensor: 10])
+        raises "Values in the input Tensor must be between -1 and 1, inclusive"
+      tensor-acos([tensor: -1, 0, 16, -2])
+        raises "Values in the input Tensor must be between -1 and 1, inclusive"
+    end
+  }
+
   @function["tensor-acosh"]
 
-  Computes the inverse hyperbolic cosine of the @pyret-id["Tensor"], element-wise.
+  Computes the inverse hyperbolic cosine of the @pyret-id["Tensor"],
+  element-wise.
+
+  @examples{
+    check:
+      tensor-acosh([tensor: 1]).data-now() is-roughly [list: 0]
+      tensor-acosh([tensor: 2]).data-now() is-roughly [list: ~1.3169579]
+      tensor-acosh([tensor: 1, 5, 10, 200]).data-now()
+        is-roughly [list: ~0, ~2.2924315, ~2.9932229, ~5.9914584]
+
+      tensor-acosh([tensor: 0])
+        raises "Values in the input Tensor must be at least 1"
+      tensor-acosh([tensor: 4, 1, 10, 32, -2, 82])
+        raises "Values in the input Tensor must be at least 1"
+    end
+  }
 
   @function["tensor-asin"]
 
   Computes the inverse sine of the @pyret-id["Tensor"], element-wise.
 
+  @examples{
+    check:
+      # Check one-dimensional usages:
+      tensor-asin([tensor: 1]).data-now() is-roughly [list: ~1.5707963]
+      tensor-asin([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-asin([tensor: -0.5]).data-now() is-roughly [list: ~-0.5235987]
+      tensor-asin([tensor: 0.5, 0.2, 0.6]).data-now()
+        is-roughly [list: ~0.5235987, ~0.2013579, ~0.6435011]
+
+      # Check bounding values:
+      tensor-asin([tensor: 9])
+        raises "Values in the input Tensor must be between -1 and 1, inclusive"
+      tensor-asin([tensor: -1, -2, -3])
+        raises "Values in the input Tensor must be between -1 and 1, inclusive"
+    end
+  }
+
   @function["tensor-asinh"]
 
-  Computes the inverse hyperbolic sine of the @pyret-id["Tensor"], element-wise.
+  Computes the inverse hyperbolic sine of the @pyret-id["Tensor"],
+  element-wise.
+
+  @examples{
+    check:
+      tensor-asinh([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-asinh([tensor: 1]).data-now() is-roughly [list: ~0.8813736]
+      tensor-asinh([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~-0.8813736, ~-1.4436353, ~-1.8184462]
+      tensor-asinh([tensor: 21, 0, 32, 2]).data-now()
+        is-roughly [list: ~3.7382359, ~0, ~4.1591272, ~1.4436354]
+    end
+  }
 
   @function["tensor-atan"]
 
   Computes the inverse tangent of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-atan([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-atan([tensor: 1]).data-now() is-roughly [list: ~0.7853981]
+      tensor-atan([tensor: -1]).data-now() is-roughly [list: ~-0.7853981]
+      tensor-atan([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~-0.7853981, ~-1.1071487, ~-1.2490458]
+    end
+  }
 
   @function["tensor-atan2"]
 
@@ -2377,25 +2905,100 @@
 
   @function["tensor-atanh"]
 
-  Computes the inverse hyperbolic tangent of the @pyret-id["Tensor"], element-wise.
+  Computes the inverse hyperbolic tangent of the @pyret-id["Tensor"],
+  element-wise.
+
+  @examples{
+    check:
+      # Check one-dimensional usages:
+      tensor-atanh([tensor: 0.5]).data-now() is-roughly [list: ~0.5493061]
+      tensor-atanh([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-atanh([tensor: -0.9]).data-now() is-roughly [list: ~-1.4722193]
+      tensor-atanh([tensor: 0.5, 0.2, 0.6]).data-now()
+        is-roughly [list: ~0.5493061, ~0.2027325, ~0.6931471]
+
+      # Check bounding values:
+      tensor-atanh([tensor: 1])
+        raises "Values in the input Tensor must be between -1 and 1, exclusive"
+      tensor-atanh([tensor: -1])
+        raises "Values in the input Tensor must be between -1 and 1, exclusive"
+      tensor-atanh([tensor: 0, 16, -1, 9, 1])
+        raises "Values in the input Tensor must be between -1 and 1, exclusive"
+    end
+  }
 
   @function["tensor-ceil"]
 
   Computes the ceiling of the @pyret-id["Tensor"], element-wise.
 
+  @examples{
+    check:
+      # Check usages on integer tensors:
+      tensor-ceil([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-ceil([tensor: 1]).data-now() is-roughly [list: 1]
+      tensor-ceil([tensor: -1, -2, -3]).data-now() is-roughly [list: -1, -2, -3]
+
+      # Check usages on float tensors:
+      tensor-ceil([tensor: 0.3]).data-now() is-roughly [list: 1]
+      tensor-ceil([tensor: 0.5]).data-now() is-roughly [list: 1]
+      tensor-ceil([tensor: 0.8]).data-now() is-roughly [list: 1]
+      tensor-ceil([tensor: -0.2]).data-now() is-roughly [list: 0]
+      tensor-ceil([tensor: -0.5]).data-now() is-roughly [list: 0]
+      tensor-ceil([tensor: -0.9]).data-now() is-roughly [list: 0]
+      tensor-ceil([tensor: 3.5, 5.2, 1.6]).data-now() is-roughly [list: 4, 6, 2]
+    end
+  }
+
   @function["clip-by-value"]
 
-  Clips the values of the @pyret-id["Tensor"], element-wise, such that every element
-  in the resulting @pyret-id["Tensor"] is at least @pyret{min-value} and is at most
-  @pyret{max-value}.
+  Clips the values of the @pyret-id["Tensor"], element-wise, such that every
+  element in the resulting @pyret-id["Tensor"] is at least @pyret{min-value}
+  and is at most @pyret{max-value}.
+
+  @examples{
+    check:
+      clip-by-value([tensor: 0], 0, 0).data-now() is-roughly [list: 0]
+      clip-by-value([tensor: 0], -1, 1).data-now() is-roughly [list: 0]
+      clip-by-value([tensor: 0], 1, 4).data-now() is-roughly [list: 1]
+      clip-by-value([tensor: 21, 0, 32, 2], 4, 9).data-now()
+        is-roughly [list: 9, 4, 9, 4]
+      clip-by-value([tensor: 3, 9, 10, 3.24], 4.5, 9.4).data-now()
+        is-roughly [list: 4.5, 9, 9.4, 4.5]
+
+      clip-by-value([tensor: 1], 10, 0)
+        raises "minimum value to clip to must be less than or equal to the maximum"
+      clip-by-value([tensor: 1], -10, -45)
+        raises "minimum value to clip to must be less than or equal to the maximum"
+    end
+  }
 
   @function["tensor-cos"]
 
   Computes the cosine of the @pyret-id["Tensor"], element-wise.
 
+  @examples{
+    check:
+      tensor-cos([tensor: 0]).data-now() is-roughly [list: 1]
+      tensor-cos([tensor: 1]).data-now() is-roughly [list: ~0.5403115]
+      tensor-cos([tensor: -1]).data-now() is-roughly [list: ~0.5403116]
+      tensor-cos([tensor: 6, 2, -4]).data-now()
+        is-roughly [list: ~0.9601798, ~-0.4161523, ~-0.6536576]
+    end
+  }
+
   @function["tensor-cosh"]
 
   Computes the hyperbolic cosine of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-cosh([tensor: 0]).data-now() is-roughly [list: 1]
+      tensor-cosh([tensor: 1]).data-now() is-roughly [list: ~1.5430805]
+      tensor-cosh([tensor: -1]).data-now() is-roughly [list: ~1.5430805]
+      tensor-cosh([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~1.5430805, ~3.7621955, ~10.0676612]
+    end
+  }
 
   @function["exponential-linear-units"]
 
@@ -2408,8 +3011,8 @@
 
   @function["gauss-error"]
 
-  Applies the @link["http://mathworld.wolfram.com/Erf.html" "gauss error function"]
-  to the @pyret-id["Tensor"], element-wise.
+  Applies the @link["http://mathworld.wolfram.com/Erf.html"
+  "gauss error function"] to the @pyret-id["Tensor"], element-wise.
 
   @function["erf"]
 
@@ -2426,6 +3029,27 @@
   @function["tensor-floor"]
 
   Computes the floor of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      # Check usages on integer tensors:
+      tensor-floor([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-floor([tensor: 1]).data-now() is-roughly [list: 1]
+      tensor-floor([tensor: -1]).data-now() is-roughly [list: -1]
+      tensor-floor([tensor: -1, -2, -3]).data-now() is-roughly [list: -1, -2, -3]
+
+      # Check usages on float tensors:
+      tensor-floor([tensor: 0.3]).data-now() is-roughly [list: 0]
+      tensor-floor([tensor: 0.5]).data-now() is-roughly [list: 0]
+      tensor-floor([tensor: 0.8]).data-now() is-roughly [list: 0]
+      tensor-floor([tensor: 0.999]).data-now() is-roughly [list: 0]
+      tensor-floor([tensor: 1.1]).data-now() is-roughly [list: 1]
+      tensor-floor([tensor: -0.2]).data-now() is-roughly [list: -1]
+      tensor-floor([tensor: -0.5]).data-now() is-roughly [list: -1]
+      tensor-floor([tensor: -0.9]).data-now() is-roughly [list: -1]
+      tensor-floor([tensor: 3.5, 5.2, 1.6]).data-now() is-roughly [list: 3, 5, 1]
+    end
+  }
 
   @function["leaky-relu"]
 
@@ -2458,6 +3082,18 @@
 
   Multiplies each element in the @pyret-id["Tensor"] by @pyret{-1}.
 
+  @examples{
+    check:
+      tensor-negate([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-negate([tensor: 1]).data-now() is-roughly [list: -1]
+      tensor-negate([tensor: -1]).data-now() is-roughly [list: 1]
+      tensor-negate([tensor: -1, 2, 3, -4, 5]).data-now()
+        is-roughly [list: 1, -2, -3, 4, -5]
+      tensor-negate([tensor: -1, -2, -3, -4, -5]).data-now()
+        is-roughly [list: 1, 2, 3, 4, 5]
+    end
+  }
+
   @function["parametric-relu"]
 
   Applies a @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Leaky_ReLUs"
@@ -2471,6 +3107,23 @@
   Computes the reciprocal of the @pyret-id["Tensor"], element-wise; that is, it
   computes the equivalent of @pyret{1 / tensor}.
 
+  @examples{
+    check:
+      tensor-reciprocal([tensor: 1]).data-now() is-roughly [list: 1]
+      tensor-reciprocal([tensor: -1]).data-now() is-roughly [list: -1]
+      tensor-reciprocal([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~-1, ~-0.5, ~-0.3333333]
+
+      # Check for division-by-zero errors:
+      tensor-reciprocal([tensor: 0])
+        raises "The argument Tensor cannot contain 0"
+      tensor-reciprocal([tensor: 1, 0])
+        raises "The argument Tensor cannot contain 0"
+      tensor-reciprocal([tensor: 7.65, 0, 1.43])
+        raises "The argument Tensor cannot contain 0"
+    end
+  }
+
   @function["relu"]
 
   Applies a @link["https://en.wikipedia.org/wiki/Rectifier_(neural_networks)"
@@ -2480,6 +3133,27 @@
 
   Computes the equivalent of @pyret{num-round(tensor)}, element-wise.
 
+  Due to unavoidable rounding errors on @pyret{Roughnum}s, the behavior for
+  numbers ending in @pyret{.5} is inconsistent. See the examples below.
+
+  @examples{
+    check:
+      tensor-round([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-round([tensor: 1]).data-now() is-roughly [list: 1]
+      tensor-round([tensor: -1]).data-now() is-roughly [list: -1]
+      tensor-round([tensor: 0.1]).data-now() is-roughly [list: 0]
+      tensor-round([tensor: 0.3]).data-now() is-roughly [list: 0]
+      tensor-round([tensor: 0.8]).data-now() is-roughly [list: 1]
+      tensor-round([tensor: 0.999]).data-now() is-roughly [list: 1]
+      tensor-round([tensor: -1, -2, -3]).data-now() is-roughly [list: -1, -2, -3]
+      tensor-round([tensor: 3.5, 5.2, 1.6]).data-now() is-roughly [list: 4, 5, 2]
+
+      # Note inconsistent behavior with rounding on Roughnums:
+      tensor-round([tensor: 0.5]).data-now() is-roughly [list: 0] # rounds down
+      tensor-round([tensor: 3.5]).data-now() is-roughly [list: 4] # rounds up
+    end
+  }
+
   @function["reciprocal-sqrt"]
 
   Computes the recriprocal of the square root of the @pyret-id["Tensor"],
@@ -2487,6 +3161,25 @@
 
   The resulting @pyret-id["Tensor"] is roughly equivalent to
   @pyret{tensor-reciprocal(tensor-sqrt(tensor))}.
+
+  @examples{
+    check:
+      reciprocal-sqrt([tensor: 1]).data-now() is-roughly [list: 1]
+      reciprocal-sqrt([tensor: -1]).data-now() is-roughly [list: 1]
+      reciprocal-sqrt([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~1, ~0.7071067, ~0.5773502]
+      reciprocal-sqrt([tensor: 6, 2, -4]).data-now()
+        is-roughly [list: ~0.4082482, ~0.7071067, ~0.5]
+
+      # Check for division-by-zero errors:
+      reciprocal-sqrt([tensor: 0])
+        raises "The argument Tensor cannot contain 0"
+      reciprocal-sqrt([tensor: 1, 0])
+        raises "The argument Tensor cannot contain 0"
+      reciprocal-sqrt([tensor: 7.65, 0, 1.43])
+        raises "The argument Tensor cannot contain 0"
+    end
+  }
 
   @function["scaled-elu"]
 
@@ -2505,13 +3198,49 @@
   @pyret{~-1} if the value was negative, or @pyret{~0} if the value was zero
   or not a number.
 
+  @examples{
+    check:
+      signed-ones([tensor: 0]).data-now() is-roughly [list: 0]
+      signed-ones([tensor: 1]).data-now() is-roughly [list: 1]
+      signed-ones([tensor: 3]).data-now() is-roughly [list: 1]
+      signed-ones([tensor: -1]).data-now() is-roughly [list: -1]
+      signed-ones([tensor: -5]).data-now() is-roughly [list: -1]
+      signed-ones([tensor: 9, -7, 5, -3, -1, 0]).data-now()
+        is-roughly [list: 1, -1, 1, -1, -1, 0]
+    end
+  }
+
   @function["tensor-sin"]
 
   Computes the sine of the @pyret-id["Tensor"], element-wise.
 
+  @examples{
+    check:
+      tensor-sin([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-sin([tensor: 1]).data-now() is-roughly [list: ~0.8414709]
+      tensor-sin([tensor: -1]).data-now() is-roughly [list: ~-0.8415220]
+      tensor-sin([tensor: 6, 2, -4]).data-now()
+        is-roughly [list: ~-0.2794162, ~0.9092976, ~0.7568427]
+      tensor-sin([tensor: 21, 0, 32, 2]).data-now()
+        is-roughly [list: ~0.8366656, ~0, ~0.5514304, ~0.9092976]
+    end
+  }
+
   @function["tensor-sinh"]
 
   Computes the hyperbolic sine of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-sinh([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-sinh([tensor: 1]).data-now() is-roughly [list: ~1.1752011]
+      tensor-sinh([tensor: -1]).data-now() is-roughly [list: ~-1.1752011]
+      tensor-sinh([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~-1.1752011, ~-3.6268603, ~-10.0178737]
+      tensor-sinh([tensor: 6, 2, -4]).data-now()
+        is-roughly [list: ~201.7131195, ~3.6268601, ~-27.2899169]
+    end
+  }
 
   @function["softplus"]
 
@@ -2522,24 +3251,84 @@
 
   Computes the square root of the @pyret-id["Tensor"], element-wise.
 
+  @examples{
+    check:
+      tensor-sqrt([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-sqrt([tensor: 1]).data-now() is-roughly [list: 1]
+      tensor-sqrt([tensor: 4]).data-now() is-roughly [list: 2]
+      tensor-sqrt([tensor: 9]).data-now() is-roughly [list: 3]
+      tensor-sqrt([tensor: 25]).data-now() is-roughly [list: 5]
+
+      tensor-sqrt([tensor: -1]).data-now()
+        raises "Values in the input Tensor must be at least 0"
+      tensor-sqrt([tensor: 9, -7, 5, -3, -1, 0, 0.5]).data-now()
+        raises "Values in the input Tensor must be at least 0"
+    end
+  }
+
   @function["tensor-square"]
 
   Computes the square of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-square([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-square([tensor: 1]).data-now() is-roughly [list: 1]
+      tensor-square([tensor: 5]).data-now() is-roughly [list: 25]
+      tensor-square([tensor: -1]).data-now() is-roughly [list: 1]
+      tensor-square([tensor: -3]).data-now() is-roughly [list: 9]
+      tensor-square([tensor: 9, -7, 5, -3, -1, 0, 0.5]).data-now()
+        is-roughly [list: 81, 49, 25, 9, 1, 0, 0.25]
+    end
+  }
 
   @function["step"]
 
   Applies the unit step function to the @pyret-id["Tensor"], element-wise;
   that is, every value in the original tensor is represented in the resulting
-  tensor as @pyret{~0} if the value is negative; otherwise, it is represented
-  as @pyret{~+1}.
+  tensor as @pyret{~+1} if the value is positive; otherwise, it is represented
+  as @pyret{~0}.
+
+  @examples{
+    check:
+      step([tensor: 0]).data-now() is-roughly [list: 0]
+      step([tensor: 1]).data-now() is-roughly [list: 1]
+      step([tensor: 5]).data-now() is-roughly [list: 1]
+      step([tensor: -1]).data-now() is-roughly [list: 0]
+      step([tensor: -3]).data-now() is-roughly [list: 0]
+      step([tensor: -1, 4, 0, 0, 15, -43, 0]).data-now()
+        is-roughly [list: 0, 1, 0, 0, 1, 0, 0]
+    end
+  }
 
   @function["tensor-tan"]
 
   Computes the tangent of the @pyret-id["Tensor"], element-wise.
 
+  @examples{
+    check:
+      tensor-tan([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-tan([tensor: 1]).data-now() is-roughly [list: ~1.5573809]
+      tensor-tan([tensor: -1]).data-now() is-roughly [list: ~-1.5573809]
+      tensor-tan([tensor: 21, 0, 32, 2]).data-now()
+        is-roughly [list: ~-1.5275151, ~0, ~0.6610110, ~-2.1850113]
+    end
+  }
+
   @function["tensor-tanh"]
 
   Computes the hyperbolic tangent of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-tanh([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-tanh([tensor: 1]).data-now() is-roughly [list: ~0.7615941]
+      tensor-tanh([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~-0.7615941, ~-0.9640275, ~-0.9950547]
+      tensor-tanh([tensor: 6, 2, -4]).data-now()
+        is-roughly [list: ~0.9999876, ~0.9640275, ~-0.9993293]
+    end
+  }
 
   @;#########################################################################
   @subsection{Reduction Operations}
@@ -2623,14 +3412,14 @@
       input-1   = [tensor: 1, 2, 3, 4]
       indices-1 = [tensor: 1, 3, 3]
 
-      gather(input-1, indices-1).data-now() is [list: 2, 4, 4]
+      gather(input-1, indices-1, none).data-now() is [list: 2, 4, 4]
 
       input-2   = [tensor: 1, 2, 3, 4].as-2d(2, 2)
       indices-2 = [tensor: 1, 1, 0]
 
-      gather(input-2, indices-2).data-now() is [list: 3, 4,
-                                                       3, 4,
-                                                       1, 2]
+      gather(input-2, indices-2, none).data-now() is [list: 3, 4,
+                                                            3, 4,
+                                                            1, 2]
     end
   }
 
@@ -2638,8 +3427,8 @@
 
   Reverses the values in @pyret{tensor} along the specified @pyret{axis}.
 
-  If @pyret{axis} is @pyret{none}, the function defaults to reversing along
-  axis 0 (the first dimension).
+  If @pyret{axes} is @pyret{none}, the function defaults to reversing along
+  all axes.
 
   @function["slice"]
 
@@ -2654,9 +3443,44 @@
   @pyret{size} is @pyret{none}, the size of all axes will be set to @pyret{-1}.
 
   @function["split"]
+
+  Splits @pyret{tensor} into sub-@pyret-id["Tensor"]s along the specified
+  @pyret{axis}.
+
+  @pyret{split-sizes} represents the sizes of each output Tensor along the
+  axis. The sum of the sizes in @pyret{split-sizes} must be equal to
+  @pyret{tensor.shape().get-value(axis)}; otherwise, an error will be raised.
+
+  If @pyret{axis} is @pyret{none}, the operation will split along the first
+  dimension (axis 0) by default.
+
   @function["stack"]
+
+  Stacks a list of rank-@pyret{R} @pyret-id["Tensor"]s into one
+  rank-@pyret{(R + 1)} @pyret-id["Tensor"] along the specified @pyret{axis}.
+
+  Every @pyret-id["Tensor"] in @pyret{tensors} must have the same shape and
+  data type; otherwise, the function raises an error.
+
+  If @pyret{axis} is @pyret{none}, the operation will split along the first
+  dimension (axis 0) by default.
+
   @function["tile"]
+
+  Constructs a new @pyret-id["Tensor"] by repeating @pyret{tensor} the number
+  of times given by @pyret{repetitions}. Each number in @pyret{repetitions}
+  represents the number of replications in each dimension; that is, the first
+  element in the list represents the number of replications along the first
+  dimension, and so on.
+
   @function["unstack"]
+
+  Unstacks a @pyret-id["Tensor"] of rank-@pyret{R} into a @pyret{List} of
+  rank-@pyret{(R - 1)} @pyret-id["Tensor"]s along the specified @pyret{axis}.
+
+  If @pyret{axis} is @pyret{none}, the operation will split along the first
+  dimension (axis 0) by default.
+
   @function["strided-slice"]
 
   Extracts a strided slice of a @pyret-id["Tensor"].
