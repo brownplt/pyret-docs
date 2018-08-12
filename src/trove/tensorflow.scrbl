@@ -3998,9 +3998,9 @@
 
       If set to @pyret{true}, then all subsequent layers in the model need to
       support masking or an exception will be raised. Additionally, if
-      @tt{mask-zero} is set to @pyret{true}, as a consequence, index 0 cannot
-      be used in the vocabulary (that is, @tt{input-dim} should equal the size
-      the of vocabulary + 1).
+      @tt{mask-zero} is set to @pyret{true}, as a consequence, index @pyret{0}
+      cannot be used in the vocabulary (that is, @tt{input-dim} should equal
+      the size the of vocabulary + 1).
     }
     @item{
       @tt{input-length :: List<NumInteger>}. Length of input sequences, when it
@@ -4019,20 +4019,164 @@
   A @pyret-id["flatten-layer"] flattens each batch in its inputs to one
   dimension (making the output two dimensional).
 
-  The @pyret{config} passed to this constructor does not have any additional
-  options other than the default @pyret-id["LayerConfig"] options.
+  The @pyret{config} passed to this constructor does not support any
+  additional options other than the default @pyret-id["LayerConfig"] options.
 
   @function["repeat-vector-layer"]
+
+  Repeats the input @tt{num-repeats} times in a new dimension.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{num-repeats :: }@pyret-id["NumInteger" "numbers"]. @bold{Required
+      parameter.} Must also be a @pyret-id["NumPositive" "numbers"].
+      Represents the number of times to repeat the input.
+    }
+  ]
+
   @function["reshape-layer"]
+
+  Reshapes an input to a certain shape.
+
+  The input shape can be arbitrary, although all dimensions in the input shape
+  must be fixed.
+
+  The output shape is
+  @pyret{[list: batch-size, target-shape.get(0), ..., target-shape.get(i)]}.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{target-shape :: List<NumInteger>}. The target shape; should not
+      include the @tt{batch-size}.
+    }
+  ]
 
   @;#########################################################################
   @subsection{Convolutional Layers}
 
   @function["conv-1d-layer"]
+
+  A one-dimensional convolution @tt{Layer}.
+
+  This layer creates a convolution kernel that is convolved with the layer
+  input over a single spatial (or temporal) dimension to produce a
+  @pyret-id["Tensor"] of outputs.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{filters :: }@pyret-id["NumInteger" "numbers"]. @bold{Required
+      parameter.} The dimensionality of the output space; that is, the number
+      of filters in the convolution.
+    }
+  ]
+
   @function["conv-2d-layer"]
+
+  A two-dimensional convolution @tt{Layer}.
+
+  This layer creates a convolution kernel that is convolved with the layer
+  input to produce a @pyret-id["Tensor"] of outputs.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{filters :: }@pyret-id["NumInteger" "numbers"]. @bold{Required
+      parameter.} The dimensionality of the output space; that is, the number
+      of filters in the convolution.
+    }
+  ]
+
   @function["conv-2d-transpose-layer"]
+
+  Transposed convolutional @tt{Layer}. This is sometimes known as a
+  "deconvolution" layer.
+
+  The need for transposed convolutions generally arises from the desire to
+  use a transformation going in the opposite direction of a normal
+  convolution; for example, from something that has the shape of the output
+  of some convolution to something that has the shape of its input while
+  maintaining a connectivity pattern that is compatible with said convolution.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{filters :: }@pyret-id["NumInteger" "numbers"]. @bold{Required
+      parameter.} The dimensionality of the output space; that is, the number
+      of filters in the convolution.
+    }
+  ]
+
   @function["cropping-2d-layer"]
+
+  Crops an two-dimensional input at the top, bottom, left, and right side
+  (for example, image data).
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{cropping :: {top-crop :: NumInteger, bottom-crop :: NumInteger,
+      left-crop :: NumInteger, right-crop :: NumInteger}}. @bold{Required
+      parameter.} An @pyret-id["Object" "<global>"] that specifies the
+      cropping along each side of the width and the height.
+    }
+    @item{
+      @tt{data-format :: }@pyret-id["DataFormat"]. Format of the data, which
+      determines the ordering of the dimensions in the inputs.
+    }
+  ]
+
   @function["depthwise-conv-2d-layer"]
+
+  Depthwise separable two-dimensional convolution.
+
+  A depthwise separable convolution consists of performing just the first
+  step in a depthwise spatial convolution (which acts on each input channel
+  separately). The @tt{depth-multiplier} argument controls how many output
+  channels are generated per input channel in the depthwise step.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{kernel-size :: {width :: NumInteger, height :: NumInteger}}.
+      @bold{Required parameter.} An @pyret-id["Object" "<global>"] that
+      specifies the width and height of the two-dimensional convolution
+      window.
+    }
+    @item{
+      @tt{depth-multiplier :: }@pyret-id["NumInteger" "numbers"]. The number
+      of depthwise convolution output channels for each input channel.
+    }
+    @item{
+      @tt{depthwise-initializer :: }@pyret-id["Initializer"]. Initializer for
+      the depthwise kernel matrix.
+    }
+    @item{
+      @tt{depthwise-constraint :: }@pyret-id["Constraint"]. Constraint for
+      the depthwise kernel matrix.
+    }
+    @item{
+      @tt{depthwise-regularizer :: }@pyret-id["Regularizer"]. Regularizer function
+      applied to the depthwise kernel matrix.
+    }
+  ]
+
   @function["separable-conv-2d-layer"]
   @function["up-sampling-2d-layer"]
 
