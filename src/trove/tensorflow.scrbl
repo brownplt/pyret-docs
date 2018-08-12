@@ -7,6 +7,7 @@
 @(define Sequential (a-id "Sequential" (xref "tensorflow" "Sequential")))
 @(define SymbolicTensor (a-id "SymbolicTensor" (xref "tensorflow" "SymbolicTensor")))
 @(define Layer (a-id "Layer" (xref "tensorflow" "Layer")))
+@(define LayerConfig (a-id "LayerConfig" (xref "tensorflow" "LayerConfig")))
 @(define Optimizer (a-id "Optimizer" (xref "tensorflow" "Optimizer")))
 
 @(define Object (a-id "Object" (xref "<global>" "Object")))
@@ -1064,6 +1065,13 @@
             )))
 
     (fun-spec
+      (name "is-symbolic-tensor")
+      (arity 1)
+      (args ("val"))
+      (return ,B)
+      (contract
+        (a-arrow ,A ,B)))
+    (fun-spec
       (name "make-input")
       (arity 1)
       (args ("shape"))
@@ -1105,273 +1113,273 @@
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "dense-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "dropout-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "embedding-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "flatten-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "repeat-vector-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "reshape-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "conv-1d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "conv-2d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "conv-2d-transpose-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "cropping-2d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "depthwise-conv-2d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "separable-conv-2d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "up-sampling-2d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "add-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "average-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "concatenate-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "maximum-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "minimum-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "multiply-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "batch-normalization-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "average-pooling-1d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "average-pooling-2d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "global-average-pooling-1d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "global-average-pooling-2d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "global-max-pooling-1d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "global-max-pooling-2d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "max-pooling-1d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "max-pooling-2d-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "gru-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "gru-cell-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "lstm-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "lstm-cell-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "rnn-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "simple-rnn-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "simple-rnn-cell-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "stacked-rnn-cells-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "bidirectional-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
     (fun-spec
       (name "time-distributed-layer")
       (arity 1)
       (args ("config"))
       (return ,Layer)
       (contract
-        (a-arrow ,Object ,Layer)))
+        (a-arrow ,LayerConfig ,Layer)))
 
     (data-spec
       (name "Layer")
@@ -1387,6 +1395,35 @@
           (contract
             (a-arrow ,Tensor ,N)))
             )))
+
+    (data-spec
+      (name "LayerConfig")
+      (type-vars ())
+      (variants))
+    (data-spec
+      (name "Activation")
+      (type-vars ())
+      (variants))
+    (data-spec
+      (name "Initializer")
+      (type-vars ())
+      (variants))
+    (data-spec
+      (name "Constraint")
+      (type-vars ())
+      (variants))
+    (data-spec
+      (name "Regularizer")
+      (type-vars ())
+      (variants))
+    (data-spec
+      (name "DataFormat")
+      (type-vars ())
+      (variants))
+    (data-spec
+      (name "PaddingMethod")
+      (type-vars ())
+      (variants))
 
     (fun-spec
       (name "is-optimizer")
@@ -2188,6 +2225,30 @@
   @;#########################################################################
   @subsection{Arithmetic Operations}
 
+  All arithmetic operations are binary operations that accept two
+  @pyret-id["Tensor"]s as arguments. If the size of any axis in either
+  @pyret-id["Tensor"] is greater than 1, the corresponding axis in the
+  other @pyret-id["Tensor"] must be the same size; otherwise, the operation
+  raises an error.
+
+  @examples{
+    # Valid operations:
+    add-tensors([tensor: 1], [tensor: 1])
+    add-tensors([tensor: 1, 2, 3], [tensor: 1])
+    add-tensors([tensor: 1, 2, 3, 4].as-2d(2, 2), [tensor: 1])
+    add-tensors([tensor: 1, 2], [tensor: 1, 2, 3, 4].as-2d(2, 2))
+    add-tensors([tensor: 1, 2].as-2d(2, 1), [tensor: 1, 2].as-2d(1, 2))
+    add-tensors([tensor: 1, 2, 3, 4].as-2d(2, 2), [tensor: 1, 2].as-2d(2, 1))
+
+    # Invalid operations:
+    add-tensors([tensor: 1, 2, 3], [tensor: 1, 2])
+    add-tensors([tensor: 1, 2].as-2d(2, 1), [tensor: 1, 2, 3].as-2d(3, 1))
+  }
+
+  In some cases, this behavior isn't intended, so most arithmetic operations
+  have a "strict" counterpart that raises an error if the two input
+  @pyret-id["Tensor"]s do not have the same shape.
+
   @function["add-tensors"]
 
   Adds two @pyret-id["Tensor"]s element-wise, A + B.
@@ -2624,6 +2685,10 @@
 
   Computes the inverse cosine of the @pyret-id["Tensor"], element-wise.
 
+  All of the values in the input @pyret-id["Tensor"] must be between
+  @pyret{-1} and @pyret{1}, inclusive; otherwise, the function raises an
+  error.
+
   @examples{
     check:
       tensor-acos([tensor: 1]).data-now() is-roughly [list: 0]
@@ -2644,6 +2709,9 @@
   Computes the inverse hyperbolic cosine of the @pyret-id["Tensor"],
   element-wise.
 
+  All of the values in the input @pyret-id["Tensor"] must be greater than
+  or equal to @pyret{1}; otherwise, the function raises an error.
+
   @examples{
     check:
       tensor-acosh([tensor: 1]).data-now() is-roughly [list: 0]
@@ -2661,6 +2729,10 @@
   @function["tensor-asin"]
 
   Computes the inverse sine of the @pyret-id["Tensor"], element-wise.
+
+  All of the values in the input @pyret-id["Tensor"] must be between
+  @pyret{-1} and @pyret{1}, inclusive; otherwise, the function raises an
+  error.
 
   @examples{
     check:
@@ -2719,6 +2791,10 @@
   Computes the inverse hyperbolic tangent of the @pyret-id["Tensor"],
   element-wise.
 
+  All of the values in the input @pyret-id["Tensor"] must be between
+  @pyret{-1} and @pyret{1}, exclusive; otherwise, the function raises an
+  error.
+
   @examples{
     check:
       # Check one-dimensional usages:
@@ -2765,6 +2841,9 @@
   Clips the values of the @pyret-id["Tensor"], element-wise, such that every
   element in the resulting @pyret-id["Tensor"] is at least @pyret{min-value}
   and is at most @pyret{max-value}.
+
+  @pyret{min-value} must be less than or equal to @pyret{max-value}; otherwise,
+  the function raises an error.
 
   @examples{
     check:
@@ -2918,6 +2997,9 @@
   Computes the reciprocal of the @pyret-id["Tensor"], element-wise; that is, it
   computes the equivalent of @pyret{1 / tensor}.
 
+  In order to avoid division-by-zero errors, the input @pyret-id["Tensor"]
+  cannot contain @pyret{0}; otherwise, the function raises an error.
+
   @examples{
     check:
       tensor-reciprocal([tensor: 1]).data-now() is-roughly [list: 1]
@@ -2944,8 +3026,8 @@
 
   Computes the equivalent of @pyret{num-round(tensor)}, element-wise.
 
-  Due to unavoidable rounding errors on @pyret{Roughnum}s, the behavior for
-  numbers ending in @pyret{.5} is inconsistent. See the examples below.
+  Due to unavoidable precision errors on @pyret{Roughnum}s, the behavior for
+  numbers ending in @tt{.5} is inconsistent. See the examples below.
 
   @examples{
     check:
@@ -2972,6 +3054,9 @@
 
   The resulting @pyret-id["Tensor"] is roughly equivalent to
   @pyret{tensor-reciprocal(tensor-sqrt(tensor))}.
+
+  In order to avoid division-by-zero errors, the input @pyret-id["Tensor"]
+  cannot contain @pyret{0}; otherwise, the function raises an error.
 
   @examples{
     check:
@@ -3055,12 +3140,18 @@
 
   @function["softplus"]
 
-  Applies the @link["https://sefiks.com/2017/08/11/softplus-as-a-neural-networks-activation-function/"
-  "softplus"] function to the @pyret-id["Tensor"], element-wise.
+  Applies the softplus function to the @pyret-id["Tensor"], element-wise.
+
+  See @link["https://sefiks.com/2017/08/11/softplus-as-a-neural-networks-activation-function/"
+  "https://sefiks.com/2017/08/11/softplus-as-a-neural-networks-activation-function/"]
+  for more information.
 
   @function["tensor-sqrt"]
 
   Computes the square root of the @pyret-id["Tensor"], element-wise.
+
+  All of the values in the input @pyret-id["Tensor"] must be greater than
+  or equal to @pyret{0}; otherwise, the function raises an error.
 
   @examples{
     check:
@@ -3516,6 +3607,9 @@
 
   @function["is-model"]
 
+  Returns @pyret{true} if @pyret{val} is a @pyret{Model}; otherwise, returns
+  @pyret{false}.
+
   @function["make-model"]
 
   @;#########################################################################
@@ -3534,6 +3628,9 @@
   }
 
   @function["is-sequential"]
+
+  Returns @pyret{true} if @pyret{val} is a @pyret{Sequential}; otherwise,
+  returns @pyret{false}.
 
   @function["make-sequential"]
 
@@ -3556,6 +3653,11 @@
     for a @pyret-id["Model"] that takes in some kind of unknown input.
 
   }
+
+  @function["is-symbolic-tensor"]
+
+  Returns @pyret{true} if @pyret{val} is a @pyret{SymbolicTensor}; otherwise,
+  returns @pyret{false}.
 
   @;#########################################################################
   @subsection{SymbolicTensor Constructors}
@@ -3584,14 +3686,342 @@
 
   @function["is-layer"]
 
+  Returns @pyret{true} if @pyret{val} is a @pyret{Layer}; otherwise,
+  returns @pyret{false}.
+
+  @;#########################################################################
+  @subsection{Layer-Specific Datatypes}
+
+  @type-spec["LayerConfig"]{
+
+    @tt{LayerConfig}s are used to construct @pyret-id["Layer"]s.
+
+    A @tt{LayerConfig} is an @pyret-id["Object" "<global>"] that describes
+    the properties of a @pyret-id["Layer"].
+
+    Every @pyret-id["Layer"] can allow for different options in the
+    @tt{LayerConfig} used to construct them. Those options are specified
+    underneath each @pyret-id["Layer"] constructor. Additionally, the
+    following options are permitted in every @tt{LayerConfig}:
+
+    @itemlist[
+      @item{
+        @tt{input-shape :: List<NumInteger>}. Defines the input shape for
+        the first layer of a model. This argument is only applicable to input
+        layers (the first layer of a model). Only one of @tt{input-shape} or
+        @tt{batch-input-shape} should be defined.
+      }
+      @item{
+      @tt{batch-input-shape :: List<NumInteger>}. Defines the batch
+        input shape for the first layer of a model. This argument is only
+        applicable to input layers (the first layer of a model). Only one of
+        @tt{input-shape} or @tt{batch-input-shape} should be defined.
+      }
+      @item{
+        @tt{batch-size :: }@pyret-id["NumInteger" "numbers"]. If
+        @tt{input-shape} is specified, @tt{batch-size} is used to construct
+        the @tt{batch-input-shape} in the form
+        @pyret{[list: batch-size, ...input-shape]}.
+      }
+      @item{
+        @tt{trainable :: }@pyret-id["Boolean" "<global>"]. Whether this layer
+        is trainable.
+      }
+      @item{
+        @tt{updatable :: }@pyret-id["Boolean" "<global>"]. Whether the
+        weights of this layer are updatable by a call to
+        @pyret-method["Sequential" "fit"].
+      }
+    ]
+
+    All options allowed in a given @pyret-id["Layer"]'s @tt{LayerConfig} are
+    optional unless otherwise stated.
+
+  }
+
+  @type-spec["Activation"]{
+
+    A @pyret-id["String" "<global>"] that specifies a TensorFlow activation
+    function. The following strings are options:
+
+    @itemlist[
+      @item{@pyret{"elu"}}
+      @item{@pyret{"hardSigmoid"}}
+      @item{@pyret{"linear"}}
+      @item{@pyret{"relu"}}
+      @item{@pyret{"relu6"}}
+      @item{@pyret{"selu"}}
+      @item{@pyret{"sigmoid"}}
+      @item{@pyret{"softmax"}}
+      @item{@pyret{"softplus"}}
+      @item{@pyret{"softsign"}}
+      @item{@pyret{"tanh"}}
+    ]
+
+  }
+
+  @type-spec["Initializer"]{
+
+    A @pyret-id["String" "<global>"] that specifies a TensorFlow
+    initialization method. The following strings are options:
+
+    @itemlist[
+      @item{@pyret{"constant"}}
+      @item{@pyret{"glorotNormal"}}
+      @item{@pyret{"glorotUniform"}}
+      @item{@pyret{"heNormal"}}
+      @item{@pyret{"identity"}}
+      @item{@pyret{"leCunNormal"}}
+      @item{@pyret{"ones"}}
+      @item{@pyret{"orthogonal"}}
+      @item{@pyret{"randomNormal"}}
+      @item{@pyret{"randomUniform"}}
+      @item{@pyret{"truncatedNormal"}}
+      @item{@pyret{"varianceScaling"}}
+      @item{@pyret{"zeros"}}
+    ]
+
+  }
+
+  @type-spec["Constraint"]{
+
+    A @pyret-id["String" "<global>"] that specifies a TensorFlow
+    constraint function. The following strings are options:
+
+    @itemlist[
+      @item{@pyret{"maxNorm"}}
+      @item{@pyret{"minMaxNorm"}}
+      @item{@pyret{"nonNeg"}}
+      @item{@pyret{"unitNorm"}}
+    ]
+
+  }
+
+  @type-spec["Regularizer"]{
+
+    A @pyret-id["String" "<global>"] that specifies a TensorFlow
+    regularizer function. The following strings are options:
+
+    @itemlist[
+      @item{@pyret{"l1l2"}}
+    ]
+
+  }
+
+  @type-spec["DataFormat"]{
+
+    A @pyret-id["String" "<global>"] that specifies a TensorFlow
+    tensor data format. The following strings are options:
+
+    @itemlist[
+      @item{@pyret{"channelsFirst"}}
+      @item{@pyret{"channelsLast"}}
+    ]
+
+  }
+
+  @type-spec["PaddingMethod"]{
+
+    A @pyret-id["String" "<global>"] that specifies a TensorFlow
+    padding method. The following strings are options:
+
+    @itemlist[
+      @item{@pyret{"valid"}}
+      @item{@pyret{"same"}}
+      @item{@pyret{"casual"}}
+    ]
+
+  }
+
   @;#########################################################################
   @subsection{Basic Layers}
 
   @function["activation-layer"]
+
+  Applies an element-wise activation function to an output.
+
+  Other layers, most notably @pyret-id["dense-layer"]s, can also apply
+  activation functions. This @pyret{Layer} can be used to extract the values
+  before and after the activation.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{activation :: }@pyret-id["Activation"]. Defines the activation
+      function to apply in this @tt{Layer}.
+    }
+  ]
+
   @function["dense-layer"]
+
+  Creates a dense (fully-connected) @tt{Layer}.
+
+  This @tt{Layer} implements the operation
+  @pyret{output = activation(dot(input, kernel) + bias)}, where
+  @pyret{activation} is the element-wise activation function passed as the
+  @tt{activation} argument, @pyret{kernel} is a weights matrix created by the
+  @tt{Layer}, and @pyret{bias} is a bias vector created by the layer if the
+  @tt{use-bias} option is set to @pyret{true}.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{units :: }@pyret-id["NumInteger" "numbers"]. @bold{Required
+      parameter.} A positive integer specifying the dimensionality of the
+      output space.
+    }
+    @item{
+      @tt{activation :: }@pyret-id["Activation"]. Defines the activation
+      function to apply in this @tt{Layer}.
+    }
+    @item{
+      @tt{use-bias :: }@pyret-id["Boolean" "<global>"]. Whether to apply a
+      bias vector.
+    }
+    @item{
+      @tt{kernel-initializer :: }@pyret-id["Initializer"]. Initializer for
+      the dense kernel weights matrix.
+    }
+    @item{
+      @tt{bias-initializer :: }@pyret-id["Initializer"]. Initializer for the
+      bias vector.
+    }
+    @item{
+      @tt{input-dim :: }@pyret-id["NumInteger" "numbers"]. If specified,
+      defines @tt{input-shape} as @pyret{[list: input-dim]}.
+    }
+    @item{
+      @tt{kernel-constraint :: }@pyret-id["Constraint"]. Constraint for
+      the kernel weights matrix.
+    }
+    @item{
+      @tt{bias-constraint :: }@pyret-id["Constraint"]. Constraint for the
+      bias vector.
+    }
+    @item{
+      @tt{kernel-regularizer :: }@pyret-id["Regularizer"]. Regularizer function
+      applied to the dense kernel weights matrix.
+    }
+    @item{
+      @tt{bias-regularizer :: }@pyret-id["Regularizer"]. Regularizer function
+      applied to the bias vector.
+    }
+    @item{
+      @tt{activity-regularizer :: }@pyret-id["Regularizer"]. Regularizer
+      function applied to the activation.
+    }
+  ]
+
   @function["dropout-layer"]
+
+  Applies dropout to the input.
+
+  Dropout consists of randomly setting a fraction rate of input units to 0 at
+  each update during training time, which helps prevent overfitting. See
+  @link["http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf"
+  "http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf"] for more
+  information.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{rate :: }@pyret-id["Number" "numbers"]. @bold{Required parameter.}
+      Denotes the fraction of the input units to drop; must be between
+      @pyret{0} and @pyret{1}.
+    }
+    @item{
+      @tt{noise-shape :: List<NumInteger>}. Integer array representing the
+      shape of the binary dropout mask that will be multiplied with the input.
+
+      For instance, if your inputs have shape
+      @pyret{[list: batch-size, timesteps, features]} and you want the dropout
+      mask to be the same for all timesteps, you can set
+      @tt{noise_shape} to @pyret{[list: batch-size, 1, features]}.
+    }
+    @item{
+      @tt{seed :: }@pyret-id["NumInteger" "numbers"]. An integer to use as
+      random seed.
+    }
+  ]
+
   @function["embedding-layer"]
+
+  Maps positive integers (indices) into dense vectors of fixed size.
+
+  The input shape of this layer is a two-dimensional @pyret-id["Tensor"]
+  with shape @pyret{[list: batch-size, sequence-length]}.
+
+  The output shape of this layer is a three-dimensional @pyret-id["Tensor"]
+  with shape @pyret{[list: batch-size, sequence-length, output-dim]}.
+
+  In addition to the default @pyret-id["LayerConfig"] options, the
+  @pyret{config} passed to this constructor can also contain:
+
+  @itemlist[
+    @item{
+      @tt{input-dim :: }@pyret-id["NumInteger" "numbers"]. @bold{Required
+      parameter.} Must also be a @pyret-id["NumPositive" "numbers"]. Denotes
+      the size of the vocabulary; that is, the maximum integer index + 1.
+    }
+    @item{
+      @tt{output-dim :: }@pyret-id["NumInteger" "numbers"]. @bold{Required
+      parameter.} Must also be a @pyret-id["NumNonNegative" "numbers"].
+      Dimension of the dense embedding.
+    }
+    @item{
+      @tt{embeddings-initializer :: }@pyret-id["Initializer"]. Initializer for
+      embeddings matrix.
+    }
+    @item{
+      @tt{embeddings-regularizer :: }@pyret-id["Regularizer"]. Regularizer function
+      applied to the embeddings matrix.
+    }
+    @item{
+      @tt{activity-regularizer :: }@pyret-id["Regularizer"]. Regularizer
+      function applied to the activation.
+    }
+    @item{
+      @tt{embeddings-constraint :: }@pyret-id["Constraint"]. Constraint
+      applied to the embeddings matrix.
+    }
+    @item{
+      @tt{mask-zero :: }@pyret-id["Boolean" "<global>"]. Whether the input
+      value @pyret{0} is a special "padding" value that should be masked out.
+      This is useful when using recurrent layers which may take variable
+      length input.
+
+      If set to @pyret{true}, then all subsequent layers in the model need to
+      support masking or an exception will be raised. Additionally, if
+      @tt{mask-zero} is set to @pyret{true}, as a consequence, index 0 cannot
+      be used in the vocabulary (that is, @tt{input-dim} should equal the size
+      the of vocabulary + 1).
+    }
+    @item{
+      @tt{input-length :: List<NumInteger>}. Length of input sequences, when it
+      is constant.
+
+      This argument is required if you are going to connect
+      @pyret-id["flatten-layer"]s then @pyret-id["dense-layer"]s upstream,
+      since otherwise the shape of the dense outputs cannot be computed.
+    }
+  ]
+
   @function["flatten-layer"]
+
+  Flattens the input. Does not affect the batch size.
+
+  A @pyret-id["flatten-layer"] flattens each batch in its inputs to one
+  dimension (making the output two dimensional).
+
+  The @pyret{config} passed to this constructor does not have any additional
+  options other than the default @pyret-id["LayerConfig"] options.
+
   @function["repeat-vector-layer"]
   @function["reshape-layer"]
 
