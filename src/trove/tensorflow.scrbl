@@ -2662,24 +2662,7 @@
   }
 
   @;#########################################################################
-  @subsection{Basic Math Operations}
-
-  @function["tensor-abs"]
-
-  Computes the absolute value of the @pyret-id["Tensor"], element-wise.
-
-  @examples{
-    check:
-      tensor-abs([tensor: 0]).data-now() is-roughly [list: 0]
-      tensor-abs([tensor: 1]).data-now() is-roughly [list: 1]
-      tensor-abs([tensor: -1]).data-now() is-roughly [list: 1]
-      tensor-abs([tensor: -1, -2, -3]).data-now() is-roughly [list: 1, 2, 3]
-
-      two-dim-abs = tensor-abs([tensor: -4, 5, -6, -7, -8, 9].as-2d(3, 2))
-      two-dim-abs.shape() is [list: 3, 2]
-      two-dim-abs.data-now() is-roughly [list: 4, 5, 6, 7, 8, 9]
-    end
-  }
+  @subsection{Trigonometry Operations}
 
   @function["tensor-acos"]
 
@@ -2814,6 +2797,115 @@
     end
   }
 
+  @function["tensor-cos"]
+
+  Computes the cosine of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-cos([tensor: 0]).data-now() is-roughly [list: 1]
+      tensor-cos([tensor: 1]).data-now() is-roughly [list: ~0.5403115]
+      tensor-cos([tensor: -1]).data-now() is-roughly [list: ~0.5403116]
+      tensor-cos([tensor: 6, 2, -4]).data-now()
+        is-roughly [list: ~0.9601798, ~-0.4161523, ~-0.6536576]
+    end
+  }
+
+  @function["tensor-cosh"]
+
+  Computes the hyperbolic cosine of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-cosh([tensor: 0]).data-now() is-roughly [list: 1]
+      tensor-cosh([tensor: 1]).data-now() is-roughly [list: ~1.5430805]
+      tensor-cosh([tensor: -1]).data-now() is-roughly [list: ~1.5430805]
+      tensor-cosh([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~1.5430805, ~3.7621955, ~10.0676612]
+    end
+  }
+
+  @function["tensor-sin"]
+
+  Computes the sine of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-sin([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-sin([tensor: 1]).data-now() is-roughly [list: ~0.8414709]
+      tensor-sin([tensor: -1]).data-now() is-roughly [list: ~-0.8415220]
+      tensor-sin([tensor: 6, 2, -4]).data-now()
+        is-roughly [list: ~-0.2794162, ~0.9092976, ~0.7568427]
+      tensor-sin([tensor: 21, 0, 32, 2]).data-now()
+        is-roughly [list: ~0.8366656, ~0, ~0.5514304, ~0.9092976]
+    end
+  }
+
+  @function["tensor-sinh"]
+
+  Computes the hyperbolic sine of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-sinh([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-sinh([tensor: 1]).data-now() is-roughly [list: ~1.1752011]
+      tensor-sinh([tensor: -1]).data-now() is-roughly [list: ~-1.1752011]
+      tensor-sinh([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~-1.1752011, ~-3.6268603, ~-10.0178737]
+      tensor-sinh([tensor: 6, 2, -4]).data-now()
+        is-roughly [list: ~201.7131195, ~3.6268601, ~-27.2899169]
+    end
+  }
+
+  @function["tensor-tan"]
+
+  Computes the tangent of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-tan([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-tan([tensor: 1]).data-now() is-roughly [list: ~1.5573809]
+      tensor-tan([tensor: -1]).data-now() is-roughly [list: ~-1.5573809]
+      tensor-tan([tensor: 21, 0, 32, 2]).data-now()
+        is-roughly [list: ~-1.5275151, ~0, ~0.6610110, ~-2.1850113]
+    end
+  }
+
+  @function["tensor-tanh"]
+
+  Computes the hyperbolic tangent of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-tanh([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-tanh([tensor: 1]).data-now() is-roughly [list: ~0.7615941]
+      tensor-tanh([tensor: -1, -2, -3]).data-now()
+        is-roughly [list: ~-0.7615941, ~-0.9640275, ~-0.9950547]
+      tensor-tanh([tensor: 6, 2, -4]).data-now()
+        is-roughly [list: ~0.9999876, ~0.9640275, ~-0.9993293]
+    end
+  }
+
+  @;#########################################################################
+  @subsection{Math Operations}
+
+  @function["tensor-abs"]
+
+  Computes the absolute value of the @pyret-id["Tensor"], element-wise.
+
+  @examples{
+    check:
+      tensor-abs([tensor: 0]).data-now() is-roughly [list: 0]
+      tensor-abs([tensor: 1]).data-now() is-roughly [list: 1]
+      tensor-abs([tensor: -1]).data-now() is-roughly [list: 1]
+      tensor-abs([tensor: -1, -2, -3]).data-now() is-roughly [list: 1, 2, 3]
+
+      two-dim-abs = tensor-abs([tensor: -4, 5, -6, -7, -8, 9].as-2d(3, 2))
+      two-dim-abs.shape() is [list: 3, 2]
+      two-dim-abs.data-now() is-roughly [list: 4, 5, 6, 7, 8, 9]
+    end
+  }
+
   @function["tensor-ceil"]
 
   Computes the ceiling of the @pyret-id["Tensor"], element-wise.
@@ -2859,34 +2951,6 @@
         raises "minimum value to clip to must be less than or equal to the maximum"
       clip-by-value([tensor: 1], -10, -45)
         raises "minimum value to clip to must be less than or equal to the maximum"
-    end
-  }
-
-  @function["tensor-cos"]
-
-  Computes the cosine of the @pyret-id["Tensor"], element-wise.
-
-  @examples{
-    check:
-      tensor-cos([tensor: 0]).data-now() is-roughly [list: 1]
-      tensor-cos([tensor: 1]).data-now() is-roughly [list: ~0.5403115]
-      tensor-cos([tensor: -1]).data-now() is-roughly [list: ~0.5403116]
-      tensor-cos([tensor: 6, 2, -4]).data-now()
-        is-roughly [list: ~0.9601798, ~-0.4161523, ~-0.6536576]
-    end
-  }
-
-  @function["tensor-cosh"]
-
-  Computes the hyperbolic cosine of the @pyret-id["Tensor"], element-wise.
-
-  @examples{
-    check:
-      tensor-cosh([tensor: 0]).data-now() is-roughly [list: 1]
-      tensor-cosh([tensor: 1]).data-now() is-roughly [list: ~1.5430805]
-      tensor-cosh([tensor: -1]).data-now() is-roughly [list: ~1.5430805]
-      tensor-cosh([tensor: -1, -2, -3]).data-now()
-        is-roughly [list: ~1.5430805, ~3.7621955, ~10.0676612]
     end
   }
 
@@ -3106,38 +3170,6 @@
     end
   }
 
-  @function["tensor-sin"]
-
-  Computes the sine of the @pyret-id["Tensor"], element-wise.
-
-  @examples{
-    check:
-      tensor-sin([tensor: 0]).data-now() is-roughly [list: 0]
-      tensor-sin([tensor: 1]).data-now() is-roughly [list: ~0.8414709]
-      tensor-sin([tensor: -1]).data-now() is-roughly [list: ~-0.8415220]
-      tensor-sin([tensor: 6, 2, -4]).data-now()
-        is-roughly [list: ~-0.2794162, ~0.9092976, ~0.7568427]
-      tensor-sin([tensor: 21, 0, 32, 2]).data-now()
-        is-roughly [list: ~0.8366656, ~0, ~0.5514304, ~0.9092976]
-    end
-  }
-
-  @function["tensor-sinh"]
-
-  Computes the hyperbolic sine of the @pyret-id["Tensor"], element-wise.
-
-  @examples{
-    check:
-      tensor-sinh([tensor: 0]).data-now() is-roughly [list: 0]
-      tensor-sinh([tensor: 1]).data-now() is-roughly [list: ~1.1752011]
-      tensor-sinh([tensor: -1]).data-now() is-roughly [list: ~-1.1752011]
-      tensor-sinh([tensor: -1, -2, -3]).data-now()
-        is-roughly [list: ~-1.1752011, ~-3.6268603, ~-10.0178737]
-      tensor-sinh([tensor: 6, 2, -4]).data-now()
-        is-roughly [list: ~201.7131195, ~3.6268601, ~-27.2899169]
-    end
-  }
-
   @function["softplus"]
 
   Applies the softplus function to the @pyret-id["Tensor"], element-wise.
@@ -3200,35 +3232,6 @@
       step([tensor: -3]).data-now() is-roughly [list: 0]
       step([tensor: -1, 4, 0, 0, 15, -43, 0]).data-now()
         is-roughly [list: 0, 1, 0, 0, 1, 0, 0]
-    end
-  }
-
-  @function["tensor-tan"]
-
-  Computes the tangent of the @pyret-id["Tensor"], element-wise.
-
-  @examples{
-    check:
-      tensor-tan([tensor: 0]).data-now() is-roughly [list: 0]
-      tensor-tan([tensor: 1]).data-now() is-roughly [list: ~1.5573809]
-      tensor-tan([tensor: -1]).data-now() is-roughly [list: ~-1.5573809]
-      tensor-tan([tensor: 21, 0, 32, 2]).data-now()
-        is-roughly [list: ~-1.5275151, ~0, ~0.6610110, ~-2.1850113]
-    end
-  }
-
-  @function["tensor-tanh"]
-
-  Computes the hyperbolic tangent of the @pyret-id["Tensor"], element-wise.
-
-  @examples{
-    check:
-      tensor-tanh([tensor: 0]).data-now() is-roughly [list: 0]
-      tensor-tanh([tensor: 1]).data-now() is-roughly [list: ~0.7615941]
-      tensor-tanh([tensor: -1, -2, -3]).data-now()
-        is-roughly [list: ~-0.7615941, ~-0.9640275, ~-0.9950547]
-      tensor-tanh([tensor: 6, 2, -4]).data-now()
-        is-roughly [list: ~0.9999876, ~0.9640275, ~-0.9993293]
     end
   }
 
