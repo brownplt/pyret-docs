@@ -4405,9 +4405,7 @@
       doc: ```Used to calculate a measure of difference between the predicted
            Y-values and the actual Y-values```
 
-      TF.subtract-tensors(prediction, actual-values)
-        ^ TF.tensor-square(_)
-        ^ TF.reduce-mean(_)
+      TF.reduce-mean(TF.tensor-square(TF.subtract-tensors(prediction, actual-values)), none)
     end
 
     # Train the model by creating an Optimizer. The optimizer will change any
@@ -4478,10 +4476,10 @@
         .add(TF.random-normal([list: num-points], some(0), some(sigma)))
 
       # Normalize the y values to the range 0 to 1:
-      y-min = TF.reduce-min(ys)
-      y-max = TF.reduce-max(ys)
+      y-min = TF.reduce-min(ys, none)
+      y-max = TF.reduce-max(ys, none)
       y-range = TF.subtract-tensors(y-max, y-min)
-      ys-normalized = TF.subtract-tensors(ys, y-min) ^ TF.divide-tensors(_, y-range)
+      ys-normalized = TF.divide-tensors(TF.subtract-tensors(ys, y-min), y-range)
 
       {xs: xs, ys: ys-normalized}
     end
@@ -4497,7 +4495,7 @@
     fun loss(prediction :: Tensor, actual-values :: Tensor) -> Tensor:
       TF.subtract-tensors(prediction, actual-values)
         ^ TF.tensor-square(_)
-        ^ TF.reduce-mean(_)
+        ^ TF.reduce-mean(_, none)
     end
 
     fun plot(scatter-plot :: DataSeries, a :: Tensor, b :: Tensor, c :: Tensor, d :: Tensor) block:
