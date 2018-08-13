@@ -837,14 +837,14 @@
         (a-arrow ,Tensor ,Tensor)))
 
     (fun-spec
-      (name "all")
+      (name "reduce-all")
       (arity 2)
       (args ("tensor" "axis"))
       (return ,Tensor)
       (contract
         (a-arrow ,Tensor ,(O-of N) ,Tensor)))
     (fun-spec
-      (name "any")
+      (name "reduce-any")
       (arity 2)
       (args ("tensor" "axis"))
       (return ,Tensor)
@@ -3238,22 +3238,6 @@
   @;#########################################################################
   @subsection{Reduction Operations}
 
-  @function["all"]
-
-  Reduces the input @pyret-id["Tensor"] across all dimensions by computing the
-  logical "and" of its elements.
-
-  @pyret{tensor} must be of type @pyret{"bool"}; otherwise, the function raises
-  an error.
-
-  @function["any"]
-
-  Reduces the input @pyret-id["Tensor"] across all dimensions by computing the
-  logical "or" of its elements.
-
-  @pyret{tensor} must be of type @pyret{"bool"}; otherwise, the function raises
-  an error.
-
   @function["arg-max"]
 
   Returns a new @pyret-id["Tensor"] where each element is the index of the maximum
@@ -3269,6 +3253,22 @@
   Computes @pyret{log(sum(exp(elements along the outermost dimension))}.
 
   Reduces @pyret{tensor} along the outermost dimension.
+
+  @function["reduce-all"]
+
+  Reduces the input @pyret-id["Tensor"] across all dimensions by computing the
+  logical "and" of its elements.
+
+  @pyret{tensor} must be of type @pyret{"bool"}; otherwise, the function raises
+  an error.
+
+  @function["reduce-any"]
+
+  Reduces the input @pyret-id["Tensor"] across all dimensions by computing the
+  logical "or" of its elements.
+
+  @pyret{tensor} must be of type @pyret{"bool"}; otherwise, the function raises
+  an error.
 
   @function["reduce-max"]
 
