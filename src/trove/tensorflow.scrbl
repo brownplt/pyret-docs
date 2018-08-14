@@ -394,7 +394,7 @@
           (args ("self" "indices"))
           (return ,N)
           (contract
-            (a-arrow ,TensorBuffer ,(L-of NumInteger) ,N)))
+            (a-arrow ,TensorBuffer ,(L-of NumInteger) ,RN)))
         (method-spec
           (name "set-now")
           (arity 3)
@@ -906,42 +906,42 @@
       (args ("tensors" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,(L-of Tensor) ,(O-of N) ,Tensor)))
+        (a-arrow ,(L-of Tensor) ,NumInteger ,Tensor)))
     (fun-spec
       (name "gather")
       (arity 3)
       (args ("tensor" "indices" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,Tensor ,(O-of N) ,Tensor)))
+        (a-arrow ,Tensor ,Tensor ,NumInteger ,Tensor)))
     (fun-spec
       (name "reverse")
       (arity 2)
       (args ("tensor" "axes"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+        (a-arrow ,Tensor ,(O-of (L-of NumInteger)) ,Tensor)))
     (fun-spec
       (name "slice")
       (arity 3 )
       (args ("tensor" "begin" "size"))
       (return ,Tensor)
       (contract
-        (a-arrow ,Tensor ,(L-of N) ,(O-of (L-of N)) ,Tensor)))
+        (a-arrow ,Tensor ,(L-of NumInteger) ,(O-of (L-of NumInteger)) ,Tensor)))
     (fun-spec
       (name "split")
       (arity 3)
       (args ("tensor" "split-sizes" "axis"))
-      (return ,Tensor)
+      (return ,(L-of Tensor))
       (contract
-        (a-arrow ,Tensor ,(L-of N) ,(O-of N) ,Tensor)))
+        (a-arrow ,Tensor ,(L-of NumInteger) ,NumInteger ,(L-of Tensor))))
     (fun-spec
       (name "stack")
       (arity 2)
-      (args ("tensors" "axes"))
+      (args ("tensors" "axis"))
       (return ,Tensor)
       (contract
-        (a-arrow ,(L-of Tensor) ,(O-of (L-of N)) ,Tensor)))
+        (a-arrow ,(L-of Tensor) ,NumInteger ,Tensor)))
     (fun-spec
       (name "tile")
       (arity 2)
@@ -952,10 +952,10 @@
     (fun-spec
       (name "unstack")
       (arity 2)
-      (args ("tensor" "axes"))
-      (return ,Tensor)
+      (args ("tensor" "axis"))
+      (return ,(L-of Tensor))
       (contract
-        (a-arrow ,Tensor ,(O-of (L-of N)) ,Tensor)))
+        (a-arrow ,Tensor ,NumInteger ,(L-of Tensor))))
     (fun-spec
       (name "strided-slice")
       (arity 4)
@@ -991,8 +991,7 @@
           (args ("self"))
           (return ,N)
           (contract
-            (a-arrow ,Tensor ,N)))
-            )))
+            (a-arrow ,Tensor ,N))))))
 
     (fun-spec
       (name "is-sequential")
@@ -1061,8 +1060,7 @@
           (args ("self" "x" "y" "config" "epoch-callback"))
           (return ,Nothing)
           (contract
-            (a-arrow ,Sequential ,Tensor ,Tensor ,Object (a-arrow ,N ,Object ,Nothing) ,Nothing)))
-            )))
+            (a-arrow ,Sequential ,Tensor ,Tensor ,Object (a-arrow ,N ,Object ,Nothing) ,Nothing))))))
 
     (fun-spec
       (name "is-symbolic-tensor")
@@ -1096,9 +1094,9 @@
           (arity 1)
           (params ())
           (args ("self"))
-          (return ,(L-of (O-of N)))
+          (return ,(L-of (O-of NumInteger)))
           (contract
-            (a-arrow ,SymbolicTensor ,(L-of (O-of N))))))))
+            (a-arrow ,SymbolicTensor ,(L-of (O-of NumInteger))))))))
 
     (fun-spec
       (name "is-layer")
@@ -1393,8 +1391,7 @@
           (args ("self"))
           (return ,N)
           (contract
-            (a-arrow ,Tensor ,N)))
-            )))
+            (a-arrow ,Tensor ,N))))))
 
     (data-spec
       (name "LayerConfig")
@@ -1497,8 +1494,7 @@
           (args ("self" "f", "variables"))
           (return ,Tensor)
           (contract
-            (a-arrow ,Optimizer (a-arrow "" ,Tensor) ,(L-of Tensor) ,Tensor)))
-            )))
+            (a-arrow ,Optimizer (a-arrow "" ,Tensor) ,(L-of Tensor) ,Tensor))))))
    ))
 
 @docmodule["tensorflow"]{
@@ -1975,7 +1971,7 @@
   @pyret{Tensor} with all of the values cast to the input datatype.
 
   The possible @pyret{data-type}s are @pyret{"float32"}, @pyret{"int32"}, or
-  @pyret{"bool"}. Any other @pyret{dataType} will raise an error.
+  @pyret{"bool"}. Any other @pyret{data-type} will raise an error.
 
   @examples{
     check:
@@ -2134,9 +2130,9 @@
 
   Returns a @pyret{Tensor} with dimensions of size 1 removed from the shape.
 
-  If @pyret{axis} is not @pyret{none}, the method only squeezes the dimensions
-  listed as indices in @pyret{axis}. The method will raise an error if one of
-  the dimensions specified in @pyret{axis} is not of size 1.
+  If @pyret{axes} is not @pyret{none}, the method only squeezes the dimensions
+  listed as indices in @pyret{axes}. The method will raise an error if one of
+  the dimensions specified in @pyret{axes} is not of size 1.
 
   @examples{
     check:
@@ -3298,19 +3294,30 @@
   Concatenates each @pyret-id["Tensor"] in @pyret{tensors} along the given
   @pyret{axis}.
 
-  If @pyret{axis} is @pyret{none}, the function defaults to concatenating along
-  axis 0 (the first dimension).
-
   The @pyret-id["Tensor"]s' ranks and types must match, and their sizes must
   match in all dimensions except @pyret{axis}.
+
+  @examples{
+    check:
+      concatenate([list: [tensor: 1], [tensor: 2]], 0).data-now()
+        is-roughly [list: 1, 2]
+      concatenate([list: [tensor: 1, 2, 3], [tensor: 4, 5, 6]], 0).data-now()
+        is-roughly [list: 1, 2, 3, 4, 5, 6]
+
+      two-dim-1 = [tensor: 1, 2, 3, 4].as-2d(2, 2)
+      two-dim-2 = [tensor: 5, 6, 7, 8].as-2d(2, 2)
+
+      concatenate([list: two-dim-1, two-dim-2], 0).data-now()
+        is-roughly [list: 1, 2, 3, 4, 5, 6, 7, 8]
+      concatenate([list: two-dim-1, two-dim-2], 1).data-now()
+        is-roughly [list: 1, 2, 5, 6, 3, 4, 7, 8]
+    end
+  }
 
   @function["gather"]
 
   Gathers slices from the @pyret-id["Tensor"] at every index in @pyret{indices}
   along the given @pyret{axis}.
-
-  If @pyret{axis} is @pyret{none}, the function defaults to gathering along
-  axis 0 (the first dimension).
 
   @examples{
     check:
@@ -3335,6 +3342,26 @@
   If @pyret{axes} is @pyret{none}, the function defaults to reversing along
   all axes.
 
+  @examples{
+    check:
+      reverse([tensor: 0], none).data-now()
+        is-roughly [list: 0]
+      reverse([tensor: 1, 2], none).data-now()
+        is-roughly [list: 2, 1]
+      reverse([tensor: 1, 2, 3, 4, 5], none).data-now()
+        is-roughly [list: 5, 4, 3, 2, 1]
+
+      two-dim = [tensor: 1, 2, 3, 4, 5, 6].as-2d(3, 2)
+
+      reverse(two-dim, none).data-now()
+        is-roughly [list: 6, 5, 4, 3, 2, 1]
+      reverse(two-dim, some([list: 0])).data-now()
+        is-roughly [list: 5, 6, 3, 4, 1, 2]
+      reverse(two-dim, some([list: 1])).data-now()
+        is-roughly [list: 2, 1, 4, 3, 6, 5]
+    end
+  }
+
   @function["slice"]
 
   Extracts a slice from @pyret{tensor} starting at the coordinates represented
@@ -3347,6 +3374,32 @@
   size of the rest of the axes will be implicitly set to @pyret{-1}. If
   @pyret{size} is @pyret{none}, the size of all axes will be set to @pyret{-1}.
 
+  @examples{
+    check:
+      slice([tensor: 1], [list: 0], none).data-now()
+        is-roughly [list: 1]
+      slice([tensor: 1, 2, 3, 4, 5], [list: 2], none).data-now()
+        is-roughly [list: 3, 4, 5]
+
+      two-dim = [tensor: 1, 2, 3, 4, 5, 6].as-2d(3, 2)
+      slice(two-dim, [list: 2, 1], none).data-now()
+        is-roughly [list: 6]
+      slice(two-dim, [list: 1, 0], none).data-now()
+        is-roughly [list: 3, 4, 5, 6]
+
+      slice(two-dim, [list: 2], none)
+        raises "number of coordinates to start the slice at must be equal to the rank"
+
+      slice(two-dim, [list: 1, 0], some([list: 2, 1])).data-now()
+        is-roughly [list: 3, 5]
+      slice(two-dim, [list: 1, 0], some([list: 1, 2])).data-now()
+        is-roughly [list: 3, 4]
+
+      slice(two-dim, [list: 1, 0], some([list: 1]))
+        raises "dimensions for the size of the slice at must be equal to the rank"
+    end
+  }
+
   @function["split"]
 
   Splits @pyret{tensor} into sub-@pyret-id["Tensor"]s along the specified
@@ -3356,8 +3409,21 @@
   axis. The sum of the sizes in @pyret{split-sizes} must be equal to
   @pyret{tensor.shape().get-value(axis)}; otherwise, an error will be raised.
 
-  If @pyret{axis} is @pyret{none}, the operation will split along the first
-  dimension (axis 0) by default.
+  @examples{
+    check:
+      one-dim = split([tensor: 1, 2, 3, 4], [list: 1, 1, 2], 0)
+
+      one-dim.length() is 3
+      one-dim.get(0).data-now() is-roughly [list: 1]
+      one-dim.get(1).data-now() is-roughly [list: 2]
+      one-dim.get(2).data-now() is-roughly [list: 3, 4]
+
+      split([tensor: 1, 2, 3, 4], [list: 1], 0)
+        raises "sum of split sizes must match the size of the dimension"
+      split([tensor: 1, 2, 3, 4], [list: 1, 1, 1, 1, 1], 0)
+        raises "sum of split sizes must match the size of the dimension"
+    end
+  }
 
   @function["stack"]
 
@@ -3369,6 +3435,24 @@
 
   If @pyret{axis} is @pyret{none}, the operation will split along the first
   dimension (axis 0) by default.
+
+  @examples{
+    check:
+      stack([list: [tensor: 1]], 0).data-now()
+        is-roughly [list: 1]
+      stack([list: [tensor: 1], [tensor: 2]], 0).data-now()
+        is-roughly [list: 1, 2]
+      stack([list: [tensor: 1, 2], [tensor: 3, 4], [tensor: 5, 6]], 0).data-now()
+        is-roughly [list: 1, 2, 3, 4, 5, 6]
+
+      stack(empty, 0).data-now()
+        raises "At least one Tensor must be supplied"
+      stack([list: [tensor: 1]], 1)
+        raises "Axis must be within the bounds of the Tensor"
+      stack([list: [tensor: 1], [tensor: 2, 3], [tensor: 4]], 0)
+        raises "All tensors passed to `stack` must have matching shapes"
+    end
+  }
 
   @function["tile"]
 
@@ -3385,6 +3469,23 @@
 
   If @pyret{axis} is @pyret{none}, the operation will split along the first
   dimension (axis 0) by default.
+
+  @examples{
+    check:
+      unstack([tensor: 1], 0).map({(x): x.data-now()})
+        is-roughly [list: [list: 1]]
+      unstack([tensor: 1, 2], 0).map({(x): x.data-now()})
+        is-roughly [list: [list: 1], [list: 2]]
+      unstack([tensor: 1, 2, 3, 4], 0).map({(x): x.data-now()})
+        is-roughly [list: [list: 1], [list: 2], [list: 3], [list: 4]]
+
+      unstack([tensor: 1].as-scalar(), 0)
+        raises "Tensor to be unstacked must be at least rank-1, but was rank-0"
+
+      unstack([tensor: 1, 2, 3, 4], 1)
+        raises "axis at which to unstack the Tensor must be within the bounds"
+    end
+  }
 
   @function["strided-slice"]
 
