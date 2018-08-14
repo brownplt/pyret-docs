@@ -2167,20 +2167,77 @@
   Adds @pyret{x} to the @tt{Tensor}. This is equivalent to
   @pyret-id["add-tensors"]@pyret{(self, x)}.
 
+  @examples{
+    check:
+      [tensor: 1].add([tensor: 1]).data-now()
+        is-roughly [list: 2]
+      [tensor: 1, 3].add([tensor: 1]).data-now()
+        is-roughly [list: 2, 4]
+      [tensor: 1, 3].add([tensor: 5, 1]).data-now()
+        is-roughly [list: 6, 4]
+      [tensor: 1, 3, 4].add([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
+
   @tensor-method["subtract"]
 
   Subtracts @pyret{x} from the @tt{Tensor}. This is equivalent to
   @pyret-id["subtract-tensors"]@pyret{(self, x)}.
+
+  @examples{
+    check:
+      [tensor: 1].subtract([tensor: 1]).data-now()
+        is-roughly [list: 0]
+      [tensor: 1, 3].subtract([tensor: 1]).data-now()
+        is-roughly [list: 0, 2]
+      [tensor: 1, 3].subtract([tensor: 5, 1]).data-now()
+        is-roughly [list: -4, 2]
+      [tensor: 1, 3, 4].subtract([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
 
   @tensor-method["multiply"]
 
   Multiplies the @tt{Tensor} by @pyret{x}. This is equivalent to
   @pyret-id["multiply-tensors"]@pyret{(self, x)}.
 
+  @examples{
+    check:
+      [tensor: 1].multiply([tensor: 1]).data-now()
+        is-roughly [list: 1]
+      [tensor: 1, 3].multiply([tensor: 1]).data-now()
+        is-roughly [list: 1, 3]
+      [tensor: 1, 3].multiply([tensor: 5, 1]).data-now()
+        is-roughly [list: 5, 3]
+      [tensor: 1, 3, 4].multiply([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
+
   @tensor-method["divide"]
 
   Divides the @tt{Tensor} by @pyret{x}. This is equivalent to
   @pyret-id["divide-tensors"]@pyret{(self, x)}.
+
+  @examples{
+    check:
+      [tensor: 1].divide([tensor: 1]).data-now()
+        is-roughly [list: 1]
+      [tensor: 1, 3].divide([tensor: 1]).data-now()
+        is-roughly [list: 1, 3]
+      [tensor: 1, 3].divide([tensor: 5, 1]).data-now()
+        is-roughly [list: 0.2, 3]
+      [tensor: 1, 3, 4].divide([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+
+      [tensor: 1].divide([tensor: 0])
+        raises "The argument Tensor cannot contain 0"
+      [tensor: 4.23].divide([tensor: 7.65, 1.43, 0, 2.31])
+        raises "The argument Tensor cannot contain 0"
+    end
+  }
 
   @tensor-method["floor-divide"]
 
@@ -2188,30 +2245,126 @@
   with the floor function. This is equivalent to
   @pyret-id["floor-divide-tensors"]@pyret{(self, x)}.
 
+  @examples{
+    check:
+      [tensor: 1].floor-divide([tensor: 1]).data-now()
+        is-roughly [list: 1]
+      [tensor: 1, 3].floor-divide([tensor: 1]).data-now()
+        is-roughly [list: 1, 3]
+      [tensor: 1, 3].floor-divide([tensor: 5, 1]).data-now()
+        is-roughly [list: 0, 3]
+      [tensor: 1, 3, 4].floor-divide([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+
+      [tensor: 1].floor-divide([tensor: 0])
+        raises "The argument Tensor cannot contain 0"
+      [tensor: 4.23].floor-divide([tensor: 7.65, 1.43, 0])
+        raises "The argument Tensor cannot contain 0"
+    end
+  }
+
   @tensor-method["max"]
 
   Returns the maximum of the @tt{Tensor} and @pyret{x}. This is equivalent to
   @pyret-id["tensor-max"]@pyret{(self, x)}.
+
+  @examples{
+    check:
+      [tensor: 0].max([tensor: 1]).data-now()
+        is-roughly [list: 1]
+      [tensor: 1, 3].max([tensor: 1]).data-now()
+        is-roughly [list: 1, 3]
+      [tensor: 1, 3].max([tensor: 200]).data-now()
+        is-roughly [list: 200, 200]
+      [tensor: 1, 3].max([tensor: 5, 1]).data-now()
+        is-roughly [list: 5, 3]
+      [tensor: 1, 3, 4].max([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
 
   @tensor-method["min"]
 
   Returns the minimum of the @tt{Tensor} and @pyret{x}. This is equivalent to
   @pyret-id["tensor-min"]@pyret{(self, x)}.
 
+  @examples{
+    check:
+      [tensor: 0].min([tensor: 1]).data-now()
+        is-roughly [list: 0]
+      [tensor: 1, 3].min([tensor: 1]).data-now()
+        is-roughly [list: 1, 1]
+      [tensor: 1, 3].min([tensor: 200]).data-now()
+        is-roughly [list: 1, 3]
+      [tensor: 1, 3].min([tensor: 0]).data-now()
+        is-roughly [list: 0, 0]
+      [tensor: 1, 3, 4].min([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
+
   @tensor-method["modulo"]
 
   Computes the modulo of the @tt{Tensor} and @pyret{x}. This is equivalent to
   @pyret-id["tensor-modulo"]@pyret{(self, x)}.
+
+  @examples{
+    check:
+      [tensor: 0].modulo([tensor: 1]).data-now()
+        is-roughly [list: 0]
+      [tensor: 1, 3].modulo([tensor: 1]).data-now()
+        is-roughly [list: 0, 0]
+      [tensor: 1, 3].modulo([tensor: 5, 1]).data-now()
+        is-roughly [list: 1, 0]
+      [tensor: 1, 3, 4].modulo([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+
+      [tensor: 1].modulo([tensor: 0])
+        raises "The argument Tensor cannot contain 0"
+      [tensor: 1].modulo([tensor: 1, 0])
+        raises "The argument Tensor cannot contain 0"
+    end
+  }
 
   @tensor-method["expt"]
 
   Computes the power of the @tt{Tensor} to @pyret{exponent}. This is
   equivalent to @pyret-id["tensor-expt"]@pyret{(self, x)}.
 
+  @examples{
+    check:
+      [tensor: 0].expt([tensor: 1]).data-now()
+        is-roughly [list: 0]
+      [tensor: 1, 3].expt([tensor: 1]).data-now()
+        is-roughly [list: 1, 3]
+      [tensor: 1, 3].expt([tensor: 4]).data-now()
+        is-roughly [list: 1, 81]
+      [tensor: 3, 3].expt([tensor: 5, 1]).data-now()
+        is-roughly [list: 243, 3]
+      [tensor: 1, 3, 4].expt([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
+
   @tensor-method["squared-difference"]
 
   Computes @pyret{(self - x) * (self - x)}, element-wise. This is
   equivalent to @pyret-id["squared-difference"]@pyret{(self, x)}.
+
+  @examples{
+    check:
+      [tensor: 0].squared-difference([tensor: 1]).data-now()
+        is-roughly [list: 1]
+      [tensor: 3].squared-difference([tensor: -3]).data-now()
+        is-roughly [list: 36]
+      [tensor: 1, 3].squared-difference([tensor: 4]).data-now()
+        is-roughly [list: 9, 1]
+      [tensor: 3, 3].squared-difference([tensor: 5, 1]).data-now()
+        is-roughly [list: 4, 4]
+      [tensor: 1, 3, 4].squared-difference([tensor: 5, 1])
+        raises "Tensors could not be applied as binary operation arguments"
+    end
+  }
 
   @;#########################################################################
   @section{Tensor Operations}
