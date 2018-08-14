@@ -1508,7 +1508,7 @@
 
   @type-spec["Tensor"]{
 
-    @pyret{Tensor}s are the core datastructure for @pyret{tensorflow}
+    @tt{Tensor}s are the core datastructure for @pyret{tensorflow}
     applications. They are a generalization of vectors and matrices that
     allows for higher dimensions.
 
@@ -1518,24 +1518,22 @@
     visualize.
 
     @margin-note{
-      @pyret{Tensor}s actually store values in a form slightly less precise
-      than @pyret{Roughnum}s. The reason for this is that TensorFlow.js (the
-      library that Pyret @pyret{Tensor}s are built on) stores tensor values in
-      JavaScript @tt{Float32Array}s for performance reasons. (But this
-      shouldn't substantially affect program results in most cases.)
+      This is because TensorFlow.js (the library that the @tt{tensorflow}
+      library is built on) stores @tt{Tensor} values in JavaScript
+      @tt{Float32Array}s for performance reasons.
     }
 
-    For performance reasons, @pyret{Tensor}s do not support arbitrary
-    precision. Retrieving values from a @pyret{Tensor} using
+    For performance reasons, @tt{Tensor}s do not support arbitrary
+    precision. Retrieving values from a @tt{Tensor} using
     @pyret-method["Tensor" "data-now"] always returns a
     @pyret{List<Roughnum>}.
 
-    Since @pyret{Tensor}s are immutable, all operations always return new
-    @pyret{Tensor}s and never modify the input @pyret{Tensor}s. The exception
-    to this is when a @pyret{Tensor} is transformed into a mutable
-    @pyret{Tensor} using the @pyret-id["make-variable"] function or the
+    Since @tt{Tensor}s are immutable, all operations always return new
+    @tt{Tensor}s and never modify the input @tt{Tensor}s. The exception
+    to this is when a @tt{Tensor} is transformed into a mutable
+    @tt{Tensor} using the @pyret-id["make-variable"] function or the
     @pyret-method["Tensor" "to-variable"] method. These "variable tensors"
-    can be modified by @pyret{Optimizer}s.
+    can be modified by @tt{Optimizer}s.
 
   }
 
@@ -1544,12 +1542,12 @@
 
   @collection-doc["tensor" #:contract `(a-arrow ("value" ,N) ,Tensor)]
 
-  Creates a new @pyret{Tensor} with the given @pyret{value}s.
+  Creates a new @tt{Tensor} with the given @pyret{value}s.
 
-  Every @pyret{Tensor} created with this constructor is one-dimensional. Use
+  Every @tt{Tensor} created with this constructor is one-dimensional. Use
   @pyret-method["Tensor" "as-1d"], @pyret-method["Tensor" "as-2d"],
   @pyret-method["Tensor" "as-3d"], @pyret-method["Tensor" "as-4d"], or
-  @pyret-method["Tensor" "reshape"] to change the shape of a @pyret{Tensor}
+  @pyret-method["Tensor" "reshape"] to change the shape of a @tt{Tensor}
   after instantiating it.
 
   @examples{
@@ -1560,7 +1558,7 @@
 
   @function["is-tensor"]
 
-  Returns @pyret{true} if @pyret{val} is a @pyret{Tensor}; otherwise, returns
+  Returns @pyret{true} if @pyret{val} is a @tt{Tensor}; otherwise, returns
   @pyret{false}.
 
   @examples{
@@ -1574,13 +1572,13 @@
 
   @function["list-to-tensor"]
 
-  Creates a new @pyret{Tensor} with the values in the input @pyret{List}.
+  Creates a new @tt{Tensor} with the values in the input @pyret{List}.
 
-  Similar to the @pyret-id["tensor"] constructor, all @pyret{Tensor}s created
+  Similar to the @pyret-id["tensor"] constructor, all @tt{Tensor}s created
   using @pyret-id["list-to-tensor"] are one-dimensional by default. Use
   @pyret-method["Tensor" "as-1d"], @pyret-method["Tensor" "as-2d"],
   @pyret-method["Tensor" "as-3d"], @pyret-method["Tensor" "as-4d"], or
-  @pyret-method["Tensor" "reshape"] to change the shape of a @pyret{Tensor}
+  @pyret-method["Tensor" "reshape"] to change the shape of a @tt{Tensor}
   after instantiating it.
 
   @examples{
@@ -1596,7 +1594,7 @@
 
   @function["make-scalar"]
 
-  Creates a new @pyret{Tensor} of rank-0 with the given @pyret{value}.
+  Creates a new @tt{Tensor} of rank-0 with the given @pyret{value}.
 
   The same functionality can be achieved with the @pyret-id["tensor"]
   constructor and the @pyret-method["Tensor" "as-scalar"] method, but it's
@@ -1613,7 +1611,7 @@
 
   @function["fill"]
 
-  Creates a @pyret{Tensor} with the input @pyret{shape} where all of the
+  Creates a @tt{Tensor} with the input @pyret{shape} where all of the
   entries are @pyret{value}.
 
   @examples{
@@ -1629,9 +1627,9 @@
 
   @function["linspace"]
 
-  Returns a @pyret{Tensor} whose values are an evenly spaced sequence of
+  Returns a @tt{Tensor} whose values are an evenly spaced sequence of
   numbers over the range @pyret{[start, stop]}. @pyret{num-values} is the
-  number of entries in the output @pyret{Tensor}.
+  number of entries in the output @tt{Tensor}.
 
   @examples{
     check:
@@ -1650,7 +1648,7 @@
 
   @function["ones"]
 
-  Returns a @pyret{Tensor} with the given @pyret{shape} where all of the
+  Returns a @tt{Tensor} with the given @pyret{shape} where all of the
   entries are ones.
 
   @examples{
@@ -1665,7 +1663,7 @@
 
   @function["zeros"]
 
-  Returns a @pyret{Tensor} with the given @pyret{shape} where all of the
+  Returns a @tt{Tensor} with the given @pyret{shape} where all of the
   entries are zeros.
 
   @examples{
@@ -1680,10 +1678,10 @@
 
   @function["multinomial"]
 
-  Creates a new @pyret{Tensor} where all of the values are sampled from a
+  Creates a new @tt{Tensor} where all of the values are sampled from a
   multinomial distribution.
 
-  @pyret{logits} should be a @pyret{Tensor} representing a one-dimensional
+  @pyret{logits} should be a @tt{Tensor} representing a one-dimensional
   array containing with unnormalized log-probabilities, or a two-dimensional
   array of structure @pyret{[batch-size, num-outcomes]}.
 
@@ -1712,7 +1710,7 @@
 
   @function["random-normal"]
 
-  Creates a new @pyret{Tensor} with the given shape (represented as values in
+  Creates a new @tt{Tensor} with the given shape (represented as values in
   the input @pyret{List<Number> shape}) where all of the values are sampled
   from a normal distribution.
 
@@ -1732,7 +1730,7 @@
 
   @function["random-uniform"]
 
-  Creates a new @pyret{Tensor} with the given shape (represented as values in
+  Creates a new @tt{Tensor} with the given shape (represented as values in
   the input @pyret{List}) where all of the values are sampled from a uniform
   distribution.
 
@@ -1759,8 +1757,8 @@
 
   @function["make-variable"]
 
-  Creates a new, mutable @pyret{Tensor} initialized to the values of the input
-  @pyret{Tensor}.
+  Creates a new, mutable @tt{Tensor} initialized to the values of the input
+  @tt{Tensor}.
 
   The same functionality can be achieved with the
   @pyret-method["Tensor" "to-variable"] method.
@@ -1784,8 +1782,8 @@
 
   @tensor-method["size"]
 
-  Returns the size of the @pyret{Tensor} (the number of values stored in the
-  @pyret{Tensor}).
+  Returns the size of the @tt{Tensor} (the number of values stored in the
+  @tt{Tensor}).
 
   @examples{
     check:
@@ -1799,7 +1797,7 @@
   @tensor-method["shape"]
 
   Returns a @pyret{List<NumInteger>} representing the shape of the
-  @pyret{Tensor}. Each element in the @pyret{List<NumInteger>} corresponds
+  @tt{Tensor}. Each element in the @pyret{List<NumInteger>} corresponds
   to the size in each dimension.
 
   @examples{
@@ -1813,8 +1811,8 @@
 
   @tensor-method["flatten"]
 
-  Constructs a new, one-dimensional @pyret{Tensor} from the values of the
-  original @pyret{Tensor}.
+  Constructs a new, one-dimensional @tt{Tensor} from the values of the
+  original @tt{Tensor}.
 
   @examples{
     check:
@@ -1830,10 +1828,10 @@
 
   @tensor-method["as-scalar"]
 
-  Constructs a new, zero-dimensional @pyret{Tensor} from the values of the
-  original, size-1 @pyret{Tensor}.
+  Constructs a new, zero-dimensional @tt{Tensor} from the values of the
+  original, size-1 @tt{Tensor}.
 
-  Raises an error if the calling @pyret{Tensor} is not size-1.
+  Raises an error if the calling @tt{Tensor} is not size-1.
 
   @examples{
     check:
@@ -1849,8 +1847,8 @@
 
   @tensor-method["as-1d"]
 
-  Constructs a new, rank-1 @pyret{Tensor} from the values of the original
-  @pyret{Tensor}.
+  Constructs a new, rank-1 @tt{Tensor} from the values of the original
+  @tt{Tensor}.
 
   The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
   but it's recommended to use @pyret-method["Tensor" "as-1d"] as it makes the
@@ -1875,11 +1873,11 @@
 
   @tensor-method["as-2d"]
 
-  Constructs a new, rank-2 @pyret{Tensor} with the input dimensions from the
-  values of the original @pyret{Tensor}.
+  Constructs a new, rank-2 @tt{Tensor} with the input dimensions from the
+  values of the original @tt{Tensor}.
 
   The number of elements implied by the input dimensions must be the same as the
-  number of elements in the calling @pyret{Tensor}. Otherwise, the method
+  number of elements in the calling @tt{Tensor}. Otherwise, the method
   raises an error.
 
   The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
@@ -1909,11 +1907,11 @@
 
   @tensor-method["as-3d"]
 
-  Constructs a new, rank-3 @pyret{Tensor} with the input dimensions from the
-  values of the original @pyret{Tensor}.
+  Constructs a new, rank-3 @tt{Tensor} with the input dimensions from the
+  values of the original @tt{Tensor}.
 
   The number of elements implied by the input dimensions must be the same as the
-  number of elements in the calling @pyret{Tensor}. Otherwise, the method
+  number of elements in the calling @tt{Tensor}. Otherwise, the method
   raises an error.
 
   The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
@@ -1938,11 +1936,11 @@
 
   @tensor-method["as-4d"]
 
-  Constructs a new, rank-4 @pyret{Tensor} with the input dimensions from the
-  values of the original @pyret{Tensor}.
+  Constructs a new, rank-4 @tt{Tensor} with the input dimensions from the
+  values of the original @tt{Tensor}.
 
   The number of elements implied by the input dimensions must be the same as the
-  number of elements in the calling @pyret{Tensor}. Otherwise, the method
+  number of elements in the calling @tt{Tensor}. Otherwise, the method
   raises an error.
 
   The same functionality can be achieved with @pyret-method["Tensor" "reshape"],
@@ -1967,8 +1965,8 @@
 
   @tensor-method["as-type"]
 
-  Constructs a new @pyret{Tensor} from the values of the original
-  @pyret{Tensor} with all of the values cast to the input datatype.
+  Constructs a new @tt{Tensor} from the values of the original
+  @tt{Tensor} with all of the values cast to the input datatype.
 
   The possible @pyret{data-type}s are @pyret{"float32"}, @pyret{"int32"}, or
   @pyret{"bool"}. Any other @pyret{data-type} will raise an error.
@@ -1987,7 +1985,7 @@
 
   @tensor-method["data-now"]
 
-  Returns a @pyret{List} containing the data in the @pyret{Tensor}.
+  Returns a @pyret{List} containing the data in the @tt{Tensor}.
 
   @examples{
     check:
@@ -2000,8 +1998,8 @@
 
   @tensor-method["to-float"]
 
-  Constructs a new @pyret{Tensor} from the values of the original
-  @pyret{Tensor} with all of the values cast to the @tt{"float32"} datatype.
+  Constructs a new @tt{Tensor} from the values of the original
+  @tt{Tensor} with all of the values cast to the @tt{"float32"} datatype.
 
   @examples{
     check:
@@ -2015,8 +2013,8 @@
 
   @tensor-method["to-int"]
 
-  Constructs a new @pyret{Tensor} from the values of the original
-  @pyret{Tensor} with all of the values cast to the @tt{"int32"} datatype.
+  Constructs a new @tt{Tensor} from the values of the original
+  @tt{Tensor} with all of the values cast to the @tt{"int32"} datatype.
 
   @examples{
     check:
@@ -2030,8 +2028,8 @@
 
   @tensor-method["to-bool"]
 
-  Constructs a new @pyret{Tensor} from the values of the original
-  @pyret{Tensor} with all of the values cast to the @tt{"bool"} datatype.
+  Constructs a new @tt{Tensor} from the values of the original
+  @tt{Tensor} with all of the values cast to the @tt{"bool"} datatype.
 
   @examples{
     check:
@@ -2045,7 +2043,7 @@
   @tensor-method["to-buffer"]
 
   Constructs a new @pyret-id["TensorBuffer"] from the values of the original
-  @pyret{Tensor}.
+  @tt{Tensor}.
 
   @examples{
     check:
@@ -2065,9 +2063,9 @@
 
   @tensor-method["to-variable"]
 
-  Constructs a new, mutable @pyret{Tensor} from the values of the original
-  @pyret{Tensor}. Equivalent to applying @pyret-id["make-variable"] on the
-  calling @pyret{Tensor}.
+  Constructs a new, mutable @tt{Tensor} from the values of the original
+  @tt{Tensor}. Equivalent to applying @pyret-id["make-variable"] on the
+  calling @tt{Tensor}.
 
   @examples{
     check:
@@ -2079,14 +2077,14 @@
 
   @tensor-method["reshape"]
 
-  Constructs a new @pyret{Tensor} with the input dimensions @pyret{new-shape}
-  from the values of the original @pyret{Tensor}.
+  Constructs a new @tt{Tensor} with the input dimensions @pyret{new-shape}
+  from the values of the original @tt{Tensor}.
 
   The number of elements implied by @pyret{new-shape} must be the same as the
-  number of elements in the calling @pyret{Tensor}. Otherwise, the method
+  number of elements in the calling @tt{Tensor}. Otherwise, the method
   raises an error.
 
-  When reshaping a @pyret{Tensor} to be 0-, 1-, 2-, 3-, or 4-dimensional,
+  When reshaping a @tt{Tensor} to be 0-, 1-, 2-, 3-, or 4-dimensional,
   it's recommended to use @pyret-method["Tensor" "as-scalar"],
   @pyret-method["Tensor" "as-1d"], @pyret-method["Tensor" "as-2d"],
   @pyret-method["Tensor" "as-3d"], or @pyret-method["Tensor" "as-4d"] as
@@ -2109,8 +2107,8 @@
 
   @tensor-method["expand-dims"]
 
-  Returns a @pyret{Tensor} that has expanded rank, by inserting a dimension
-  into the @pyret{Tensor}'s shape at the given dimension index @pyret{axis}.
+  Returns a @tt{Tensor} that has expanded rank, by inserting a dimension
+  into the @tt{Tensor}'s shape at the given dimension index @pyret{axis}.
   If @pyret{axis} is @pyret{none}, the method inserts a dimension at index 0
   by default.
 
@@ -2128,7 +2126,7 @@
 
   @tensor-method["squeeze"]
 
-  Returns a @pyret{Tensor} with dimensions of size 1 removed from the shape.
+  Returns a @tt{Tensor} with dimensions of size 1 removed from the shape.
 
   If @pyret{axes} is not @pyret{none}, the method only squeezes the dimensions
   listed as indices in @pyret{axes}. The method will raise an error if one of
@@ -2152,7 +2150,7 @@
 
   @tensor-method["clone"]
 
-  Constructs a new @pyret{Tensor} that is a copy of the original @pyret{Tensor}.
+  Constructs a new @tt{Tensor} that is a copy of the original @tt{Tensor}.
 
   @examples{
     check:
@@ -2166,48 +2164,48 @@
 
   @tensor-method["add"]
 
-  Adds @pyret{x} to the @pyret{Tensor}. This is equivalent to
+  Adds @pyret{x} to the @tt{Tensor}. This is equivalent to
   @pyret-id["add-tensors"]@pyret{(self, x)}.
 
   @tensor-method["subtract"]
 
-  Subtracts @pyret{x} from the @pyret{Tensor}. This is equivalent to
+  Subtracts @pyret{x} from the @tt{Tensor}. This is equivalent to
   @pyret-id["subtract-tensors"]@pyret{(self, x)}.
 
   @tensor-method["multiply"]
 
-  Multiplies the @pyret{Tensor} by @pyret{x}. This is equivalent to
+  Multiplies the @tt{Tensor} by @pyret{x}. This is equivalent to
   @pyret-id["multiply-tensors"]@pyret{(self, x)}.
 
   @tensor-method["divide"]
 
-  Divides the @pyret{Tensor} by @pyret{x}. This is equivalent to
+  Divides the @tt{Tensor} by @pyret{x}. This is equivalent to
   @pyret-id["divide-tensors"]@pyret{(self, x)}.
 
   @tensor-method["floor-divide"]
 
-  Divides the @pyret{Tensor} by @pyret{x}, with the result rounded
+  Divides the @tt{Tensor} by @pyret{x}, with the result rounded
   with the floor function. This is equivalent to
   @pyret-id["floor-divide-tensors"]@pyret{(self, x)}.
 
   @tensor-method["max"]
 
-  Returns the maximum of the @pyret{Tensor} and @pyret{x}. This is equivalent to
+  Returns the maximum of the @tt{Tensor} and @pyret{x}. This is equivalent to
   @pyret-id["tensor-max"]@pyret{(self, x)}.
 
   @tensor-method["min"]
 
-  Returns the minimum of the @pyret{Tensor} and @pyret{x}. This is equivalent to
+  Returns the minimum of the @tt{Tensor} and @pyret{x}. This is equivalent to
   @pyret-id["tensor-min"]@pyret{(self, x)}.
 
   @tensor-method["modulo"]
 
-  Computes the modulo of the @pyret{Tensor} and @pyret{x}. This is equivalent to
+  Computes the modulo of the @tt{Tensor} and @pyret{x}. This is equivalent to
   @pyret-id["tensor-modulo"]@pyret{(self, x)}.
 
   @tensor-method["expt"]
 
-  Computes the power of the @pyret{Tensor} to @pyret{exponent}. This is
+  Computes the power of the @tt{Tensor} to @pyret{exponent}. This is
   equivalent to @pyret-id["tensor-expt"]@pyret{(self, x)}.
 
   @tensor-method["squared-difference"]
@@ -3502,7 +3500,7 @@
 
   @type-spec["TensorBuffer"]{
 
-    @pyret{TensorBuffer}s are mutable objects that allow users to set values
+    @tt{TensorBuffer}s are mutable objects that allow users to set values
     at specific locations before converting the buffer into an immutable
     @pyret-id["Tensor"].
 
@@ -3510,7 +3508,7 @@
 
   @function["is-tensor-buffer"]
 
-  Returns @pyret{true} if @pyret{val} is a @pyret{TensorBuffer}; otherwise,
+  Returns @pyret{true} if @pyret{val} is a @tt{TensorBuffer}; otherwise,
   returns @pyret{false}.
 
   @examples{
@@ -3528,8 +3526,8 @@
 
   @function["make-buffer"]
 
-  Creates an @pyret{TensorBuffer} with the specified @pyret{shape}. The
-  returned @pyret{TensorBuffer}'s values are initialized to @pyret{~0}.
+  Creates an @tt{TensorBuffer} with the specified @pyret{shape}. The
+  returned @tt{TensorBuffer}'s values are initialized to @pyret{~0}.
 
   @examples{
     check:
@@ -3554,8 +3552,8 @@
 
   @tensor-buffer-method["size"]
 
-  Returns the size of the @pyret{TensorBuffer} (the number of values stored
-  in the @pyret{TensorBuffer}).
+  Returns the size of the @tt{TensorBuffer} (the number of values stored
+  in the @tt{TensorBuffer}).
 
   @examples{
     check:
@@ -3570,7 +3568,7 @@
   @tensor-buffer-method["shape"]
 
   Returns a @pyret{List<NumInteger>} representing the shape of the
-  @pyret{TensorBuffer}. Each element in the @pyret{List<NumInteger>}
+  @tt{TensorBuffer}. Each element in the @pyret{List<NumInteger>}
   corresponds to the size in each dimension.
 
   @examples{
@@ -3584,7 +3582,7 @@
 
   @tensor-buffer-method["set-now"]
 
-  Sets the value in the @pyret{TensorBuffer} at the specified @pyret{indicies}
+  Sets the value in the @tt{TensorBuffer} at the specified @pyret{indicies}
   to @pyret{value}.
 
   @examples{
@@ -3617,7 +3615,7 @@
 
   @tensor-buffer-method["get-now"]
 
-  Returns the value in the @pyret{TensorBuffer} at the specified
+  Returns the value in the @tt{TensorBuffer} at the specified
   @pyret{indicies}.
 
   @examples{
@@ -3641,7 +3639,7 @@
 
   @tensor-buffer-method["get-all-now"]
 
-  Returns all values in the @pyret{TensorBuffer}.
+  Returns all values in the @tt{TensorBuffer}.
 
   @examples{
     check:
@@ -3664,7 +3662,7 @@
 
   @tensor-buffer-method["to-tensor"]
 
-  Creates an immutable @pyret-id["Tensor"] from the @pyret{TensorBuffer}.
+  Creates an immutable @pyret-id["Tensor"] from the @tt{TensorBuffer}.
 
   @examples{
     check:
@@ -3689,7 +3687,7 @@
   @;#########################################################################
   @section{Models}
 
-  @pyret{Model}s represent a collection of @pyret-id["Layer"]s, and define a
+  @tt{Model}s represent a collection of @pyret-id["Layer"]s, and define a
   series of inputs and outputs. They are one of the primary abstractions used
   in TensorFlow, and can be trained, evaluated, and used for prediction.
 
@@ -3703,7 +3701,7 @@
 
   @type-spec["Model"]{
 
-    A @pyret{Model} is a data structure that consists of @pyret-id["Layer"]s and
+    A @tt{Model} is a data structure that consists of @pyret-id["Layer"]s and
     defines inputs and outputs. It is more generic than @pyret-id["Sequential"]
     models as it supports arbitrary, non-cyclic graphs of @pyret-id["Layer"]s.
 
@@ -3711,46 +3709,80 @@
 
   @function["is-model"]
 
-  Returns @pyret{true} if @pyret{val} is a @pyret{Model}; otherwise, returns
+  Returns @pyret{true} if @pyret{val} is a @tt{Model}; otherwise, returns
   @pyret{false}.
 
   @function["make-model"]
+
+  Creates a new generic @tt{Model}.
 
   @;#########################################################################
   @subsection{Sequential Models}
 
   @type-spec["Sequential"]{
 
-    A @pyret{Sequential} model is a model where the outputs of one
+    A @tt{Sequential} model is a model where the outputs of one
     @pyret-id["Layer"] are the inputs to the next @pyret-id["Layer"]. That is,
     the model topology is a simple "stack" of layers, with no branching or
     skipping.
 
-    As a result, the first layer passed to a @pyret{Sequential} model must
-    have a defined input shape.
+    As a result, the first @pyret-id["Layer"] passed to a @tt{Sequential} model
+    must have a defined input shape. This means that the
+    @pyret-id["LayerConfig"] used to instantiate the first @pyret-id["Layer"]
+    must have a defined @tt{input-shape} or @tt{batch-input-shape} parameter.
 
   }
 
   @function["is-sequential"]
 
-  Returns @pyret{true} if @pyret{val} is a @pyret{Sequential}; otherwise,
+  Returns @pyret{true} if @pyret{val} is a @tt{Sequential}; otherwise,
   returns @pyret{false}.
 
   @function["make-sequential"]
 
+  Creates a new @tt{Sequential} model.
+
   @sequential-method["add"]
+
+  Adds a @pyret-id["Layer"] on top of the @tt{Sequential}'s stack.
+
   @sequential-method["compile"]
+
+  Configures and prepares the @tt{Sequential} model for training and
+  evaluation.
+
+  Compiling outfits the @tt{Sequential} with an optimizer, loss, and/or
+  metrics. Calling @pyret-method["Sequential" "fit"] or
+  Calling @pyret-method["Sequential" "evaluate"] on an un-compiled model will
+  raise an error.
+
   @sequential-method["evaluate"]
+
+  Returns the loss value & metrics values for the model in test mode.
+
+  Loss and metrics parameters should be specified in a call to
+  @pyret-method["Sequential" "compile"] before calling this method.
+
   @sequential-method["predict"]
+
+  Generates output predictions for the input samples.
+
+  Computation is done in batches.
+
   @sequential-method["predict-on-batch"]
+
+  Returns predictions for a single batch of samples.
+
   @sequential-method["fit"]
+
+  Trains the model for a fixed number of epochs (iterations on a dataset).
 
   @;#########################################################################
   @section{SymbolicTensors}
 
   @type-spec["SymbolicTensor"]{
 
-    @pyret{SymbolicTensor}s are placeholders for @pyret-id["Tensor"]s without
+    @tt{SymbolicTensor}s are placeholders for @pyret-id["Tensor"]s without
     any concrete value.
 
     They are most often encountered when building a graph of @pyret-id["Layer"]s
@@ -3760,37 +3792,53 @@
 
   @function["is-symbolic-tensor"]
 
-  Returns @pyret{true} if @pyret{val} is a @pyret{SymbolicTensor}; otherwise,
+  Returns @pyret{true} if @pyret{val} is a @tt{SymbolicTensor}; otherwise,
   returns @pyret{false}.
 
   @;#########################################################################
   @subsection{SymbolicTensor Constructors}
 
   @function["make-input"]
+
+  Creates a new @tt{SymbolicTensor} with the input shape, not including the
+  batch size.
+
+  @pyret{none} values in the input @pyret{List} represent dimensions of
+  arbitrary length.
+
   @function["make-batch-input"]
+
+  Creates a new @tt{SymbolicTensor} with the input shape, where the first
+  element in the input @pyret{List} is the batch size.
+
+  @pyret{none} values in the input @pyret{List} represent dimensions of
+  arbitrary length.
 
   @;#########################################################################
   @subsection{SymbolicTensor Methods}
 
   @symbolic-tensor-method["shape"]
 
+  Returns the shape of the @tt{SymbolicTensor}. @pyret{none} values in the
+  output @pyret{List} represent dimensions of arbitrary length.
+
   @;#########################################################################
   @section{Layers}
 
   @type-spec["Layer"]{
 
-    @pyret{Layer}s are the primary building block for constructing a
-    @pyret-id["Model"]. Each @pyret{Layer} will typically perform some
+    @tt{Layer}s are the primary building block for constructing a
+    @pyret-id["Model"]. Each @tt{Layer} will typically perform some
     computation to transform its input to its output.
 
-    @pyret{Layer}s will automatically take care of creating and initializing
+    @tt{Layer}s will automatically take care of creating and initializing
     the various internal variables/weights they need to function.
 
   }
 
   @function["is-layer"]
 
-  Returns @pyret{true} if @pyret{val} is a @pyret{Layer}; otherwise,
+  Returns @pyret{true} if @pyret{val} is a @tt{Layer}; otherwise,
   returns @pyret{false}.
 
   @;#########################################################################
@@ -3945,7 +3993,7 @@
   Applies an element-wise activation function to an output.
 
   Other layers, most notably @pyret-id["dense-layer"]s, can also apply
-  activation functions. This @pyret{Layer} can be used to extract the values
+  activation functions. This @tt{Layer} can be used to extract the values
   before and after the activation.
 
   In addition to the default @pyret-id["LayerConfig"] options, the
@@ -4334,36 +4382,36 @@
 
   @type-spec["Optimizer"]{
 
-    @pyret{Optimizer}s are used to perform training operations and compute
+    @tt{Optimizer}s are used to perform training operations and compute
     gradients.
 
-    @pyret{Optimizer}s eagerly compute gradients. This means that when a user
+    @tt{Optimizer}s eagerly compute gradients. This means that when a user
     provides a function that is a combination of TensorFlow operations
-    to an @pyret{Optimizer}, the @pyret{Optimizer} automatically differentiates
+    to an @tt{Optimizer}, the @tt{Optimizer} automatically differentiates
     that function's output with respect to its inputs.
 
   }
 
   @function["is-optimizer"]
 
-  Returns @pyret{true} if @pyret{val} is an @pyret{Optimizer}; otherwise,
+  Returns @pyret{true} if @pyret{val} is an @tt{Optimizer}; otherwise,
   returns @pyret{false}.
 
   @;#########################################################################
   @subsection{Optimizer Constructors}
 
-  There are many different types of @pyret{Optimizer}s that use different
+  There are many different types of @tt{Optimizer}s that use different
   formulas to compute gradients.
 
   @function["train-sgd"]
 
-  Constructs an @pyret{Optimizer} that uses a stochastic gradient descent
+  Constructs an @tt{Optimizer} that uses a stochastic gradient descent
   algorithm, where @pyret{learning-rate} is the learning rate to use for the
   algorithm.
 
   @function["train-momentum"]
 
-  Constructs an @pyret{Optimizer} that uses a momentum gradient descent
+  Constructs an @tt{Optimizer} that uses a momentum gradient descent
   algorithm, where @pyret{learning-rate} is the learning rate to use for the
   algorithm and @pyret{momentum} is the momentum to use for the algorithm.
 
@@ -4372,7 +4420,7 @@
 
   @function["train-adagrad"]
 
-  Constructs an @pyret{Optimizer} that uses the Adagrad algorithm, where
+  Constructs an @tt{Optimizer} that uses the Adagrad algorithm, where
   @pyret{learning-rate} is the learning rate to use for the Adagrad gradient
   descent algorithm.
 
@@ -4388,7 +4436,7 @@
 
   @function["train-adadelta"]
 
-  Constructs an @pyret{Optimizer} that uses the Adadelta algorithm.
+  Constructs an @tt{Optimizer} that uses the Adadelta algorithm.
 
   If not @pyret{none}, @pyret{learning-rate} is the learning rate to use for
   the Adamax gradient descent algorithm, @pyret{rho} is the learning rate
@@ -4399,7 +4447,7 @@
 
   @function["train-adam"]
 
-  Constructs an @pyret{Optimizer} that uses the Adam algorithm.
+  Constructs an @tt{Optimizer} that uses the Adam algorithm.
 
   If not @pyret{none}, @pyret{learning-rate} is the learning rate to use for
   the Adamax gradient descent algorithm, @pyret{beta-1} is the exponential
@@ -4411,7 +4459,7 @@
 
   @function["train-adamax"]
 
-  Constructs an @pyret{Optimizer} that uses the Adamax algorithm.
+  Constructs an @tt{Optimizer} that uses the Adamax algorithm.
 
   If not @pyret{none}, @pyret{learning-rate} is the learning rate to use for
   the Adamax gradient descent algorithm, @pyret{beta-1} is the exponential
@@ -4424,7 +4472,7 @@
 
   @function["train-rmsprop"]
 
-  Constructs an @pyret{Optimizer} that uses RMSProp gradient descent, where
+  Constructs an @tt{Optimizer} that uses RMSProp gradient descent, where
   @pyret{learning-rate} is the learning rate to use for the RMSProp gradient
   descent algorithm.
 
@@ -4449,12 +4497,12 @@
 
   Executes @pyret{f} and minimizes the scalar output of @pyret{f} by computing
   gradients of @pyret{y} with with respect to the list of trainable, variable
-  @pyret{Tensor}s provided by @pyret{variables}.
+  @tt{Tensor}s provided by @pyret{variables}.
 
-  @pyret{f} must be a thunk that returns a scalar @pyret{Tensor}.
-  The method then returns the scalar @pyret{Tensor} produced by @pyret{f}.
+  @pyret{f} must be a thunk that returns a scalar @tt{Tensor}.
+  The method then returns the scalar @tt{Tensor} produced by @pyret{f}.
 
-  If @pyret{variables} is @pyret{empty}, the @pyret{Optimizer} will default
+  If @pyret{variables} is @pyret{empty}, the @tt{Optimizer} will default
   to training all trainable variables that have been instantiated.
 
   @;#########################################################################
