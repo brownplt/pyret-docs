@@ -16,7 +16,6 @@
   (fun-spec (name "is-step-count") (arity 1))
   (fun-spec (name "is-image") (arity 1))
   (fun-spec (name "bitmap-url") (arity 1))
-  (fun-spec (name "open-image-url") (arity 1))
   (fun-spec (name "image-url") (arity 1))
   (fun-spec (name "images-equal") (arity 2))
   (fun-spec (name "images-difference") (arity 2))
@@ -834,14 +833,6 @@
     pixel frame draw around the bounding box of the image.
   }
   @section{Bitmaps}
-  @function[
-    "open-image-url"
-            #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
-                                Image)
-            #:return Image
-            #:args (list '("url" ""))]{
-    Loads the image specified by @pyret["url"].
-  }
   @function[
     "image-url"
             #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
