@@ -58,7 +58,7 @@
          singleton-spec2
          with-members
          shared
-         examples
+         examples repl-examples
          a-compound
          a-id
          a-arrow
@@ -82,6 +82,7 @@
          tag-name
          code-style
          div-style
+         span-style
          doc-internal
          internal-id
          )
@@ -791,6 +792,17 @@
   (nested #:style (div-style "examples")
           (para (bold "Examples:"))
           (apply pyret-block body)))
+
+@(define (repl-examples . body)
+  (define (repl-ex code ans)
+    (let [(code (if (string? code) (list code) code))]
+      (nested #:style (div-style "repl-examples")
+              (nested #:style (div-style "repl-example") (apply pyret-block code))
+              (para ans))))
+  (nested #:style (div-style "examples")
+          (para (bold "Examples:"))
+          (map (lambda(ex) (apply repl-ex ex)) body)))
+
 
 @(define (function name
                    #:contract (contract #f)

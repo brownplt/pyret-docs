@@ -1,6 +1,8 @@
 #lang scribble/base
 @(require "../../scribble-api.rkt"
           "../abbrevs.rkt"
+          (prefix-in html: "../../manual-html.rkt")
+          2htdp/image
           scribble/manual)
 
 @(append-gen-docs
@@ -94,6 +96,15 @@
 @(define FontWeight (a-id "FontWeight" (xref "image" "FontWeight")))
 @(define XPlace (a-id "XPlace" (xref "image" "XPlace")))
 @(define YPlace (a-id "YPlace" (xref "image" "YPlace")))
+@(define (paint-swatch color css-color)
+   (list (html:span 'style: "font-size: initial;"
+                    (html:image 'class: "paintBrush" "https://code.pyret.org/img/brush.svg")
+                    (html:span 'class: "paintSpan" 'style: "display: inline-block;"
+                               (html:span 'class: "checkersBlob")
+                               (html:span 'class: "paintBlob"
+                                          'style: (format "background-color: ~a; margin-right: 0.25em;" css-color))))
+         (pyret color)))
+
 @docmodule["image"]{
 
   The functions in this module are used for creating, combining, and displaying
@@ -140,6 +151,12 @@
 
   Looks up the given string in the list of predefined colors.
 
+  @repl-examples[
+    (list '@{name-to-color("red")} (paint-swatch "red" "red"))
+    (list '@{name-to-color("blue")} (paint-swatch "blue" "blue"))
+    (list '@{name-to-color("transparent")} (paint-swatch "transparent" "rgba(0,0,0,0)"))
+  ]
+
   @type-spec["Mode" (list)]{
 
     A @pyret-id["String" "<global>"] that describes a style for a shape.  Either the string
@@ -157,6 +174,11 @@
     Constructs a circle with the given radius, mode and color.
   }
 
+  @repl-examples[
+    (list '@{circle(30, "outline", "red")} (circle 30 "outline" "red"))
+    (list '@{circle(20, "solid", "red")} (circle 20 "solid" "red"))
+  ]
+
   @function[
     "ellipse"
             #:contract (a-arrow N N Mode ImageColor Image)
@@ -168,6 +190,10 @@
     Constructs an ellipse with the given width, height, mode and
     color.
   }
+  @repl-examples[
+    (list '@{ellipse(60, 30, "outline", "black")} (ellipse 60 30 "outline" "black"))
+    (list '@{ellipse(30, 60, "solid", "blue")} (ellipse 30 60 "solid" "blue"))
+  ]
   @function[
     "line"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -181,6 +207,12 @@
     Draws an image of a line that connects the point (0,0) to the point
     (x,y).
   }
+  @repl-examples[
+    `(@{line(60, 30, "black")} ,(line 60 30 "black"))
+    `(@{line(30, 60, "blue")} ,(line 30 60 "blue"))
+    `(@{line(-30, 20, "red")} ,(line -30 20 "red"))
+    `(@{line(30, -20, "red")} ,(line 30 -20 "red"))
+  ]
   @function[
     "add-line"
             #:contract (a-arrow Image
@@ -203,6 +235,12 @@
     if the line passes outside of @pyret["img"], the image gets larger to
     accommodate the line.
   }
+  @repl-examples[
+    `(@{add-line(circle(20, "outline", "maroon"), 0, 40, 40, 0, "orange")}
+      ,(add-line (circle 20 "outline" "maroon") 0 40 40 0 "orange"))
+    `(@{add-line(rectangle(40, 40, "outline", "maroon"), -10, 50, 50, -10, "orange")}
+      ,(add-line (rectangle 40 40 "outline" "maroon") -10 50 50 -10 "orange"))
+  ]
 
   @section{Text}
 
@@ -216,6 +254,12 @@
     Constructs an image of @pyret["string"], using the given font size
     and color.
   }
+  @repl-examples[
+    `(@{text("Hello", 24, "olive")}
+      ,(text/font "Hello" 24 "olive" "DejaVu Serif" 'roman 'normal 'normal #f))
+    `(@{text("Goodbye", 36, "indigo")}
+      ,(text/font "Goodbye" 36 "indigo" "DejaVu Serif" 'roman 'normal 'normal #f))
+  ]
   @margin-note{@pyret{font-face} is system-dependent because
     different computers and operating systems have different fonts installed.
     You can try different options for the names of fonts on your machine,
@@ -237,6 +281,14 @@
     string, but makes use of a complete font specification.  The various style
     options are described below.  
   }
+  @repl-examples[
+    `(@{text-font("Hello", 24, "green", "Gill Sans",
+                  "swiss", "italic", "normal", true)}
+      ,(text/font "Hello" 24 "green" "Gill Sans" 'swiss 'italic 'normal #t))
+    `(@{text-font("Goodbye", 36, "turquoise", "Treasure Map Deadhand",
+                  "decorative", "normal", "normal", false)}
+      ,(text/font "Goodbye" 36 "turquoise" "Treasure Map Deadhand" 'decorative 'normal 'normal #f))
+  ]
   @type-spec["FontFamily" (list)]{
 
     A @pyret-id["String" "<global>"] that describes a family of fonts.  The
@@ -274,6 +326,10 @@
     Constructs an image of an upward-pointing equilateral triangle. Each
     side will be of length @pyret["side-length"].
   }
+  @repl-examples[
+    `(@{triangle(40, "solid", "tan")}
+      ,(triangle 40 'solid 'tan))
+  ]
   @function[
     "right-triangle"
             #:contract (a-arrow N N Mode ImageColor Image)
@@ -286,6 +342,10 @@
     corner and where the two sides adjacent to the right angle have lengths
     @pyret["side-length1"] and @pyret["side-length2"].
   }
+  @repl-examples[
+    `(@{right-triangle(36, 48, "solid", "steel blue")}
+      ,(right-triangle 36 48 'solid "steelblue"))
+  ]
   @function[
     "isosceles-triangle"
             #:contract (a-arrow N N Mode ImageColor Image)
@@ -299,6 +359,14 @@
     @pyret["angle-c"]. if the angle is less than @pyret["180"], then the triangle
     will point up; otherwise, the triangle will point down.
   }
+  @repl-examples[
+    `(@{isosceles-triangle(200, 170, "solid", "sea-green")}
+      ,(isosceles-triangle 200 170 'solid "seagreen"))
+    `(@{isosceles-triangle(60, 30, "solid", "royal-blue")}
+      ,(isosceles-triangle 60 30 'solid "royalblue"))
+    `(@{isosceles-triangle(60, 330, "solid", "dark-magenta")}
+      ,(isosceles-triangle 60 330 'solid "darkmagenta"))
+  ]
   @function[
     "triangle-sss"
             #:contract (a-arrow N N N Mode ImageColor Image)
@@ -310,6 +378,14 @@
                          '("color" ""))]{
     Constructs an image of a triangle using the three given sides.
   }
+  @repl-examples[
+    `(@{triangle-sss(40, 60, 80, "solid", "sea-green")}
+      ,(triangle/sss 40 60 80 'solid "seagreen"))
+    `(@{triangle-sss(80, 40, 60, "solid", "royal-blue")}
+      ,(triangle/sss 80 40 60 'solid "royalblue"))
+    `(@{triangle-sss(80, 80, 40, "solid", "dark-magenta")}
+      ,(triangle/sss 80 80 40 'solid "darkmagenta"))
+  ]
   @function[
     "triangle-ass"
             #:contract (a-arrow N N N Mode ImageColor Image)
@@ -317,6 +393,14 @@
             #:args (list '("angle-a" "") '("side-b" "") '("side-c" "") '("mode" "") '("color" ""))]{
     Constructs an image of a triangle using the given angle and two sides.
   }
+  @repl-examples[
+    `(@{triangle-ass(10, 60, 100, "solid", "sea-green")}
+      ,(triangle/ass 10 60 100 'solid "seagreen"))
+    `(@{triangle-ass(90, 60, 100, "solid", "royal-blue")}
+      ,(triangle/ass 90 60 100 'solid "royalblue"))
+    `(@{triangle-ass(130, 60, 100, "solid", "dark-magenta")}
+      ,(triangle/ass 130 60 100 'solid "darkmagenta"))
+  ]
   @function[
     "triangle-sas"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -333,6 +417,14 @@
                          '("color" ""))]{
     Constructs an image of a triangle using the given angle and two sides.
   }
+  @repl-examples[
+    `(@{triangle-sas(60, 10, 100, "solid", "sea-green")}
+      ,(triangle/sas 60 10 100 'solid "seagreen"))
+    `(@{triangle-sas(60, 90, 100, "solid", "royal-blue")}
+      ,(triangle/sas 60 90 100 'solid "royalblue"))
+    `(@{triangle-sas(60, 130, 100, "solid", "dark-magenta")}
+      ,(triangle/sas 60 130 100 'solid "darkmagenta"))
+  ]
   @function[
     "triangle-ssa"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -349,6 +441,14 @@
                          '("color" ""))]{
     Constructs an image of a triangle using the given angle and two sides.
   }
+  @repl-examples[
+    `(@{triangle-ssa(60, 100, 10, "solid", "sea-green")}
+      ,(triangle/ssa 60 100 10 'solid "seagreen"))
+    `(@{triangle-ssa(60, 100, 90, "solid", "royal-blue")}
+      ,(triangle/ssa 60 100 90 'solid "royalblue"))
+    `(@{triangle-ssa(60, 100, 130, "solid", "dark-magenta")}
+      ,(triangle/ssa 60 100 130 'solid "darkmagenta"))
+  ]
   @function[
     "triangle-aas"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -366,6 +466,14 @@
     Constructs an image of a triangle using the two given angles and
     side.
   }
+  @repl-examples[
+    `(@{triangle-aas(10, 40, 200, "solid", "sea-green")}
+      ,(triangle/aas 10 40 200 'solid "seagreen"))
+    `(@{triangle-aas(90, 40, 200, "solid", "royal-blue")}
+      ,(triangle/aas 90 40 200 'solid "royalblue"))
+    `(@{triangle-aas(130, 40, 40, "solid", "dark-magenta")}
+      ,(triangle/aas 130 40 40 'solid "darkmagenta"))
+  ]
   @function[
     "triangle-asa"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -383,6 +491,14 @@
     Constructs an image of a triangle using the two given angles and
     side.
   }
+  @repl-examples[
+    `(@{triangle-asa(10, 200, 40, "solid", "sea-green")}
+      ,(triangle/asa 10 200 40 'solid "seagreen"))
+    `(@{triangle-asa(90, 200, 40, "solid", "royal-blue")}
+      ,(triangle/asa 90 200 40 'solid "royalblue"))
+    `(@{triangle-asa(130, 40, 40, "solid", "dark-magenta")}
+      ,(triangle/asa 130 40 40 'solid "darkmagenta"))
+  ]
   @function[
     "triangle-saa"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -400,6 +516,14 @@
     Constructs an image of a triangle using the two given angles and
     sides.
   }
+  @repl-examples[
+    `(@{triangle-saa(200, 10, 40, "solid", "sea-green")}
+      ,(triangle/saa 200 10 40 'solid "seagreen"))
+    `(@{triangle-saa(200, 90, 40, "solid", "royal-blue")}
+      ,(triangle/saa 200 90 40 'solid "royalblue"))
+    `(@{triangle-saa(40, 130, 40, "solid", "dark-magenta")}
+      ,(triangle/saa 40 130 40 'solid "darkmagenta"))
+  ]
   @function[
     "square"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -412,6 +536,12 @@
                          '("color" ""))]{
     Constructs an image of a square with the given side length, mode and color.
   }
+  @repl-examples[
+    `(@{square(40, "solid", "slate-blue")}
+      ,(square 40 "solid" "slateblue"))
+    `(@{square(50, "outline", "light-steel-blue")}
+      ,(square 50 "outline" "lightsteelblue"))
+  ]
   @function[
     "rectangle"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -427,6 +557,10 @@
     Constructs an image of a rectangle with the given side width, height,
     mode and color.
   }
+  @repl-examples[
+    (list '@{rectangle(60, 30, "outline", "black")} (rectangle 60 30 "outline" "black"))
+    (list '@{rectangle(30, 60, "solid", "blue")} (rectangle 30 60 "solid" "blue"))
+  ]
   @function[
     "rhombus"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -444,6 +578,10 @@
     top and bottom pair of angles is @pyret["angle"] and the left and right
     pair is @pyret["180 - angle"].
   }
+  @repl-examples[
+    (list '@{rhombus(40, 45, "solid", "magenta")} (rhombus 40 45 "solid" "magenta"))
+    (list '@{rhombus(80, 150, "solid", "medium-purple")} (rhombus 80 150 "solid" "mediumpurple"))
+  ]
   @function[
     "star"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -457,6 +595,9 @@
     Constructs a five-pointed star with sides of length @pyret["side-length"],
     and with the given mode and color.
   }
+  @repl-examples[
+    (list '@{star(40, "solid", "gray")} (star 40 "solid" "gray"))
+  ]
   @function[
     "radial-star"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -471,6 +612,10 @@
     lie a distance of @pyret["outer"] from the center of the star, while the
     inner points will lie a distance of @pyret["inner"] from the center.
   }
+  @repl-examples[
+    (list '@{radial-star(8, 28, 64, "solid", "dark-green")} (radial-star 8 28 64 "solid" "darkgreen"))
+    (list '@{radial-star(32, 30, 40, "outline", "black")} (radial-star 32 30 40 "outline" "black"))
+  ]
   @function[
     "star-sized"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -508,6 +653,16 @@
     @pyret["step-count"]-th vertex (i.e., skipping every 
     @pyret["step-count - 1"] vertices).
   }
+  @repl-examples[
+    (list '@{star-polygon(40, 5, 2, "solid", "sea-green")} (star-polygon 40 5 2 "solid" "seagreen"))
+    (list '@{star-polygon(40, 7, 3, "outline", "dark-red")} (star-polygon 40 7 3 "outline" "darkred"))
+    (list '@{star-polygon(40, 8, 3, "outline", "goldenrod")} (star-polygon 40 8 3 "outline" "goldenrod"))
+    ; NOTE: This example doesn't work!
+    ;(list '@{star-polygon(40, 8, 2, "outline", "burlywood")}
+    ;      (overlay (star-polygon 40 4 1 "outline" "burlywood")
+    ;               (rotate 45 (star-polygon 40 4 1 "outline" "burlywood"))))
+    (list '@{star-polygon(20, 10, 3, "solid", "cornflower-blue")} (star-polygon 20 10 3 "solid" "cornflowerblue"))
+  ]
   @function[
     "regular-polygon"
             #:contract (a-arrow (a-id "Number" (xref "<global>" "Number"))
@@ -522,6 +677,12 @@
                          '("color" ""))]{
     Constructs an image of a regular polygon with @pyret["side-count"] sides.
   }
+  @repl-examples[
+    (list '@{regular-polygon(40, 5, "solid", "sea-green")} (regular-polygon 40 5 "solid" "seagreen"))
+    (list '@{regular-polygon(40, 7, "outline", "dark-red")} (regular-polygon 40 7 "outline" "darkred"))
+    (list '@{regular-polygon(40, 8, "outline", "goldenrod")} (regular-polygon 40 8 "outline" "goldenrod"))
+    (list '@{regular-polygon(20, 8, "solid", "cornflower-blue")} (regular-polygon 20 8 "solid" "cornflowerblue"))
+  ]
   @section{Overlaying Images}
 
   @function[
