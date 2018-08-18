@@ -100,11 +100,15 @@
   images.
 
   @margin-note{
-  The Pyret images library is based on the images teachpack in HtDP, and
-  borrows much of the language for documentation. You can find documentation
-  for the teachpack here:
+  The Pyret images library is based on the @code{images} teachpack in @emph{How to Design Programs},
+  a textbook whose pedagogy has heavily influenced Pyret's design (see
+  @hyperlink["https://www.pyret.org/pyret-code/#what-are-some-ways-the-educational-philosophy-influences-the-language"]{Why Pyret?} for more information).
+  @bold{@emph{Note:}} this original library is written in Racket, a @emph{different} language than
+  Pyret.  The examples in that file therefore do @emph{not} work with Pyret as written;
+  however, analogous examples are shown here.  If you're curious,
+  you can find documentation for the @code{images} teachpack here:
 
-  @url["http://docs.racket-lang.org/teachpack/2htdpimage.html"] 
+  @url["http://docs.racket-lang.org/teachpack/2htdpimage.html"]
   }
 
   @section[#:tag "image_DataTypes"]{Data Types}
