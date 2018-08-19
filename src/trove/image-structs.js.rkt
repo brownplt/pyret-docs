@@ -248,7 +248,7 @@
     ;; ~color13(255, 248, 220, 255)
     )
   (unknown-item
-    (name "light-goldenrody-ellow")
+    (name "light-goldenrod-yellow")
     ;; ~color13(250, 250, 210, 255)
     )
   (unknown-item
