@@ -152,9 +152,9 @@
   Looks up the given string in the list of predefined colors.
 
   @repl-examples[
-    (list '@{name-to-color("red")} (paint-swatch "red" "red"))
-    (list '@{name-to-color("blue")} (paint-swatch "blue" "blue"))
-    (list '@{name-to-color("transparent")} (paint-swatch "transparent" "rgba(0,0,0,0)"))
+    `(@{name-to-color("red")} ,(paint-swatch "red" "red"))
+    `(@{name-to-color("blue")} ,(paint-swatch "blue" "blue"))
+    `(@{name-to-color("transparent")} ,(paint-swatch "transparent" "rgba(0,0,0,0)"))
   ]
 
   @type-spec["Mode" (list)]{
@@ -175,8 +175,8 @@
   }
 
   @repl-examples[
-    (list '@{circle(30, "outline", "red")} (circle 30 "outline" "red"))
-    (list '@{circle(20, "solid", "red")} (circle 20 "solid" "red"))
+    `(@{circle(30, "outline", "red")} ,(circle 30 "outline" "red"))
+    `(@{circle(20, "solid", "red")} ,(circle 20 "solid" "red"))
   ]
 
   @function[
@@ -191,8 +191,8 @@
     color.
   }
   @repl-examples[
-    (list '@{ellipse(60, 30, "outline", "black")} (ellipse 60 30 "outline" "black"))
-    (list '@{ellipse(30, 60, "solid", "blue")} (ellipse 30 60 "solid" "blue"))
+    `(@{ellipse(60, 30, "outline", "black")} ,(ellipse 60 30 "outline" "black"))
+    `(@{ellipse(30, 60, "solid", "blue")} ,(ellipse 30 60 "solid" "blue"))
   ]
   @function[
     "line"
@@ -242,7 +242,7 @@
       ,(add-line (rectangle 40 40 "outline" "maroon") -10 50 50 -10 "orange"))
   ]
 
-  @section{Text}
+  @section[#:tag "text-images"]{Text}
 
   @function[
     "text"
@@ -558,8 +558,8 @@
     mode and color.
   }
   @repl-examples[
-    (list '@{rectangle(60, 30, "outline", "black")} (rectangle 60 30 "outline" "black"))
-    (list '@{rectangle(30, 60, "solid", "blue")} (rectangle 30 60 "solid" "blue"))
+    `(@{rectangle(60, 30, "outline", "black")} ,(rectangle 60 30 "outline" "black"))
+    `(@{rectangle(30, 60, "solid", "blue")} ,(rectangle 30 60 "solid" "blue"))
   ]
   @function[
     "rhombus"
@@ -579,8 +579,8 @@
     pair is @pyret["180 - angle"].
   }
   @repl-examples[
-    (list '@{rhombus(40, 45, "solid", "magenta")} (rhombus 40 45 "solid" "magenta"))
-    (list '@{rhombus(80, 150, "solid", "medium-purple")} (rhombus 80 150 "solid" "mediumpurple"))
+    `(@{rhombus(40, 45, "solid", "magenta")} ,(rhombus 40 45 "solid" "magenta"))
+    `(@{rhombus(80, 150, "solid", "medium-purple")} ,(rhombus 80 150 "solid" "mediumpurple"))
   ]
   @function[
     "star"
@@ -596,7 +596,7 @@
     and with the given mode and color.
   }
   @repl-examples[
-    (list '@{star(40, "solid", "gray")} (star 40 "solid" "gray"))
+    `(@{star(40, "solid", "gray")} ,(star 40 "solid" "gray"))
   ]
   @function[
     "radial-star"
@@ -613,8 +613,8 @@
     inner points will lie a distance of @pyret["inner"] from the center.
   }
   @repl-examples[
-    (list '@{radial-star(8, 28, 64, "solid", "dark-green")} (radial-star 8 28 64 "solid" "darkgreen"))
-    (list '@{radial-star(32, 30, 40, "outline", "black")} (radial-star 32 30 40 "outline" "black"))
+    `(@{radial-star(8, 28, 64, "solid", "dark-green")} ,(radial-star 8 28 64 "solid" "darkgreen"))
+    `(@{radial-star(32, 30, 40, "outline", "black")} ,(radial-star 32 30 40 "outline" "black"))
   ]
   @function[
     "star-sized"
@@ -654,14 +654,14 @@
     @pyret["step-count - 1"] vertices).
   }
   @repl-examples[
-    (list '@{star-polygon(40, 5, 2, "solid", "sea-green")} (star-polygon 40 5 2 "solid" "seagreen"))
-    (list '@{star-polygon(40, 7, 3, "outline", "dark-red")} (star-polygon 40 7 3 "outline" "darkred"))
-    (list '@{star-polygon(40, 8, 3, "outline", "goldenrod")} (star-polygon 40 8 3 "outline" "goldenrod"))
-    ; NOTE: This example doesn't work!
-    ;(list '@{star-polygon(40, 8, 2, "outline", "burlywood")}
-    ;      (overlay (star-polygon 40 4 1 "outline" "burlywood")
-    ;               (rotate 45 (star-polygon 40 4 1 "outline" "burlywood"))))
-    (list '@{star-polygon(20, 10, 3, "solid", "cornflower-blue")} (star-polygon 20 10 3 "solid" "cornflowerblue"))
+    `(@{star-polygon(40, 5, 2, "solid", "sea-green")} ,(star-polygon 40 5 2 "solid" "seagreen"))
+    `(@{star-polygon(40, 7, 3, "outline", "dark-red")} ,(star-polygon 40 7 3 "outline" "darkred"))
+    `(@{star-polygon(40, 8, 3, "outline", "goldenrod")} ,(star-polygon 40 8 3 "outline" "goldenrod"))
+    ; NOTE: This example doesn't work!  Needs the new image library...
+    ;`(@{star-polygon(40, 8, 2, "outline", "burlywood")}
+    ;  ,(overlay (star-polygon 40 4 1 "outline" "burlywood")
+    ;            (rotate 45 (star-polygon 40 4 1 "outline" "burlywood"))))
+    `(@{star-polygon(20, 10, 3, "solid", "cornflower-blue")} ,(star-polygon 20 10 3 "solid" "cornflowerblue"))
   ]
   @function[
     "regular-polygon"
@@ -678,10 +678,10 @@
     Constructs an image of a regular polygon with @pyret["side-count"] sides.
   }
   @repl-examples[
-    (list '@{regular-polygon(40, 5, "solid", "sea-green")} (regular-polygon 40 5 "solid" "seagreen"))
-    (list '@{regular-polygon(40, 7, "outline", "dark-red")} (regular-polygon 40 7 "outline" "darkred"))
-    (list '@{regular-polygon(40, 8, "outline", "goldenrod")} (regular-polygon 40 8 "outline" "goldenrod"))
-    (list '@{regular-polygon(20, 8, "solid", "cornflower-blue")} (regular-polygon 20 8 "solid" "cornflowerblue"))
+    `(@{regular-polygon(40, 5, "solid", "sea-green")} ,(regular-polygon 40 5 "solid" "seagreen"))
+    `(@{regular-polygon(40, 7, "outline", "dark-red")} ,(regular-polygon 40 7 "outline" "darkred"))
+    `(@{regular-polygon(40, 8, "outline", "goldenrod")} ,(regular-polygon 40 8 "outline" "goldenrod"))
+    `(@{regular-polygon(20, 8, "solid", "cornflower-blue")} ,(regular-polygon 20 8 "solid" "cornflowerblue"))
   ]
   @section{Overlaying Images}
 
@@ -693,8 +693,13 @@
             #:return Image
             #:args (list '("img1" "") 
                          '("img2" ""))]{
-    Constructs a new image where @pyret["img1"] overlays @pyret["img2"]. 
+    Constructs a new image where @pyret["img1"] overlays @pyret["img2"].
   }
+  @repl-examples[
+    `(@{overlay(rectangle(30, 60, "solid", "orange"),
+          ellipse(60, 30, "solid", "purple"))}
+      ,(overlay (rectangle 30 60 "solid" "orange") (ellipse 60 30 "solid" "purple")))
+  ]
   @function[
     "overlay-align"
             #:contract (a-arrow XPlace
@@ -718,8 +723,22 @@
     @pyret{"left"}, 
     @pyret{"center"}, 
     @pyret{"middle"}, or
-    @pyret{"right"}.
+    @pyret{"right"}.  The options @pyret{"center"} and @pyret{"middle"} are synonyms.
     }
+  @repl-examples[
+   `(@{overlay-align("left", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("center", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'center 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("middle", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'middle 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("right", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'right 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+  ]
   @type-spec["YPlace" (list)]{
 
     A @pyret-id["String" "<global>"] that represents a place to align an image
@@ -728,8 +747,33 @@
     @pyret{"bottom"}, 
     @pyret{"baseline"},
     @pyret{"center"}, or
-    @pyret{"middle"}.
+    @pyret{"middle"}.  The options @pyret{"center"} and @pyret{"middle"} are synonyms.
+
+    The @pyret{"baseline"} option only makes sense with
+    @seclink["text-images"]{text images}. It allows
+    aligning multiple images of text at their baseline, as if they
+    were part of a single image, or to appear to underline text.
+    For all other images, their @pyret{"baseline"} is the same as
+    their @pyret{"bottom"}.
     }
+  @repl-examples[
+   `(@{overlay-align("left", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "middle",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'middle (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "center",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'center (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "bottom",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'bottom (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "baseline",
+         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
+     ,(overlay/align 'left 'baseline (rectangle 140 3 "solid" "bisque")
+                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
+  ]
   @function[
     "overlay-xy"
             #:contract (a-arrow Image
@@ -747,6 +791,17 @@
     images upper-left corners and then shifts @pyret["img2"] to the right
     by @pyret["dx"] pixels, and then down by @pyret["dy"] pixels.
   }
+  @repl-examples[
+    `(@{overlay-xy(0, 0,
+          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+      ,(overlay/xy (square 30 "solid" "bisque") 0 0 (square 50 "solid" "darkgreen")))
+    `(@{overlay-xy(30, 20, # Move green square right 30 and down 20
+          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+      ,(overlay/xy (square 30 "solid" "bisque") 30 20 (square 50 "solid" "darkgreen")))
+    `(@{overlay-xy(-10, -20, # Move green square left 10 and up 20
+          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+      ,(overlay/xy (square 30 "solid" "bisque") -10 -20 (square 50 "solid" "darkgreen")))
+  ]
   @function[
     "underlay"
             #:contract (a-arrow Image
@@ -756,7 +811,13 @@
             #:args (list '("img1" "") 
                          '("img2" ""))]{
     Constructs a new image by placing @pyret["img1"] under @pyret["img2"].
+    This is the reverse of @secref[(tag-name "image" "overlay")].
   }
+  @repl-examples[
+    `(@{underlay(rectangle(30, 60, "solid", "orange"),
+          ellipse(60, 30, "solid", "purple"))}
+      ,(underlay (rectangle 30 60 "solid" "orange") (ellipse 60 30 "solid" "purple")))
+  ]
   @function[
     "underlay-align"
             #:contract (a-arrow XPlace
@@ -771,8 +832,39 @@
                          '("img2" ""))]{
     Underlays @pyret["img1"] beneath @pyret["img2"] like 
     @secref[(tag-name "image" "underlay")], but uses @pyret["place-x"] and
-    @pyret["place-y"] to determine where the images should line up.
+    @pyret["place-y"] to determine where the images should line up.  This is the
+    reverse of @secref[(tag-name "image" "overlay-align")].
   }
+  @repl-examples[
+   `(@{underlay-align("left", "top",
+         square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+     ,(underlay/align 'left 'top (square 50 "solid" "bisque") (square 30 "solid" "darkgreen")))
+   `(@{underlay-align("center", "top",
+         square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+     ,(underlay/align 'center 'top (square 50 "solid" "bisque") (square 30 "solid" "darkgreen")))
+   `(@{underlay-align("middle", "top",
+         square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+     ,(underlay/align 'middle 'top (square 50 "solid" "bisque") (square 30 "solid" "darkgreen")))
+   `(@{underlay-align("right", "top",
+         square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+     ,(underlay/align 'right 'top (square 50 "solid" "bisque") (square 30 "solid" "darkgreen")))
+   `(@{underlay-align("left", "top",
+         square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+     ,(underlay/align 'left 'top (square 50 "solid" "bisque") (square 30 "solid" "darkgreen")))
+   `(@{underlay-align("left", "middle",
+         square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+     ,(underlay/align 'left 'middle (square 50 "solid" "bisque") (square 30 "solid" "darkgreen")))
+   `(@{underlay-align("left", "center",
+         square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+     ,(underlay/align 'left 'center (square 50 "solid" "bisque") (square 30 "solid" "darkgreen")))
+   `(@{underlay-align("left", "bottom",
+         square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+     ,(underlay/align 'left 'bottom (square 50 "solid" "bisque") (square 30 "solid" "darkgreen")))
+   `(@{underlay-align("left", "baseline",
+         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
+     ,(underlay/align 'left 'baseline (rectangle 140 3 "solid" "bisque")
+                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
+  ]
   @function[
     "underlay-xy"
             #:contract (a-arrow Image
@@ -788,8 +880,20 @@
     Underlays @pyret["img1"] beneath @pyret["img2"] like 
     @secref[(tag-name "image" "underlay")], but initially lines up the two
     images upper-left corners and then shifts @pyret["img2"] to the right
-    by @pyret["x"] pixels, and then down by @pyret["y"] pixels.
+    by @pyret["x"] pixels, and then down by @pyret["y"] pixels.  This is the
+    reverse of @secref[(tag-name "image" "overlay-xy")].
   }
+  @repl-examples[
+    `(@{underlay-xy(0, 0,
+          square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+      ,(underlay/xy (square 50 "solid" "bisque") 0 0 (square 30 "solid" "darkgreen")))
+    `(@{underlay-xy(50, 20, # Move green square right 50 and down 20
+          square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+      ,(underlay/xy (square 50 "solid" "bisque") 50 20 (square 30 "solid" "darkgreen")))
+    `(@{underlay-xy(-10, -20, # Move green square left 10 and up 20
+          square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+      ,(underlay/xy (square 50 "solid" "bisque") -10 -20 (square 30 "solid" "darkgreen")))
+  ]
   @function[
     "beside"
             #:contract (a-arrow Image
@@ -801,6 +905,11 @@
     Constructs an image by placing @pyret["img1"] to the left of
     @pyret["img2"].
   }
+  @repl-examples[
+    `(@{beside(rectangle(30, 60, "solid", "orange"),
+          ellipse(60, 30, "solid", "purple"))}
+      ,(beside (rectangle 30 60 "solid" "orange") (ellipse 60 30 "solid" "purple")))
+  ]
   @function[
     "beside-align"
             #:contract (a-arrow YPlace
@@ -815,6 +924,25 @@
     @pyret["img2"], and aligning the two images as indicated by
     @pyret["place-y"].
   }
+  @repl-examples[
+   `(@{beside-align("top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(beside/align 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{beside-align("middle",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(beside/align 'middle (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{beside-align("center",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(beside/align 'center (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{beside-align("bottom",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(beside/align 'bottom (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{beside-align("baseline",
+         text("Hello", 30, "dark-green"), text(" Pyret", 18, "lawn-green"))}
+     ,(beside/align 'baseline
+                     (text/font "Hello" 30 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)
+                     (text/font " Pyret" 18 "lawngreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
+  ]
   @function[
     "above"
             #:contract (a-arrow Image
@@ -824,6 +952,11 @@
             #:args (list '("img1" "") '("img2" ""))]{
     Constructs an image by placing @pyret["img1"] above @pyret["img2"].
   }
+  @repl-examples[
+    `(@{above(rectangle(30, 60, "solid", "orange"),
+          ellipse(60, 30, "solid", "purple"))}
+      ,(above (rectangle 30 60 "solid" "orange") (ellipse 60 30 "solid" "purple")))
+  ]
   @function[
     "above-align"
             #:contract (a-arrow XPlace
@@ -837,6 +970,20 @@
     Constructs an image by placing @pyret["img1"] above @pyret["img2"],
     and aligning the two images as indicated by @pyret["place-x"].
   }
+  @repl-examples[
+   `(@{above-align("left",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(above/align 'left (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{above-align("center",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(above/align 'center (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{above-align("middle",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(above/align 'middle (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{above-align("right",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(above/align 'right (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+  ]
   @section{Placing Images & Scenes}
   @function[
     "empty-scene"
@@ -898,9 +1045,9 @@
                          '("place-x" "") 
                          '("place-y" "") 
                          '("background" ""))]{
-    Functions like @secref[(tag-name "image" "place-image")], but uses
+    Behaves similar to @secref[(tag-name "image" "place-image")], but uses
     @pyret["place-x"] and @pyret["place-y"] to determine where to anchor
-    @pyret["img"], instead of using the center.
+    @pyret["img"], instead of always using the center.
   }
   @function[
     "scene-line"
@@ -999,14 +1146,6 @@
     pixel frame draw around the bounding box of the image.
   }
   @section{Bitmaps}
-  @function[
-    "open-image-url"
-            #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
-                                Image)
-            #:return Image
-            #:args (list '("url" ""))]{
-    Loads the image specified by @pyret["url"].
-  }
   @function[
     "image-url"
             #:contract (a-arrow (a-id "String" (xref "<global>" "String"))
