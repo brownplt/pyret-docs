@@ -836,9 +836,7 @@
                                   (get 'doc-xrefs '())))
            (define header-part
                (apply para #:style (div-style "boxed pyret-header")
-                 (append
-                  (list (tt name-elt " :: "))
-                  ann)))
+                 (list (tt name-elt " :: " ann))))
            (nested #:style (div-style "value")
                    (cons
                      header-part
