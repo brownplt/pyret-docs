@@ -126,7 +126,7 @@ big-bang(10, on-tick(increment))
             #:args (list '("handler" "")
                          '("n" ""))]{
     Consumes a function and returns a handler that, when passed to
-    @secref[(tag-name "world" "big-bang")], will be called every @pyret["n"]
+    @secref[(tag-name "world" "big-bang")], will be called every @pyret{n}
     program ticks with the current world state.
   }
   
@@ -193,7 +193,7 @@ big-bang(10, on-tick(increment))
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called on every sampled
     mouse movement. The function will receive the world state, the current
-    @pyret["x"] and @pyret["y"] positions of the mouse, and a @secref[(tag-name
+    @pyret{x} and @pyret{y} positions of the mouse, and a @secref[(tag-name
     "<global>" "String")] representing a mouse event. Possible mouse
     events are:
 
@@ -217,7 +217,7 @@ big-bang(10, on-tick(increment))
             #:args (list '("stopper" ""))]{
     Consumes a function and returns a handler that, when passed to
     @secref[(tag-name "world" "big-bang")], will be called to determine if
-    the world should stop running. If the function returns @pyret["true"],
+    the world should stop running. If the function returns @pyret{true},
     then no other handlers will be called. The @secref[(tag-name "world" "big-bang")] 
     function will return this last world state.
   }
