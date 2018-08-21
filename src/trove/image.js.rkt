@@ -1242,8 +1242,8 @@
     Returns the width of @pyret{img}.
   }
   @repl-examples[
-   `(@{image-width(circle(30, "solid", "red"))} , @pyret{60})
-   `(@{image-width(text("Pyret", 30, "green"))} , @pyret{82})
+   `(@{image-width(circle(30, "solid", "red"))} @,pyret{60})
+   `(@{image-width(text("Pyret", 30, "green"))} @,pyret{82})
   ]
   @function[
     "image-height"
@@ -1253,8 +1253,8 @@
     Returns the height of @pyret{img}.
   }
   @repl-examples[
-   `(@{image-height(rectangle(30, 40, "solid", "red"))} , @pyret{40})
-   `(@{image-height(text("Pyret", 30, "green"))} , @pyret{36})
+   `(@{image-height(rectangle(30, 40, "solid", "red"))} @,pyret{40})
+   `(@{image-height(text("Pyret", 30, "green"))} @,pyret{36})
   ]
   @function[
     "image-baseline"
@@ -1266,8 +1266,8 @@
     without counting the descender, such as the tails on "y", "g" or "j".
   }
   @repl-examples[
-   `(@{image-baseline(rectangle(30, 40, "solid", "red"))} , @pyret{40})
-   `(@{image-baseline(text("Pyret", 30, "green"))} , @pyret{30})
+   `(@{image-baseline(rectangle(30, 40, "solid", "red"))} @,pyret{40})
+   `(@{image-baseline(text("Pyret", 30, "green"))} @,pyret{30})
   ]
   @section{Image Predicates}
   @function[
