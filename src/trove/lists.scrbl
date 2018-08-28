@@ -122,29 +122,29 @@
       (method-spec
         (name "foldr")
         (arity 3)
-        (params ("b"))
+        (params ("Base"))
         (args ("self" "f" "base"))
-        (return "b")
+        (return "Base")
         (contract
           (a-arrow
             (a-id "is-List" (xref "lists" "is-List"))
-            (a-arrow "a" "b" "b")
-            "b"
-            "b"))
+            (a-arrow "a" "Base" "Base")
+            "Base"
+            "Base"))
         (doc
           "Takes a function and an initial value, and folds the function over this list from the right,\n            starting with the base value"))
       (method-spec
         (name "foldl")
         (arity 3)
-        (params ("b"))
+        (params ("Base"))
         (args ("self" "f" "base"))
-        (return "b")
+        (return "Base")
         (contract
           (a-arrow
             (a-id "is-List" (xref "lists" "is-List"))
-            (a-arrow "a" "b" "b")
-            "b"
-            "b"))
+            (a-arrow "a" "Base" "Base")
+            "Base"
+            "Base"))
         (doc
           "Takes a function and an initial value, and folds the function over this list from the left,\n            starting with the base value"))
       (method-spec
@@ -909,123 +909,123 @@
   (fun-spec
     (name "fold-while")
     (arity 3)
-    (params [list: leaf("a"), leaf("b")])
+    (params [list: leaf("Base"), leaf("Elt")])
     (args ("f" "base" "lst"))
-    (return "a")
+    (return "Base")
     (contract
       (a-arrow
         (a-arrow
-          "a"
-          "b"
-          (a-app (a-id "Either" (xref "either" "Either")) "a" "a"))
-        "a"
-        (a-app (a-id "List" (xref "lists" "List")) "b")
-        "a"))
+          "Base"
+          "Elt"
+          (a-app (a-id "Either" (xref "either" "Either")) "Base" "Base"))
+        "Base"
+        (a-app (a-id "List" (xref "lists" "List")) "Elt")
+        "Base"))
     (doc
       "Takes a function that takes two arguments and returns an Either, and also a base value, and folds\n        over the given list from the left as long as the function returns a left() value, and returns either\n        the final value or the right() value"))
   (fun-spec
     (name "fold")
     (arity 3)
-    (params [list: leaf("a"), leaf("b")])
+    (params [list: leaf("Base"), leaf("Elt")])
     (args ("f" "base" "lst"))
-    (return "a")
+    (return "Base")
     (contract
       (a-arrow
-        (a-arrow "a" "b" "a")
-        "a"
-        (a-app (a-id "List" (xref "lists" "List")) "b")
-        "a"))
+        (a-arrow "Base" "Elt" "Base")
+        "Base"
+        (a-app (a-id "List" (xref "lists" "List")) "Elt")
+        "Base"))
     (doc
       "Takes a function, an initial value and a list, and folds the function over the list from the left,\n        starting with the initial value"))
   (fun-spec
     (name "foldl")
     (arity 3)
-    (params [list: leaf("a"), leaf("b")])
+    (params [list: leaf("Base"), leaf("Elt")])
     (args ("f" "base" "lst"))
-    (return "a")
+    (return "Base")
     (contract
       (a-arrow
-        (a-arrow "a" "b" "a")
-        "a"
-        (a-app (a-id "List" (xref "lists" "List")) "b")
-        "a"))
+        (a-arrow "Base" "Elt" "Base")
+        "Base"
+        (a-app (a-id "List" (xref "lists" "List")) "Elt")
+        "Base"))
     (doc
       "Takes a function, an initial value and a list, and folds the function over the list from the left,\n        starting with the initial value"))
   (fun-spec
     (name "foldr")
     (arity 3)
-    (params [list: leaf("a"), leaf("b")])
+    (params [list: leaf("Base"), leaf("Elt")])
     (args ("f" "base" "lst"))
-    (return "a")
+    (return "Base")
     (contract
       (a-arrow
-        (a-arrow "a" "b" "a")
-        "a"
-        (a-app (a-id "List" (xref "lists" "List")) "b")
-        "a"))
+        (a-arrow "Base" "Elt" "Base")
+        "Base"
+        (a-app (a-id "List" (xref "lists" "List")) "Elt")
+        "Base"))
     (doc
       "Takes a function, an initial value and a list, and folds the function over the list from the right,\n        starting with the initial value"))
   (fun-spec
     (name "fold2")
     (arity 4)
-    (params [list: leaf("a"), leaf("b"), leaf("c")])
+    (params [list: leaf("Base"), leaf("Elt1"), leaf("Elt2")])
     (args ("f" "base" "l1" "l2"))
-    (return "a")
+    (return "Base")
     (contract
       (a-arrow
-        (a-arrow "a" "b" "c" "a")
-        "a"
-        (a-app (a-id "List" (xref "lists" "List")) "b")
-        (a-app (a-id "List" (xref "lists" "List")) "c")
-        "a"))
+        (a-arrow "Base" "Elt1" "Elt2" "Base")
+        "Base"
+        (a-app (a-id "List" (xref "lists" "List")) "Elt1")
+        (a-app (a-id "List" (xref "lists" "List")) "Elt2")
+        "Base"))
     (doc
       "Takes a function, an initial value and two lists, and folds the function over the lists in parallel\n        from the left, starting with the initial value and ending when either list is empty"))
   (fun-spec
     (name "fold3")
     (arity 5)
-    (params [list: leaf("a"), leaf("b"), leaf("c"), leaf("d")])
+    (params [list: leaf("Base"), leaf("Elt1"), leaf("Elt2"), leaf("Elt3")])
     (args ("f" "base" "l1" "l2" "l3"))
-    (return "a")
+    (return "Base")
     (contract
       (a-arrow
-        (a-arrow "a" "b" "c" "d" "a")
-        "a"
-        (a-app (a-id "List" (xref "lists" "List")) "b")
-        (a-app (a-id "List" (xref "lists" "List")) "c")
-        (a-app (a-id "List" (xref "lists" "List")) "d")
-        "a"))
+        (a-arrow "Base" "Elt1" "Elt2" "Elt3" "Base")
+        "Base"
+        (a-app (a-id "List" (xref "lists" "List")) "Elt1")
+        (a-app (a-id "List" (xref "lists" "List")) "Elt2")
+        (a-app (a-id "List" (xref "lists" "List")) "Elt3")
+        "Base"))
     (doc
       "Takes a function, an initial value and three lists, and folds the function over the lists in parallel\n        from the left, starting with the initial value and ending when any list is empty"))
   (fun-spec
     (name "fold4")
     (arity 6)
-    (params [list: leaf("a"), leaf("b"), leaf("c"), leaf("d"), leaf("e")])
+    (params [list: leaf("Base"), leaf("Elt1"), leaf("Elt2"), leaf("Elt3"), leaf("Elt4")])
     (args ("f" "base" "l1" "l2" "l3" "l4"))
-    (return "a")
+    (return "Base")
     (contract
       (a-arrow
-        (a-arrow "a" "b" "c" "d" "e" "a")
-        "a"
-        (a-app (a-id "List" (xref "lists" "List")) "b")
-        (a-app (a-id "List" (xref "lists" "List")) "c")
-        (a-app (a-id "List" (xref "lists" "List")) "d")
-        (a-app (a-id "List" (xref "lists" "List")) "e")
-        "a"))
+        (a-arrow "Base" "Elt1" "Elt2" "Elt3" "Elt4" "Base")
+        "Base"
+        (a-app (a-id "List" (xref "lists" "List")) "Elt1")
+        (a-app (a-id "List" (xref "lists" "List")) "Elt2")
+        (a-app (a-id "List" (xref "lists" "List")) "Elt3")
+        (a-app (a-id "List" (xref "lists" "List")) "Elt4")
+        "Base"))
     (doc
       "Takes a function, an initial value and four lists, and folds the function over the lists in parallel\n        from the left, starting with the initial value and ending when any list is empty"))
   (fun-spec
     (name "fold_n")
     (arity 4)
-    (params [list: leaf("a"), leaf("b")])
+    (params [list: leaf("Base"), leaf("Elt")])
     (args ("f" "num" "base" "lst"))
-    (return "a")
+    (return "Base")
     (contract
       (a-arrow
-        (a-arrow (a-id "Number" (xref "<global>" "Number")) "a" "b" "a")
+        (a-arrow (a-id "Number" (xref "<global>" "Number")) "Base" "Elt" "Base")
         (a-id "Number" (xref "<global>" "Number"))
-        "a"
-        (a-app (a-id "List" (xref "lists" "List")) "b")
-        "a"))
+        "Base"
+        (a-app (a-id "List" (xref "lists" "List")) "Elt")
+        "Base"))
     (doc
       "Takes a function, an initial value and a list, and folds the function over the list from the left,\n        starting with the initial value and passing along the index (starting with the given num)"))
   (fun-spec
@@ -1416,8 +1416,8 @@ Computes @pyret{f(last-elt, ... f(second-elt, f(first-elt, base))...)}.  For
 @pyret-id{empty}, returns @pyret{base}.
 
 In other words, @pyret{.foldl} uses the function @tt{f}, starting with the @tt{base}
-value, of type @tt{b}, to calculate the return value of type @tt{b} from each
-item in the @pyret{List}, of input type @tt{a}, starting the sequence from the @emph{left} (hence, fold@bold{l}).
+value, of type @tt{Base}, to calculate the return value of type @tt{Base} from each
+item in the @pyret{List}, of input type @tt{Elt}, starting the sequence from the @emph{left} (hence, fold@bold{l}).
 
 @examples{
 check:
@@ -1436,9 +1436,9 @@ end
 Computes @pyret{f(first-elt, f(second-elt, ... f(last-elt, base)))}.  For
 @pyret-id{empty}, returns @pyret{base}. 
 
-In other words, @pyret{.foldl} uses the function @tt{f}, starting with the @tt{base}
-value, of type @tt{b}, to calculate the return value of type @tt{b} from each
-item in the @pyret{List}, of input type @tt{a}, starting the sequence from the @emph{right} (hence, fold@bold{r}).
+In other words, @pyret{.foldr} uses the function @tt{f}, starting with the @tt{base}
+value, of type @tt{Base}, to calculate the return value of type @tt{Base} from each
+item in the @pyret{List}, of input type @tt{Elt}, starting the sequence from the @emph{right} (hence, fold@bold{r}).
 
 @examples{
 check:
@@ -2112,8 +2112,8 @@ end
 @pyret-id{empty}, returns @pyret{base}.
 
 In other words, @pyret{fold} uses the function @tt{f}, starting with the @tt{base}
-value, of type @tt{a}, to calculate the return value of type @tt{a} from each
-item in the @pyret{List}, of input type @tt{b}, starting the sequence from the left.
+value, of type @tt{Base}, to calculate the return value of type @tt{Base} from each
+item in the @pyret{List}, of input type @tt{Elt}, starting the sequence from the left.
   }
 @examples{
 check:
@@ -2135,9 +2135,9 @@ Computes @pyret{f(first-elt, f(second-elt, ... f(last-elt, base)))}.  For
 @pyret-id{empty}, returns @pyret{base}.  In other words, it uses
 @pyret{f} to combine @pyret{base} with each item in the @pyret{List} starting from the right.
 
-In other words, @pyret{.foldl} uses the function @tt{f}, starting with the @tt{base}
-value, of type @tt{a}, to calculate the return value of type @tt{a} from each
-item in the @pyret{List}, of input type @tt{a}, starting the sequence from the right.
+In other words, @pyret{foldr} uses the function @tt{f}, starting with the @tt{base}
+value, of type @tt{Base}, to calculate the return value of type @tt{Base} from each
+item in the @pyret{List}, of input type @tt{Elt}, starting the sequence from the right.
 
 @examples{
 import lists as L
