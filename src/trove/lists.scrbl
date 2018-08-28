@@ -2112,8 +2112,8 @@ end
 @pyret-id{empty}, returns @pyret{base}.
 
 In other words, @pyret{fold} uses the function @tt{f}, starting with the @tt{base}
-value, of type @tt{b}, to calculate the return value of type @tt{b} from each
-item in the @pyret{List}, of input type @tt{a}, starting the sequence from the left.
+value, of type @tt{a}, to calculate the return value of type @tt{a} from each
+item in the @pyret{List}, of input type @tt{b}, starting the sequence from the left.
   }
 @examples{
 check:
@@ -2136,7 +2136,7 @@ Computes @pyret{f(first-elt, f(second-elt, ... f(last-elt, base)))}.  For
 @pyret{f} to combine @pyret{base} with each item in the @pyret{List} starting from the right.
 
 In other words, @pyret{.foldl} uses the function @tt{f}, starting with the @tt{base}
-value, of type @tt{b}, to calculate the return value of type @tt{b} from each
+value, of type @tt{a}, to calculate the return value of type @tt{a} from each
 item in the @pyret{List}, of input type @tt{a}, starting the sequence from the right.
 
 @examples{
