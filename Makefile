@@ -12,6 +12,7 @@ docs:
     ++extra ./node_modules/pyret-codemirror-mode/mode/pyret.js \
     ++style ./node_modules/pyret-codemirror-mode/css/pyret.css \
     ++extra src/hilite.js \
+    ++extra src/Pyret-Tutorial/airplane-small.png \
     \
     ++style src/styles.css \
     --prefix src/myprefix.html \

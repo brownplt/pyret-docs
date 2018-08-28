@@ -90,12 +90,12 @@ First, here's an image of an airplane:@margin-note*{Have fun finding
 your preferred airplane image! But don't spend too long on it,
 because we've still got a lot of work to do.}
 
-@show-url{http://world.cs.brown.edu/1/clipart/airplane-small.png}
+@show-url["https://pyret.org/docs/airplane-small.png"]
 
 We can tell Pyret to load this image and give it a name as follows:
 @pydisp{
 AIRPLANE-URL = 
-  "http://world.cs.brown.edu/1/clipart/airplane-small.png"
+  "https://pyret.org/docs/airplane-small.png"
 AIRPLANE = I.image-url(AIRPLANE-URL)
 }
 Henceforth, when we refer to @pyin{AIRPLANE}, it will always refer to
