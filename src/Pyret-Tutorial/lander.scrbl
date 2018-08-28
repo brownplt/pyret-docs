@@ -90,7 +90,7 @@ First, here's an image of an airplane:@margin-note*{Have fun finding
 your preferred airplane image! But don't spend too long on it,
 because we've still got a lot of work to do.}
 
-@show-url["https://pyret.org/docs/airplane-small.png"]
+@show-url["https://pyret.org/docs/latest/airplane-small.png"]
 
 We can tell Pyret to load this image and give it a name as follows:
 @pydisp{
