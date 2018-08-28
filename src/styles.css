@@ -1,14 +1,3 @@
-.tocset {
-  position: fixed;
-  overflow: scroll;
-  height: 100%;
-  padding-top: 1rem;
-}
-
-.navsettop {
-  display: none;
-}
-
 /* New styles just for Pyret */
 
 .boxed .SIntrapara {
@@ -85,4 +74,12 @@ pre.pyret-block {
 .bnf-phantom::before {
    content: attr(data-prod);
    color: transparent;
+}
+
+.hide {
+    display: none;
+}
+
+.searchbox.large {
+    width: 24rem;
 }

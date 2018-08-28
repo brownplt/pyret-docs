@@ -1555,10 +1555,11 @@ If the list has more than one element, the function will use @pyret{last-sep}
 to join the last element instead of the regular @pyret{sep}.
 @examples{
 check:
-  [list: 1, 2, 3].join-str-last("; ", "$ ") is "1; 2$ 3"
+  [list: 1, 2, 3].join-str-last(", ", " and ") is "1, 2 and 3"
   [list: "a", true, ~5.3].join-str-last(" : ", " # ") is "a : true # ~5.3"
   empty.join-str-last("nothing at all", "really nothing") is ""
   [list: 1, 2].join-str-last("a", "b") is "1b2"
+  [list: 1].join-str-last("a", "b") is "1"
 end
 }
 
