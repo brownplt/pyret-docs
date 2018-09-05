@@ -339,7 +339,7 @@ However, we can make it more concise using an @tt{ask} block:
 
 @codedisp{
 fun is-this-noah(str :: String) -> String:
-  Ask:
+  ask:
     | str == "Noah" then: "Yes"
     | str == "Nosh" then: "Close"
     | str == "No" then: "ah"
