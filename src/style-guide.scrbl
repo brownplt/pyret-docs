@@ -201,23 +201,31 @@ this subtly implies that multiple elements of different types could exist.
 In other words, @tt{[list: 1, "apple", true]} would satisfy the annotation
 @tt{List<Any>}. Creating @tt{List}s like this is usually bad practice.
 
-In Pyret, we can do this by parametrizing the type. Rather than
+In Pyret, we can do this by parametrizing the type. Rather than:
 
 @codedisp{
 fun search(lst :: List<Any>) -> Any: ... end
 }
 
-we'd now do something like
+We should instead do something like:
 
 @codedisp{
 fun search<A>(lst :: List<A>) -> A: ... end
 }
 
-Now, the elements of @tt{lst} can be of any type, but all elements of lst will
-be of type @tt{A} (along with the return value of @tt{search})! Note that the
-actual name of the type parameter is arbitrary (we could have written
-@tt{search<SomeOtherName>} instead of @tt{search<A>}), but it is convention to
-use a single letter for parametric annotations.
+In the code above, we don't know or care what the type the elements of 
+@tt{lst} are, but we are asserting that they all be of the same type—namely 
+@tt{A}. The use of @tt{A} as the return type also means that the type of the 
+value returned by @tt{search} must also be the same as the type of the
+elements of @tt{list}. 
+
+In other words, using parameterized types allows us to make the subtle but
+important distinction between "any type at all" (@tt{List<Any>}) and
+"any single type, for any particular list" (@tt{List<A>}).
+
+Note that the actual name of the type parameter is arbitrary (we could have 
+written @tt{search<SomeOtherName>} instead of @tt{search<A>}), but it is 
+convention to use a single letter for parametric annotations.
 
 @subsection{Testing}
 
