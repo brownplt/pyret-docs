@@ -65,6 +65,7 @@
   (fun-spec (name "radial-star") (arity 5))
   (fun-spec (name "star-polygon") (arity 5))
   (fun-spec (name "rhombus") (arity 4))
+  (fun-spec (name "color-at-position") (arity 3))
   (fun-spec (name "image-to-color-list") (arity 1))
   (fun-spec (name "color-list-to-image") (arity 1))
   (fun-spec (name "color-list-to-bitmap") (arity 1))
@@ -858,6 +859,18 @@
             #:args (list '("url" ""))]{
     Loads the image specified by @pyret["url"].
   }
+  @function[
+    "color-at-position"
+            #:contract (a-arrow Image
+                                (a-id "Number" (xref "<global>" "Number"))
+                                (a-id "Number" (xref "<global>" "Number"))
+                                (a-id "Color" (xref "image-structs" "Color")))
+            #:return Color
+            #:args (list '("image" "") '("x" "") '("y" ""))]{
+    Returns the color at the pixel given by @pyret{x} and @pyret{y}
+    coordinates. The coordinates are 0-based, with 0, 0 in the top-left corner
+    of the image.
+  ]
   @function[
     "image-to-color-list"
             #:contract (a-arrow Image
