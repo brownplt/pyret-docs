@@ -870,7 +870,7 @@
     Returns the color at the pixel given by @pyret{x} and @pyret{y}
     coordinates. The coordinates are 0-based, with 0, 0 in the top-left corner
     of the image.
-  ]
+  }
   @function[
     "image-to-color-list"
             #:contract (a-arrow Image
