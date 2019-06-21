@@ -16,6 +16,8 @@
     (fun-spec (name "running-reduce"))
     (fun-spec (name "raw-row"))
     (fun-spec (name "table-from-rows"))
+    (fun-spec (name "table-from-columns"))
+    (fun-spec (name "table-from-column"))
     
     (data-spec
       (name "Row")
@@ -829,6 +831,47 @@ check:
   t.row-n(0) is [raw-row: {"A"; 5}, {"B"; 7}, {"C"; 8}]
 end
 }
+
+@collection-doc["table-from-columns" #:contract `(a-arrow ("elt" ,(a-tuple "String" (L-of "A"))) ,Table)]
+
+A collection constructor that creates tables from columns, where each column is
+specified as a tuple of its name (as a @pyret-id["String" "<global>"]) and a
+@pyret-id["List" "lists"] of its values.
+
+@examples{
+check:
+  t = [table-from-columns:
+    {"a"; [list: 100, 200, 300]},
+    {"b"; [list: true, false, true]}
+  ]
+
+  t.length() is 3
+  t.column("a") is [list: 100, 200, 300]
+  t.row-n(2) is [raw-row: {"a"; 300}, {"b"; true}]
+end
+}
+
+@function["table-from-column"
+    #:contract (a-arrow S (L-of "A") Table)
+    #:args '(("column-name" #f) ("values" #f))
+    #:return Table]{
+
+A function that creates a table of a single column from a column name, given as
+a @pyret-id["String" "<global>"] and a @pyret-id["List" "lists"] of values.
+
+@examples{
+check:
+  col = range(0, 100)
+  tfc = table-from-column("a", col)
+  tfc.length() is 100
+  tfc.column-names() is [list: "a"]
+  cs = tfc.all-columns()
+  cs.get(0) is col
+end
+}
+
+    }
+
 
 @table-method["length"
   #:contract (a-arrow Table N)
