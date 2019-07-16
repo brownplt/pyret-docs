@@ -1442,7 +1442,9 @@ check:
   [list: 2, 4, 6].member(3) is false
   [list: ].member(empty) is false
   [list: 1, 2, 3].member(~1) raises "Roughnums"
-  [list: ~1, 2, 3].member(1) is false
+  [list: ~1, 2, 3].member(1) raises "Roughnums"
+  [list: 1, 2, 3].member(4) is false
+  [list: 1, 2, 3].member(~4) raises "Roughnums"
 
   [list: 'a'].member('a') is true
   [list: false].member(false) is true
