@@ -87,13 +87,13 @@
         (params ())
         (args ("self" "f"))
         (return
-          (a-app (a-compound (a-dot "O" "Option") (xref "option" "Option")) "a"))
+          (a-app (a-id "Option" (xref "option" "Option")) "a"))
         (contract
           (a-arrow
             (a-id "is-List" (xref "lists" "is-List"))
             (a-arrow "a" (a-id "Boolean" (xref "<global>" "Boolean")))
             (a-app
-              (a-compound (a-dot "O" "Option") (xref "option" "Option"))
+              (a-id "Option" (xref "option" "Option"))
               "a")))
         (doc
           "Takes a predicate and returns on option containing either the first item in this list that passes the predicate, or none"))
@@ -301,15 +301,11 @@
         (params ())
         (args ("self"))
         (return
-          (a-compound
-            (a-dot "VS" "ValueSkeleton")
-            (xref "valueskeleton" "ValueSkeleton")))
+          (a-id "ValueSkeleton" (xref "valueskeleton" "ValueSkeleton")))
         (contract
           (a-arrow
             (a-id "List" (xref "lists" "List"))
-            (a-compound
-              (a-dot "VS" "ValueSkeleton")
-              (xref "valueskeleton" "ValueSkeleton")))))
+            (a-id "ValueSkeleton" (xref "valueskeleton" "ValueSkeleton")))))
       (method-spec
         (name "_plus")
         (arity 2)
@@ -592,12 +588,12 @@
     (params [list: leaf("a")])
     (args ("f" "lst"))
     (return
-      (a-app (a-compound (a-id "Option") (xref "option" "Option")) "a"))
+      (a-app (a-id "Option" (xref "option" "Option")) "a"))
     (contract
       (a-arrow
         (a-arrow "a" (a-id "Boolean" (xref "<global>" "Boolean")))
         (a-app (a-id "List" (xref "lists" "List")) "a")
-        (a-app (a-compound (a-id "Option") (xref "option" "Option")) "a")))
+        (a-app (a-id "Option" (xref "option" "Option")) "a")))
     (doc
       "Returns some(elem) where elem is the first elem in lst for which\n        f(elem) returns true, or none otherwise"))
   (fun-spec
@@ -1033,7 +1029,7 @@
     (arity 3)
     (params [list: leaf("a")])
     (args ("lst" "elt" "eq"))
-    (return (a-dot "equality" "EqualityResult"))
+    (return (a-id "EqualityResult" (xref "equality" "EqualityResult")))
     (contract
       (a-arrow
         (a-app (a-id "List" (xref "lists" "List")) "a")
@@ -1041,9 +1037,7 @@
         (a-arrow
           "a"
           "a"
-          (a-compound
-            (a-dot "equality" "EqualityResult")
-            (xref "equality" "EqualityResult")))
+          (a-id "EqualityResult" (xref "equality" "EqualityResult")))
         "Any")))
   (fun-spec
     (name "member3")
@@ -1051,16 +1045,12 @@
     (params [list: leaf("a")])
     (args ("lst" "elt"))
     (return
-      (a-compound
-        (a-dot "equality" "EqualityResult")
-        (xref "equality" "EqualityResult")))
+      (a-id "EqualityResult" (xref "equality" "EqualityResult")))
     (contract
       (a-arrow
         (a-app (a-id "List" (xref "lists" "List")) "a")
         "a"
-        (a-compound
-          (a-dot "equality" "EqualityResult")
-          (xref "equality" "EqualityResult")))))
+        (a-id "EqualityResult" (xref "equality" "EqualityResult")))))
   (fun-spec (name "append"))
   (fun-spec (name "sort"))
   (fun-spec (name "sort-by"))
@@ -1084,16 +1074,12 @@
     (params [list: leaf("a")])
     (args ("lst" "elt"))
     (return
-      (a-compound
-        (a-dot "equality" "EqualityResult")
-        (xref "equality" "EqualityResult")))
+      (a-id "EqualityResult" (xref "equality" "EqualityResult")))
     (contract
       (a-arrow
         (a-app (a-id "List" (xref "lists" "List")) "a")
         "a"
-        (a-compound
-          (a-dot "equality" "EqualityResult")
-          (xref "equality" "EqualityResult")))))
+        (a-id "EqualityResult" (xref "equality" "EqualityResult")))))
   (fun-spec
     (name "member-always")
     (arity 2)
@@ -1111,16 +1097,12 @@
     (params [list: leaf("a")])
     (args ("lst" "elt"))
     (return
-      (a-compound
-        (a-dot "equality" "EqualityResult")
-        (xref "equality" "EqualityResult")))
+      (a-id "EqualityResult" (xref "equality" "EqualityResult")))
     (contract
       (a-arrow
         (a-app (a-id "List" (xref "lists" "List")) "a")
         "a"
-        (a-compound
-          (a-dot "equality" "EqualityResult")
-          (xref "equality" "EqualityResult")))))
+        (a-id "EqualityResult" (xref "equality" "EqualityResult")))))
   (fun-spec
     (name "member-now")
     (arity 2)
@@ -1138,16 +1120,12 @@
     (params [list: leaf("a")])
     (args ("lst" "elt"))
     (return
-      (a-compound
-        (a-dot "equality" "EqualityResult")
-        (xref "equality" "EqualityResult")))
+      (a-id "EqualityResult" (xref "equality" "EqualityResult")))
     (contract
       (a-arrow
         (a-app (a-id "List" (xref "lists" "List")) "a")
         "a"
-        (a-compound
-          (a-dot "equality" "EqualityResult")
-          (xref "equality" "EqualityResult")))))
+        (a-id "EqualityResult" (xref "equality" "EqualityResult")))))
   (fun-spec
     (name "member-identical")
     (arity 2)
