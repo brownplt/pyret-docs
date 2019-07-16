@@ -2,7 +2,7 @@
 
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 
-@title{Modules}
+@title{Module Representation}
 
 @section[#:tag "s:module-rep"]{Representation}
 
