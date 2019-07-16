@@ -51,8 +51,8 @@ JSON = "{" <string> ":" JSON "," ... <string> ":" JSON "}"
     The second form parses to a @sref["j-arr"] containing the nested
     sub-expression results as a list.
     Numbers become @sref["j-num"]s, strings become
-    @sref["j-str"]s, the strings @pyret["true"] and @pyret["false"] become
-    @sref["j-bool"]s, and the string @pyret["null"] becomes @sref["j-null"].
+    @sref["j-str"]s, the strings @pyret{true} and @pyret{false} become
+    @sref["j-bool"]s, and the string @pyret{null} becomes @sref["j-null"].
 
 @examples{
 import json as J
