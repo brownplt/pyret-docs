@@ -82,11 +82,11 @@ by non-negative intgers.  These arrays are implemented using
 @collection-doc["array" #:contract `(a-arrow ("elt" "a") ,(A-of "a"))]
 
 Creates an @pyret-id{Array} with the given elements.  Note that
-@pyret-id{Array}s are mutable, so comparisons using @pyret["=="]
+@pyret-id{Array}s are mutable, so comparisons using @pyret{==}
 (the operator for @pyret-id["equal-always" "equality"]) will only
 return @pyret{true} on @pyret-id{Array}s when they are also
 @pyret-id["identical" "equality"], regardless of their contents.  To compare
-the elements, use @pyret-id["equal-now" "equality"]/@pyret["=~"],
+the elements, use @pyret-id["equal-now" "equality"]/@pyret{=~},
 and test with @pyret-id["is=~" "testing"].
 
 @examples{

@@ -2246,7 +2246,7 @@ check:
     if string-length(a) == string-length(b):
       EQ.Equal
     else:
-      EQ.NotEqual(a, b, "Different lengths.")
+      EQ.NotEqual("Different lengths.", a, b)
     end
   end
   equal-length('tom', 'dad') is EQ.Equal

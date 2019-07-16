@@ -164,7 +164,7 @@ won't work).  List-based sets perform up to n comparisons on removal, addition,
 and membership testing, where n is the number of elements in the set (in order
 to give this guarantee, list-based sets don't store duplicate elements by
 scanning the whole list on insertion).  Tree-based sets require that all
-elements implement the @pyret["_lessthan"] method in order to perform
+elements implement the @pyret{_lessthan} method in order to perform
 comparisons, and guarantee that only up to log(n) less-than comparisons will be
 performed for a set with n elements on removal, addition, and membership
 testing.
@@ -206,7 +206,7 @@ An empty set.
 @collection-doc["tree-set" #:contract `(a-arrow ("elt" "a") ,(S-of "a"))]
 
 Constructs a set out of the @pyret{elt}s backed by a tree.  Raises an exception
-if the elements don't support the @pyret{<} operator via @pyret["_lessthan"].
+if the elements don't support the @pyret{<} operator via @pyret{_lessthan}.
 
 @examples{
 check:

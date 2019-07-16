@@ -308,7 +308,7 @@ a-pie-chart-series = from-list.bar-chart(countries, num-speakers)
 
   @pyret-block{
 fun some-fun(x): num-sin(2 * x) end # some arbitrary function
-a-function-series = from-list.function-plot(f)
+a-function-series = from-list.function-plot(some-fun)
   }
 
   So far, we have only constructed @|DataSeries| without any additionnal configuration. @|DataSeries| also exist to allow customizing individual plots. As a simple first example of this, suppose the function plot should be in a specific color. You might write:
@@ -321,7 +321,7 @@ colorful-function-series = a-function-series.color(I.purple)
 
   @pyret-block{
 fun some-fun(x): num-sin(2 * x) end # some arbitrary function
-colorful-function-series = from-list.function-plot(f)
+colorful-function-series = from-list.function-plot(some-fun)
                                     .color(I.purple)
   }
 
@@ -340,8 +340,8 @@ colorful-function-series = from-list.function-plot(f)
   From the example in the previous section:
 
   @pyret-block{
-fun f(x): num-sin(2 * x) end
-a-series = from-list.function-plot(f)
+fun some-fun(x): num-sin(2 * x) end
+a-series = from-list.function-plot(some-fun)
   .color(I.purple)
 a-chart-window = render-chart(a-series)
   }
@@ -381,6 +381,18 @@ an-image = a-chart-window.get-image()
 
   For some kind of charts (e.g., function plot) there
   will be a controller panel for you to adjust configurations of the chart window interactively.
+
+  @;############################################################################
+  @subsection{Why are there watermarks on my charts?}
+
+  If you evaluate @pyret{colorful-function-series} or @pyret{a-chart-window} in the interactions pane, you will produce images like the following:
+
+  @repl-examples[
+   `(@{colorful-function-series} ,(in-image "data-series-watermark"))
+   `(@{a-chart-window}           ,(in-image "chart-window-watermark"))
+  ]
+
+  These images have watermarks on them to remind you that you are still working with @emph{intermediate} values, either @|DataSeries| or @|ChartWindow| respectively.  By default, both will render themselves as an appropriate chart with default configurations, but in order to interact with the chart you must use the @pyret-method["ChartWindow" "display"] method, and to produce an unwatermarked image of the chart you must use the @pyret-method["ChartWindow" "get-image"] method.
 
   @;############################################################################
   @section{Chart Constructors for List Interface}

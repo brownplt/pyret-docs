@@ -248,7 +248,7 @@
     ;; ~color13(255, 248, 220, 255)
     )
   (unknown-item
-    (name "light-goldenrody-ellow")
+    (name "light-goldenrod-yellow")
     ;; ~color13(250, 250, 210, 255)
     )
   (unknown-item
@@ -687,7 +687,7 @@
     @render-color["lemon-chiffon" 255 250 205 255]
     @render-color["antique-white" 250 235 215 255]
     @render-color["cornsilk" 255 248 220 255]
-    @render-color["light-goldenrody-ellow" 250 250 210 255]
+    @render-color["light-goldenrod-yellow" 250 250 210 255]
     @render-color["old-lace" 253 245 230 255]
     @render-color["linen" 250 240 230 255]
     @render-color["light-yellow" 255 255 224 255]
