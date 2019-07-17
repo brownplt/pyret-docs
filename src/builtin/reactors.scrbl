@@ -443,7 +443,7 @@ the history of states as data.
   @pyret{state} column holds the values of all the states that the reactor held
   during the interaction, and the @pyret{tick} column numbers them.
 
-  This is equivalent to @pyret{get-trace-as-table(interact(start(r)))}.
+  This is equivalent to @pyret{get-trace-as-table(interact(start-trace(r)))}.
 
   }
 
