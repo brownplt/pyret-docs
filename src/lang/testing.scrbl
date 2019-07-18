@@ -8,18 +8,31 @@
           "../../scribble-api.rkt"
           scribble/html-properties)
 
+@(define (test-index-tag opname)
+  (define tag (make-generated-tag))
+  (define index-tags (list (pyret opname) "testing"))
+  (make-index-element #f
+                       (list (make-target-element #f '() `(idx ,tag)))
+                       `(idx ,tag)
+                       (cons opname (list "testing"))
+                       index-tags
+                       #f))
+
 @(define (test-doc opname left right)
   @para[#:style "boxed pyret-header"]{
+    @(test-index-tag opname)
     @(tt @left " " @(make-header-elt-for (seclink (xref (curr-module-name) opname) (tt opname)) opname) " " @right)
   })
 
 @(define (test-doc1 opname left)
   @para[#:style "boxed pyret-header"]{
+    @(test-index-tag opname)
     @(tt @left " " @(make-header-elt-for (seclink (xref (curr-module-name) opname) (tt opname)) opname))
   })
 
 @(define (test-doc-pred opname pred left right)
   @para[#:style "boxed pyret-header"]{
+    @(test-index-tag opname)
     @(tt @left " " @(make-header-elt-for (seclink (xref (curr-module-name) opname) (tt opname)) opname) "(" pred ")" " " @right)
   })
 
