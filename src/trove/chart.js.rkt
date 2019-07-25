@@ -711,7 +711,7 @@ render-chart(a-series).display()
   @examples{
 a-series = from-list.exploding-pie-chart(
   [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
-  [list: 10,       6,       1,   3,     5,       8,        9]
+  [list: 10,       6,       1,   3,     5,       8,        9],
   [list: 0.2,      0,       0,   0,     0,       0.1,      0])
 render-chart(a-series).display()
   }

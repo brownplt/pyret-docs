@@ -272,7 +272,7 @@
   }
 
   @function["bar-chart"
-    #:contract (a-arrow TA S (in-link "PlotWindowOptions") Image)
+    #:contract (a-arrow TA (in-link "PlotWindowOptions") Image)
     #:args '(("tab" #f) ("options" #f))
     #:return Image
   ]{
