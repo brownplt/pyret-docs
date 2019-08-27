@@ -16,6 +16,7 @@
          scribble/basic
          scribble/html-properties
          (only-in scriblib/footnote note)
+         scribble/private/manual-tech
          (for-syntax racket/base racket/syntax)
          racket/bool
          racket/file
@@ -36,6 +37,8 @@
          prod-link
          prod-ref
          custom-index-block
+
+         (all-from-out scribble/private/manual-tech)
 
          docmodule
          function

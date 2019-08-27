@@ -16,8 +16,8 @@ follow a JSON-structured schema.  The format has several design goals:
 
 @item{It should not require any free or global JavaScript identifiers beyond
 chapter 15 of the ES5 spec, allowing the compiler and runtime system to
-parameterize the module by its context.@margin-note{Some modules, like images
-and the world library, use global variables like @tt{document}, though we'd
+parameterize the module by its context.@margin-note{Some modules, like @seclink["image"]{images}
+and the @seclink{world} library, use global variables like @tt{document}, though we'd
 like to refactor them so they don't need to.}}
 
 @item{It should be reasonable for a developer to write by hand, so that modules

@@ -3,37 +3,45 @@
 @(require "../../scribble-api.rkt")
 @(append-gen-docs
   `(module "type-check" (path "src/arr/compiler/type-check.arr")))
+@(append-gen-docs
+  `(module "modules" (path #f)
+    (form-spec (name "<id-import>"))
+    (form-spec (name "file"))
+    (form-spec (name "js-file"))
+    (form-spec (name "gdrive-js"))
+    (form-spec (name "shared-gdrive"))))
 
 @docmodule["modules" #:noimport #t #:friendly-title "Modules"]{
 
-We often want to write programs in separate pieces and store the pieces
-independently. This can be for a number of reasons, a few are:
+As programs get larger, it becomes intractable to manage the entirety of a
+program in a single file: we often want to separate programs into independent
+pieces.  Doing so has a number of benefits, giving us the abilities to:
 
 @itemlist[
 
-@item{To provide library code to students (unseen to them).}
+@item{provide library code to students (unseen to them).}
 
-@item{To logically separate responsibilities of a program into different files
+@item{logically separate responsibilities of a program into different files
 to make it easier for programmers to understand the code's layout.}
 
-@item{To provide a boundary over which it's relatively simple to substitute one
+@item{provide a boundary over which it's relatively simple to substitute one
 implementation of a library for another.}
 
-@item{To provide a boundary where the two sides may be implemented in different
+@item{provide a boundary where the two sides may be implemented in different
 languages, but can still share values.}
 
-@item{To provide only a subset of defined names to a different part of a
+@item{provide only a subset of defined names to a different part of a
 program.}
 
-@item{To manage names when the same (good) names may be in use in different
+@item{manage names when the same (good) names may be in use in different
 parts of the same program.}
 
-@item{To support incremental compilation.}
+@item{support incremental compilation.}
 
 ]
 
 Not all of these require a module system, but a module system can help with all
-of them, and these use cases motivate Pyret's.
+of them, and these use cases (and others) motivate Pyret's.
 
 This section describes the components of Pyret's module system and how to use
 it.
@@ -44,9 +52,9 @@ The shortest way to get started using the module system is to understand three
 key ideas:
 
 @itemlist[
-@item{How to provide names from a module}
-@item{How to tell Pyret to locate a module from a different module}
-@item{How to include names from a located module}
+@item{How to @emph{provide} names from a module}
+@item{How to tell Pyret to @emph{locate} one module from a different module}
+@item{How to @emph{include} names from a located module}
 ]
 
 Here's a simple example that demonstrates all three.
@@ -84,55 +92,45 @@ collection of definitions to another context across modules.
 
 @section[#:tag "s:modules:finding-modules"]{Finding Modules}
 
-The syntax for @pyret{import} and @pyret{include} statements specifies a
-@emph{dependency}, which tells Pyret how to find the module. Here are some
-examples of dependencies:
+Each @pyret{import} or @pyret{include} statement indicates a @deftech{dependency}
+of the current module on some other module.  The syntax for @pyret{import} and
+@pyret{include} statements specifies a @deftech{locator}, which tells Pyret how
+to find the module.
 
-@pyret-block{
-string-dict
-file("path/to/a/file.arr")
-js-file("path/to/a/file.arr.js")
-my-gdrive("stored-in-gdrive.arr")
-shared-gdrive("stored-in-gdrive-publicly.arr", "ABCDEFhijkl1234")
-}
+There are currently five types of @tech{locator}s supported, though the
+compiler can be configured to support some, all, or other types of
+@tech{locator}; for example, the @seclink[(xref "modules" "gdrive-js")]{@pyret{gdrive} locators} (below) only
+work in @url{code.pyret.org}, where it is assumed the user is authenticated to
+Google Drive.
 
-In general, a dependency is either:
-
-@itemlist[
-@item{Written as an identifier (like @pyret{string-dict} above), in which case
-it refers to a built-in module.}
-@item{Written as an identifier followed by string literals in parentheses, in
-which case it is referring to a user-written module that is located and loaded
-by the compiler.}
-]
-
-The compiler can be configured to load different types of locator; for example,
-the @pyret{gdrive} locators only work in code.pyret.org, where it is assumed
-the user is authenticated to Google Drive.
-
-The meaning of the supported forms are:
+The meaning of the currently supported forms are:
 
 @form["<id-import>" "<id-of-builtin>"]{
+@pyret-block[#:style "good-ex"]{include string-dict}
 Imports the given builtin module. Many built-in modules are documented in this
 documentation.
 }
 
 @form["file" "file(<path>)"]{
+@pyret-block[#:style "good-ex"]{include file("path/to/a/file.arr")}
 Find the module at the given @pyret{path}. If @pyret{path} is relative, it is
 interpreted relative to the module the import statement appears in.
 }
 
 @form["js-file" "js-file(<path>)"]{
+@pyret-block[#:style "good-ex"]{include js-file("path/to/a/file.arr.js")}
 Like @pyret{file}, but expects the contents of the file to contain a
-definition in @seclink["s:single-module" "JavaScript module format"]
+definition in @seclink["s:single-module" "JavaScript module format"].
 }
 
 @form["gdrive-js" "gdrive-js(<name>)"]{
+@pyret-block[#:style "good-ex"]{include my-gdrive("stored-in-gdrive.arr")}
 Looks for a Pyret file with the given filename in the user's
 @tt{code.pyret.org/} directory in the root of Google Drive.
 }
 
 @form["shared-gdrive" "shared-gdrive(<name>, <id>)"]{
+@pyret-block[#:style "good-ex"]{include shared-gdrive("public-in-gdrive.arr", "ABCDEF12345")}
 Looks for a Pyret file with the given id in Google Drive. The file must have
 the sharing settings set to “Public on the Web”. The name must match the actual
 name of the underlying file. These dependencies can be most easily generated by
@@ -193,7 +191,9 @@ In this example, the name @pyret{concat} could have one of two
 meanings. Since this is ambiguous, this program results in an error that
 reports the conflict between names.
 
-Neither of the list-helpers modules is @emph{wrong}, the module that uses both
+Neither of the list-helpers modules is @emph{wrong}: they each define a
+function named @pyret{concat} that is internally consistent within each helper
+module.  Instead, the client module that uses both helpers
 simply needs more control in order to use the right behavior from each. One way
 to get this control is to use @pyret{import}, rather than @pyret{include},
 which allows the programmer to give a name to the imported module. This name
@@ -211,14 +211,18 @@ check:
 end
 }
 
-Using `import` to define a module identifier is a simple way to unambiguously
+Using @pyret{import} to define a module identifier is a simple way to unambiguously
 refer to individual modules' exported names, and avoids conflicting names. It
 is always a straightforward way to resolve these ambiguities.
 
-Some potential downsides of always using module ids are the verbosity of
-prefixing all uses with @pyret{LH1}., and, in teaching settings, the need to
+Using @pyret{import} and module ids comes with some downsides:
+@itemlist[
+@item{It introduces verbosity, by forcing programmers to type @pyret{LH1.}
+every time they want to use a name from that module.}
+@item{In teaching settings, it forces teachers to
 introduce the syntactic form @pyret{a.b} before it's strictly necessary, causing a
-needless curricular dependency.
+needless curricular dependency.}
+]
 
 For situations where these issues become too onerous, Pyret provides more ways
 to control names.
@@ -227,11 +231,10 @@ to control names.
 
 It is not required that a module provide @emph{all} of its defined names. To
 provide fewer names than @pyret{provide *}, a module can use one or more
-@emph{provide blocks}. The overall set of features allowed is quite broad, and
+@deftech{provide blocks}. The overall set of features allowed is quite broad, and
 simple examples follow:
 
 @bnf['Pyret]{
-IMPORT: "provide"
 COLON: ":"
 STAR: "*"
 AS: "as"
@@ -249,7 +252,7 @@ PROVIDE: "provide"
 FROM: "from"
 provide-block: PROVIDECOLON [provide-spec (COMMA provide-spec)* [COMMA]] END
 
-provide-spec: provide-name-spec
+provide-spec: provide-name-spec | provide-type-spec | provide-data-spec | provide-module-spec
 
 name-spec: STAR [hiding-spec] | module-ref | module-ref AS NAME
 data-name-spec: STAR | module-ref
@@ -261,8 +264,7 @@ hiding-spec: HIDING PARENSPACE [(NAME COMMA)* NAME] RPAREN
 module-ref: (NAME DOT)* NAME
 }
 
-First, some simple examples. A module might define several names of values, and
-only provide a few:
+Let's unpack this in stages, starting with @py-prod{provide-name-spec}. A module might define several names of values, and only provide a few:
 
 @pyret-block{
 # A module that includes this one will only see concat and is-odd-length, and
@@ -346,12 +348,221 @@ import image as I
 A student library that @pyret{include}s this module would have access to all of
 the names from these three modules.
 
+@subsection{Providing more than just values}
+
+Modules can give names to other things besides values: they may define new
+types or new datatypes, or they may import another module and give it a name.
+The syntax above can be used to provide them as well.
+
+@bnf['Pyret]{
+COLON: ":"
+STAR: "*"
+AS: "as"
+PARENSPACE: "("
+RPAREN: ")"
+COMMA: ","
+TYPE: "type"
+DATA: "data"
+MODULE: "module"
+DOT: "."
+HIDING: "hiding"
+END: "end"
+PROVIDECOLON: "provide:"
+PROVIDE: "provide"
+FROM: "from"
+
+provide-type-spec: TYPE name-spec
+}
+
+Providing a @seclink["s:type-decl"]{type definition} is analogous to providing a
+value definition:
+
+@pyret-block{
+# A module that includes this one will see the name NumPair as a type
+provide:
+  type NumPair
+end
+
+type NumPair = {Number; Number}
+}
+
+@bnf['Pyret]{
+COLON: ":"
+STAR: "*"
+AS: "as"
+PARENSPACE: "("
+RPAREN: ")"
+COMMA: ","
+TYPE: "type"
+DATA: "data"
+MODULE: "module"
+DOT: "."
+HIDING: "hiding"
+END: "end"
+PROVIDECOLON: "provide:"
+PROVIDE: "provide"
+FROM: "from"
+
+provide-module-spec: MODULE name-spec
+}
+
+Providing a module id is also quite similar
+
+@pyret-block{
+# A module that includes this one will see the name SD as a module id,
+# just as if it had written `import string-dict as SD` itself.
+provide:
+  module SD
+end
+
+import string-dict as SD
+}
+The ability to re-provide imported modules is useful for large programs, where
+a single file can conveniently give access to all the submodules of the program.
+
+
+@bnf['Pyret]{
+COLON: ":"
+STAR: "*"
+AS: "as"
+PARENSPACE: "("
+RPAREN: ")"
+COMMA: ","
+TYPE: "type"
+DATA: "data"
+MODULE: "module"
+DOT: "."
+HIDING: "hiding"
+END: "end"
+PROVIDECOLON: "provide:"
+PROVIDE: "provide"
+FROM: "from"
+
+provide-data-spec: DATA data-name-spec [hiding-spec]
+}
+
+Providing a @seclink["s:data-decl"]{data definition} is more complicated, since
+data definitions implicitly define types and values.  The following two
+programs are equivalent in meaning:
+
+@pyret-block{
+provide:
+  data MyPosn
+end
+
+data MyPosn:
+  | pos2d(x, y)
+  | pos3d(x, y, z)
+end
+}
+
+means the same thing as the much longer
+
+@pyret-block{
+provide:
+  # constructors
+  pos2d, pos3d,
+  # type tester
+  is-MyPosn,
+  # variant testers
+  is-pos2d, is-pos3d,
+  # the type declaration itself
+  type MyPosn
+end
+
+data MyPosn:
+  | pos2d(x, y)
+  | pos3d(x, y, z)
+end
+}
+
+Similarly to how we could hide some names before, providing data definitions
+also permits hiding names:
+
+@pyret-block{
+provide:
+  data MyPosn hiding (pos2d, pos3d)
+end
+
+data MyPosn:
+  | pos2d(x, y)
+  | pos3d(x, y, z)
+end
+}
+
+will not provide the constructors for this data definition.  Clients will
+therefore not be able to construct new values of this data type, but they will
+still be able to manipulate any values they do receive.  This can be useful in
+combination with providing @emph{other} functions that do construct these
+values.  For instance, the following program will only allow clients to
+construct points with positive coordinates, by combining providing data, hiding
+some elements of it, and providing other values and renaming them:
+
+@pyret-block{
+provide:
+  data MyPosn hiding (pos2d, pos3d)
+  smart-pos2d as pos2d,
+  smart-pos3d as pos3d
+end
+
+data MyPosn:
+  | pos2d(x, y)
+  | pos3d(x, y, z)
+end
+
+fun smart-pos2d(x, y):
+  pos2d(num-max(x, 0), num-max(y, 0))
+end
+fun smart-pos3d(x, y, z):
+  pos2d(num-max(x, 0), num-max(y, 0), num-max(z, 0))
+end
+}
+
+Clients of this module will see the "smart" versions of these functions with
+the same names as the constructors, and will therefore never be able to
+construct invalid values.
+
 
 @subsection[#:tag "s:include-fewer"]{Including Fewer (and More) Names}
 
 There are forms for @pyret{include} with the same structure as @pyret{provide}
 for including particular names from other modules. All @pyret{include} forms
 take a module id and a list of specifications of names to include.
+
+@bnf['Pyret]{
+COLON: ":"
+STAR: "*"
+AS: "as"
+LPAREN: "("
+RPAREN: ")"
+COMMA: ","
+TYPE: "type"
+DATA: "data"
+MODULE: "module"
+DOT: "."
+HIDING: "hiding"
+END: "end"
+INCLUDECOLON: "include:"
+INCLUDE: "include"
+IMPORT: "import"
+FROM: "from"
+
+import-stmt: INCLUDE import-source
+           | INCLUDE FROM module-ref COLON [include-spec (COMMA include-spec)* [COMMA]] END
+           | IMPORT import-source AS NAME
+           | IMPORT NAME (COMMA NAME)*  FROM import-source
+import-source: import-special | import-name
+import-special: NAME LPAREN STRING (COMMA STRING)* RPAREN
+import-name: NAME
+
+include-spec: include-name-spec | include-type-spec | include-data-spec | include-module-spec
+
+include-name-spec: name-spec
+include-type-spec: TYPE name-spec
+include-data-spec: DATA data-name-spec [hiding-spec]
+include-module-spec: MODULE name-spec
+
+}
 
 Some examples:
 
@@ -406,21 +617,11 @@ include from L: map end
 # map included again here, but it's OK because the other map is the same
 }
 
+@subsection{Importing more than just values}
 
-@subsection[#:tag "s:modules:name-kinds"]{The Kinds of Names}
-
-The documentation above applies to names of values. In Pyret, we can define
-names that refer to values, types, or modules.
-
-Names for values are defined in many ways; by @pyret{fun} declarations, by
-@pyret{data} declarations creating constructors, by simple variable
-declarations like @pyret{x = 10}, and more.
-
-Names for types are defined by @pyret{type} (which creates type aliases), and
-@pyret{data} (which creates new types).
-
-Names for modules are defined by @pyret{import} statements, discussed above.
-
+Just as we can provide types, data definitions, and module ids, so too we can
+import them or include them from other modules.  The syntax is exactly
+analogous to providing
 
 
 
