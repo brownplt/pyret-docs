@@ -1,24 +1,8 @@
 #lang scribble/manual
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 
-@; WARNING in report-undocumented: Undocumented export "push" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "max" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "remove" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "member-identical" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "stdev" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "member-always3" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "mean" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "reverse-help" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "member-now" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "member-identical3" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "range-by" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "member-always" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "member3" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "min" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "median" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "member-now3" from module "lists"
-@; WARNING in report-undocumented: Undocumented export "sum" from module "lists"
 @; WARNING in report-undocumented: Undocumented export "join-str" from module "lists"
+@; WARNING in report-undocumented: Undocumented export "push" from module "lists"
 
 
 @(append-gen-docs
@@ -472,19 +456,6 @@
         "a"))
     (doc
       "Returns a new list with the same values as the given list but with the nth element\n        set to the given value, or raises an error if n is out of range"))
-  (fun-spec
-    (name "reverse-help")
-    (arity 2)
-    (params [list: leaf("a")])
-    (args ("lst" "acc"))
-    (return (a-app (a-id "List" (xref "lists" "List")) "a"))
-    (contract
-      (a-arrow
-        (a-app (a-id "List" (xref "lists" "List")) "a")
-        (a-app (a-id "List" (xref "lists" "List")) "a")
-        (a-app (a-id "List" (xref "lists" "List")) "a")))
-    (doc
-      "Returns a new list containing the same elements as this list, in reverse order"))
   (fun-spec
     (name "reverse")
     (arity 1)
@@ -1326,7 +1297,7 @@ end
 
 @list-method["push"]
 
-Returns @tt{link(elt, rest)}.
+Returns @tt{link(elt, self)}.
 
 @examples{
 check:
@@ -1612,17 +1583,7 @@ end
     end
     }
   ]
-  @;{@function[
-    "reverse"
-    #:examples
-    '@{
-    import lists as L
-    check:
-      L.reverse([list: ], [list: ]) is [list: ]
-      L.reverse([list: 1, 3], [list: ]) is [list: 3, 1]
-    end
-    }
-  ]}
+  
 
 @function["sort"
   #:contract (a-arrow (L-of "A") (L-of "A"))
@@ -1665,6 +1626,22 @@ end
 }
 }
 
+@function["join-str"
+          #:contract (a-arrow (L-of "A") S S)
+          #:args '(("lst" #f) ("sep" #f))
+          #:return S
+#:examples
+'@{
+check:
+  [list: 1, 2, 3].join-str("; ") is "1; 2; 3"
+  [list: "a", true, ~5.3].join-str(" : ") is "a : true : ~5.3"
+  empty.join-str("nothing at all") is ""
+end
+}
+]
+
+
+
   @function[
     "range"
     #:examples
@@ -1676,6 +1653,19 @@ end
     end
     }
   ]
+  @function["range-by"]{
+  @examples{
+  import lists as L
+  check:
+    L.range-by(1, 10, 4) is [list: 1, 5, 9]
+    L.range-by(10, 1, -4) is [list: 10, 6, 2]
+    L.range-by(3, 20, 9) is [list: 3, 12]
+    L.range-by(20, 3, 9) is empty
+    L.range-by(20, 3, -9) is [list: 20, 11]
+    L.range-by(2, 3, 0) raises "interval of 0"
+  end
+  }
+  }
   @function[
     "repeat"
     #:examples
@@ -1788,6 +1778,20 @@ end
   }
 
   }
+
+@function["push"
+#:contract (a-arrow (L-of "A") "A" (L-of "A"))
+#:args '(("l" #f) ("elt" #f))
+#:return (L-of "A")]{
+Constructs a list with the given element prepended to the front of the given
+list.
+@examples{
+check:
+  push(empty, "a") is link("a", empty)
+  push(link("a", empty), "b") is link("b", link("a", empty))
+end
+}
+}
 
   @function["append"
     #:contract (a-arrow (L-of "A") (L-of "A") (L-of "A"))
@@ -2258,6 +2262,24 @@ check:
     satisfies EQ.is-NotEqual 
 end
 }
+
+@function["member-always"]
+@function["member-identical"]
+@function["member-now"]
+Analogous to @pyret-id{member}, but uses @pyret-id["equal-always" "equality"]
+or @pyret-id["identical" "equality"] to perform the comparison.
+
+@function["member3"]
+@function["member-always3"]
+Analogous to @pyret-id{member-with}, but uses @pyret-id["equal-always3" "equality"]
+to perform the comparison.
+
+@function["member-identical3"]
+Analogous to @pyret-id{member-with}, but uses @pyret-id["identical3" "equality"] to perform the comparison.
+
+@function["member-now3"]
+Analogous to @pyret-id{member-with}, but uses @pyret-id["equal-now3"
+"equality"] to perform the comparison.
   
   @function[
     "reverse"
@@ -2273,6 +2295,19 @@ check:
   L.reverse(l) is [list: 4, 3, 2, 1]
 end
 }
+
+@function["remove"]
+Returns a new @pyret{List} with all the elements of the original that are not
+equal to the specified element (using @pyret-id["==" "equality"] as the comparison).
+
+@examples{
+import lists as L
+check:
+  l = [list: 1, 2, 3, 4, 3, 2, 1]
+  L.remove(l, 2) is [list: 1, 3, 4, 3, 1]
+end
+}
+
 
   @function[
     "shuffle"

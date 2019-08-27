@@ -105,7 +105,7 @@ big-bang(10, [list: not-a-handler(increment)])
 big-bang(10, on-tick(increment))
 }
     
-  @section{Functions}
+  @section[#:tag "functions-world"]{Functions}
 
   @function["on-tick"
             #:contract (a-arrow (a-arrow "a"
