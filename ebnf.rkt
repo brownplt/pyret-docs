@@ -10,6 +10,15 @@
 (define (prod-link grammar name)
   (elemref (prod-tag grammar name) (prod-ref name)))
 
+(define grammar-prod-counts (make-hash))
+(define (get-next-grammar-prod-tag grammar prod-name)
+  (define grammar-prod (hash-ref! grammar-prod-counts grammar make-hash))
+  (define prod-num (+ 1 (hash-ref grammar-prod prod-name 0)))
+  (hash-set! grammar-prod prod-name prod-num)
+  (if (= prod-num 1)
+      (prod-tag grammar prod-name)
+      (prod-tag grammar (format "~a@~a" prod-name prod-num))))
+
 
 (define (render grammar parsed)
   (define-values (constants prods) (partition constant? parsed))
@@ -58,6 +67,7 @@
        (define tok (assoc (pattern-token-val p) names))
        (cond
          [tok (lit (second tok))]
+         [(string=? (pattern-token-val p) "...") (meta "...")]
          [else (unknown-lit (pattern-token-val p))])]
       [(pattern-lit? p)
        (lit (pattern-lit-val p))]
@@ -72,7 +82,7 @@
           (add-between
            (for/list [(p prods)]
              (parameterize ([rule-name (lhs-id-val (rule-lhs p))])
-               (list (elemtag (prod-tag grammar (rule-name))
+               (list (elemtag (get-next-grammar-prod-tag grammar (rule-name))
                               (elem (prod-ref (rule-name))
                                     #:style (make-style #f (list (attributes '((class . "bnf-rule")))))))
                      (meta ":")
