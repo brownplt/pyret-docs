@@ -1,6 +1,7 @@
 #lang scribble/base
 
 @(require
+  scribble/core
   racket/list
   racket/file
   (only-in racket/string string-join)
@@ -9,6 +10,17 @@
   "../../scribble-api.rkt"
   "../../ragged.rkt")
 
+@(define (spy-index-tag opname)
+  (define tag (make-generated-tag))
+  (define index-tags (list (pyret opname) "spies"))
+  (make-index-element #f
+                       (list (make-target-element #f '() `(idx ,tag)))
+                       `(idx ,tag)
+                       (cons opname (list "spies"))
+                       index-tags
+                       #f))
+
+@(spy-index-tag "spy")
 @title[#:tag "s:spies"]{Spies}
 
 Spies are used for convenient display of values for print-style debugging. See
