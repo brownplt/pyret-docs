@@ -16,7 +16,6 @@
     (fun-spec (name "mean") (arity 1))
     (fun-spec (name "median") (arity 1))
     (fun-spec (name "stdev") (arity 1))
-    (fun-spec (name "distinct") (arity 1))
     (fun-spec (name "modes") (arity 1))
     (fun-spec (name "has-mode") (arity 1))
     (fun-spec (name "mode-smallest") (arity 1))

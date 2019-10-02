@@ -342,11 +342,11 @@ check:
 end
 }
 
-@section{Data}
+@section[#:tag "data-tour"]{Data}
 
 Pyret has a builtin form for declaring and manipulating structured data.
 
-@subsection{Definitions}
+@subsection[#:tag "definitions-tour"]{Definitions}
 
 One example that you've already seen is @pyret-id["List" "lists"]. A
 @pyret-id["List" "lists"] list is either @pyret{empty} or it is a @pyret{link}
@@ -416,7 +416,7 @@ the testing forms.}
 
 
 
-@section{Cases}
+@section[#:tag "cases-tour"]{Cases}
 
 A common pattern is to do different things based on the variant of a
 @pyret{data} definition.  The @pyret{cases} expression allows you to write
@@ -463,7 +463,7 @@ check:
 end
 }
 
-@section{Annotations}
+@section[#:tag "annotations-tour"]{Annotations}
 
 Pyret is not currently a typed language (a static checker is an ongoing
 project), but it allows type-like annotations, both to document the type

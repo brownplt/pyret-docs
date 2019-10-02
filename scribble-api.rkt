@@ -16,6 +16,7 @@
          scribble/basic
          scribble/html-properties
          (only-in scriblib/footnote note)
+         scribble/private/manual-tech
          (for-syntax racket/base racket/syntax)
          racket/bool
          racket/file
@@ -37,9 +38,12 @@
          prod-ref
          custom-index-block
 
+         (all-from-out scribble/private/manual-tech)
+
          docmodule
          function
          value
+         form
          render-fun-helper
          re-export from
          pyret pyret-id pyret-method pyret-block
@@ -822,6 +826,28 @@
           ; error checking complete, record name as documented
      (when (not private) (set-documented! (curr-module-name) name))
      ans))
+
+(define (form name text #:private (private #f) . contents)
+  (when (not private) (set-documented! (curr-module-name) name))
+   (let ([processing-module (curr-module-name)])
+     (define part-tag (list 'part (tag-name (curr-module-name) name)))
+     (define pyret-text (seclink (xref processing-module name) (pyret text)))
+     (define pyret-elt (toc-target-element code-style (list pyret-text) part-tag))
+     (interleave-parbreaks/all
+      (list
+        (traverse-block ; use this to build xrefs on an early pass through docs
+         (lambda (get set!)
+           (set! 'doc-xrefs (cons (list name processing-module)
+                                  (get 'doc-xrefs '())))
+           (define header-part
+               (apply para #:style (div-style "boxed pyret-header")
+                  (list pyret-elt)))
+           (nested #:style (div-style "value")
+                   (cons
+                     header-part
+                     (interleave-parbreaks/all
+                      (append
+                        (list (nested #:style (div-style "description") contents))))))))))))
 
 (define (value name ann #:private (private #f) . contents)
   (when (not private) (set-documented! (curr-module-name) name))
