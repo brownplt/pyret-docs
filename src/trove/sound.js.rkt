@@ -8,21 +8,21 @@
 @(append-gen-docs
 '(module "sound"
   (path "build/phase1/trove/sound.js")
-  (fun-spec (name "makeSound") (arity 2))
-  (fun-spec (name "getSoundFromURL") (arity 1))
-  (fun-spec (name "getBufferFromURL") (arity 1))
-  (fun-spec (name "getBufferFromSound") (arity 1))
-  (fun-spec (name "denormalizeSound") (arity 1))
-  (fun-spec (name "getSoundFromAudioBuffer") (arity 1))
+  (fun-spec (name "make-sound") (arity 2))
+  (fun-spec (name "get-sound-from-url") (arity 1))
+  (fun-spec (name "get-buffer-from-url") (arity 1))
+  (fun-spec (name "get-array-from-sound") (arity 1))
+  (fun-spec (name "denormalize-sound") (arity 1))
+  (fun-spec (name "get-sound-from-audio-buffer") (arity 1))
   (fun-spec (name "overlay") (arity 1))
   (fun-spec (name "concat") (arity 1))
-  (fun-spec (name "setPlaybackSpeed") (arity 2))
+  (fun-spec (name "set-playback-speed") (arity 2))
   (fun-spec (name "shorten") (arity 3))
-  (fun-spec (name "getCosineWave") (arity 0))
-  (fun-spec (name "getSineWave") (arity 0))
-  (fun-spec (name "getTone") (arity 1))
+  (fun-spec (name "get-cosine-wave") (arity 0))
+  (fun-spec (name "get-sine-wave") (arity 0))
+  (fun-spec (name "get-tone") (arity 1))
   (fun-spec (name "fade") (arity 1))
-  (fun-spec (name "removeVocals") (arity 1))
+  (fun-spec (name "remove-vocals") (arity 1))
   (data-spec (name "Sound") (variants) (shared))
   (data-spec (name "AudioBuffer") (variants) (shared))
 ))
@@ -49,15 +49,15 @@
 
   @section{Basic Sounds}
   @function[
-    "makeSound"
-            #:contract (a-arrow N (A-of (A-of N)) Sound)
+    "make-sound"
+            #:contract (a-arrow N (RA-of (RA-of N)) Sound)
             #:return Sound   
             #:args (list '("sample_rate" "")
                          '("data_array" "") )]{
               Constructs a sound with the given sample rate and data array.
             }
   @function[
-    "getSoundFromURL"
+    "get-sound-from-url"
             #:contract (a-arrow S Sound)
             #:return Sound   
             #:args (list '("path" ""))]{
@@ -66,28 +66,28 @@
 
   @section{Sound Buffers}
   @function[
-    "getBufferFromURL"
+    "get-buffer-from-url"
             #:contract (a-arrow S Sound)
             #:return Sound   
             #:args (list '("path" ""))]{
               Constructs a sound buffer from the given url path.
             }
   @function[
-    "getBufferFromSound"
-            #:contract (a-arrow Sound AudioBuffer)
+    "get-array-from-sound"
+            #:contract (a-arrow Sound (RA-of (RA-of N)))
             #:return Sound   
             #:args (list '("sound" ""))]{
-              Constructs a andio buffer from the given sound.
+              Returns the data array of the given sound.
             }
   @function[
-    "getSoundFromAudioBuffer"
+    "get-sound-from-audio-buffer"
             #:contract (a-arrow AudioBuffer Sound)
             #:return Sound   
             #:args (list '("buffer" ""))]{
               Constructs a sound from the given audio buffer.
             }
   @function[
-    "denormalizeSound"
+    "denormalize-sound"
             #:contract (a-arrow AudioBuffer AudioBuffer)
             #:return Sound   
             #:args (list '("buffer" ""))]{
@@ -112,7 +112,7 @@
             }
   @section{Scaling, and Shortening Sounds}
   @function[
-    "setPlaybackSpeed"
+    "set-playback-speed"
             #:contract (a-arrow Sound N Sound)
             #:return Sound   
             #:args (list '("sample" "")
@@ -130,21 +130,21 @@
             }
   @section{Starter Sound Waves and Tones}
   @function[
-    "getCosineWave"
+    "get-cosine-wave"
             #:contract (a-arrow Sound)
             #:return Sound   
             #:args (list )]{
               Constructs consine waves.
             }
   @function[
-    "getSineWave"
+    "get-sine-wave"
             #:contract (a-arrow Sound)
             #:return Sound   
             #:args (list )]{
               Constructs sine waves.
             }
   @function[
-    "getTone"
+    "get-tone"
             #:contract (a-arrow S Sound)
             #:return Sound   
             #:args (list '("key" ""))]{
@@ -160,7 +160,7 @@
             }
   @section{Removing Vocals}
   @function[
-    "removeVocals"
+    "remove-vocals"
             #:contract (a-arrow Sound Sound)
             #:return Sound   
             #:args (list '("sound" ""))]{
