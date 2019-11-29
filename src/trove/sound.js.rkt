@@ -10,10 +10,8 @@
   (path "build/phase1/trove/sound.js")
   (fun-spec (name "make-sound") (arity 2))
   (fun-spec (name "get-sound-from-url") (arity 1))
-  (fun-spec (name "get-buffer-from-url") (arity 1))
   (fun-spec (name "get-array-from-sound") (arity 1))
   (fun-spec (name "denormalize-sound") (arity 1))
-  (fun-spec (name "get-sound-from-audio-buffer") (arity 1))
   (fun-spec (name "overlay") (arity 1))
   (fun-spec (name "concat") (arity 1))
   (fun-spec (name "set-playback-speed") (arity 2))
@@ -24,27 +22,38 @@
   (fun-spec (name "fade") (arity 1))
   (fun-spec (name "remove-vocals") (arity 1))
   (data-spec (name "Sound") (variants) (shared))
-  (data-spec (name "AudioBuffer") (variants) (shared))
 ))
 @(define Sound (a-id "Sound" (xref "sound" "Sound")))
 @(define AudioBuffer (a-id "AudioBuffer" (xref "audiobuffer" "AudioBuffer")))
 
 @docmodule["sound"]{
 
-  The functions in this module are used for creating, combining, and displaying
-  sounds.
+  The functions in this module are responsible for the creation and manipulation of various types of sounds.
+  
+  A sound file can be visualized as a set of channels, each corresponding to a sound wave. Depending on the
+  construction and framework, these channels serve varying purposes. In some cases, they may refer to the
+  left and right stereo sound stream. In others, each channel may correspond to a different instrument. In
+  many cases, a set of channels may contain very similar sounds that have been overlaid together to improve
+  quality. This library is supported by an underlying infrastructure of the WebAudioAPI. Therefore, it is 
+  equipped to handle only .wav files for uploads and downloads.
+
+  A sound wave can be represented in a numeric form as a set of amplitudes whose values can range from -1
+  to +1. As a consequence, each sound in this library is a characterized by a two-dimensional float array,
+  where each row corresponds to the sound wave in a given channel. 
+  
+  The sound library is equipped with a widget that possesses media-player capabilities. Any object of the
+  type 'sound', will automatically invoke the widget.
 
   @section[#:tag "sound_DataTypes"]{Data Types}
   @type-spec["Sound" (list)]{
 
+    This data type is the standard representation in this library for a sound. 
+    Imitating a real-world sound, this object is characterized by the two-dimensional
+    float array of amplitudes, the sample rate, the duration, and the number of channels.
+
     This is the return type of many of the functions in this module; it
     includes simple sounds, and also combinations or transformations of 
-    existing sounds, like overlays, concatenations, and scaling.
-    }
-  @type-spec["AudioBuffer" (list)]{
-
-    The AudioBuffer represents a short audio asset residing in memory; it
-    includes sample rate, channel data, and length.
+    existing sounds, like overlays, concatenations, and scaling. 
     }
 
   @section{Basic Sounds}
@@ -54,44 +63,31 @@
             #:return Sound   
             #:args (list '("sample_rate" "")
                          '("data_array" "") )]{
-              Constructs a sound with the given sample rate and data array.
+              Primary function to constructs a sound from scratch using the given sample rate and data array.
             }
   @function[
     "get-sound-from-url"
             #:contract (a-arrow S Sound)
             #:return Sound   
             #:args (list '("path" ""))]{
-              Constructs a sound object from the given url path.
+              Constructs a sound object from the given URL resource that points to a .wav audio file.
             }
 
   @section{Sound Buffers}
-  @function[
-    "get-buffer-from-url"
-            #:contract (a-arrow S Sound)
-            #:return Sound   
-            #:args (list '("path" ""))]{
-              Constructs a sound buffer from the given url path.
-            }
   @function[
     "get-array-from-sound"
             #:contract (a-arrow Sound (RA-of (RA-of N)))
             #:return Sound   
             #:args (list '("sound" ""))]{
-              Returns the data array of the given sound.
-            }
-  @function[
-    "get-sound-from-audio-buffer"
-            #:contract (a-arrow AudioBuffer Sound)
-            #:return Sound   
-            #:args (list '("buffer" ""))]{
-              Constructs a sound from the given audio buffer.
+              Returns the two-dimensional float array of the given sound.
             }
   @function[
     "denormalize-sound"
-            #:contract (a-arrow AudioBuffer AudioBuffer)
+            #:contract (a-arrow Sound (RA-of (RA-of N)))
             #:return Sound   
             #:args (list '("buffer" ""))]{
-              Denormalizes the given audio buffer and returns the result as a new audio buffer.
+              Denormalizes the given sound and returns the result as a new sound. Note that a given sound
+              is normalized by default. 
             }
   @section{Overlaying Sounds}
   @function[
@@ -117,7 +113,7 @@
             #:return Sound   
             #:args (list '("sample" "")
                          '("rate" ""))]{
-              Constructs a sound with the given sample at the given rate.
+              Constructs a sound that plays at the new rate given by the playback speed, such as 2X, 3X etc.
             }
   @function[
     "shorten"
@@ -126,7 +122,8 @@
             #:args (list '("sample" "")
                          '("start" "")
                          '("end" ""))]{
-              Shortens a sound with the given start and end time.
+              Shortens a sound to a new sound based on the given start and end time. In other words, 
+              it crops the sound to specified interval.
             }
   @section{Starter Sound Waves and Tones}
   @function[
@@ -134,21 +131,21 @@
             #:contract (a-arrow Sound)
             #:return Sound   
             #:args (list )]{
-              Constructs consine waves.
+              Constructs a default cosine wave with frequency of 440Hz.
             }
   @function[
     "get-sine-wave"
             #:contract (a-arrow Sound)
             #:return Sound   
             #:args (list )]{
-              Constructs sine waves.
+              Constructs a default sine wave with frequency of 440Hz.
             }
   @function[
     "get-tone"
             #:contract (a-arrow S Sound)
             #:return Sound   
             #:args (list '("key" ""))]{
-              Constructs a tone with the given key.
+              Constructs a sound tone of an octave of the given key, such as A4, C8 etc.
             }
   @section{Panning and Fading Sounds}
   @function[
@@ -156,7 +153,7 @@
             #:contract (a-arrow Sound Sound)
             #:return Sound   
             #:args (list '("sound" ""))]{
-              Fades the given sound and returns the result.
+              Progressively fades a given sound and returns the result.
             }
   @section{Removing Vocals}
   @function[
