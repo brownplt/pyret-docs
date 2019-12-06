@@ -78,7 +78,7 @@
               The data array is a 1 - Dimensional float array, where the elements  
               correspond to the amplitudes of the sound wave present in that channel.
 
-              @(image "src/builtin/soundwave.png")
+              @(image "src/builtin/soundwave.PNG")
             }
   @function[
     "make-multi-channel-sound"
@@ -93,8 +93,8 @@
               The data array is a 2 - Dimensional float array, where the elements of each row of this array 
               corresponds to the amplitudes of the sound wave present in that channel.
 
-              @(image "src/builtin/soundwave.png")
-              @(image "src/builtin/soundwave.png")
+              @(image "src/builtin/soundwave.PNG")
+              @(image "src/builtin/soundwave.PNG")
             }
   @function[
     "get-sound-from-url"
