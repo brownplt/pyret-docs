@@ -141,11 +141,11 @@
               overlay of these two sounds. A practical application of this function is when we want to 
               overlay the sounds being played by different instruments for one one song.
 
-              @(image "src/builtin/overlayone.png")
+              @(image "src/builtin/overlayone.PNG")
 
-              @(image "src/builtin/overlaytwo.png")
+              @(image "src/builtin/overlaytwo.PNG")
 
-              @(image "src/builtin/overlayed.png")
+              @(image "src/builtin/overlayed.PNG")
 
             }
 
@@ -162,11 +162,11 @@
               Given below are two individual sound objects, and the sound resulting from a
               concatenation of these two sounds.
 
-              @(image "src/builtin/overlayone.png")
+              @(image "src/builtin/overlayone.PNG")
 
-              @(image "src/builtin/overlaytwo.png")
+              @(image "src/builtin/overlaytwo.PNG")
 
-              @(image "src/builtin/concated.png")
+              @(image "src/builtin/concated.PNG")
             }
   @section{Scaling, and Shortening Sounds}
   @function[
@@ -212,7 +212,7 @@
               Constructs a sound tone of an octave of the given key, such as A4, C8 etc. 
               Concatenation of several tones will result in one long set of beeps with no pauses in between.
 
-              @(image "src/builtin/overlayone.png")
+              @(image "src/builtin/overlayone.PNG")
             }
   @function[
     "get-note"
@@ -223,7 +223,7 @@
               tangible silence in the end. Hence, it works like a typical press of a piano key. 
               Concatenation of several notes will result in a melody akin to playing notes on a piano.
 
-              @(image "src/builtin/getnote.png")
+              @(image "src/builtin/getnote.PNG")
             }
   @section{Fading Sounds}
   @function[
@@ -233,7 +233,7 @@
             #:args (list '("sound" ""))]{
               Progressively fades a given sound towards the end and returns the result as a new sound.
 
-              @(image "src/builtin/fade.png")
+              @(image "src/builtin/fade.PNG")
             }
   @section{Removing Vocals}
   @function[
