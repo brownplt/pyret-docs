@@ -19,3 +19,4 @@ that you can follow to build up a simple animated game:
 
 @include-section["tour.scrbl"]
 @include-section["Pyret-Tutorial/lander.scrbl"]
+@include-section["Pyret-Tutorial/jingleBells.scrbl"]
