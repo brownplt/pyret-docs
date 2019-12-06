@@ -20,6 +20,7 @@ script:
 - make
 deploy:
 - provider: s3
+  acl: public_read
   bucket: pyret-docs-sound
   local_dir: build/docs
   upload-dir: docs
