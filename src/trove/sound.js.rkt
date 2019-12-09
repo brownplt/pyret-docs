@@ -451,7 +451,7 @@
 
   @function[
     "get-note"
-            #:contract (a-arrow S Sound)
+            #:contract (a-arrow S N N)
             #:return Sound   
             #:args (list '("key" "")
             '("durationOn" "")
