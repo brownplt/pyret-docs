@@ -8,15 +8,26 @@
 @(append-gen-docs
 '(module "sound"
   (path "build/phase1/trove/sound.js")
-  (fun-spec (name "make-single-channel-sound") (arity 2))
+  (fun-spec (name "make-sound") (arity 2))
   (fun-spec (name "make-multi-channel-sound") (arity 2))
   (fun-spec (name "get-sound-from-url") (arity 1))
-  (fun-spec (name "get-array-from-sound") (arity 1))
-  (fun-spec (name "denormalize-sound") (arity 1))
+  (fun-spec (name "get-multi-channel-data-arrays") (arity 1))
+  (fun-spec (name "get-channel-data-array") (arity 1))
+  (fun-spec (name "sound-duration") (arity 1))
+  (fun-spec (name "sound-sample-rate") (arity 1))
+  (fun-spec (name "sound-num-channels") (arity 1))
+  (fun-spec (name "sound-num-samples") (arity 1))
+  (fun-spec (name "is-sound") (arity 1))
+  (fun-spec (name "sounds-equal") (arity 1))
+  (fun-spec (name "normalize-sound") (arity 1))
   (fun-spec (name "overlay") (arity 1))
   (fun-spec (name "concat") (arity 1))
-  (fun-spec (name "set-playback-speed") (arity 2))
-  (fun-spec (name "shorten") (arity 3))
+  (fun-spec (name "overlay-list") (arity 1))
+  (fun-spec (name "concat-list") (arity 1))
+  (fun-spec (name "adjust-playback-speed") (arity 2))
+  (fun-spec (name "set-sample-rate") (arity 1))
+  (fun-spec (name "crop-by-time") (arity 3))
+  (fun-spec (name "crop-by-index") (arity 3))
   (fun-spec (name "get-cosine-wave") (arity 0))
   (fun-spec (name "get-sine-wave") (arity 0))
   (fun-spec (name "get-tone") (arity 1))
@@ -66,8 +77,8 @@
 
   @section{Basic Sounds}
   @function[
-    "make-single-channel-sound"
-            #:contract (a-arrow N (RA-of (RA-of N)) Sound)
+    "make-sound"
+            #:contract (a-arrow N (RA-of N) Sound)
             #:return Sound   
             #:args (list '("sample_rate" "")
                          '("data_array" "") )]{
@@ -80,6 +91,9 @@
 
               @(image "src/builtin/soundwave.PNG")
             }
+            @codeblock|{
+                soundA = S.make-sound(3000, [G.raw-array: 0.1, 0.2, 0.3, 0.1])
+            }|
   @function[
     "make-multi-channel-sound"
             #:contract (a-arrow N (RA-of (RA-of N)) Sound)
@@ -96,6 +110,9 @@
               @(image "src/builtin/soundwave.PNG")
               @(image "src/builtin/soundwave.PNG")
             }
+            @codeblock|{
+                soundB = S.make-multi-channel-sound(3000, [G.raw-array: [G.raw-array: 0.1, 0.2, 0.3, 0.1], [G.raw-array: -0.2, -0.3, -0.1, 0.5]])
+            }|
   @function[
     "get-sound-from-url"
             #:contract (a-arrow S Sound)
@@ -111,28 +128,126 @@
 
   @section{Sound Buffers}
   @function[
-    "get-array-from-sound"
+    "get-multi-channel-data-arrays"
             #:contract (a-arrow Sound (RA-of (RA-of N)))
-            #:return Sound   
+            #:return (RA-of N)   
             #:args (list '("sound" ""))]{
               Returns the two-dimensional / single-dimensional float array of the given sound.
               
             }
             @codeblock|{
                 urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
-                numArray = S.get-array-from-sound(urlSound)
+                numArray = S.get-multi-channel-data-arrays(urlSound)
+            }|
+  @function[
+    "get-channel-data-array"
+            #:contract (a-arrow Sound N)
+            #:return (RA-of N)  
+            #:args (list '("sound" "")
+                         '("channel" ""))]{
+              Returns the single-dimensional float array of the given channel of a given sound.
+              
+            }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                numArray = S.get-channel-data-array(urlSound)
             }|
 
   @function[
-    "denormalize-sound"
-            #:contract (a-arrow Sound (RA-of (RA-of N)))
+    "sound-duration"
+            #:contract (a-arrow Sound )
+            #:return N   
+            #:args (list '("sound" ""))]{
+              Returns the duration of a given sound in seconds.
+              
+            }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                duration = S.sound-duration(urlSound)
+            }|
+  @function[
+    "sound-sample-rate"
+            #:contract (a-arrow Sound )
+            #:return N   
+            #:args (list '("sound" ""))]{
+              Returns the sample rate (number of samples per second) of a given sound, which is necessarily the frequency of a sound in Hz.
+              
+            }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                sampleRate = S.sound-sample-rate(urlSound)
+            }|
+  @function[
+    "set-sample-rate"
+            #:contract (a-arrow Sound )
             #:return Sound   
-            #:args (list '("buffer" ""))]{
+            #:args (list '("sound" ""))]{
+              Sets / Updates the sample rate (number of samples per second) of a given sound, 
+              and returns the new sound.
+              
+            }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                newSound = S.set-sample-rate(urlSound)
+            }|
+  @function[
+    "sound-num-channels"
+            #:contract (a-arrow Sound )
+            #:return N  
+            #:args (list '("sound" ""))]{
+              Returns the number of channels present in a given sound.
+              
+            }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                numChannels = S.sound-num-channels(urlSound)
+            }|
+  @function[
+    "sound-num-samples"
+            #:contract (a-arrow Sound )
+            #:return N   
+            #:args (list '("sound" ""))]{
+              Returns the number of samples or the size of the float array of the very first channel present in a given sound.
+              
+            }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                numSamples = S.sound-num-samples(urlSound)
+            }|
+  @function[
+    "is-sound"
+            #:contract (a-arrow Sound )
+            #:return "Boolean"   
+            #:args (list '("sound" ""))]{
+              Validates if a given sound object is of a valid sound type.
+              
+            }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                val = S.is-sound(urlSound)
+            }| 
+  @function[
+    "sounds-equal"
+            #:contract (a-arrow Sound Sound)
+            #:return "Boolean"   
+            #:args (list '("sound1" "")
+                         '("sound2" ""))]{
+              Specifies if two given sound objects are equal.
+              
+            }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                val = S.is-sound(urlSound)
+            }|             
+  @function[
+    "normalize-sound"
+            #:contract (a-arrow Sound )
+            #:return Sound   
+            #:args (list '("sound" ""))]{
               Normalization is the process of transforming / scaling the amplitudes of a sound to 
-              fall between the range of -1 to +1. Note that a given sound is normalized by default. 
-              The above function denormalizes the given sound and returns the result as a new sound. 
+              fall between the range of -1 to +1. 
 
-              Please note that the array returned by a denormalized sound will have amplitude values 
+              Please note that the array returned by a sound that is not normalized will have amplitude values 
               that are outside the range of -1 to +1. However, while playing the sound, the internal
               sound API automatically clamps the values that fall out of this range, in order to play it as a valid sound. 
               One can observe these non-compliant points being plotted as red dots on the widget. 
@@ -140,17 +255,17 @@
             }
             @codeblock|{
                 urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
-                normSound = S.denormalize-sound(urlSound)
+                normSound = S.normalize-sound(urlSound)
             }|
 
   @section{Overlaying Sounds}
   @function[
-    "overlay"
+    "overlay-list"
             #:contract (a-arrow (L-of Sound) Sound)
             #:return Sound   
             #:args (list '("samples" ""))]{
               Places one sound over another, and is the equivalent of an addition operation 
-              between the amplitudes of a set of sounds. The Overlay function requires a 
+              between the amplitudes of a set of sounds. The function requires a 
               list of sound objects that need to be overlayed, and returns the result as a new sound.
 
               Given below are two individual sound objects, and the sound resulting from an 
@@ -167,13 +282,41 @@
             @codeblock|{
                 soundA = S.get-note("A3")
                 soundB = S.get-note("A1")
-                soundList = [L.list: a,b]
+                soundList = [L.list: soundA, soundB]
                 soundC = S.overlay(soundList)
+            }|
+
+
+    @function[
+    "overlay"
+            #:contract (a-arrow Sound Sound)
+            #:return Sound   
+            #:args (list '("sound1" "")
+                         '("sound2" ""))]{
+              Places one sound over another, and is the equivalent of an addition operation 
+              between the amplitudes of a set of sounds. The function requires two 
+              sound objects that need to be overlayed, and returns the result as a new sound.
+
+              Given below are two individual sound objects, and the sound resulting from an 
+              overlay of these two sounds. A practical application of this function is when we want to 
+              overlay the sounds being played by different instruments for one one song.
+
+              @(image "src/builtin/overlayone.PNG")
+
+              @(image "src/builtin/overlaytwo.PNG")
+
+              @(image "src/builtin/overlayed.PNG")
+
+            }
+            @codeblock|{
+                soundA = S.get-note("A3")
+                soundB = S.get-note("A1")
+                soundC = S.overlay(soundA, soundB)
             }|
 
   @section{Concatenating Sounds}
   @function[
-    "concat"
+    "concat-list"
             #:contract (a-arrow (L-of Sound) Sound)
             #:return Sound   
             #:args (list '("samples" ""))]{
@@ -193,13 +336,39 @@
             @codeblock|{
                 soundA = S.get-note("A3")
                 soundB = S.get-note("A1")
-                soundList = [L.list: a,a,a,b,a,a,a]
+                soundList = [L.list: soundA, soundB]
                 soundC = S.concat(soundList)
             }|
+  
+  @function[
+    "concat"
+            #:contract (a-arrow Sound Sound)
+            #:return Sound   
+            #:args (list '("sound1" "")
+                         '("sound2" ""))]{
+              Concatenates different sounds together as one long sound. The function requires a 
+              list of sound objects in the order in which they need to be concatenated. It then 
+              returns the result as a new sound.
+
+              Given below are two individual sound objects, and the sound resulting from a
+              concatenation of these two sounds.
+
+              @(image "src/builtin/overlayone.PNG")
+
+              @(image "src/builtin/overlaytwo.PNG")
+
+              @(image "src/builtin/concated.PNG")
+            }
+            @codeblock|{
+                soundA = S.get-note("A3")
+                soundB = S.get-note("A1")
+                soundC = S.concat(soundA, soundB)
+            }|
+
 
   @section{Scaling, and Shortening Sounds}
   @function[
-    "set-playback-speed"
+    "adjust-playback-speed"
             #:contract (a-arrow Sound N Sound)
             #:return Sound   
             #:args (list '("sample" "")
@@ -212,22 +381,35 @@
             
             @codeblock|{
                 soundA = S.get-note("A3")
-                soundC = S.set-playback-speed(soundA, 3)
+                soundC = S.adjust-playback-speed(soundA, 3)
             }|
   @function[
-    "shorten"
+    "crop-by-time"
             #:contract (a-arrow Sound N N Sound)
             #:return Sound   
             #:args (list '("sample" "")
                          '("start" "")
                          '("end" ""))]{
-              Shortens a sound to a new sound based on the given start and end time. In other words, 
-              it crops the sound to the specified interval.
+              Crops a sound to a new sound based on the given start and end time. 
 
             }
             @codeblock|{
                 urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
-                soundC = S.set-playback-speed(urlSound, 1, 2)
+                soundC = S.crop-by-time(urlSound, 1, 2)
+            }|
+  @function[
+    "crop-by-index"
+            #:contract (a-arrow Sound N N Sound)
+            #:return Sound   
+            #:args (list '("sample" "")
+                         '("start" "")
+                         '("end" ""))]{
+              Crops a sound to a new sound based on the given start and end index for the float array. 
+
+            }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                soundC = S.crop-by-index(urlSound, 20, 100)
             }|
   @section{Starter Sound Waves and Tones}
   @function[
