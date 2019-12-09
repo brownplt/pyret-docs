@@ -8,19 +8,24 @@
 @(append-gen-docs
 '(module "sound"
   (path "build/phase1/trove/sound.js")
-  (fun-spec (name "make-single-channel-sound") (arity 2))
+  (fun-spec (name "make-sound") (arity 2))
   (fun-spec (name "make-multi-channel-sound") (arity 2))
   (fun-spec (name "get-sound-from-url") (arity 1))
   (fun-spec (name "get-array-from-sound") (arity 1))
+  (fun-spec (name "get-channel-data-from-sound") (arity 1))
+  (fun-spec (name "get-duration") (arity 1))
+  (fun-spec (name "get-sample-rate") (arity 1))
   (fun-spec (name "denormalize-sound") (arity 1))
-  (fun-spec (name "overlay") (arity 1))
-  (fun-spec (name "concat") (arity 1))
+  (fun-spec (name "overlay") (arity 2))
+  (fun-spec (name "overlay-list") (arity 1))
+  (fun-spec (name "concat") (arity 2))
+  (fun-spec (name "concat-list") (arity 1))
   (fun-spec (name "set-playback-speed") (arity 2))
   (fun-spec (name "shorten") (arity 3))
-  (fun-spec (name "get-cosine-wave") (arity 0))
-  (fun-spec (name "get-sine-wave") (arity 0))
-  (fun-spec (name "get-tone") (arity 1))
-  (fun-spec (name "get-note") (arity 1))
+  (fun-spec (name "get-cosine-wave") (arity 1))
+  (fun-spec (name "get-sine-wave") (arity 1))
+  (fun-spec (name "get-tone") (arity 2))
+  (fun-spec (name "get-note") (arity 3))
   (fun-spec (name "fade") (arity 1))
   (fun-spec (name "remove-vocals") (arity 1))
   (data-spec (name "Sound") (variants) (shared))
@@ -66,7 +71,7 @@
 
   @section{Basic Sounds}
   @function[
-    "make-single-channel-sound"
+    "make-sound"
             #:contract (a-arrow N (RA-of (RA-of N)) Sound)
             #:return Sound   
             #:args (list '("sample_rate" "")
@@ -234,8 +239,8 @@
     "get-cosine-wave"
             #:contract (a-arrow Sound)
             #:return Sound   
-            #:args (list )]{
-              Constructs a default cosine wave with frequency of 440Hz.
+            #:args (list '("duration" ""))]{
+              Constructs a default cosine wave of the given duration with frequency of 440Hz.
 
             }
             @codeblock|{
@@ -245,8 +250,8 @@
     "get-sine-wave"
             #:contract (a-arrow Sound)
             #:return Sound   
-            #:args (list )]{
-              Constructs a default sine wave with frequency of 440Hz.
+            #:args (list '("duration" ""))]{
+              Constructs a default sine wave of the given duration with frequency of 440Hz.
 
             }
             @codeblock|{
@@ -256,8 +261,9 @@
     "get-tone"
             #:contract (a-arrow S Sound)
             #:return Sound   
-            #:args (list '("key" ""))]{
-              Constructs a sound tone of an octave of the given key, such as A4, C8 etc. 
+            #:args (list '("key" "")
+            '("duration" ""))]{
+              Constructs a sound tone of the given duration of an octave of the given key, such as A4, C8 etc. 
               Concatenation of several tones will result in one long set of beeps with no pauses in between.
 
               @(image "src/builtin/overlayone.PNG")
@@ -270,9 +276,11 @@
     "get-note"
             #:contract (a-arrow S Sound)
             #:return Sound   
-            #:args (list '("key" ""))]{
-              Constructs a sound note of an octave of the given key, such as A4, C8 etc, with a 
-              tangible silence in the end. Hence, it works like a typical press of a piano key. 
+            #:args (list '("key" "")
+            '("durationOn" "")
+            '("durationOff" ""))]{
+              Constructs a sound note of the given durationOn of an octave of the given key, such as A4, C8 etc, with a 
+              tangible silence of the given durationOff in the end. Hence, it works like a typical press of a piano key. 
               Concatenation of several notes will result in a melody akin to playing notes on a piano.
 
               @(image "src/builtin/getnote.PNG")
