@@ -416,8 +416,8 @@
     "get-cosine-wave"
             #:contract (a-arrow Sound)
             #:return Sound   
-            #:args (list )]{
-              Constructs a default cosine wave with frequency of 440Hz.
+            #:args (list '("duration" ""))]{
+              Constructs a default cosine wave of the given duration with frequency of 440Hz.
 
             }
             @codeblock|{
@@ -427,8 +427,8 @@
     "get-sine-wave"
             #:contract (a-arrow Sound)
             #:return Sound   
-            #:args (list )]{
-              Constructs a default sine wave with frequency of 440Hz.
+            #:args (list '("duration" ""))]{
+              Constructs a default sine wave of the given duration with frequency of 440Hz.
 
             }
             @codeblock|{
@@ -438,8 +438,9 @@
     "get-tone"
             #:contract (a-arrow S Sound)
             #:return Sound   
-            #:args (list '("key" ""))]{
-              Constructs a sound tone of an octave of the given key, such as A4, C8 etc. 
+            #:args (list '("key" "")
+            '("duration" ""))]{
+              Constructs a sound tone of the given duration of an octave of the given key, such as A4, C8 etc. 
               Concatenation of several tones will result in one long set of beeps with no pauses in between.
 
               @(image "src/builtin/overlayone.PNG")
@@ -452,9 +453,11 @@
     "get-note"
             #:contract (a-arrow S Sound)
             #:return Sound   
-            #:args (list '("key" ""))]{
-              Constructs a sound note of an octave of the given key, such as A4, C8 etc, with a 
-              tangible silence in the end. Hence, it works like a typical press of a piano key. 
+            #:args (list '("key" "")
+            '("durationOn" "")
+            '("durationOff" ""))]{
+              Constructs a sound note of the given durationOn of an octave of the given key, such as A4, C8 etc, with a 
+              tangible silence of the given durationOff in the end. Hence, it works like a typical press of a piano key. 
               Concatenation of several notes will result in a melody akin to playing notes on a piano.
 
               @(image "src/builtin/getnote.PNG")
