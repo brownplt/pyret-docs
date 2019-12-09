@@ -103,7 +103,11 @@
             #:args (list '("path" ""))]{
               Constructs a sound object from a given URL resource that points to a .wav audio file.
               The URL is passed as a string parameter.
+
             }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+            }|
 
   @section{Sound Buffers}
   @function[
@@ -112,7 +116,13 @@
             #:return Sound   
             #:args (list '("sound" ""))]{
               Returns the two-dimensional / single-dimensional float array of the given sound.
+              
             }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                numArray = S.get-array-from-sound(urlSound)
+            }|
+
   @function[
     "denormalize-sound"
             #:contract (a-arrow Sound (RA-of (RA-of N)))
@@ -126,7 +136,13 @@
               that are outside the range of -1 to +1. However, while playing the sound, the internal
               sound API automatically clamps the values that fall out of this range, in order to play it as a valid sound. 
               One can observe these non-compliant points being plotted as red dots on the widget. 
+
             }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                normSound = S.denormalize-sound(urlSound)
+            }|
+
   @section{Overlaying Sounds}
   @function[
     "overlay"
@@ -148,6 +164,12 @@
               @(image "src/builtin/overlayed.PNG")
 
             }
+            @codeblock|{
+                soundA = S.get-note("A3")
+                soundB = S.get-note("A1")
+                soundList = [L.list: a,b]
+                soundC = S.overlay(soundList)
+            }|
 
   @section{Concatenating Sounds}
   @function[
@@ -168,6 +190,13 @@
 
               @(image "src/builtin/concated.PNG")
             }
+            @codeblock|{
+                soundA = S.get-note("A3")
+                soundB = S.get-note("A1")
+                soundList = [L.list: a,a,a,b,a,a,a]
+                soundC = S.concat(soundList)
+            }|
+
   @section{Scaling, and Shortening Sounds}
   @function[
     "set-playback-speed"
@@ -178,7 +207,13 @@
               Constructs a sound that plays at the new rate given by the playback speed, such as 2X, 3X etc.
               It takes a sound object and an integer number that specifies the factor by which the sound needs 
               to be sped up or slowed down. It then returns a resultant new sound object.
+
             }
+            
+            @codeblock|{
+                soundA = S.get-note("A3")
+                soundC = S.set-playback-speed(soundA, 3)
+            }|
   @function[
     "shorten"
             #:contract (a-arrow Sound N N Sound)
@@ -188,7 +223,12 @@
                          '("end" ""))]{
               Shortens a sound to a new sound based on the given start and end time. In other words, 
               it crops the sound to the specified interval.
+
             }
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                soundC = S.set-playback-speed(urlSound, 1, 2)
+            }|
   @section{Starter Sound Waves and Tones}
   @function[
     "get-cosine-wave"
@@ -196,14 +236,22 @@
             #:return Sound   
             #:args (list )]{
               Constructs a default cosine wave with frequency of 440Hz.
+
             }
+            @codeblock|{
+                soundC = S.get-cosine-wave()
+            }|
   @function[
     "get-sine-wave"
             #:contract (a-arrow Sound)
             #:return Sound   
             #:args (list )]{
               Constructs a default sine wave with frequency of 440Hz.
+
             }
+            @codeblock|{
+                soundC = S.get-sine-wave()
+            }|
   @function[
     "get-tone"
             #:contract (a-arrow S Sound)
@@ -214,6 +262,10 @@
 
               @(image "src/builtin/overlayone.PNG")
             }
+            @codeblock|{
+                soundC = S.get-tone("A4")
+            }|
+
   @function[
     "get-note"
             #:contract (a-arrow S Sound)
@@ -225,6 +277,9 @@
 
               @(image "src/builtin/getnote.PNG")
             }
+            @codeblock|{
+                soundC = S.get-note("A4")
+            }|
   @section{Fading Sounds}
   @function[
     "fade"
@@ -235,6 +290,11 @@
 
               @(image "src/builtin/fade.PNG")
             }
+            
+            @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                soundC = S.fade(urlSound)
+            }|
   @section{Removing Vocals}
   @function[
     "remove-vocals"
@@ -242,5 +302,11 @@
             #:return Sound   
             #:args (list '("sound" ""))]{
               Removes vocals from the given sound and returns the result.
+
+              @codeblock|{
+                urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
+                soundC = S.removeVocals(urlSound)
+              }|
+
             }
 }
