@@ -488,7 +488,7 @@
             @repl-examples[
             `(@{urlSound = S.get-tone("C3", 5)
                 soundC = S.fade-in(urlSound)}, 
-            @image[#:scale 0.5 "src/builtin/fadein.PNG"])
+            @image[#:scale 0.5 "src/builtin/fadein.png"])
              ]   
 
       @function[
@@ -504,7 +504,7 @@
             @repl-examples[
             `(@{urlSound = S.get-tone("C3", 5)
                 soundC = S.fade-in-by-index(urlSound, 50000)}, 
-            @image[#:scale 0.5 "src/builtin/fadeinindex.PNG"])
+            @image[#:scale 0.5 "src/builtin/fadeinindex.png"])
              ]   
   @function[
     "fade-in-by-time"
@@ -519,7 +519,7 @@
             @repl-examples[
             `(@{urlSound = S.get-tone("C3", 5)
                 soundC = S.fade-in-by-time(urlSound, 3)}, 
-            @image[#:scale 0.5 "src/builtin/fadeintime.PNG"])
+            @image[#:scale 0.5 "src/builtin/fadeintime.png"])
              ]  
           
   @function[
@@ -549,7 +549,7 @@
             @repl-examples[
             `(@{urlSound = S.get-tone("C3", 5)
                 soundC = S.fade-out-by-index(urlSound, 50000)}, 
-            @image[#:scale 0.5 "src/builtin/fadeoutindex.PNG"])]
+            @image[#:scale 0.5 "src/builtin/fadeoutindex.png"])]
 
   @function[
     "fade-out-by-time"
