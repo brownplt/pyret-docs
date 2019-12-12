@@ -563,6 +563,6 @@
             
             @repl-examples[
             `(@{urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
-                soundC = S.fade-out-by-time(urlSound, 3)}, @image[#:scale 0.5 "src/builtin/fadeouttime.PNG"])]
+                soundC = S.fade-out-by-time(urlSound, 3)}, @image[#:scale 0.5 "src/builtin/fadeouttime.png"])]
 
 }
