@@ -63,39 +63,37 @@ Hence, it works like a typical press of a piano key. Concatenation of several no
 Consider the following code that creates a note of keys A3, A1 and C3:
 
 @pydisp{
-a = S.get-note("A3")
-b = S.get-note("A1")
-c = S.get-note("C3")
+a = S.get-note("A3", 1, 1.25)
+b = S.get-note("A1", 1, 1.25)
+c = S.get-note("C3", 1, 1.25)
 }
 
 @subsection{Concatenating notes}
 
 Now we're ready to draw append these notes together, to create a line of music. For this,
-we will use the concat function of the Sound library. This function concatenates different 
+we will use the concatList function of the Sound library. This function concatenates different 
 sounds together as one long sound. The function requires a list of sound objects in the order 
 in which they need to be concatenated. It then returns the result as a new sound.
 Hence, we need to construct a list of the above notes in the right order to create our first line.
 @pydisp{
-l1 = [L.list: a,a,a,b,a,a,a]
+l1 = [G.raw-array: a,a,a,b,a,a,a]
 
-l2 = [L.list: c,c,c,b,c,c,c]
+l2 = [G.raw-array: c,c,c,b,c,c,c]
 
-r = S.concat(l1)
+r = S.concat-list(l1)
 
-q = S.concat(l2)
+q = S.concat-list(l2)
 }
 
 @subsection{Overlaying two sounds}
 The reason for the creation of two sounds for the same line is to add a layer dimensionality, 
 which makes the sound more profound and interesting. We can combine these two sounds to play a 
-single line by overlaying them using the overlay function.Overlay places one sound over another, 
+single line by overlaying them using the overlay function. Overlay places one sound over another, 
 and is the equivalent of an addition operation between the amplitudes of a set of sounds. 
-The Overlay function requires a list of sound objects that need to be overlayed, and returns the 
+The Overlay function requires two sound objects that need to be overlayed, and returns the 
 result as a new sound. 
 @pydisp{
-l3 = [L.list: r,q]
-
-p = S.overlay(l3)
+p = S.overlay(r,q)
 }
 
 @exercise{
@@ -104,12 +102,12 @@ modify the sound, so that it sounds similar to the original?
 }
 
 @subsection{Increasing the Tempo}
-We can increase the tempo of a sound to our required speed using the set-playback-speed function in 
+We can increase the tempo of a sound to our required speed using the adjust-playback-speed function in 
 the Sound library. This function Constructs a sound that plays at the new rate given by the playback 
 speed, such as 2X, 3X etc. It takes a sound object and an integer number that specifies the factor by 
 which the sound needs to be sped up or slowed down. It then returns a resultant new sound object.
 @pydisp{
-t = S.set-playback-speed(p, 3)
+t = S.adjust-playback-speed(p, 8)
 }
 
 That's it! We've created our very first line of music using Pyret's sound library!
@@ -123,9 +121,9 @@ entire song? You can use the following resource for note reference -
 @subsection{Fading a sound}
 
 Have you ever noticed how the ending of a song has a gradual fade? You can implement that functionality
-to your very own rendition of Jingle Bells that you have constructed above. we use the fade function from
-the Pyret Sound library for this purpose. The function progressively fades a given sound towards the end 
+to your very own rendition of Jingle Bells that you have constructed above. We use the fade-out function from
+the Pyret Sound library for this purpose. The function progressively fades / softens a given sound towards the end 
 and returns the result as a new sound.
 @pydisp{
-m = S.fade(t)
+m = S.fade-out(t)
 }
