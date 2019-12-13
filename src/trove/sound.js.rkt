@@ -117,7 +117,7 @@
             @repl-examples[
             `(@{soundB = S.make-multi-channel-sound(3000, [G.raw-array: 
             [G.raw-array: 0.1, 0.2, 0.3, 0.1], [G.raw-array: -0.2, -0.3, -0.1, 0.5]])}, 
-            @image[#:scale 0.5 "src/builtin/multichannel.png"])
+            @image[#:scale 0.35 "src/builtin/multichannel.png"])
              ]
   @function[
     "get-sound-from-url"
@@ -131,7 +131,7 @@
              @repl-examples[
             `(@{urlSound = 
             S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")}, 
-            @image[#:scale 0.5 "src/builtin/urlsound.png"])
+            @image[#:scale 0.35 "src/builtin/urlsound.png"])
              ]
 
   @section{Sound Properties}
