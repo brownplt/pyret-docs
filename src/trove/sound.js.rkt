@@ -12,26 +12,26 @@
   (fun-spec (name "make-multi-channel-sound") (arity 2))
   (fun-spec (name "get-sound-from-url") (arity 1))
   (fun-spec (name "get-multi-channel-data-arrays") (arity 1))
-  (fun-spec (name "get-channel-data-array") (arity 1))
+  (fun-spec (name "get-channel-data-array") (arity 2))
   (fun-spec (name "sound-duration") (arity 1))
   (fun-spec (name "sound-sample-rate") (arity 1))
   (fun-spec (name "sound-num-channels") (arity 1))
   (fun-spec (name "sound-num-samples") (arity 1))
   (fun-spec (name "is-sound") (arity 1))
-  (fun-spec (name "sounds-equal") (arity 1))
+  (fun-spec (name "sounds-equal") (arity 2))
   (fun-spec (name "normalize-sound") (arity 1))
   (fun-spec (name "overlay") (arity 2))
   (fun-spec (name "concat") (arity 2))
   (fun-spec (name "overlay-list") (arity 1))
   (fun-spec (name "concat-list") (arity 1))
   (fun-spec (name "adjust-playback-speed") (arity 2))
-  (fun-spec (name "set-sample-rate") (arity 1))
+  (fun-spec (name "set-sample-rate") (arity 2))
   (fun-spec (name "crop-by-time") (arity 3))
   (fun-spec (name "crop-by-index") (arity 3))
-  (fun-spec (name "get-cosine-wave") (arity 0))
-  (fun-spec (name "get-sine-wave") (arity 0))
-  (fun-spec (name "get-tone") (arity 1))
-  (fun-spec (name "get-note") (arity 1))
+  (fun-spec (name "get-cosine-wave") (arity 1))
+  (fun-spec (name "get-sine-wave") (arity 1))
+  (fun-spec (name "get-tone") (arity 2))
+  (fun-spec (name "get-note") (arity 3))
   (fun-spec (name "fade-in") (arity 1))
   (fun-spec (name "fade-in-by-index") (arity 2))
   (fun-spec (name "fade-in-by-time") (arity 2))
@@ -150,7 +150,7 @@
 
   @function[
     "get-channel-data-array"
-            #:contract (a-arrow Sound N)
+            #:contract (a-arrow Sound N (RA-of N) )
             #:return (RA-of N)  
             #:args (list '("sound" "")
                          '("channel" ""))]{
@@ -165,7 +165,7 @@
 
   @function[
     "sound-duration"
-            #:contract (a-arrow Sound )
+            #:contract (a-arrow Sound N)
             #:return N   
             #:args (list '("sound" ""))]{
               Returns the duration of a given sound in seconds.
@@ -177,7 +177,7 @@
             }
   @function[
     "sound-sample-rate"
-            #:contract (a-arrow Sound )
+            #:contract (a-arrow Sound N)
             #:return N   
             #:args (list '("sound" ""))]{
               Returns the sample rate (number of samples per second) of a given sound, which is necessarily the frequency of a sound in Hz.
@@ -189,20 +189,21 @@
             }
   @function[
     "set-sample-rate"
-            #:contract (a-arrow Sound )
+            #:contract (a-arrow Sound N Sound)
             #:return Sound   
-            #:args (list '("sound" ""))]{
+            #:args (list '("sound" "")
+            '("sampleRate" ""))]{
               Sets / Updates the sample rate (number of samples per second) of a given sound, 
               and returns the new sound.
               
             }
             @examples{
                 urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
-                newSound = S.set-sample-rate(urlSound)
+                newSound = S.set-sample-rate(urlSound, 10000)
             }
   @function[
     "sound-num-channels"
-            #:contract (a-arrow Sound )
+            #:contract (a-arrow Sound N)
             #:return N  
             #:args (list '("sound" ""))]{
               Returns the number of channels present in a given sound.
@@ -214,7 +215,7 @@
             }
   @function[
     "sound-num-samples"
-            #:contract (a-arrow Sound )
+            #:contract (a-arrow Sound N)
             #:return N   
             #:args (list '("sound" ""))]{
               Returns the number of samples or the size of the float array of the very first channel present in a given sound.
@@ -226,10 +227,10 @@
             }
   @function[
     "is-sound"
-            #:contract (a-arrow Sound )
-            #:return "Boolean"   
-            #:args (list '("sound" ""))]{
-              Validates if a given sound object is of a valid sound type.
+            #:contract (a-arrow A B)
+            #:return B  
+            #:args (list '("thing" ""))]{
+              Validates if a given object is of a valid sound type.
               
             }
             @examples{
@@ -238,8 +239,8 @@
             } 
   @function[
     "sounds-equal"
-            #:contract (a-arrow Sound Sound)
-            #:return "Boolean"   
+            #:contract (a-arrow Sound Sound B)
+            #:return B  
             #:args (list '("sound1" "")
                          '("sound2" ""))]{
               Specifies if two given sound objects are equal.
@@ -248,11 +249,11 @@
             @examples{
                 urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
                 urlSound2 = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
-                val = S.sound-equal(urlSound, urlSound2)
+                val = S.sounds-equal(urlSound, urlSound2)
             }         
   @function[
     "normalize-sound"
-            #:contract (a-arrow Sound )
+            #:contract (a-arrow Sound Sound)
             #:return Sound   
             #:args (list '("sound" ""))]{
               Normalization is the process of transforming / scaling the amplitudes of a sound to 
@@ -270,36 +271,6 @@
             }
 
   @section{Overlaying Sounds}
-  @function[
-    "overlay-list"
-            #:contract (a-arrow (RA-of Sound) Sound)
-            #:return Sound   
-            #:args (list '("samples" ""))]{
-              Places one sound over another, and is the equivalent of an addition operation 
-              between the amplitudes of a set of sounds. The function requires a 
-              list of sound objects that need to be overlayed, and returns the result as a new sound.
-
-              Given below are two individual sound objects, and the sound resulting from an 
-              overlay of these two sounds. A practical application of this function is when we want to 
-              overlay the sounds being played by different instruments for one one song.
-
-            }
-            @examples{
-                soundA = S.get-note("A3")
-                soundB = S.get-note("A1")
-                soundList = [G.raw-array: soundA, soundB]
-                soundC = S.overlay(soundList)
-            }
-            @repl-examples[
-            `(@{soundA = S.get-note("A3")}, 
-            @image[#:scale 0.5 "src/builtin/overlayone.PNG"])
-            `(@{soundB = S.get-note("A1")}, 
-            @image[#:scale 0.5 "src/builtin/overlaytwo.PNG"])
-            `(@{soundList = [G.raw-array: soundA, soundB]
-                soundC = S.overlay(soundList)}, 
-            @image[#:scale 0.5 "src/builtin/overlayed.PNG"])
-             ]       
-
 
     @function[
     "overlay"
@@ -317,13 +288,67 @@
 
             }
             @repl-examples[
-            `(@{soundA = S.get-note("A3")}, 
+            `(@{soundA = S.get-note("A3", 0.5, 0.25)}, 
             @image[#:scale 0.5 "src/builtin/overlayone.PNG"])
-            `(@{soundB = S.get-note("A1")}, 
+            `(@{soundB = S.get-note("A1", 0.5, 0.25)}, 
             @image[#:scale 0.5 "src/builtin/overlaytwo.PNG"])
             `(@{soundC = S.overlay(soundA, soundB)}, 
             @image[#:scale 0.5 "src/builtin/overlayed.PNG"])
-             ]       
+             ]   
+
+  @function[
+    "overlay-list"
+            #:contract (a-arrow (RA-of Sound) Sound)
+            #:return Sound   
+            #:args (list '("samples" ""))]{
+              Places one sound over another, and is the equivalent of an addition operation 
+              between the amplitudes of a set of sounds. The function requires a 
+              list of sound objects that need to be overlayed, and returns the result as a new sound.
+
+              Given below are two individual sound objects, and the sound resulting from an 
+              overlay of these two sounds. A practical application of this function is when we want to 
+              overlay the sounds being played by different instruments for one one song.
+
+            }
+            @examples{
+                soundA = S.get-note("A3", 0.5, 0.25)
+                soundB = S.get-note("A1", 0.5, 0.25)
+                soundList = [G.raw-array: soundA, soundB]
+                soundC = S.overlay(soundList)
+            }
+            @repl-examples[
+            `(@{soundA = S.get-note("A3", 0.5, 0.25)}, 
+            @image[#:scale 0.5 "src/builtin/overlayone.PNG"])
+            `(@{soundB = S.get-note("A1", 0.5, 0.25)}, 
+            @image[#:scale 0.5 "src/builtin/overlaytwo.PNG"])
+            `(@{soundList = [G.raw-array: soundA, soundB]
+                soundC = S.overlay(soundList)}, 
+            @image[#:scale 0.5 "src/builtin/overlayed.PNG"])
+             ]    
+
+    @function[
+    "concat"
+            #:contract (a-arrow Sound Sound Sound)
+            #:return Sound   
+            #:args (list '("sound1" "")
+                         '("sound2" ""))]{
+              Concatenates different sounds together as one long sound. The function requires a 
+              list of sound objects in the order in which they need to be concatenated. It then 
+              returns the result as a new sound.
+
+              Given below are two individual sound objects, and the sound resulting from a
+              concatenation of these two sounds.
+
+            }
+            @repl-examples[
+            `(@{soundA = S.get-note("A3", 0.5, 0.25)}, 
+            @image[#:scale 0.5 "src/builtin/overlayone.PNG"])
+            `(@{soundB = S.get-note("A1", 0.5, 0.25)}, 
+            @image[#:scale 0.5 "src/builtin/overlaytwo.PNG"])
+            `(@{soundC = S.concat(soundA, soundB)}, 
+            @image[#:scale 0.5 "src/builtin/concated.PNG"])
+             ]     
+
 
   @section{Concatenating Sounds}
   @function[
@@ -340,40 +365,17 @@
 
             }
             @repl-examples[
-            `(@{soundA = S.get-note("A3")}, 
+            `(@{soundA = S.get-note("A3", 0.5, 0.25)}, 
             @image[#:scale 0.5 "src/builtin/overlayone.PNG"])
-            `(@{soundB = S.get-note("A1")}, 
+            `(@{soundB = S.get-note("A1", 0.5, 0.25)}, 
             @image[#:scale 0.5 "src/builtin/overlaytwo.PNG"])
             `(@{soundList = [G.raw-array: soundA, soundB]
                 soundC = S.concat(soundList)}, 
             @image[#:scale 0.5 "src/builtin/concated.PNG"])
              ]       
 
-  
-  @function[
-    "concat"
-            #:contract (a-arrow Sound Sound Sound)
-            #:return Sound   
-            #:args (list '("sound1" "")
-                         '("sound2" ""))]{
-              Concatenates different sounds together as one long sound. The function requires a 
-              list of sound objects in the order in which they need to be concatenated. It then 
-              returns the result as a new sound.
 
-              Given below are two individual sound objects, and the sound resulting from a
-              concatenation of these two sounds.
-
-            }
-            @repl-examples[
-            `(@{soundA = S.get-note("A3")}, 
-            @image[#:scale 0.5 "src/builtin/overlayone.PNG"])
-            `(@{soundB = S.get-note("A1")}, 
-            @image[#:scale 0.5 "src/builtin/overlaytwo.PNG"])
-            `(@{soundC = S.concat(soundA, soundB)}, 
-            @image[#:scale 0.5 "src/builtin/concated.PNG"])
-             ]     
-
-  @section{Scaling, and Shortening Sounds}
+  @section{Scaling, and Cropping Sounds}
   @function[
     "adjust-playback-speed"
             #:contract (a-arrow Sound N Sound)
@@ -387,9 +389,11 @@
             }
             
             @examples{
-                soundA = S.get-note("A3")
+                soundA = S.get-note("A3", 0.5, 0.25)
                 soundC = S.adjust-playback-speed(soundA, 3)
             }
+
+
   @function[
     "crop-by-time"
             #:contract (a-arrow Sound N N Sound)
@@ -421,7 +425,7 @@
   @section{Starter Sound Waves and Tones}
   @function[
     "get-cosine-wave"
-            #:contract (a-arrow Sound)
+            #:contract (a-arrow N Sound)
             #:return Sound   
             #:args (list '("duration" ""))]{
               Constructs a default cosine wave of the given duration with frequency of 440Hz.
@@ -432,7 +436,7 @@
             }
   @function[
     "get-sine-wave"
-            #:contract (a-arrow Sound)
+            #:contract (a-arrow N Sound)
             #:return Sound   
             #:args (list '("duration" ""))]{
               Constructs a default sine wave of the given duration with frequency of 440Hz.
@@ -443,7 +447,7 @@
             }
   @function[
     "get-tone"
-            #:contract (a-arrow S Sound)
+            #:contract (a-arrow S N Sound)
             #:return Sound   
             #:args (list '("key" "")
             '("duration" ""))]{
@@ -453,13 +457,13 @@
             }
 
             @repl-examples[
-            `(@{soundC = S.get-tone("A4")}, 
+            `(@{soundC = S.get-tone("A4", 0.5)}, 
             @image[#:scale 0.5 "src/builtin/overlayone.PNG"])
              ]   
 
   @function[
     "get-note"
-            #:contract (a-arrow S N N)
+            #:contract (a-arrow S N N Sound)
             #:return Sound   
             #:args (list '("key" "")
             '("durationOn" "")
@@ -471,7 +475,7 @@
             }
 
             @repl-examples[
-            `(@{soundC = S.get-note("A4")}, 
+            `(@{soundC = S.get-note("A4", 0.5, 0.25)}, 
             @image[#:scale 0.5 "src/builtin/getnote.PNG"])
              ]   
 
@@ -488,7 +492,7 @@
             @repl-examples[
             `(@{urlSound = S.get-tone("C3", 5)
                 soundC = S.fade-in(urlSound)}, 
-            @image[#:scale 0.5 "src/builtin/fadein.png"])
+            @image[#:scale 0.35 "src/builtin/fadein.png"])
              ]   
 
       @function[
@@ -504,11 +508,11 @@
             @repl-examples[
             `(@{urlSound = S.get-tone("C3", 5)
                 soundC = S.fade-in-by-index(urlSound, 50000)}, 
-            @image[#:scale 0.5 "src/builtin/fadeinindex.png"])
+            @image[#:scale 0.35 "src/builtin/fadeinindex.png"])
              ]   
   @function[
     "fade-in-by-time"
-            #:contract (a-arrow Sound Sound)
+            #:contract (a-arrow Sound N Sound)
             #:return Sound   
             #:args (list '("sound" "")
             '("end" ""))]{
@@ -519,12 +523,12 @@
             @repl-examples[
             `(@{urlSound = S.get-tone("C3", 5)
                 soundC = S.fade-in-by-time(urlSound, 3)}, 
-            @image[#:scale 0.5 "src/builtin/fadeintime.png"])
+            @image[#:scale 0.35 "src/builtin/fadeintime.png"])
              ]  
           
   @function[
     "fade-out"
-            #:contract (a-arrow Sound N Sound)
+            #:contract (a-arrow Sound Sound)
             #:return Sound   
             #:args (list '("sound" ""))]{
               Progressively fades out a given sound towards the end and returns the result as a new sound.
@@ -549,7 +553,7 @@
             @repl-examples[
             `(@{urlSound = S.get-tone("C3", 5)
                 soundC = S.fade-out-by-index(urlSound, 50000)}, 
-            @image[#:scale 0.5 "src/builtin/fadeoutindex.png"])]
+            @image[#:scale 0.35 "src/builtin/fadeoutindex.png"])]
 
   @function[
     "fade-out-by-time"
@@ -563,6 +567,6 @@
             
             @repl-examples[
             `(@{urlSound = S.get-sound-from-url("http://bbcsfx.acropolis.org.uk/assets/07075055.wav")
-                soundC = S.fade-out-by-time(urlSound, 3)}, @image[#:scale 0.5 "src/builtin/fadeouttime.png"])]
+                soundC = S.fade-out-by-time(urlSound, 3)}, @image[#:scale 0.35 "src/builtin/fadeouttime.png"])]
 
 }
