@@ -91,7 +91,7 @@
 @(define Image (a-id "Image" (xref "image" "Image")))
 @(define Scene (a-id "Scene" (xref "image" "Scene")))
 @(define ImageColor (a-id "ImageColor" (xref "image" "ImageColor")))
-@(define Color (a-id "Color" (xref "image-structs" "Color")))
+@(define Color (a-id "Color" (xref "color" "Color")))
 @(define Mode (a-id "Mode" (xref "image" "Mode")))
 @(define FontFamily (a-id "FontFamily" (xref "image" "FontFamily")))
 @(define FontStyle (a-id "FontStyle" (xref "image" "FontStyle")))
@@ -101,7 +101,7 @@
 @(define (paint-swatch color css-color)
    (list (html:span 'style: "font-size: initial;"
                     (html:image 'class: "paintBrush" "https://code.pyret.org/img/brush.svg")
-                    (html:span 'class: "paintSpan" 'style: "display: inline-block;"
+                    (html:span 'class: "paintSpan"
                                (html:span 'class: "checkersBlob")
                                (html:span 'class: "paintBlob"
                                           'style: (format "background-color: ~a; margin-right: 0.25em;" css-color))))
@@ -141,7 +141,7 @@
   @type-spec["ImageColor" (list)]{
 
     An @tt{ImageColor} is either a string from the list in
-    @secref["s:color-constants"], or a @pyret-id["Color" "image-structs"],
+    @secref["s:color-constants"], or a @pyret-id["Color" "color"],
     which you can use to construct colors other than the predefined ones,
     including making colors partially transparent by controlling their opacity.
     }
@@ -1185,7 +1185,7 @@
             #:contract (a-arrow Image
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Color" (xref "image-structs" "Color")))
+                                (a-id "Color" (xref "color" "Color")))
             #:return Color
             #:args (list '("image" "") '("x" "") '("y" ""))]{
     Returns the color at the pixel given by @pyret{x} and @pyret{y}

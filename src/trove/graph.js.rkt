@@ -3,7 +3,7 @@
 @(require (only-in scribble/core delayed-block))
 
 @(define (type T) (a-id T (xref "graph" T)))
-@(define (Color) (a-id "Color" (xref "image-structs" "Color")))
+@(define (Color) (a-id "Color" (xref "color" "Color")))
 @(define (SD-of typ) (a-app (a-id "StringDict" (xref "string-dict" "StringDict")) typ))
 @(define (Tree-of typ) (a-app (a-id "Tree" (xref "graph" "Tree")) typ))
 @(define (Graph-of typ1 typ2) (a-app (a-id "Graph" (xref "graph" "Graph")) typ1 typ2))
@@ -67,8 +67,8 @@
   The value of @tt{vertex-options} is @tt{{color: gray}}
 
   @examples{
-    import image-structs as I
-    my-vertex-options = vertex-options.{color: I.red}
+    import color as C
+    my-vertex-options = vertex-options.{color: C.red}
   }
 
   @section{The Edge Type}
@@ -110,7 +110,7 @@
   The value of @tt{vertex-options} is @tt{{color: gray, directed: true}}
 
   @examples{
-    import image-structs as I
+    import color as C
     undirected-edge-options = edge-options.{directed: false}
   }
 

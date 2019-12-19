@@ -5,7 +5,7 @@
 @(define (in-link T) (a-id T (xref "chart" T)))
 @(define (in-image f) (image (string-append "src/trove/chart-images/" f ".png") #:scale 0.4))
 @(define Self A)
-@(define Color (a-id "Color" (xref "image-structs" "Color")))
+@(define Color (a-id "Color" (xref "color" "Color")))
 @(define Image (a-id "Image" (xref "image" "Image")))
 @(define DataSeries (in-link "DataSeries"))
 @(define ChartWindow (in-link "ChartWindow"))
@@ -277,11 +277,11 @@
   The Pyret Chart library. It consists of chart, plot, and data visualization tools,
   using @link["https://developers.google.com/chart/" "Google Charts"] as a backend.
 
-  This documentation assumes that your program begins with including the @pyret{chart} library and importing the @pyret{image-structs} library as follows:
+  This documentation assumes that your program begins with including the @pyret{chart} library and importing the @pyret{color} library as follows:
 
   @pyret-block{
 include chart
-import image-structs as I
+import color as C
   }
 
   There are two steps to create a chart: first, creating @emph{@|DataSeries|} representing the information to be charted, and second, rendering @|DataSeries| into a @emph{@|ChartWindow|}. We give examples of both steps below.
@@ -314,7 +314,7 @@ a-function-series = from-list.function-plot(some-fun)
   So far, we have only constructed @|DataSeries| without any additionnal configuration. @|DataSeries| also exist to allow customizing individual plots. As a simple first example of this, suppose the function plot should be in a specific color. You might write:
 
   @pyret-block{
-colorful-function-series = a-function-series.color(I.purple)
+colorful-function-series = a-function-series.color(C.purple)
   }
 
   You can also combine @|DataSeries| creation and @|DataSeries| customization together via chaining to avoid an intermediate variable:
@@ -322,7 +322,7 @@ colorful-function-series = a-function-series.color(I.purple)
   @pyret-block{
 fun some-fun(x): num-sin(2 * x) end # some arbitrary function
 colorful-function-series = from-list.function-plot(some-fun)
-                                    .color(I.purple)
+                                    .color(C.purple)
   }
 
   There are also other customization options, described below, that can be chained onto the end of this expression to successively customize other details of the @|DataSeries|.
@@ -342,7 +342,7 @@ colorful-function-series = from-list.function-plot(some-fun)
   @pyret-block{
 fun some-fun(x): num-sin(2 * x) end
 a-series = from-list.function-plot(some-fun)
-  .color(I.purple)
+  .color(C.purple)
 a-chart-window = render-chart(a-series)
   }
 
@@ -623,7 +623,7 @@ a-series = from-list.labeled-histogram(
   @examples{
 NUM_E = ~2.71828
 f-series = from-list.function-plot(lam(x): 1 - num-expt(NUM_E, 0 - x) end)
-  .color(I.orange)
+  .color(C.orange)
   .legend("My legend")
 render-chart(f-series).display()
   }
@@ -643,7 +643,7 @@ render-chart(f-series).display()
 a-series = from-list.line-plot(
   [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
   [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
-  .color(I.orange)
+  .color(C.orange)
   .legend("My legend")
 render-chart(a-series).display()
   }
@@ -666,7 +666,7 @@ a-series = from-list.labeled-scatter-plot(
   [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
   [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
   [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
-  .color(I.orange)
+  .color(C.orange)
   .legend("My legend")
 render-chart(a-series).display()
   }
