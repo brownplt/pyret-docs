@@ -382,7 +382,7 @@ check:
 end
 }
 
-Read this aloud as ``The distance to origin of (3, 4) is 5, because the
+Read this aloud as ``The distance to origin of (3, 4) is roughly 5, because the
 square-root of three squared plus four squared is roughly 5.''  The @pyret{because}
 clause lets us show work, while also connecting the explanation to the original
 test case.
