@@ -2,7 +2,7 @@
 @(require "../../scribble-api.rkt"
           "../abbrevs.rkt"
           (prefix-in html: "../../manual-html.rkt")
-          2htdp/image racket/list
+          2htdp/image lang/posn racket/list
           scribble/manual)
 
 @(define (transpose . args) (apply map list args))
@@ -225,6 +225,9 @@ feedback.  To use this version of the library:
   While you cannot @pyret{include} both versions of the library
 simultaneously, you @emph{can} @pyret{import} them both, if you would
 like to migrate from one version of the library to the other.
+
+Note that most of the examples below use the @pyret{image} version of
+this library, with arguments as strings.
 
 
 @section[#:tag "image_DataTypes"]{Data Types}
@@ -522,7 +525,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                          '("style" "") 
                          '("weight" "") 
                          '("underline" ""))]{
-    Like @secref[(tag-name "image" "text")], constructs an image that draws the given
+    Like @pyret-id{text}, constructs an image that draws the given
     string, but makes use of a complete font specification.  The various style
     options are described below.  
   }
@@ -917,7 +920,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                          '("inner" "") 
                          '("mode" "") 
                          '("color" ""))]{
-    Same as @secref[(tag-name "image" "radial-star")].
+    Same as @pyret-id{radial-star}.
   }
   @function[
     "star-polygon"
@@ -968,8 +971,26 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
             #:args '(("points" "") ("mode" "") ("color" ""))]{
     Creates a polygon whose corners are specified by the given list of
     points.
-  }        
-  
+  }
+
+  @repl-examples[
+    `(@{point-polygon(
+          [list: point(0, 0), point(-10, 20), point(60, 0), point(-10, -20)],
+          "solid", "burlywood")}
+      ,(polygon (list (make-posn 0 0) (make-posn -10 20) (make-posn 60 0) (make-posn -10 -20))
+                "solid" "burlywood"))
+    `(@{fun deg-to-rad(t):
+          t * (~3.14159265358979323 / 180)
+        end
+        points = for map(n from [list: 0, 1, 2, 3, 4, 5]):
+          point-polar(30, deg-to-rad(60 * n))
+        end
+        draw-pinhole(point-polygon(points, "outline", "steel-blue"))}
+      ,(regular-polygon 30 6 "outline" "SteelBlue"))
+  ]
+
+  @section{Other images}
+            
   @function["wedge"
             #:contract (a-arrow N N FillMode ImageColor Image)
             #:return Image
@@ -979,6 +1000,21 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     center of the circle from which this wedge is cut.  The angle is
     measured in degrees, measured counterclockwise from the positive x-axis.
   }
+
+  @repl-examples[
+    `(@{wedge(100, 60, "solid", "sea-green")}
+      ,(let* [(R 100)
+              (img
+               (overlay/pinhole
+                (put-pinhole R 0 (rectangle (* 2 R) R 'solid 'white))
+                (rotate 60 (put-pinhole R R (rectangle (* 2 R) R 'solid 'white)))
+                (circle R 'solid 'seagreen)))
+              (pin-x (pinhole-x img))
+              (pin-y (pinhole-y img))]
+         (clear-pinhole
+          (crop pin-x (- pin-y (* R (sqrt 3) 0.5)) R (* R (sqrt 3) 0.5)
+                img))))
+  ]
 
   
   @section{Overlaying Images}
@@ -990,6 +1026,9 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
             #:args (list '("img1" "") 
                          '("img2" ""))]{
     Constructs a new image where @pyret{img1} overlays @pyret{img2}.
+    The two images are aligned at their @seclink["pinholes"]{pinholes}, so
+    @pyret-id{overlay}@pyret{(img1, img2)} behaves like
+    @pyret-id{overlay-align}@pyret{("pinhole", "pinhole", img1, img2)}.
   }
   @repl-examples[
     `(@{overlay(rectangle(30, 60, "solid", "orange"),
@@ -1005,9 +1044,54 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                          '("img1" "") 
                          '("img2" ""))]{
     Overlays @pyret{img1} on @pyret{img2} like 
-    @secref[(tag-name "image" "overlay")], but uses @pyret{place-x} and
-    @pyret{place-y} to determine where the images should line up.
+    @pyret-id{overlay}, but uses @pyret{place-x} and
+    @pyret{place-y} to determine the alignment point in each image.
+    A call to @pyret-id{overlay-align}@pyret{(place-x, place-y, img1, img2)} 
+    behaves the same as @pyret-id{overlay-onto-offset}@pyret{(img1, place-x, place-y, 
+    0, 0, place-x, place-y, img2)}
   }
+
+  @repl-examples[
+   `(@{overlay-align("left", "bottom",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'bottom (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("center", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'center 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("right", "middle",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'right 'middle (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+  ]
+
+
+  @function[
+    "overlay-xy"
+            #:contract (a-arrow Image N N Image Image)
+            #:return Image
+            #:args (list '("img1" "") 
+                         '("dx" "") 
+                         '("dy" "") 
+                         '("img2" ""))]{
+    Overlays @pyret{img1} on @pyret{img2} like 
+    @pyret-id{overlay}, but initially lines up the two
+    images upper-left corners and then shifts @pyret{img2} to the right
+    by @pyret{dx} pixels, and then down by @pyret{dy} pixels.  A call
+    to @pyret-id{overlay-xy}@pyret{(img1, dx, dy, img2)} behaves the
+    same as @pyret-id{overlay-onto-offset}@pyret{(img1, "left", "top", 
+    dx, dy, "left", "top", img2)}.
+  }
+  @repl-examples[
+    `(@{overlay-xy(0, 0,
+          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+      ,(overlay/xy (square 30 "solid" "bisque") 0 0 (square 50 "solid" "darkgreen")))
+    `(@{overlay-xy(30, 20, # Move green square right 30 and down 20
+          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+      ,(overlay/xy (square 30 "solid" "bisque") 30 20 (square 50 "solid" "darkgreen")))
+    `(@{overlay-xy(-10, -20, # Move green square left 10 and up 20
+          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+      ,(overlay/xy (square 30 "solid" "bisque") -10 -20 (square 50 "solid" "darkgreen")))
+  ]
+
 
   @function[
     "overlay-onto-offset"
@@ -1022,37 +1106,15 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                          '("place-y2" "") 
                          '("img2" ""))]{
     Overlays @pyret{img1} on @pyret{img2} like 
-    @secref[(tag-name "image" "overlay")], but uses @pyret{place-x1} and
+    @pyret-id{overlay}, but uses @pyret{place-x1} and
     @pyret{place-y1} to choose the reference point for the first
     image, @pyret{place-x2} and @pyret{place-y2} to choose the
     reference point for the second image, and slides the second
     image's reference point down and to the right by @pyret{offset-x}
     and @pyret{offset-y}.
   }
-  @function[
-    "overlay-xy"
-            #:contract (a-arrow Image N N Image Image)
-            #:return Image
-            #:args (list '("img1" "") 
-                         '("dx" "") 
-                         '("dy" "") 
-                         '("img2" ""))]{
-    Overlays @pyret{img1} on @pyret{img2} like 
-    @secref[(tag-name "image" "overlay")], but initially lines up the two
-    images upper-left corners and then shifts @pyret{img2} to the right
-    by @pyret{dx} pixels, and then down by @pyret{dy} pixels.
-  }
-  @repl-examples[
-    `(@{overlay-xy(0, 0,
-          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-      ,(overlay/xy (square 30 "solid" "bisque") 0 0 (square 50 "solid" "darkgreen")))
-    `(@{overlay-xy(30, 20, # Move green square right 30 and down 20
-          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-      ,(overlay/xy (square 30 "solid" "bisque") 30 20 (square 50 "solid" "darkgreen")))
-    `(@{overlay-xy(-10, -20, # Move green square left 10 and up 20
-          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-      ,(overlay/xy (square 30 "solid" "bisque") -10 -20 (square 50 "solid" "darkgreen")))
-  ]
+
+
   @function[
     "underlay"
             #:contract (a-arrow Image Image Image)
@@ -1060,7 +1122,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
             #:args (list '("img1" "") 
                          '("img2" ""))]{
     Constructs a new image by placing @pyret{img1} under @pyret{img2}.
-    This is the reverse of @secref[(tag-name "image" "overlay")].
+    This is the reverse of @pyret-id{overlay}.
   }
   @repl-examples[
     `(@{underlay(rectangle(30, 60, "solid", "orange"),
@@ -1076,9 +1138,9 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                          '("img1" "") 
                          '("img2" ""))]{
     Underlays @pyret{img1} beneath @pyret{img2} like 
-    @secref[(tag-name "image" "underlay")], but uses @pyret{place-x} and
+    @pyret-id{underlay}, but uses @pyret{place-x} and
     @pyret{place-y} to determine where the images should line up.  This is the
-    reverse of @secref[(tag-name "image" "overlay-align")].
+    reverse of @pyret-id{overlay-align}.
   }
   @repl-examples[
    `(@{underlay-align("left", "top",
@@ -1123,10 +1185,10 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                          '("dy" "") 
                          '("img2" ""))]{
     Underlays @pyret{img1} beneath @pyret{img2} like 
-    @secref[(tag-name "image" "underlay")], but initially lines up the two
+    @pyret-id{underlay}, but initially lines up the two
     images upper-left corners and then shifts @pyret{img2} to the right
     by @pyret{x} pixels, and then down by @pyret{y} pixels.  This is the
-    reverse of @secref[(tag-name "image" "overlay-xy")].
+    reverse of @pyret-id{overlay-xy}.
   }
   @repl-examples[
     `(@{underlay-xy(0, 0,
@@ -1461,7 +1523,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                          '("place-x" "") 
                          '("place-y" "") 
                          '("background" ""))]{
-    Behaves similar to @secref[(tag-name "image" "place-image")], but uses
+    Behaves similar to @pyret-id{place-image}, but uses
     @pyret{place-x} and @pyret{place-y} to determine where to anchor
     @pyret{img}, instead of always using the center.
   }
@@ -1488,7 +1550,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                          '("y2" "") 
                          '("background" ""))]{
     Draws a line from (x1,y1) to (x2,y2) on the scene
-    @pyret{background}. Unlike @secref[(tag-name "image" "add-line")],
+    @pyret{background}. Unlike @pyret-id{add-line},
     this function crops the resulting image to be the same size as
     @pyret{background}.
   }
@@ -1648,7 +1710,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
             #:contract (a-arrow S Image)
             #:return Image
             #:args (list '("url" ""))]{
-    Same as @secref[(tag-name "image" "image-url")]
+    Same as @pyret-id{image-url}
   }
   @function[
     "color-at-position"
@@ -1712,8 +1774,9 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
             #:args (list '("list" "") 
                          '("width" "") 
                          '("height" ""))]{
-    Same as @secref[(tag-name "image" "color-list-to-image")], but
-    assumes the @seclink["pinholes"]{pinhole} is at the center of the image.
+    Same as @pyret-id{color-list-to-image}, but
+    places the @seclink["pinholes"]{pinhole} at the center of the
+    image (i.e. @pyret{width / 2} and @pyret{height / 2}).
   }
 
   @section[#:tag "pinholes"]{Pinholes}
@@ -1739,14 +1802,9 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
   the triangles' heights.  To fix this, Pyret defines a notion of a
   @emph{pinhole}, which lets us specify one more point in our images,
   where we'd like to pin images together.  By default, Pyret's pinhole
-  is either:
-  @itemlist[
-     @item{In the geometric center (half the width, half the height) of
-           any polygon with an even number of sides, and}
-     @item{In the @emph{visual} center of any polygon with an odd
-           number of sides}
-  ]
-
+  of polygon images is at the @emph{centroid} of the polygon, which is
+  the average of the coordinates of each corner.
+  
   If we use our pinholes to align these triangles, we get the more
   intuitive result:
 
