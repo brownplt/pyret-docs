@@ -84,6 +84,8 @@
   (fun-spec (name "radial-star") (arity 5))
   (fun-spec (name "star-polygon") (arity 5))
   (fun-spec (name "rhombus") (arity 4))
+  (fun-spec (name "point-polygon") (arity 3))
+  (fun-spec (name "wedge") (arity 4))
   (fun-spec (name "color-at-position") (arity 3))
   (fun-spec (name "image-to-color-list") (arity 1))
   (fun-spec (name "color-list-to-image") (arity 1))
@@ -328,50 +330,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     `(@{name-to-color("transparent")} (,(pyret "some(") ,(paint-swatch "transparent" "rgba(0,0,0,0)") ,(pyret ")")))
     `(@{color-named("UNKNOWN")} ,(pyret "none"))
   ]
-
-  @type-spec["FillMode" (list) #:private #t]{
-    @|FillMode|s describe the style for a shape.
-
-    @type-versions[
-     (list @bold{The @pyret{image} library}
-
-           @nested{@|FillMode|s can be one of a fixed set of
-                         @pyret-id["String" "<global>"]s, or a
-                         @pyret-id["Number" "<global>"]}
-           
-           @nested{The string @pyret{"solid"}}
-           @nested{The string @pyret{"outline"}}
-           @nested{A number between 0 and 1}
-           )
-     
-     (list @bold{The @pyret{image-typed} library}
-
-           @nested{@|FillMode|s are an enumerated data definition:
-                         
-           @data-spec2["FillMode" (list) #:no-toc #t
-                        (list
-                         (singleton-spec2 "FillMode" "mode-solid")
-                         (singleton-spec2 "FillMode" "mode-outline")
-                         (constructor-spec "FillMode" "mode-fade"
-                                           `(("n" ("type" "normal") ("contract" ,N)))))]}
-
-           @nested{@singleton-doc["FillMode" "mode-solid" FillMode #:style ""]{
-                 Shapes should be drawn solidly filled in}}
-
-           @nested{@singleton-doc["FillMode" "mode-outline" FillMode #:style ""]{
-                 Shapes should only be drawn in outline}}
-
-           @nested{@constructor-doc["FillMode" "mode-fade"
-                                  `(("n" ("type" "normal") ("contract" ,N)))
-                                  FillMode #:style "pyret-header"]{
-                 Shapes should be drawn semi-transparently,
-                        where @pyret{n} is an opacity
-                        between 0 (transparent) and 1 (fully opaque)
-                        }}
-           )
-     ]
-    }
-
+  
 
   @data-spec2["Point" (list) (list
     (constructor-spec "Point" "point-xy"
@@ -481,6 +440,53 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
       ,(add-line (rectangle 40 40 "outline" "maroon") -10 50 50 -10 "orange"))
   ]
 
+  @subsection{Data types for drawing basic images}
+
+    @type-spec["FillMode" (list) #:private #t]{
+    @|FillMode|s describe the style for a shape.
+
+    @type-versions[
+     (list @bold{The @pyret{image} library}
+
+           @nested{@|FillMode|s can be one of a fixed set of
+                         @pyret-id["String" "<global>"]s, or a
+                         @pyret-id["Number" "<global>"]}
+           
+           @nested{The string @pyret{"solid"}}
+           @nested{The string @pyret{"outline"}}
+           @nested{A number between 0 and 1}
+           )
+     
+     (list @bold{The @pyret{image-typed} library}
+
+           @nested{@|FillMode|s are an enumerated data definition:
+                         
+           @data-spec2["FillMode" (list) #:no-toc #t
+                        (list
+                         (singleton-spec2 "FillMode" "mode-solid")
+                         (singleton-spec2 "FillMode" "mode-outline")
+                         (constructor-spec "FillMode" "mode-fade"
+                                           `(("n" ("type" "normal") ("contract" ,N)))))]}
+
+           @nested{@singleton-doc["FillMode" "mode-solid" FillMode #:style ""]{
+                 Shapes should be drawn solidly filled in}}
+
+           @nested{@singleton-doc["FillMode" "mode-outline" FillMode #:style ""]{
+                 Shapes should only be drawn in outline}}
+
+           @nested{@constructor-doc["FillMode" "mode-fade"
+                                  `(("n" ("type" "normal") ("contract" ,N)))
+                                  FillMode #:style "pyret-header"]{
+                 Shapes should be drawn semi-transparently,
+                        where @pyret{n} is an opacity
+                        between 0 (transparent) and 1 (fully opaque)
+                        }}
+           )
+     ]
+    }
+
+
+  
   @section[#:tag "text-images"]{Text}
 
   @function[
@@ -528,6 +534,9 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                   "decorative", "normal", "normal", false)}
       ,(text/font "Goodbye" 36 "turquoise" "Treasure Map Deadhand" 'decorative 'normal 'normal #f))
   ]
+
+  @subsection{Data types for text images}
+  
   @type-spec["FontFamily" (list) #:private #t]{
     @type-versions[
                    
@@ -952,6 +961,26 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     `(@{regular-polygon(40, 8, "outline", "goldenrod")} ,(regular-polygon 40 8 "outline" "goldenrod"))
     `(@{regular-polygon(20, 8, "solid", "cornflower-blue")} ,(regular-polygon 20 8 "solid" "cornflowerblue"))
   ]
+
+  @function["point-polygon"
+            #:contract (a-arrow (L-of Point) FillMode ImageColor Image)
+            #:return Image
+            #:args '(("points" "") ("mode" "") ("color" ""))]{
+    Creates a polygon whose corners are specified by the given list of
+    points.
+  }        
+  
+  @function["wedge"
+            #:contract (a-arrow N N FillMode ImageColor Image)
+            #:return Image
+            #:args '(("radius" "") ("angle" "") ("mode" "") ("color" ""))]{
+    Draws a pie-shaped section of a circle.  The
+    @seclink["pinholes"]{pinhole} of the resulting image is at the
+    center of the circle from which this wedge is cut.  The angle is
+    measured in degrees, measured counterclockwise from the positive x-axis.
+  }
+
+  
   @section{Overlaying Images}
 
   @function[
@@ -1000,147 +1029,6 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     image's reference point down and to the right by @pyret{offset-x}
     and @pyret{offset-y}.
   }
-
-  @type-spec["XPlace" (list) #:private #t]{
-    @|XPlace|s describe a landmark to align an image along the x-axis.
-
-    @type-versions[
-                   
-     (list @bold{The @pyret{image} library}
-
-           @nested{@|XPlace|s can be one of a fixed set of
-                           @pyret-id["String" "<global>"]s}
-
-           @nested{@pyret{"left"}}
-           
-           @nested{@pyret{"center"} or @pyret{"middle"} (these are synonyms)} 
-
-           @nested{@pyret{"pinhole"}}
-
-           @nested{@pyret{"right"}})
-
-     
-     (list @bold{The @pyret{image-typed} library}
-
-           @nested{@|XPlace|s are an enumerated data definition:
-                         
-           @data-spec2["XPlace" (list) #:no-toc #t
-                        (list
-                         (singleton-spec2 "XPlace" "x-left")
-                         (singleton-spec2 "XPlace" "x-middle")
-                         (singleton-spec2 "XPlace" "x-pinhole")
-                         (singleton-spec2 "XPlace" "x-right"))]}
-
-           @nested{@singleton-doc["XPlace" "x-left" XPlace #:style ""]{
-                 Shape should be aligned along its left edge.}}
-
-           @nested{@singleton-doc["XPlace" "x-middle" XPlace #:style ""]{}
-                   @value["x-center" XPlace #:style ""]{
-                 Shape should be aligned at its horizontal midpoint.  For
-                 convenience, you can also write @pyret-id{x-center}
-                 as a synonym.}}
-
-           @nested{@singleton-doc["XPlace" "x-pinhole" XPlace #:style ""]{
-                 Shape should be aligned by its @seclink["pinholes"]{pinhole}.}}
-
-           @nested{@singleton-doc["XPlace" "x-right" XPlace #:style ""]{
-                 Shape should be aligned along its right edge.}})]
-
-    }
-  @repl-examples[
-   `(@{overlay-align("left", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("center", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'center 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("middle", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'middle 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("right", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'right 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-  ]
-  @type-spec["YPlace" (list) #:private #t]{
-    @|YPlace|s describe a landmark to align an image along the y-axis.
-
-    @type-versions[
-                   
-     (list @bold{The @pyret{image} library}
-
-           @nested{@|YPlace|s can be one of a fixed set of
-                           @pyret-id["String" "<global>"]s}
-
-           @nested{@pyret{"top"}}
-           
-           @nested{@pyret{"middle"} or @pyret{"center"} (these are synonyms)} 
-
-           @nested{@pyret{"pinhole"}}
-
-           @nested{@pyret{"baseline"}}
-
-           @nested{@pyret{"bottom"}})
-
-     
-     (list @bold{The @pyret{image-typed} library}
-
-           @nested{@|YPlace|s are an enumerated data definition:
-                         
-           @data-spec2["YPlace" (list) #:no-toc #t
-                        (list
-                         (singleton-spec2 "YPlace" "y-top")
-                         (singleton-spec2 "YPlace" "y-center")
-                         (singleton-spec2 "YPlace" "y-pinhole")
-                         (singleton-spec2 "YPlace" "y-baseline")
-                         (singleton-spec2 "YPlace" "y-bottom"))]}
-
-           @nested{@singleton-doc["YPlace" "y-top" YPlace #:style ""]{
-                 Shape should be aligned along its top edge.}}
-
-           @nested{@singleton-doc["YPlace" "y-center" YPlace #:style ""]{}
-                   @value["y-middle" YPlace #:style ""]{
-                 Shape should be aligned at its vertical midpoint.  For
-                 convenience, you can also write @pyret-id{y-middle}
-                 as a synonym.}}
-
-           @nested{@singleton-doc["YPlace" "y-pinhole" YPlace #:style ""]{
-                 Shape should be aligned by its @seclink["pinholes"]{pinhole}.}}
-
-           @nested{@singleton-doc["YPlace" "y-baseline" YPlace #:style ""]{
-                 Shape should be aligned by its basline. This option only makes sense with
-                 @seclink["text-images"]{text images}. It allows
-                 aligning multiple images of text at their baseline, as if they
-                 were part of a single image, or to appear to underline text.
-                 For all other images, their baseline is the same as
-                 their bottom.
-                 }}
-
-           @nested{@singleton-doc["YPlace" "y-bottom" YPlace #:style ""]{
-                 Shape should be aligned along its bottom edge.}})]
-
-    }
-  @repl-examples[
-   `(@{overlay-align("left", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("left", "middle",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'left 'middle (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("left", "center",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'left 'center (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("left", "bottom",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'left 'bottom (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("left", "baseline",
-         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
-     ,(overlay/align 'left 'baseline (rectangle 140 3 "solid" "bisque")
-                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
-   `(@{overlay-align("left", "bottom",
-         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
-     ,(overlay/align 'left 'bottom (rectangle 140 3 "solid" "bisque")
-                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
-  ]
   @function[
     "overlay-xy"
             #:contract (a-arrow Image N N Image Image)
@@ -1331,6 +1219,154 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
      ,(above/align 'right (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
   ]
+
+  @subsection{Data types for aligning images}
+
+  
+  @type-spec["XPlace" (list) #:private #t]{
+    @|XPlace|s describe a landmark to align an image along the x-axis.
+
+    @type-versions[
+                   
+     (list @bold{The @pyret{image} library}
+
+           @nested{@|XPlace|s can be one of a fixed set of
+                           @pyret-id["String" "<global>"]s}
+
+           @nested{@pyret{"left"}}
+           
+           @nested{@pyret{"center"} or @pyret{"middle"} (these are synonyms)} 
+
+           @nested{@pyret{"pinhole"}}
+
+           @nested{@pyret{"right"}})
+
+     
+     (list @bold{The @pyret{image-typed} library}
+
+           @nested{@|XPlace|s are an enumerated data definition:
+                         
+           @data-spec2["XPlace" (list) #:no-toc #t
+                        (list
+                         (singleton-spec2 "XPlace" "x-left")
+                         (singleton-spec2 "XPlace" "x-middle")
+                         (singleton-spec2 "XPlace" "x-pinhole")
+                         (singleton-spec2 "XPlace" "x-right"))]}
+
+           @nested{@singleton-doc["XPlace" "x-left" XPlace #:style ""]{
+                 Shape should be aligned along its left edge.}}
+
+           @nested{@singleton-doc["XPlace" "x-middle" XPlace #:style ""]{}
+                   @value["x-center" XPlace #:style ""]{
+                 Shape should be aligned at its horizontal midpoint.  For
+                 convenience, you can also write @pyret-id{x-center}
+                 as a synonym.}}
+
+           @nested{@singleton-doc["XPlace" "x-pinhole" XPlace #:style ""]{
+                 Shape should be aligned by its @seclink["pinholes"]{pinhole}.}}
+
+           @nested{@singleton-doc["XPlace" "x-right" XPlace #:style ""]{
+                 Shape should be aligned along its right edge.}})]
+
+    }
+
+  @repl-examples[
+   `(@{overlay-align("left", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("center", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'center 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("middle", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'middle 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("right", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'right 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+  ]
+  
+  @type-spec["YPlace" (list) #:private #t]{
+    @|YPlace|s describe a landmark to align an image along the y-axis.
+
+    @type-versions[
+                   
+     (list @bold{The @pyret{image} library}
+
+           @nested{@|YPlace|s can be one of a fixed set of
+                           @pyret-id["String" "<global>"]s}
+
+           @nested{@pyret{"top"}}
+           
+           @nested{@pyret{"middle"} or @pyret{"center"} (these are synonyms)} 
+
+           @nested{@pyret{"pinhole"}}
+
+           @nested{@pyret{"baseline"}}
+
+           @nested{@pyret{"bottom"}})
+
+     
+     (list @bold{The @pyret{image-typed} library}
+
+           @nested{@|YPlace|s are an enumerated data definition:
+                         
+           @data-spec2["YPlace" (list) #:no-toc #t
+                        (list
+                         (singleton-spec2 "YPlace" "y-top")
+                         (singleton-spec2 "YPlace" "y-center")
+                         (singleton-spec2 "YPlace" "y-pinhole")
+                         (singleton-spec2 "YPlace" "y-baseline")
+                         (singleton-spec2 "YPlace" "y-bottom"))]}
+
+           @nested{@singleton-doc["YPlace" "y-top" YPlace #:style ""]{
+                 Shape should be aligned along its top edge.}}
+
+           @nested{@singleton-doc["YPlace" "y-center" YPlace #:style ""]{}
+                   @value["y-middle" YPlace #:style ""]{
+                 Shape should be aligned at its vertical midpoint.  For
+                 convenience, you can also write @pyret-id{y-middle}
+                 as a synonym.}}
+
+           @nested{@singleton-doc["YPlace" "y-pinhole" YPlace #:style ""]{
+                 Shape should be aligned by its @seclink["pinholes"]{pinhole}.}}
+
+           @nested{@singleton-doc["YPlace" "y-baseline" YPlace #:style ""]{
+                 Shape should be aligned by its basline. This option only makes sense with
+                 @seclink["text-images"]{text images}. It allows
+                 aligning multiple images of text at their baseline, as if they
+                 were part of a single image, or to appear to underline text.
+                 For all other images, their baseline is the same as
+                 their bottom.
+                 }}
+
+           @nested{@singleton-doc["YPlace" "y-bottom" YPlace #:style ""]{
+                 Shape should be aligned along its bottom edge.}})]
+
+    }
+  @repl-examples[
+   `(@{overlay-align("left", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "middle",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'middle (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "center",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'center (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "bottom",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'bottom (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "baseline",
+         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
+     ,(overlay/align 'left 'baseline (rectangle 140 3 "solid" "bisque")
+                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
+   `(@{overlay-align("left", "bottom",
+         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
+     ,(overlay/align 'left 'bottom (rectangle 140 3 "solid" "bisque")
+                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
+  ]
+
+  
   @section{Placing Images & Scenes}
   @function[
     "empty-scene"
