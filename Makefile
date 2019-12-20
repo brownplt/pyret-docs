@@ -33,3 +33,6 @@ release-docs: docs
 
 install:
 	npm install
+
+clean:
+	rm -rf build/docs
