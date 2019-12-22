@@ -986,7 +986,8 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
           point-polar(30, deg-to-rad(60 * n))
         end
         draw-pinhole(point-polygon(points, "outline", "steel-blue"))}
-      ,(regular-polygon 30 6 "outline" "SteelBlue"))
+      ,(let ((i (regular-polygon 30 6 "outline" "SteelBlue")))
+        (draw-pinhole 0 0  i)))
   ]
 
   @section{Other images}
