@@ -93,6 +93,8 @@
   (fun-spec (name "image-width") (arity 1))
   (fun-spec (name "image-height") (arity 1))
   (fun-spec (name "image-baseline") (arity 1))
+  (fun-spec (name "image-pinhole-x") (arity 1))
+  (fun-spec (name "image-pinhole-y") (arity 1))
   (fun-spec (name "name-to-color") (arity 1))
   (fun-spec (name "color-named") (arity 1))
   (fun-spec (name "move-pinhole") (arity 3))
@@ -1049,7 +1051,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     @pyret{place-y} to determine the alignment point in each image.
     A call to @pyret-id{overlay-align}@pyret{(place-x, place-y, img1, img2)} 
     behaves the same as @pyret-id{overlay-onto-offset}@pyret{(img1, place-x, place-y, 
-    0, 0, place-x, place-y, img2)}
+    0, 0, img2, place-x, place-y)}
   }
 
   @repl-examples[
@@ -1079,7 +1081,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     by @pyret{dx} pixels, and then down by @pyret{dy} pixels.  A call
     to @pyret-id{overlay-xy}@pyret{(img1, dx, dy, img2)} behaves the
     same as @pyret-id{overlay-onto-offset}@pyret{(img1, "left", "top", 
-    dx, dy, "left", "top", img2)}.
+    dx, dy, img2, "left", "top")}.
   }
   @repl-examples[
     `(@{overlay-xy(0, 0,
@@ -1103,9 +1105,10 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
                          '("place-y1" "") 
                          '("offset-x" "") 
                          '("offset-y" "") 
+                         '("img2" "")
                          '("place-x2" "") 
                          '("place-y2" "") 
-                         '("img2" ""))]{
+                         )]{
     Overlays @pyret{img1} on @pyret{img2} like 
     @pyret-id{overlay}, but uses @pyret{place-x1} and
     @pyret{place-y1} to choose the reference point for the first
@@ -1911,6 +1914,30 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
    `(@{image-baseline(rectangle(30, 40, "solid", "red"))} @,pyret{40})
    `(@{image-baseline(text("Pyret", 30, "green"))} @,pyret{30})
   ]
+  @function[
+    "image-pinhole-x"
+            #:contract (a-arrow Image N)
+            #:return N
+            #:args (list '("img" ""))]{
+    Returns the distance from the left of @pyret{img} to its pinhole.
+  }
+  @repl-examples[
+   `(@{image-pinhole-x(circle(30, "solid", "red"))} @,pyret{30})
+   `(@{image-pinhole-x(text("Pyret", 30, "green"))} @,pyret{40.5})
+  ]
+  @function[
+    "image-pinhole-y"
+            #:contract (a-arrow Image N)
+            #:return N
+            #:args (list '("img" ""))]{
+    Returns the distance from the top of @pyret{img} to its pinhole.
+  }
+  @repl-examples[
+   `(@{image-pinhole-y(circle(30, "solid", "red"))} @,pyret{30})
+   `(@{image-height(star(40, "solid", "green"))} @,pyret{62})
+   `(@{image-pinhole-y(star(40, "solid", "green"))}
+     @,pyret{34 # NOTE: lower than the center, which would be (62 / 2) == 31})
+  ]
   @section{Image Predicates}
   @function[
     "is-image"
@@ -1934,7 +1961,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     Checks if @pyret{maybe-color} can be used as a color. Strings, if
            names of colors (e.g. @pyret{"red"} or @pyret{"green"}) can
            also be used, if they exist in the color database.
-           @bold{This function is only defined in the @pyret{image} library}
+           @bold{This function is only defined in the @pyret{image} library.}
   }
   @function[
     "is-y-place"
@@ -1944,7 +1971,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     Checks if @pyret{maybe-y-place} can be used as y-place in appropriate
     functions. Valid strings are @pyret{"top"}, @pyret{"bottom"},
     @pyret{"middle"}, @pyret{"center"}, @pyret{"baseline"} and
-    @pyret{"pinhole"}. @bold{This function is only defined in the @pyret{image} library}
+    @pyret{"pinhole"}. @bold{This function is only defined in the @pyret{image} library.}
 
   }
   @function[
@@ -1955,7 +1982,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     Checks if @pyret{maybe-x-place} can be used as x-place in appropriate
     functions. Valid strings are @pyret{"left"}, @pyret{"right"},
     @pyret{"middle"}, @pyret{"center"} and @pyret{"pinhole"}.
-    @bold{This function is only defined in the @pyret{image} library}
+    @bold{This function is only defined in the @pyret{image} library.}
   }
   @function[
     "is-angle"
