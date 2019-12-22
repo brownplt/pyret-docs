@@ -1686,7 +1686,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
             #:return Image
             #:args (list '("img" ""))]{
     Construct an image similar to @pyret{img}, but with a black, single
-    pixel frame draw around the bounding box of the image.
+    pixel frame drawn around the bounding box of the image.
   }
   @repl-examples[
    `(@{frame(ellipse(40, 60, "solid", "gray"))}
