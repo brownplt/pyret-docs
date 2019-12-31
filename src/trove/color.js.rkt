@@ -610,7 +610,7 @@
 
 @(define (paint-swatch color css-color)
    (list (html:span 'style: "font-size: initial;"
-                    (html:image 'class: "paintBrush" "https://code.pyret.org/img/brush.svg")
+                    (html:image 'class: "paintBrush" "path://brush.svg")
                     (html:span 'class: "paintSpan"
                                (html:span 'class: "checkersBlob")
                                (html:span 'class: "paintBlob"

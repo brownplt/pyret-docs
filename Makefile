@@ -13,6 +13,9 @@ docs:
     ++style ./node_modules/pyret-codemirror-mode/css/pyret.css \
     ++extra src/hilite.js \
     ++extra src/Pyret-Tutorial/airplane-small.png \
+    ++extra src/trove/brush.svg \
+    ++extra src/trove/paint.svg \
+    ++extra src/trove/checkers.svg \
     ++extra src/search.js \
     \
     ++style src/styles.css \

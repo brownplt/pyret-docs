@@ -91,6 +91,12 @@
                                                            (if src (list (cons 'src src)) '())
                                                            (if alt (list (cons 'alt alt)) '())
                                                            attribs)))))]
+       [(or (string-contains src "path://"))
+        (elem #:style (make-style class (list (alt-tag "img")
+                                              (attributes (append
+                                                           (if src (list (cons 'src (substring src 7))) '())
+                                                           (if alt (list (cons 'alt alt)) '())
+                                                           attribs)))))]
        [alt
         (apply scr:image (append body (list alt))
                #:style (make-style class (list (attributes attribs)))
