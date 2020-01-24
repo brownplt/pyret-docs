@@ -62,7 +62,7 @@ Here's a simple example that demonstrates all three.
 In a file called @tt{list-helpers.arr}:
 
 @pyret-block{
-provide *
+provide: * end
 
 concat :: <A> List<A>, List<A> -> List<A>
 fun concat(l1, l2):
@@ -80,17 +80,17 @@ check:
 end
 }
 
-The @pyret{provide *} declaration tells Pyret to make @emph{all} the names of
+The @pyret{provide: * end} declaration tells Pyret to make @emph{all} the names of
 functions and values defined in the @tt{list-helpers.arr} module available to
 any module that imports it. The @pyret{include file("list-helper.arr")}
 declaration tells Pyret to find the module at the path given in quotes, and
 then make all the names it provides available in the top-level of the module
 the @pyret{include} appears in.
 
-In general, @pyret{include} and @pyret{provide *} are handy ways to provide a
+In general, @pyret{include} and @pyret{provide: * end} are handy ways to provide a
 collection of definitions to another context across modules.
 
-Note that @pyret{provide *} only provides @emph{values}.  If you want to
+Note that @pyret{provide: * end} only provides @emph{values}.  If you want to
 provide @emph{type definitions}, then you may use a related declaration:
 
 In a file called @tt{mypos-provider.arr}:
@@ -197,7 +197,7 @@ definitions besides values}}
 
 @section[#:tag "s:modules:import"]{@pyret{import} and Module Identifiers}
 
-In @secref["s:modules:quick-start"] we showed @pyret{provide *} and
+In @secref["s:modules:quick-start"] we showed @pyret{provide: * end} and
 @pyret{include} @techlink[#:key "dependency"]{@emph{<dependency>}} as a quick
 way to get names from one module to another. This is convenient and often a
 good choice. However, there are situations where this is inadequate. For
@@ -208,14 +208,14 @@ Consider:
 
 @pyret-block{
 # list-helpers.arr
-provide *
+provide: * end
 fun concat(l1, l2): l1.append(l2) end
 fun every-other(l): ... end
 }
 
 @pyret-block{
 # list-helpers2.arr
-provide *
+provide: * end
 concat :: <A> List<List<A>> -> List<A>
 fun concat(list-of-lists):
   for fold(acc from empty, l from list-of-lists): acc.append(l) end
@@ -274,7 +274,7 @@ to control names.
 @section[#:tag "s:modules:provide-fewer"]{Providing Fewer (and More) Names}
 
 It is not required that a module provide @emph{all} of its defined names. To
-provide fewer names than @pyret{provide *}, a module can use one or more
+provide fewer names than @pyret{provide: * end}, a module can use one or more
 @deftech{provide blocks}. The overall set of features allowed is quite broad, and
 simple examples follow:
 
@@ -321,8 +321,6 @@ provide:
 end
 }
 
-This is synonymous with @pyret{provide *}.  It is primarily useful when
-combined with additional @tech{provide specifications}.
 }
 
 @item{A module might define several names of values, and only provide a few:
