@@ -96,8 +96,10 @@ provide @emph{type definitions}, then you may use a related declaration:
 In a file called @tt{mypos-provider.arr}:
 
 @pyret-block{
-provide *       # This line provides `pos2d`, `pos3d`, `is-pos2d` and `is-pos3d`
-provide-types * # This line provides the type named `MyPos`
+provide:
+  *,       # This line provides `pos2d`, `pos3d`, `is-pos2d` and `is-pos3d`
+  type *   # This line provides the type named `MyPos`
+end
 
 data MyPos:
   | pos2d(x, y)
@@ -244,8 +246,8 @@ module.
 
 
 @pyret-block{
-include file("list-helpers.arr") as LH1
-include file("list-helpers2.arr") as LH2
+import file("list-helpers.arr") as LH1
+import file("list-helpers2.arr") as LH2
 
 check:
   LH1.concat([list: 1, 2], [list: 3, 4]) is [list: 1, 2, 3, 4]
@@ -716,6 +718,12 @@ include from SD:
 end
 }
 
+
+
+
+
+
+@;{
 @subsection{Inlcuding data definitions as types}
 
 There is a subtle nuance regarding including data definitions.  Data
@@ -769,6 +777,7 @@ end
 }
 
 Note that both examples will run fine when @emph{not} using the type-checker at all.
+}
 
 @section{Converting between shorthand and expanded syntax}
 
