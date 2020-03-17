@@ -8,7 +8,7 @@
     (form-spec (name "<id-import>"))
     (form-spec (name "file"))
     (form-spec (name "js-file"))
-    (form-spec (name "gdrive-js"))
+    (form-spec (name "my-gdrive"))
     (form-spec (name "shared-gdrive"))))
 
 @docmodule["modules" #:noimport #t #:friendly-title "Modules"]{
@@ -120,7 +120,7 @@ cases(MyPos) favorite-spot:
 end
 }
 
-The @pyret{provide-types} declaration is needed for the @pyret{cases}
+The @pyret{type *} declaration is needed for the @pyret{cases}
 expression to recognize the name @pyret{MyPos} as a type name.
 
 @section[#:tag "s:modules:finding-modules"]{Finding Modules}
@@ -131,7 +131,7 @@ of the current module on some other module.  The syntax of each @pyret{import} a
 
 There are currently five types of @tech{dependencies} supported, though the
 compiler can be configured to support some, all, or other types of
-@tech{dependency}; for example, the @seclink[(xref "modules" "gdrive-js")]{@pyret{gdrive} dependencies} (below) only
+@tech{dependency}; for example, the @seclink[(xref "modules" "my-gdrive")]{@pyret{gdrive} dependencies} (below) only
 work in @url{code.pyret.org}, where it is assumed the user is authenticated to
 Google Drive.
 
@@ -155,7 +155,7 @@ Like @pyret{file}, but expects the contents of the file to contain a
 definition in @seclink["s:single-module" "JavaScript module format"].
 }
 
-@form["gdrive-js" "gdrive-js(<name>)"]{
+@form["my-gdrive" "my-gdrive(<name>)"]{
 @pyret-block[#:style "good-ex"]{include my-gdrive("stored-in-gdrive.arr")}
 Looks for a Pyret file with the given filename in the user's
 @tt{code.pyret.org/} directory in the root of Google Drive.
@@ -386,14 +386,11 @@ For example, this module exports both one name it defines, and all the names
 from @pyret{string-dict}:
 
 @pyret-block{
+import string-dict as SD
 provide from SD: * end
 provide: my-string-dict-helper end
-import string-dict as SD
 fun my-string-dict-helper(): ... end
 }
-
-Note that since provides always come before imports, the @pyret{SD} used on
-line 1 of the example above is defined two lines later.
 
 
 Combining provides from multiple modules can be an effective way to put
@@ -402,12 +399,12 @@ science may benefit from a helper library that gives access to the image,
 chart, and table libraries:
 
 @pyret-block{
-provide from T: * end
-provide from C: * end
-provide from I: * end
 import tables as T
 import chart as C
 import image as I
+provide from T: * end
+provide from C: * end
+provide from I: * end
 }
 
 A student library that @pyret{include}s this module would have access to all of
@@ -518,8 +515,8 @@ provide-data-spec: DATA data-name-spec [hiding-spec]
 data-name-spec: STAR | module-ref
 }
 
-Providing a @seclink["s:data-decl"]{data definition} is more complicated, since
-data definitions implicitly define types and values.  The following two
+Providing a @seclink["s:data-decl"]{data definition} is more sophisticated,
+since data definitions implicitly define types and values.  The following two
 programs are equivalent in meaning:
 
 @pyret-block{
@@ -599,11 +596,11 @@ Clients of this module will see the "smart" versions of these functions with
 the same names as the constructors, and will therefore never be able to
 construct invalid values.
 
-As with values and types, a module may use @pyret{data *} as a shorthand to export
-all the data definitions it contains.  @bold{Note} that trying to write
-@pyret{data * hiding (something)} will not work; to hide some component of a
-data definition, you must explicitly name the data definition whose component
-you are trying to hide.
+As with values and types, a module may use @pyret{data *} as a shorthand to
+export all the data definitions it contains.  @bold{Note} that trying to write
+@pyret{data D1 as D2} is not allowed syntax. You could export with a different
+name for the type alias (e.g. @pyret{type D1 as D2}) if you want to refer to
+one type with a different name in another context.
 
 @section[#:tag "s:modules:include-fewer"]{Including Fewer (and More) Names}
 
@@ -694,11 +691,12 @@ provide from L: map, filter, fold end
 import lists as L
 
 # in "student-code.arr"
-include path("student-helpers.arr")
+include file("student-helpers.arr")
 import lists as L
 include from L: map end
 # map included again here, but it's OK because the other map is the same
 }
+
 
 @section[#:tag "s:modules:import-other"]{Importing more than just values}
 
@@ -779,6 +777,12 @@ Note that both examples will run fine when @emph{not} using the type-checker at 
 
 @section{Converting between shorthand and expanded syntax}
 
+Pyret used to have, and supports for backwards compatibility, a few other
+syntaxes for modules. The short guide below shows how to convert from this old
+syntax to the new. Of the old syntax, we only recommend the continued use of
+@pyret{include <some-module>}, which is a convenient first line of many
+student-facing starter files.
+
 @tabular[#:sep (hspace 4)
  (list
   (list "Shorthand syntax" "Expanded form")
@@ -790,8 +794,7 @@ Note that both examples will run fine when @emph{not} using the type-checker at 
   (list @pyret-block{provide-types *}
         @pyret-block{
         provide:
-          type *,
-          data *
+          type *
         end})
   (list @pyret-block{include <some-module>}
         @pyret-block{
