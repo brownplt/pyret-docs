@@ -1807,11 +1807,30 @@ is also a binary operator expression.
 binop-expr: expr (BINOP expr)*
 }
 
-@margin-note{The @pyret{==} and @pyret{=~} operators also call methods, but are
+Pyret supports the following operations, shown by example:
+@pyret-block{
+examples:
+  1 + 1  is 2
+  1 - 1  is 0
+  2 * 4  is 8
+  6 / 3  is 2
+  1 < 2  is true
+  1 <= 1 is true
+  1 > 1  is false
+  1 >= 1 is true
+  1 == 1 is true
+  true and true is true
+  false or true is true
+  not(false) is true
+end
+}
+
+@margin-note{There are additional equality operators in Pyret, which also call methods, but are
 somewhat more complex.  They are documented in detail in @seclink["equality"].}
-Each binary operator is syntactic sugar for a particular method or function
-call.  The following table lists the operators, their intended use, and the
-corresponding call:
+The arithmetic and comparison operators examine their arguments.  For primtive
+numbers and strings, the operation happens internally to Pyret.  If the
+arguments are objects, however, the operators are syntactic sugar for a particular
+method call, as follows:
 
 @tabular[#:sep @hspace[2]
   (list
@@ -1825,9 +1844,8 @@ corresponding call:
     (list @tt{left > right} @tt{left._greaterthan(right)}))
 ]
 
-For the primitive strings and numbers, the operation happens internally.  For
-all object or data values, the operator looks for the method appropriate method
-and calls it.
+Logical operators do not have a corresponding method call, since they only
+apply to primitive boolean values.
 
 @subsection[#:tag "s:tuple-expr"]{Tuple Expressions}
 
