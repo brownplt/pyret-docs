@@ -96,7 +96,9 @@
     #:args '(("l" #f))
     #:return N
   ]{
-  Calculates the arithmetic mean of the numbers in @pyret{l}.
+  Calculates the arithmetic mean, also known as the average, of the numbers in
+  @pyret{l}.  This is simply the sum of all the values in the list, divided by
+  its length.
   
   @examples{
     check:
@@ -112,7 +114,8 @@
     #:args '(("l" #f))
     #:return N
   ]{
-  Calculates the median of the numbers in @pyret{l}.  If the list is of even
+  Calculates the median of the numbers in @pyret{l}.  This is the
+  ``middle-most'' value in the list, if the values were sorted.  If the list is of even
   length, returns the average of the two middle-most values.
   
   @examples{
@@ -129,7 +132,8 @@
     #:args '(("l" #f))
     #:return (L-of N)
     ]{
-    Calculates the modes of the numbers in @pyret{l}.  If no number appears
+    Calculates the modes of the numbers in @pyret{l}.  These are the numbers
+  that appear most often in the list.  If @emph{no} number appears
   more than once, returns the empty list.  The modes will be returned in sorted order.
 
 Computing the mode of a list of values is unambiguous when there is a unique
@@ -228,14 +232,31 @@ definition they will find in their textbooks.
     #:args '(("l" #f))
     #:return N
   ]{
-  Gives the standard deviation of the data set represented by
-  numbers in @pyret{l}.
+  Gives the @emph{population} or @emph{uncorrected sample} standard deviation
+  of the data set represented by numbers in @pyret{l}.
   
   @examples{
     check:  
-      stdev([list: ]) raises "Empty List"
+      stdev([list: ]) raises "list is empty"
       stdev([list: 2]) is 0
       stdev([list: 2, 4, 4, 4, 5, 5, 7, 9]) is 2
+    end 
+  }
+  }
+
+  @function["stdev-sample"
+    #:contract (a-arrow (L-of N) N)
+    #:args '(("l" #f))
+    #:return N
+  ]{
+  Gives the @emph{corrected sample} standard deviation of the data set represented by
+  numbers in @pyret{l}.
+    
+  @examples{
+    check:  
+      stdev([list: ]) raises "list is empty"
+      stdev([list: 2]) raises "division by zero"
+      stdev([list: 2, 4, 4, 4, 5, 5, 7, 9]) is-roughly 2.1380899
     end 
   }
   }
@@ -300,13 +321,14 @@ definition they will find in their textbooks.
     #:args '(("X" #f)("Y" #f))
     #:return (link "StatModel")
   ]{
-  Calculates a linear regression to model simple independent -> dependent
-  variable relationship.  Uses Ordinary Least Squares.
+  Gives the @emph{corrected sample} standard deviation of the data set represented by
+  numbers in @pyret{l}.
     
   @examples{
-    check:
-      lin-reg-2V([list: 0, 1, 2, 3], [list: 3, 2, 1, 0]) is StatModel(3, -1, 1)
-    end
-  }
+    check:  
+      stdev([list: ]) raises "list is empty"
+      stdev([list: 2]) raises "division by zero"
+      stdev([list: 2, 4, 4, 4, 5, 5, 7, 9]) is-roughly 2.1380899
+    end 
   }
 }
