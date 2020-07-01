@@ -1195,14 +1195,17 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     reverse of @pyret-id{overlay-xy}.
   }
   @repl-examples[
-    `(@{underlay-xy(0, 0,
-          square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+    `(@{underlay-xy(square(50, "solid", "bisque"),
+          0, 0,
+          square(30, "solid", "dark-green"))}
       ,(underlay/xy (square 50 "solid" "bisque") 0 0 (square 30 "solid" "darkgreen")))
-    `(@{underlay-xy(50, 20, # Move green square right 50 and down 20
-          square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+    `(@{underlay-xy(square(50, "solid", "bisque"), 
+          50, 20, # Move green square right 50 and down 20
+          square(30, "solid", "dark-green"))}
       ,(underlay/xy (square 50 "solid" "bisque") 50 20 (square 30 "solid" "darkgreen")))
-    `(@{underlay-xy(-10, -20, # Move green square left 10 and up 20
-          square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+    `(@{underlay-xy(square(50, "solid", "bisque"),
+          -10, -20, # Move green square left 10 and up 20
+          square(30, "solid", "dark-green"))}
       ,(underlay/xy (square 50 "solid" "bisque") -10 -20 (square 30 "solid" "darkgreen")))
   ]
   @function[
