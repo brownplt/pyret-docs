@@ -6,7 +6,7 @@
 @title{Pyret Style Guide}
 @author{Frank Goodman and Shriram Krishnamurthi}
 
-Ahoy matey! Here be the style guide for Pyret. Follow me rules to find 
+Ahoy matey! Here be the style guide for Pyret. Follow me rules to find
 the hidden treasure, or walk the plank!
 
 @(table-of-contents)
@@ -19,20 +19,22 @@ You should indent your code blocks using two spaces (not tabs).
 
 @subsection{Line Length}
 
-Try to keep the total length of your lines under 80 characters.
+The total length of your lines should be kept under 80 characters. The Pyret
+editor displays a dotted blue at the 80 character mark when any of your lines
+are over this limit.
 
 For overly long lines, it's actually really hard to figure out where
 to put in good line breaks. This is in every language. Look for
 something that tries to match the logical structure of your program.
- 
+
 However, there's usually a better way to solve this problem: create
 extra variables to name the intermediate pieces, and use those
 names. E.g.: instead of worrying where to put in line breaks in
-@codedisp{ 
+@codedisp{
 fun f(x, y, z):
   g(some-very-long-thing(x * x, y + y), other-very-long-thing((x + y + z) / (2 * 3 * 4)))
 end
-} 
+}
 it might be better to write it as
 @codedisp{
 fun f(x, y, z):
@@ -40,7 +42,7 @@ fun f(x, y, z):
   sensible-name-2 = other-very-long-thing((x + y + z) / (2 * 3 * 4))
   g(sensible-name-1, sensible-name-2)
 end
-} 
+}
 (and think about indenting/shortening those two new lines).
 
 Not only does this shorten lines, it makes it clearer what all these
@@ -168,7 +170,7 @@ end
 Even though Pyret does not currently check parametric annotations, you
 should still write them for their value as user documentation. Thus:
 @codedisp{
-fun length(lst :: List<Any>) -> Number:
+fun sum-str-lengths(lst :: List<String>) -> Number:
   # ...
 end
 }
@@ -187,6 +189,43 @@ fun sqrt(n :: Number%(non-negative)) -> Number:
   # ...
 end
 }
+
+@subsection{Parametric Annotations}
+
+You should avoid using @tt{Any} as the subtype of a parametric data structure,
+like a @tt{List}.
+
+In general, a @tt{List<Any>} definition is often undesirable because it
+indicates elements of any type can be members of the list. In particular,
+this subtly implies that multiple elements of different types could exist.
+In other words, @tt{[list: 1, "apple", true]} would satisfy the annotation
+@tt{List<Any>}. Creating @tt{List}s like this is usually bad practice.
+
+In Pyret, we can do this by parametrizing the type. Rather than:
+
+@codedisp{
+fun search(lst :: List<Any>) -> Any: ... end
+}
+
+We should instead do something like:
+
+@codedisp{
+fun search<A>(lst :: List<A>) -> A: ... end
+}
+
+In the code above, we don't know or care what the type the elements of 
+@tt{lst} are, but we are asserting that they all be of the same type—namely 
+@tt{A}. The use of @tt{A} as the return type also means that the type of the 
+value returned by @tt{search} must also be the same as the type of the
+elements of @tt{list}. 
+
+In other words, using parameterized types allows us to make the subtle but
+important distinction between "any type at all" (@tt{List<Any>}) and
+"any single type, for any particular list" (@tt{List<A>}).
+
+Note that the actual name of the type parameter is arbitrary (we could have 
+written @tt{search<SomeOtherName>} instead of @tt{search<A>}), but it is 
+convention to use a single letter for parametric annotations.
 
 @subsection{Testing}
 
@@ -266,7 +305,7 @@ cases (Animal) a:
   | dillo(_, _) => ...
 end
 }
-and thus ignore multiple fields. 
+and thus ignore multiple fields.
 
 Finally, if your conditional is not designed to handle a particular
 kind of datum, signal an error:
@@ -276,6 +315,84 @@ cases (Animal) a:
   | dillo(_, _) => raise("Serpents only, please!")
 end
 }
+
+@section{Boolean Expressions}
+
+@subsection{Ask Blocks}
+
+If you have an @tt{if} block containing a lot of conditionals (greater than 3
+branches), you should convert it to an @tt{ask} block. This aligns your
+conditionals along the left side of the block, which makes your code look
+cleaner and more readable.
+
+For example, this @tt{if} block is very verbose:
+
+@codedisp{
+fun is-this-noah(str :: String) -> String:
+  if str == "Noah":
+    "Yes"
+  else if str == "Nosh":
+    "Close"
+  else if str == "No":
+    "ah"
+  else if str == "Noa":
+    "I don’t think so"
+  else:
+    "No"
+  end
+end
+}
+
+However, we can make it more concise using an @tt{ask} block:
+
+@codedisp{
+fun is-this-noah(str :: String) -> String:
+  ask:
+    | str == "Noah" then: "Yes"
+    | str == "Nosh" then: "Close"
+    | str == "No" then: "ah"
+    | str == "Noa" then: "I don’t think so"
+    | otherwise: "No"
+  end
+end
+}
+
+@subsection{Concise Conditionals}
+
+You should never determine the boolean value of something by doing:
+
+@codedisp{
+if some-boolean == true:
+  ...
+else:
+  ...
+end
+}
+
+Instead, you should use:
+
+@codedisp{
+if some-boolean:
+  ...
+else:
+  ...
+end
+}
+
+Similarly, do not use an @tt{if} expression to evalulate a predicate, and
+then return @tt{true} or @tt{false}. For example, this would be
+considered incorrect:
+
+@codedisp{
+if my-expression:
+  true
+else:
+  false
+end
+}
+
+Instead, the entire @tt{if} expression above can be replaced with
+@tt{my-expression}.
 
 @section{Naming Intermediate Expressions}
 
