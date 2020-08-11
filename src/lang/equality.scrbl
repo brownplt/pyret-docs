@@ -230,7 +230,7 @@
 
 @docmodule["equality"]{
 
-@section{Types of Equality}
+@section[#:tag "types-of-equality"]{Types of Equality}
 
 Pyret has three notions of equality.  Two values can be @emph{equal now},
 @emph{always equal}, and/or @emph{identical}.  The following table summarizes

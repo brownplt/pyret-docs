@@ -474,7 +474,7 @@ end
   }
   @function["num-sin" #:contract (a-arrow N N) #:return N]{
 
-Returns the sine of the argument, usually as a @pyret{Roughnum}.
+Returns the sine of the argument (an angle in radians), usually as a @pyret{Roughnum}.
   If the argument is @pyret{Exactnum} 0, the result is @pyret{Exactnum} 0 too.
 
 @examples{
@@ -486,7 +486,7 @@ end
   }
   @function["num-cos" #:contract (a-arrow N N) #:return N]{
 
-Returns the cosine of the argument, usually  as a @pyret{Roughnum}. If
+Returns the cosine of the argument (an angle in radians), usually as a @pyret{Roughnum}. If
 the argument is @pyret{Exactnum} 0, the result is @pyret{Exactnum} 1.
 
 @examples{
@@ -497,7 +497,7 @@ end
 }
   }
   @function["num-tan" #:contract (a-arrow N N) #:return N]{
-Returns the tangent of the argument, usually as a @pyret{Roughnum}. If
+Returns the tangent of the argument (an angle in radians), usually as a @pyret{Roughnum}. If
 the argument is @pyret{Exactnum} 0, the result is @pyret{Exactnum} 1.
 
 @examples{
@@ -510,8 +510,8 @@ end
   }
   @function["num-asin" #:contract (a-arrow N N) #:return N]{
   
-Returns the arcsine of the argument as an angle in radians in the range [-pi/2,
-pi/2], usually as a @pyret{Roughnum}. If the argument is @pyret{Exactnum} 0, the
+Returns the arcsine of the argument as an angle in radians in the range [-π/2,
+π/2], usually as a @pyret{Roughnum}. If the argument is @pyret{Exactnum} 0, the
 result is @pyret{Exactnum} 0.
 
 @examples{
@@ -525,7 +525,7 @@ end
   @function["num-acos" #:contract (a-arrow N N) #:return N]{
 
 Returns the arccosine of the argument as an angle in radians in the range [0,
-pi], usually as a @pyret{Roughnum}. However, if the argument is
+π], usually as a @pyret{Roughnum}. However, if the argument is
 @pyret{Exactnum} 1, the result is @pyret{Exactnum} 0.
 
 @examples{
@@ -538,16 +538,16 @@ end
   @function["num-atan" #:contract (a-arrow N N) #:return N]{
 
 Returns the arctangent of the argument as an angle in radians in the range
-(-pi/2, pi/2), usually as a @pyret{Roughnum}. However, if the argument is
+(-π/2, π/2), usually as a @pyret{Roughnum}. However, if the argument is
 @pyret{Exactnum} 0, the result is @pyret{Exactnum} 0.
 
 @examples{
 check:
   num-atan(0) is 0
-  num-atan(1) is-roughly (3.141592 * 1/4) # 45 degrees = pi/4 radians
-  num-atan(-1) is-roughly (-3.141592 * 1/4) # 315 degrees = -pi/4 radians
-  num-atan(100000000000) is-roughly (3.141592 / 2) # 90 degrees = pi/2 radians
-  num-atan(-100000000000) is-roughly (-3.141592 / 2) # 270 degrees = -pi/2 radians
+  num-atan(1) is-roughly (3.141592 * 1/4) # 45 degrees = π/4 radians
+  num-atan(-1) is-roughly (-3.141592 * 1/4) # 315 degrees = -π/4 radians
+  num-atan(100000000000) is-roughly (3.141592 / 2) # 90 degrees = π/2 radians
+  num-atan(-100000000000) is-roughly (-3.141592 / 2) # 270 degrees = -π/2 radians
 end
 }
   }
@@ -558,7 +558,7 @@ The @pyret{num-atan} function takes a tangent value and returns @emph{a}
 corresponding angle, but it is not clear which angle to return: for example,
 both @pyret{num-tan(3.141592 * 1/4)} and @pyret{num-tan(3.141592 * 5/4)} have a
 tangent of @pyret{~1}.  The @pyret{num-atan2} function produces an angle in
-radians in the range [0, 2pi], where the tangent value is the @emph{ratio} of
+radians in the range [0, 2π], where the tangent value is the @emph{ratio} of
 the two arguments: the two arguments represent the (signed)
 @emph{height} and @emph{width} of a triangle whose angle is unknown (i.e.,
 their ratio is the "rise over run", defining the tangent of that angle).  The

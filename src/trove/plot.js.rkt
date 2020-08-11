@@ -3,7 +3,7 @@
 @(require (only-in scribble/core delayed-block))
 
 @(define (in-link T) (a-id T (xref "plot" T)))
-@(define Color (a-id "Color" (xref "image-structs" "Color")))
+@(define Color (a-id "Color" (xref "color" "Color")))
 @(define Image (a-id "Image" (xref "image" "Image")))
 @(define (t-field name ty) (a-field (tt name) ty))
 @(define (t-record . rest)
@@ -150,14 +150,14 @@
   from @pyret{options}.
 
   @examples{
-  import image-structs as I
-  p1 = function-plot(lam(x): x * x end, _.{color: I.red})
+  import color as C
+  p1 = function-plot(lam(x): x * x end, _.{color: C.red})
   p2 = line-plot(table: x :: Number, y :: Number
       row: 1, 1
       row: 2, 4
       row: 3, 9
       row: 4, 16
-    end, _.{color: I.green})
+    end, _.{color: C.green})
   display-multi-plot(
     [list: p1, p2],
     _.{
@@ -356,8 +356,8 @@
   The default config is @t-record{color: blue}
 
   @examples{
-    import image-structs as I
-    my-plot-options-1 = _.{color: I.red}
+    import color as C
+    my-plot-options-1 = _.{color: C.red}
     my-plot-options-2 = default-options
   }
   }

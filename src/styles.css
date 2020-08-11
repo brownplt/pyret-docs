@@ -79,8 +79,8 @@
    z-index: 1;
    vertical-align: baseline;
    display: inline-block;
-   -webkit-mask-image: url(https://code.pyret.org/img/paint.svg);
-   mask-image: url(https://code.pyret.org/img/paint.svg);
+   -webkit-mask-image: url(./paint.svg);
+   mask-image: url(./paint.svg);
    -webkit-mask-size: contain;
    mask-size: 100% 100%;
    mask-type: luminance;
@@ -90,7 +90,7 @@
    width: 2.5em;
    height: 1.5em;
    position: absolute;
-   background-image: url(https://code.pyret.org/img/checkers.svg);
+   background-image: url(./checkers.svg);
    background-size: 2.5em 1.5em;
    display: inline-block;
 }

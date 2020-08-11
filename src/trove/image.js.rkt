@@ -2,11 +2,26 @@
 @(require "../../scribble-api.rkt"
           "../abbrevs.rkt"
           (prefix-in html: "../../manual-html.rkt")
-          2htdp/image
+          2htdp/image lang/posn racket/list
           scribble/manual)
 
+@(define (transpose . args) (apply map list args))
+
+@(define (type-versions v1 v2)
+   (define (add-paras info)
+     (cons (first info)
+           (add-between (rest info) @para{})))
+   @tabular[#:sep @hspace[4]
+            #:row-properties '((center bottom-border) (top))
+            (transpose (add-paras v1) (add-paras v2))])
+
+
+@(define (draw-pinhole x y img #:color [c 'black])
+   (overlay/offset (overlay (line 10 0 c) (line 0 10 c)) x y img))
+
+
 @(append-gen-docs
-'(module "image"
+`(module "image"
   (path "build/phase1/trove/image.js")
   (fun-spec (name "circle") (arity 3))
   (fun-spec (name "is-image-color") (arity 1))
@@ -26,6 +41,7 @@
   (fun-spec (name "overlay") (arity 2))
   (fun-spec (name "overlay-xy") (arity 4))
   (fun-spec (name "overlay-align") (arity 4))
+  (fun-spec (name "overlay-onto-offset") (arity 8))
   (fun-spec (name "underlay") (arity 2))
   (fun-spec (name "underlay-xy") (arity 4))
   (fun-spec (name "underlay-align") (arity 4))
@@ -68,6 +84,8 @@
   (fun-spec (name "radial-star") (arity 5))
   (fun-spec (name "star-polygon") (arity 5))
   (fun-spec (name "rhombus") (arity 4))
+  (fun-spec (name "point-polygon") (arity 3))
+  (fun-spec (name "wedge") (arity 4))
   (fun-spec (name "color-at-position") (arity 3))
   (fun-spec (name "image-to-color-list") (arity 1))
   (fun-spec (name "color-list-to-image") (arity 1))
@@ -75,42 +93,95 @@
   (fun-spec (name "image-width") (arity 1))
   (fun-spec (name "image-height") (arity 1))
   (fun-spec (name "image-baseline") (arity 1))
+  (fun-spec (name "image-pinhole-x") (arity 1))
+  (fun-spec (name "image-pinhole-y") (arity 1))
   (fun-spec (name "name-to-color") (arity 1))
+  (fun-spec (name "color-named") (arity 1))
+  (fun-spec (name "move-pinhole") (arity 3))
+  (fun-spec (name "place-pinhole") (arity 1))
+  (fun-spec (name "center-pinhole") (arity 1))
+  (fun-spec (name "draw-pinhole") (arity 1))
   (data-spec (name "Image") (variants) (shared))
   (data-spec (name "Scene") (variants) (shared))
   (data-spec (name "ImageColor") (variants) (shared))
-  (data-spec (name "Mode") (variants) (shared))
-  (data-spec (name "FontFamily") (variants) (shared))
-  (data-spec (name "FontStyle") (variants) (shared))
-  (data-spec (name "FontWeight") (variants) (shared))
+  (data-spec (name "FontFamily") (variants "ff-default"
+                                           "ff-decorative" "ff-roman"
+                                           "ff-script" "ff-swiss"
+                                           "ff-modern" "ff-symbol" "ff-system") (shared))
+  (singleton-spec (name "ff-default") (with-members))
+  (singleton-spec (name "ff-decorative") (with-members))
+  (singleton-spec (name "ff-roman") (with-members))
+  (singleton-spec (name "ff-script") (with-members))
+  (singleton-spec (name "ff-swiss") (with-members))
+  (singleton-spec (name "ff-modern") (with-members))
+  (singleton-spec (name "ff-symbol") (with-members))
+  (singleton-spec (name "ff-system") (with-members))
+  (data-spec (name "FontStyle") (variants "fs-normal" "fs-italic" "fs-slant") (shared))
+  (singleton-spec (name "fs-normal") (with-members))
+  (singleton-spec (name "fs-italic") (with-members))
+  (singleton-spec (name "fs-slant") (with-members))
+  (data-spec (name "FontWeight") (variants "fw-normal" "fw-bold" "fw-light") (shared))
+  (singleton-spec (name "fw-normal") (with-members))
+  (singleton-spec (name "fw-bold") (with-members))
+  (singleton-spec (name "fw-light") (with-members))
   (data-spec (name "XPlace") (variants) (shared))
+  (singleton-spec (name "x-left") (with-members))
+  (singleton-spec (name "x-middle") (with-members))
+  (unknown-item (name "x-center"))
+  (singleton-spec (name "x-pinhole") (with-members))
+  (singleton-spec (name "x-right") (with-members))
   (data-spec (name "YPlace") (variants) (shared))
+  (singleton-spec (name "y-top") (with-members))
+  (singleton-spec (name "y-center") (with-members))
+  (unknown-item (name "y-middle"))
+  (singleton-spec (name "y-pinhole") (with-members))
+  (singleton-spec (name "y-baseline") (with-members))
+  (singleton-spec (name "y-bottom") (with-members))
+  (data-spec (name "Point") (variants ("point-xy" "point-polar")) (shared))
+  (data-spec (name "Point2D") (variants) (shared))
+  (constr-spec (name "point-xy")
+               (members (("x" ("type" "normal") ("contract" ,N))
+                         ("y" ("type" "normal") ("contract" ,N))))
+               (with-members))
+  (constr-spec (name "point-polar")
+               (members (("r" ("type" "normal") ("contract" ,N))
+                         ("theta" ("type" "normal") ("contract" ,N))))
+               (with-members))
+  (fun-spec (name "point") (arity 2) (params [list: ]) (args ("x" "y"))
+            (return (a-id "Point" (xref "image" "Point")))
+            (contract (a-arrow ,N ,N (a-id "Point" (xref "image"
+                                                         "Point")))))
+  (data-spec (name "FillMode") (variants ("mode-solid" "mode-outline" "mode-fade")) (shared))
+  (singleton-spec (name "mode-solid") (with-members))
+  (singleton-spec (name "mode-outline") (with-members))
+  (constr-spec (name "mode-fade")
+               (members (("n" ("type" "normal") ("contract" ,N))))
+               (with-members))
 ))
 
 
 @(define Image (a-id "Image" (xref "image" "Image")))
 @(define Scene (a-id "Scene" (xref "image" "Scene")))
 @(define ImageColor (a-id "ImageColor" (xref "image" "ImageColor")))
-@(define Color (a-id "Color" (xref "image-structs" "Color")))
-@(define Mode (a-id "Mode" (xref "image" "Mode")))
+@(define Color (a-id "Color" (xref "color" "Color")))
+@(define OptColor (O-of Color))
+@(define Point (a-id "Point" (xref "image" "Point")))
+@(define FillMode (a-id "FillMode" (xref "image" "FillMode")))
 @(define FontFamily (a-id "FontFamily" (xref "image" "FontFamily")))
 @(define FontStyle (a-id "FontStyle" (xref "image" "FontStyle")))
 @(define FontWeight (a-id "FontWeight" (xref "image" "FontWeight")))
 @(define XPlace (a-id "XPlace" (xref "image" "XPlace")))
 @(define YPlace (a-id "YPlace" (xref "image" "YPlace")))
 @(define (paint-swatch color css-color)
-   (list (html:span 'style: "font-size: initial;"
-                    (html:image 'class: "paintBrush" "https://code.pyret.org/img/brush.svg")
-                    (html:span 'class: "paintSpan" 'style: "display: inline-block;"
+   (list (html:span 'style: "font-size: initial; display: inline-block;"
+                    (html:image 'class: "paintBrush" "path://brush.svg")
+                    (html:span 'class: "paintSpan"
                                (html:span 'class: "checkersBlob")
                                (html:span 'class: "paintBlob"
                                           'style: (format "background-color: ~a; margin-right: 0.25em;" css-color))))
          (pyret color)))
 
-@docmodule["image"]{
-
-  The functions in this module are used for creating, combining, and displaying
-  images.
+@docmodule["image" #:noimport #t #:friendly-title "The image libraries"]{
 
   @margin-note{
   The Pyret images library is based on the @code{images} teachpack in @emph{How to Design Programs},
@@ -124,8 +195,50 @@
   @url["http://docs.racket-lang.org/teachpack/2htdpimage.html"]
   }
 
-  @section[#:tag "image_DataTypes"]{Data Types}
-  @type-spec["Image" (list)]{
+  Pyret supplies two modules for creating, combining, and displaying
+  images.  These two libraries supply the same set of functions, but
+  with different signatures:
+
+
+  @itemlist[
+
+            @item{The @pyret{image} module functions take
+  in strings for many of the arguments.  To use this version of the library:
+
+  @pyret{include image}
+  
+  @pyret{import image as ...}
+  
+  If you are new to programming, or to Pyret, we recommend that you
+  use this version of the library.}
+
+            @item{The @pyret{image-typed} module functions take in
+enumerated values.  This second library is encouraged for use with the
+@seclink["type-check"]{type checker}, as it can give more precise
+feedback.  To use this version of the library:
+
+  @pyret{include image}
+  
+  @pyret{import image as ...}
+
+  }
+            ]
+
+  While you cannot @pyret{include} both versions of the library
+simultaneously, you @emph{can} @pyret{import} them both, if you would
+like to migrate from one version of the library to the other.
+
+Note that most of the examples below use the @pyret{image} version of
+this library, with arguments as strings.
+
+
+@section[#:tag "image_DataTypes"]{Data Types}
+This section defines the key data types used in both versions of the
+image library.  Wherever possible, the types are identical between the
+two libraries.  When different, we will display equivalent versions of
+the types side by side.
+
+@type-spec["Image" (list)]{
 
     This is the return type of many of the functions in this module; it
     includes simple shapes, like circles and squares, and also combinations
@@ -139,36 +252,133 @@
     stretching to accommodate.
     }
   @type-spec["ImageColor" (list)]{
+   @type-versions[
+     (list @bold{The @pyret{image} library}
+           
+           @nested{An @tt{ImageColor} can be a string describing a color
+                 name, for example @pyret{"red"} or @pyret{"sea-green"}.
+                 The collection of names Pyret understands is shown
+                 @seclink["s:color-constants"]{here}: each name can be
+                 used as a string (see @pyret-id{color-named} below).}
+           
+           @nested{An @tt{ImageColor} can be one of the
+                 @seclink["s:color-constants"]{predefined colors}
+                 themselves.  To use these colors with the @pyret{image}
+                 library, you can write
+                 
+                 @pyret-block{
+                 include color
+                 include image
+                                         
+                 circle(50, "solid", sea-green)
+                 }}
+           
+           @nested{An @tt{ImageColor} can be a @pyret-id["Color" "color"],
+                 which you can use to construct colors other than the predefined ones,
+                 including making colors partially transparent by controlling their
+                 opacity.  To use this constructor with the
+                 @pyret{image} library, you need to include the
+                 @pyret{color} library as above.})
 
-    An @tt{ImageColor} is either a string from the list in
-    @secref["s:color-constants"], or a @pyret-id["Color" "image-structs"],
-    which you can use to construct colors other than the predefined ones,
-    including making colors partially transparent by controlling their opacity.
+    (list @bold{The @pyret{image-typed} library}
+
+          @nested{}
+
+          @nested{An @tt{ImageColor} can be one of the
+                @seclink["s:color-constants"]{predefined colors},
+                which are included automatically when using the
+                @pyret{image-typed} library}
+
+          @nested{An @tt{ImageColor} can be a @pyret-id["Color" "color"],
+                which you can use to construct colors other than the predefined ones,
+                including making colors partially transparent by controlling their
+                opacity.})]
     }
+
   @function[
-    "name-to-color"
+    "color-named"
             #:contract (a-arrow S Color)
             #:return Color
             #:args (list '("name" ""))]
 
-  Looks up the given string in the list of predefined colors.
+  Looks up the given string in the list of
+@seclink["s:color-constants"]{predefined colors}.  The names are
+treated case-insensitively.  Hyphens in the names can be replaced with
+spaces, or can be dropped altogether.  Unknown color names produce an error.
 
   @repl-examples[
-    `(@{name-to-color("red")} ,(paint-swatch "red" "red"))
-    `(@{name-to-color("blue")} ,(paint-swatch "blue" "blue"))
-    `(@{name-to-color("transparent")} ,(paint-swatch "transparent" "rgba(0,0,0,0)"))
+    `(@{color-named("red")} ,(paint-swatch "red" "red"))
+    `(@{color-named("blue")} ,(paint-swatch "blue" "blue"))
+    `(@{color-named("bLUE")} ,(paint-swatch "blue" "blue"))
+    `(@{color-named("sea-green")} ,(paint-swatch "sea-green" "seagreen"))
+    `(@{color-named("sea green")} ,(paint-swatch "sea-green" "seagreen"))
+    `(@{color-named("seagreen")} ,(paint-swatch "sea-green" "seagreen"))
+    `(@{color-named("transparent")} ,(paint-swatch "transparent" "rgba(0,0,0,0)"))
+    `(@{color-named("UNKNOWN")} "Unknown color name 'UNKNOWN'")
   ]
 
-  @type-spec["Mode" (list)]{
+  
+  @function[
+    "name-to-color"
+            #:contract (a-arrow S Color)
+            #:return OptColor
+            #:args (list '("name" ""))]
 
-    A @pyret-id["String" "<global>"] that describes a style for a shape.  Either the string
-    @pyret{"outline"} or the string @pyret{"solid"}.
-    }
+  Looks up the given string in the list of predefined colors.  Names
+  are simplified as in @pyret-id{color-named}.  If the color is known,
+  then @pyret-id["some" "option"] @pyret-id["Color" "color"] value is returned; if the 
+  color is unknown, the function returns @pyret-id["none" "option"].
 
+  @repl-examples[
+    `(@{name-to-color("red")} (,(pyret "some(") ,(paint-swatch "red" "red") ,(pyret ")")))
+    `(@{name-to-color("blue")} (,(pyret "some(") ,(paint-swatch "blue" "blue") ,(pyret ")")))
+    `(@{name-to-color("transparent")} (,(pyret "some(") ,(paint-swatch "transparent" "rgba(0,0,0,0)") ,(pyret ")")))
+    `(@{color-named("UNKNOWN")} ,(pyret "none"))
+  ]
+  
+
+  @data-spec2["Point" (list) (list
+    (constructor-spec "Point" "point-xy"
+                      `(("x" ("type" "normal") ("contract" ,N))
+                        ("y" ("type" "normal") ("contract" ,N))))
+    (constructor-spec "Point" "point-polar"
+                      `(("r" ("type" "normal") ("contract" ,N))
+                        ("theta" ("type" "normal") ("contract" ,N))))
+
+                              )]
+
+  @pyret-id{Point}s represent two-dimensional coordinates on a plane.
+  Points can be defined using either Cartesian or polar coordinates.
+  
+  @nested[#:style 'inset]{
+    @constructor-doc["Point" "point-xy"
+                      `(("x" ("type" "normal") ("contract" ,N))
+                        ("y" ("type" "normal") ("contract" ,N)))
+                     (a-id "Point" (xref "image" "Point"))]{
+    This constructor defines standard two-dimensional Cartesian
+         coordinates.
+         }
+                                                 
+    @function["point" #:alt-docstrings ""]
+    A convenient synonym for @pyret{point-xy}.
+
+    @constructor-doc["Point" "point-polar"
+                     `(("r" ("type" "normal") ("contract" ,N))
+                       ("theta" ("type" "normal") ("contract" ,N)))
+                     (a-id "Point" (xref "image" "Point"))]{
+    This constructor defines two-dimensional polar coordinates.  The
+         angle @pyret{theta} should be specified in radians.
+
+         }
+                           }
+
+  @type-spec["Point2D" (list)]{A convenient synonym for @|Point|.}
+
+  
   @section{Basic Images}
   @function[
     "circle"
-            #:contract (a-arrow N Mode ImageColor Image)
+            #:contract (a-arrow N FillMode ImageColor Image)
             #:return Image
             #:args (list '("radius" "") 
                          '("mode" "") 
@@ -183,7 +393,7 @@
 
   @function[
     "ellipse"
-            #:contract (a-arrow N N Mode ImageColor Image)
+            #:contract (a-arrow N N FillMode ImageColor Image)
             #:return Image
             #:args (list '("width" "") 
                          '("height" "") 
@@ -235,6 +445,53 @@
       ,(add-line (rectangle 40 40 "outline" "maroon") -10 50 50 -10 "orange"))
   ]
 
+  @subsection{Data types for drawing basic images}
+
+    @type-spec["FillMode" (list) #:private #t]{
+    @|FillMode|s describe the style for a shape.
+
+    @type-versions[
+     (list @bold{The @pyret{image} library}
+
+           @nested{@|FillMode|s can be one of a fixed set of
+                         @pyret-id["String" "<global>"]s, or a
+                         @pyret-id["Number" "<global>"]}
+           
+           @nested{The string @pyret{"solid"}}
+           @nested{The string @pyret{"outline"}}
+           @nested{A number between 0 and 1}
+           )
+     
+     (list @bold{The @pyret{image-typed} library}
+
+           @nested{@|FillMode|s are an enumerated data definition:
+                         
+           @data-spec2["FillMode" (list) #:no-toc #t
+                        (list
+                         (singleton-spec2 "FillMode" "mode-solid")
+                         (singleton-spec2 "FillMode" "mode-outline")
+                         (constructor-spec "FillMode" "mode-fade"
+                                           `(("n" ("type" "normal") ("contract" ,N)))))]}
+
+           @nested{@singleton-doc["FillMode" "mode-solid" FillMode #:style ""]{
+                 Shapes should be drawn solidly filled in}}
+
+           @nested{@singleton-doc["FillMode" "mode-outline" FillMode #:style ""]{
+                 Shapes should only be drawn in outline}}
+
+           @nested{@constructor-doc["FillMode" "mode-fade"
+                                  `(("n" ("type" "normal") ("contract" ,N)))
+                                  FillMode #:style "pyret-header"]{
+                 Shapes should be drawn semi-transparently,
+                        where @pyret{n} is an opacity
+                        between 0 (transparent) and 1 (fully opaque)
+                        }}
+           )
+     ]
+    }
+
+
+  
   @section[#:tag "text-images"]{Text}
 
   @function[
@@ -270,7 +527,7 @@
                          '("style" "") 
                          '("weight" "") 
                          '("underline" ""))]{
-    Like @secref[(tag-name "image" "text")], constructs an image that draws the given
+    Like @pyret-id{text}, constructs an image that draws the given
     string, but makes use of a complete font specification.  The various style
     options are described below.  
   }
@@ -282,36 +539,127 @@
                   "decorative", "normal", "normal", false)}
       ,(text/font "Goodbye" 36 "turquoise" "Treasure Map Deadhand" 'decorative 'normal 'normal #f))
   ]
-  @type-spec["FontFamily" (list)]{
 
-    A @pyret-id["String" "<global>"] that describes a family of fonts.  The
-    following strings are options:
+  @subsection{Data types for text images}
+  
+  @type-spec["FontFamily" (list) #:private #t]{
+    @type-versions[
+                   
+     (list @bold{The @pyret{image} library}
 
-    @itemlist[
-      @item{@pyret{"default"}}
-      @item{@pyret{"decorative"}}
-      @item{@pyret{"roman"}}
-      @item{@pyret{"script"}}
-      @item{@pyret{"swiss"}}
-      @item{@pyret{"modern"}}
-      @item{@pyret{"symbol"}}
-      @item{@pyret{"system"}}
-    ]
+           @nested{A @|FontFamily| can be one of a fixed set of @pyret-id["String" "<global>"]s}
+
+           @nested{@pyret{"default"}}
+           
+           @nested{@pyret{"decorative"}}
+           
+           @nested{@pyret{"roman"}}
+           
+           @nested{@pyret{"script"}}
+           
+           @nested{@pyret{"swiss"}}
+           
+           @nested{@pyret{"modern"}}
+           
+           @nested{@pyret{"symbol"}}
+           
+           @nested{@pyret{"system"}})
+
+     
+     (list @bold{The @pyret{image-typed} library}
+
+           @nested{A @|FontFamily| is an enumerated data definition:
+                         
+           @data-spec2["FontFamily" (list) #:no-toc #t
+                        (list
+                         (singleton-spec2 "FontFamily" "ff-default")
+                         (singleton-spec2 "FontFamily" "ff-decorative")
+                         (singleton-spec2 "FontFamily" "ff-roman")
+                         (singleton-spec2 "FontFamily" "ff-script")
+                         (singleton-spec2 "FontFamily" "ff-swiss")
+                         (singleton-spec2 "FontFamily" "ff-modern")
+                         (singleton-spec2 "FontFamily" "ff-symbol")
+                         (singleton-spec2 "FontFamily" "ff-system"))]}
+
+           @nested{@singleton-doc["FontFamily" "ff-default" FontFamily #:style ""]{}}
+           @nested{@singleton-doc["FontFamily" "ff-decorative" FontFamily #:style ""]{}}
+           @nested{@singleton-doc["FontFamily" "ff-roman" FontFamily #:style ""]{}}
+           @nested{@singleton-doc["FontFamily" "ff-script" FontFamily #:style ""]{}}
+           @nested{@singleton-doc["FontFamily" "ff-swiss" FontFamily #:style ""]{}}
+           @nested{@singleton-doc["FontFamily" "ff-modern" FontFamily #:style ""]{}}
+           @nested{@singleton-doc["FontFamily" "ff-symbol" FontFamily #:style ""]{}}
+           @nested{@singleton-doc["FontFamily" "ff-system" FontFamily #:style ""]{}}
+           )]
+
     }
-  @type-spec["FontStyle" (list)]{
 
-    A @pyret-id["String" "<global>"] that describes the style of a font.  One
-    of @pyret{"normal"}, @pyret{"italic"}, or @pyret{"slant"}.
-    }
-  @type-spec["FontWeight" (list)]{
+  @type-spec["FontStyle" (list) #:private #t]{
+    @type-versions[
+                   
+     (list @bold{The @pyret{image} library}
 
-    A @pyret-id["String" "<global>"] that describes the weight of a font.  One
-    of @pyret{"normal"}, @pyret{"bold"}, or @pyret{"light"}.
+           @nested{A @|FontStyle| can be one of a fixed set of @pyret-id["String" "<global>"]s}
+
+           @nested{@pyret{"normal"}}
+           
+           @nested{@pyret{"italic"}}
+           
+           @nested{@pyret{"slant"}}
+           )
+
+     
+     (list @bold{The @pyret{image-typed} library}
+
+           @nested{A @|FontStyle| is an enumerated data definition:
+                         
+           @data-spec2["FontStyle" (list) #:no-toc #t
+                        (list
+                         (singleton-spec2 "FontStyle" "fs-normal")
+                         (singleton-spec2 "FontStyle" "fs-italic")
+                         (singleton-spec2 "FontStyle" "fs-slant"))]}
+
+           @nested{@singleton-doc["FontStyle" "fs-normal" FontStyle #:style ""]{}}
+           @nested{@singleton-doc["FontStyle" "fs-italic" FontStyle #:style ""]{}}
+           @nested{@singleton-doc["FontStyle" "fs-slant" FontStyle #:style ""]{}}
+           )]
+
     }
+  @type-spec["FontWeight" (list) #:private #t]{
+    @type-versions[
+                   
+     (list @bold{The @pyret{image} library}
+
+           @nested{A @|FontWeight| can be one of a fixed set of @pyret-id["String" "<global>"]s}
+
+           @nested{@pyret{"normal"}}
+           
+           @nested{@pyret{"bold"}}
+           
+           @nested{@pyret{"light"}}
+           )
+
+     
+     (list @bold{The @pyret{image-typed} library}
+
+           @nested{A @|FontWeight| is an enumerated data definition:
+                         
+           @data-spec2["FontWeight" (list) #:no-toc #t
+                        (list
+                         (singleton-spec2 "FontWeight" "fw-normal")
+                         (singleton-spec2 "FontWeight" "fw-bold")
+                         (singleton-spec2 "FontWeight" "fw-light"))]}
+
+           @nested{@singleton-doc["FontWeight" "fw-normal" FontWeight #:style ""]{}}
+           @nested{@singleton-doc["FontWeight" "fw-bold" FontWeight #:style ""]{}}
+           @nested{@singleton-doc["FontWeight" "fw-light" FontWeight #:style ""]{}}
+           )]
+
+    }
+
   @section{Polygons}
   @function[
     "triangle"
-            #:contract (a-arrow N Mode ImageColor Image)
+            #:contract (a-arrow N FillMode ImageColor Image)
             #:return Image
             #:args (list '("side-length" "") 
                          '("mode" "") 
@@ -325,7 +673,7 @@
   ]
   @function[
     "right-triangle"
-            #:contract (a-arrow N N Mode ImageColor Image)
+            #:contract (a-arrow N N FillMode ImageColor Image)
             #:return Image
             #:args (list '("side-length1" "") 
                          '("side-length2" "") 
@@ -341,7 +689,7 @@
   ]
   @function[
     "isosceles-triangle"
-            #:contract (a-arrow N N Mode ImageColor Image)
+            #:contract (a-arrow N N FillMode ImageColor Image)
             #:return Image
             #:args (list '("side-length" "") 
                          '("angle-c" "") 
@@ -362,7 +710,7 @@
   ]
   @function[
     "triangle-sss"
-            #:contract (a-arrow N N N Mode ImageColor Image)
+            #:contract (a-arrow N N N FillMode ImageColor Image)
             #:return Image
             #:args (list '("side-a" "") 
                          '("side-b" "") 
@@ -381,7 +729,7 @@
   ]
   @function[
     "triangle-ass"
-            #:contract (a-arrow N N N Mode ImageColor Image)
+            #:contract (a-arrow N N N FillMode ImageColor Image)
             #:return Image
             #:args (list '("angle-a" "") '("side-b" "") '("side-c" "") '("mode" "") '("color" ""))]{
     Constructs an image of a triangle using the given angle and two sides.
@@ -574,7 +922,7 @@
                          '("inner" "") 
                          '("mode" "") 
                          '("color" ""))]{
-    Same as @secref[(tag-name "image" "radial-star")].
+    Same as @pyret-id{radial-star}.
   }
   @function[
     "star-polygon"
@@ -618,6 +966,60 @@
     `(@{regular-polygon(40, 8, "outline", "goldenrod")} ,(regular-polygon 40 8 "outline" "goldenrod"))
     `(@{regular-polygon(20, 8, "solid", "cornflower-blue")} ,(regular-polygon 20 8 "solid" "cornflowerblue"))
   ]
+
+  @function["point-polygon"
+            #:contract (a-arrow (L-of Point) FillMode ImageColor Image)
+            #:return Image
+            #:args '(("points" "") ("mode" "") ("color" ""))]{
+    Creates a polygon whose corners are specified by the given list of
+    points.
+  }
+
+  @repl-examples[
+    `(@{point-polygon(
+          [list: point(0, 0), point(-10, 20), point(60, 0), point(-10, -20)],
+          "solid", "burlywood")}
+      ,(polygon (list (make-posn 0 0) (make-posn -10 20) (make-posn 60 0) (make-posn -10 -20))
+                "solid" "burlywood"))
+    `(@{fun deg-to-rad(t):
+          t * (~3.14159265358979323 / 180)
+        end
+        points = for map(n from [list: 0, 1, 2, 3, 4, 5]):
+          point-polar(30, deg-to-rad(60 * n))
+        end
+        draw-pinhole(point-polygon(points, "outline", "steel-blue"))}
+      ,(let ((i (regular-polygon 30 6 "outline" "SteelBlue")))
+        (draw-pinhole 0 0  i)))
+  ]
+
+  @section{Other images}
+            
+  @function["wedge"
+            #:contract (a-arrow N N FillMode ImageColor Image)
+            #:return Image
+            #:args '(("radius" "") ("angle" "") ("mode" "") ("color" ""))]{
+    Draws a pie-shaped section of a circle.  The
+    @seclink["pinholes"]{pinhole} of the resulting image is at the
+    center of the circle from which this wedge is cut.  The angle is
+    measured in degrees, measured counterclockwise from the positive x-axis.
+  }
+
+  @repl-examples[
+    `(@{wedge(100, 60, "solid", "sea-green")}
+      ,(let* [(R 100)
+              (img
+               (overlay/pinhole
+                (put-pinhole R 0 (rectangle (* 2 R) R 'solid 'white))
+                (rotate 60 (put-pinhole R R (rectangle (* 2 R) R 'solid 'white)))
+                (circle R 'solid 'seagreen)))
+              (pin-x (pinhole-x img))
+              (pin-y (pinhole-y img))]
+         (clear-pinhole
+          (crop pin-x (- pin-y (* R (sqrt 3) 0.5)) R (* R (sqrt 3) 0.5)
+                img))))
+  ]
+
+  
   @section{Overlaying Images}
 
   @function[
@@ -627,6 +1029,9 @@
             #:args (list '("img1" "") 
                          '("img2" ""))]{
     Constructs a new image where @pyret{img1} overlays @pyret{img2}.
+    The two images are aligned at their @seclink["pinholes"]{pinholes}, so
+    @pyret-id{overlay}@pyret{(img1, img2)} behaves like
+    @pyret-id{overlay-align}@pyret{("pinhole", "pinhole", img1, img2)}.
   }
   @repl-examples[
     `(@{overlay(rectangle(30, 60, "solid", "orange"),
@@ -642,71 +1047,26 @@
                          '("img1" "") 
                          '("img2" ""))]{
     Overlays @pyret{img1} on @pyret{img2} like 
-    @secref[(tag-name "image" "overlay")], but uses @pyret{place-x} and
-    @pyret{place-y} to determine where the images should line up.
+    @pyret-id{overlay}, but uses @pyret{place-x} and
+    @pyret{place-y} to determine the alignment point in each image.
+    A call to @pyret-id{overlay-align}@pyret{(place-x, place-y, img1, img2)} 
+    behaves the same as @pyret-id{overlay-onto-offset}@pyret{(img1, place-x, place-y, 
+    0, 0, img2, place-x, place-y)}
   }
-  @type-spec["XPlace" (list)]{
 
-    A @pyret-id["String" "<global>"] that represents a place to align an image
-    on the x-axis.  One of
-    @pyret{"left"}, 
-    @pyret{"center"}, 
-    @pyret{"middle"}, or
-    @pyret{"right"}.  The options @pyret{"center"} and @pyret{"middle"} are synonyms.
-    }
   @repl-examples[
-   `(@{overlay-align("left", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("center", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'center 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("middle", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'middle 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("right", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'right 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-  ]
-  @type-spec["YPlace" (list)]{
-
-    A @pyret-id["String" "<global>"] that represents a place to align an image
-    on the y-axis.  One of
-    @pyret{"top"}, 
-    @pyret{"bottom"}, 
-    @pyret{"baseline"},
-    @pyret{"center"}, or
-    @pyret{"middle"}.  The options @pyret{"center"} and @pyret{"middle"} are synonyms.
-
-    The @pyret{"baseline"} option only makes sense with
-    @seclink["text-images"]{text images}. It allows
-    aligning multiple images of text at their baseline, as if they
-    were part of a single image, or to appear to underline text.
-    For all other images, their @pyret{"baseline"} is the same as
-    their @pyret{"bottom"}.
-    }
-  @repl-examples[
-   `(@{overlay-align("left", "top",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("left", "middle",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'left 'middle (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("left", "center",
-         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
-     ,(overlay/align 'left 'center (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
    `(@{overlay-align("left", "bottom",
          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
      ,(overlay/align 'left 'bottom (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
-   `(@{overlay-align("left", "baseline",
-         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
-     ,(overlay/align 'left 'baseline (rectangle 140 3 "solid" "bisque")
-                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
-   `(@{overlay-align("left", "bottom",
-         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
-     ,(overlay/align 'left 'bottom (rectangle 140 3 "solid" "bisque")
-                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
+   `(@{overlay-align("center", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'center 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("right", "middle",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'right 'middle (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
   ]
+
+
   @function[
     "overlay-xy"
             #:contract (a-arrow Image N N Image Image)
@@ -716,9 +1076,12 @@
                          '("dy" "") 
                          '("img2" ""))]{
     Overlays @pyret{img1} on @pyret{img2} like 
-    @secref[(tag-name "image" "overlay")], but initially lines up the two
+    @pyret-id{overlay}, but initially lines up the two
     images upper-left corners and then shifts @pyret{img2} to the right
-    by @pyret{dx} pixels, and then down by @pyret{dy} pixels.
+    by @pyret{dx} pixels, and then down by @pyret{dy} pixels.  A call
+    to @pyret-id{overlay-xy}@pyret{(img1, dx, dy, img2)} behaves the
+    same as @pyret-id{overlay-onto-offset}@pyret{(img1, "left", "top", 
+    dx, dy, img2, "left", "top")}.
   }
   @repl-examples[
     `(@{overlay-xy(square(30, "solid", "bisque"),
@@ -734,6 +1097,31 @@
           square(50, "solid", "dark-green"))}
       ,(overlay/xy (square 30 "solid" "bisque") -10 -20 (square 50 "solid" "darkgreen")))
   ]
+
+
+  @function[
+    "overlay-onto-offset"
+            #:contract (a-arrow Image XPlace YPlace N N XPlace YPlace Image Image Image)
+            #:return Image
+            #:args (list '("img1" "")
+                         '("place-x1" "") 
+                         '("place-y1" "") 
+                         '("offset-x" "") 
+                         '("offset-y" "") 
+                         '("img2" "")
+                         '("place-x2" "") 
+                         '("place-y2" "") 
+                         )]{
+    Overlays @pyret{img1} on @pyret{img2} like 
+    @pyret-id{overlay}, but uses @pyret{place-x1} and
+    @pyret{place-y1} to choose the reference point for the first
+    image, @pyret{place-x2} and @pyret{place-y2} to choose the
+    reference point for the second image, and slides the second
+    image's reference point down and to the right by @pyret{offset-x}
+    and @pyret{offset-y}.
+  }
+
+
   @function[
     "underlay"
             #:contract (a-arrow Image Image Image)
@@ -741,7 +1129,7 @@
             #:args (list '("img1" "") 
                          '("img2" ""))]{
     Constructs a new image by placing @pyret{img1} under @pyret{img2}.
-    This is the reverse of @secref[(tag-name "image" "overlay")].
+    This is the reverse of @pyret-id{overlay}.
   }
   @repl-examples[
     `(@{underlay(rectangle(30, 60, "solid", "orange"),
@@ -757,9 +1145,9 @@
                          '("img1" "") 
                          '("img2" ""))]{
     Underlays @pyret{img1} beneath @pyret{img2} like 
-    @secref[(tag-name "image" "underlay")], but uses @pyret{place-x} and
+    @pyret-id{underlay}, but uses @pyret{place-x} and
     @pyret{place-y} to determine where the images should line up.  This is the
-    reverse of @secref[(tag-name "image" "overlay-align")].
+    reverse of @pyret-id{overlay-align}.
   }
   @repl-examples[
    `(@{underlay-align("left", "top",
@@ -804,20 +1192,23 @@
                          '("dy" "") 
                          '("img2" ""))]{
     Underlays @pyret{img1} beneath @pyret{img2} like 
-    @secref[(tag-name "image" "underlay")], but initially lines up the two
+    @pyret-id{underlay}, but initially lines up the two
     images upper-left corners and then shifts @pyret{img2} to the right
     by @pyret{x} pixels, and then down by @pyret{y} pixels.  This is the
-    reverse of @secref[(tag-name "image" "overlay-xy")].
+    reverse of @pyret-id{overlay-xy}.
   }
   @repl-examples[
-    `(@{underlay-xy(0, 0,
-          square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+    `(@{underlay-xy(square(50, "solid", "bisque"),
+          0, 0,
+          square(30, "solid", "dark-green"))}
       ,(underlay/xy (square 50 "solid" "bisque") 0 0 (square 30 "solid" "darkgreen")))
-    `(@{underlay-xy(50, 20, # Move green square right 50 and down 20
-          square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+    `(@{underlay-xy(square(50, "solid", "bisque"), 
+          50, 20, # Move green square right 50 and down 20
+          square(30, "solid", "dark-green"))}
       ,(underlay/xy (square 50 "solid" "bisque") 50 20 (square 30 "solid" "darkgreen")))
-    `(@{underlay-xy(-10, -20, # Move green square left 10 and up 20
-          square(50, "solid", "bisque"), square(30, "solid", "dark-green"))}
+    `(@{underlay-xy(square(50, "solid", "bisque"),
+          -10, -20, # Move green square left 10 and up 20
+          square(30, "solid", "dark-green"))}
       ,(underlay/xy (square 50 "solid" "bisque") -10 -20 (square 30 "solid" "darkgreen")))
   ]
   @function[
@@ -900,6 +1291,154 @@
          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
      ,(above/align 'right (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
   ]
+
+  @subsection{Data types for aligning images}
+
+  
+  @type-spec["XPlace" (list) #:private #t]{
+    @|XPlace|s describe a landmark to align an image along the x-axis.
+
+    @type-versions[
+                   
+     (list @bold{The @pyret{image} library}
+
+           @nested{@|XPlace|s can be one of a fixed set of
+                           @pyret-id["String" "<global>"]s}
+
+           @nested{@pyret{"left"}}
+           
+           @nested{@pyret{"center"} or @pyret{"middle"} (these are synonyms)} 
+
+           @nested{@pyret{"pinhole"}}
+
+           @nested{@pyret{"right"}})
+
+     
+     (list @bold{The @pyret{image-typed} library}
+
+           @nested{@|XPlace|s are an enumerated data definition:
+                         
+           @data-spec2["XPlace" (list) #:no-toc #t
+                        (list
+                         (singleton-spec2 "XPlace" "x-left")
+                         (singleton-spec2 "XPlace" "x-middle")
+                         (singleton-spec2 "XPlace" "x-pinhole")
+                         (singleton-spec2 "XPlace" "x-right"))]}
+
+           @nested{@singleton-doc["XPlace" "x-left" XPlace #:style ""]{
+                 Shape should be aligned along its left edge.}}
+
+           @nested{@singleton-doc["XPlace" "x-middle" XPlace #:style ""]{}
+                   @value["x-center" XPlace #:style ""]{
+                 Shape should be aligned at its horizontal midpoint.  For
+                 convenience, you can also write @pyret-id{x-center}
+                 as a synonym.}}
+
+           @nested{@singleton-doc["XPlace" "x-pinhole" XPlace #:style ""]{
+                 Shape should be aligned by its @seclink["pinholes"]{pinhole}.}}
+
+           @nested{@singleton-doc["XPlace" "x-right" XPlace #:style ""]{
+                 Shape should be aligned along its right edge.}})]
+
+    }
+
+  @repl-examples[
+   `(@{overlay-align("left", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("center", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'center 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("middle", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'middle 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("right", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'right 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+  ]
+  
+  @type-spec["YPlace" (list) #:private #t]{
+    @|YPlace|s describe a landmark to align an image along the y-axis.
+
+    @type-versions[
+                   
+     (list @bold{The @pyret{image} library}
+
+           @nested{@|YPlace|s can be one of a fixed set of
+                           @pyret-id["String" "<global>"]s}
+
+           @nested{@pyret{"top"}}
+           
+           @nested{@pyret{"middle"} or @pyret{"center"} (these are synonyms)} 
+
+           @nested{@pyret{"pinhole"}}
+
+           @nested{@pyret{"baseline"}}
+
+           @nested{@pyret{"bottom"}})
+
+     
+     (list @bold{The @pyret{image-typed} library}
+
+           @nested{@|YPlace|s are an enumerated data definition:
+                         
+           @data-spec2["YPlace" (list) #:no-toc #t
+                        (list
+                         (singleton-spec2 "YPlace" "y-top")
+                         (singleton-spec2 "YPlace" "y-center")
+                         (singleton-spec2 "YPlace" "y-pinhole")
+                         (singleton-spec2 "YPlace" "y-baseline")
+                         (singleton-spec2 "YPlace" "y-bottom"))]}
+
+           @nested{@singleton-doc["YPlace" "y-top" YPlace #:style ""]{
+                 Shape should be aligned along its top edge.}}
+
+           @nested{@singleton-doc["YPlace" "y-center" YPlace #:style ""]{}
+                   @value["y-middle" YPlace #:style ""]{
+                 Shape should be aligned at its vertical midpoint.  For
+                 convenience, you can also write @pyret-id{y-middle}
+                 as a synonym.}}
+
+           @nested{@singleton-doc["YPlace" "y-pinhole" YPlace #:style ""]{
+                 Shape should be aligned by its @seclink["pinholes"]{pinhole}.}}
+
+           @nested{@singleton-doc["YPlace" "y-baseline" YPlace #:style ""]{
+                 Shape should be aligned by its basline. This option only makes sense with
+                 @seclink["text-images"]{text images}. It allows
+                 aligning multiple images of text at their baseline, as if they
+                 were part of a single image, or to appear to underline text.
+                 For all other images, their baseline is the same as
+                 their bottom.
+                 }}
+
+           @nested{@singleton-doc["YPlace" "y-bottom" YPlace #:style ""]{
+                 Shape should be aligned along its bottom edge.}})]
+
+    }
+  @repl-examples[
+   `(@{overlay-align("left", "top",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'top (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "middle",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'middle (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "center",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'center (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "bottom",
+         square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+     ,(overlay/align 'left 'bottom (square 30 "solid" "bisque") (square 50 "solid" "darkgreen")))
+   `(@{overlay-align("left", "baseline",
+         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
+     ,(overlay/align 'left 'baseline (rectangle 140 3 "solid" "bisque")
+                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
+   `(@{overlay-align("left", "bottom",
+         rectangle(140, 3, "solid", "bisque"), text("Pyret", 50, "dark-green"))}
+     ,(overlay/align 'left 'bottom (rectangle 140 3 "solid" "bisque")
+                     (text/font "Pyret" 50 "darkgreen" "DejaVu Serif" 'roman 'normal 'normal #f)))
+  ]
+
+  
   @section{Placing Images & Scenes}
   @function[
     "empty-scene"
@@ -994,7 +1533,7 @@
                          '("place-x" "") 
                          '("place-y" "") 
                          '("background" ""))]{
-    Behaves similar to @secref[(tag-name "image" "place-image")], but uses
+    Behaves similar to @pyret-id{place-image}, but uses
     @pyret{place-x} and @pyret{place-y} to determine where to anchor
     @pyret{img}, instead of always using the center.
   }
@@ -1021,7 +1560,7 @@
                          '("y2" "") 
                          '("background" ""))]{
     Draws a line from (x1,y1) to (x2,y2) on the scene
-    @pyret{background}. Unlike @secref[(tag-name "image" "add-line")],
+    @pyret{background}. Unlike @pyret-id{add-line},
     this function crops the resulting image to be the same size as
     @pyret{background}.
   }
@@ -1156,7 +1695,7 @@
             #:return Image
             #:args (list '("img" ""))]{
     Construct an image similar to @pyret{img}, but with a black, single
-    pixel frame draw around the bounding box of the image.
+    pixel frame drawn around the bounding box of the image.
   }
   @repl-examples[
    `(@{frame(ellipse(40, 60, "solid", "gray"))}
@@ -1181,14 +1720,14 @@
             #:contract (a-arrow S Image)
             #:return Image
             #:args (list '("url" ""))]{
-    Same as @secref[(tag-name "image" "image-url")]
+    Same as @pyret-id{image-url}
   }
   @function[
     "color-at-position"
             #:contract (a-arrow Image
                                 (a-id "Number" (xref "<global>" "Number"))
                                 (a-id "Number" (xref "<global>" "Number"))
-                                (a-id "Color" (xref "image-structs" "Color")))
+                                (a-id "Color" (xref "color" "Color")))
             #:return Color
             #:args (list '("image" "") '("x" "") '("y" ""))]{
     Returns the color at the pixel given by @pyret{x} and @pyret{y}
@@ -1230,7 +1769,7 @@
                          '("pinhole-y" ""))]{
     Given a list of colors, creates an image with the given width
     @pyret{width} and height @pyret{height}.  The pinhole arguments
-    specify where to consider the ``center'' of the image.
+    specify where to place the @seclink["pinholes"]{pinhole} of the image.
   }
   @repl-examples[
    `(@{scale(20, color-list-to-image([list: "red", "blue", "green", "yellow"], 2, 2, 1, 1))}
@@ -1245,9 +1784,106 @@
             #:args (list '("list" "") 
                          '("width" "") 
                          '("height" ""))]{
-    Same as @secref[(tag-name "image" "color-list-to-image")], but
-    assumes the pinhole is at the center of the image.
+    Same as @pyret-id{color-list-to-image}, but
+    places the @seclink["pinholes"]{pinhole} at the center of the
+    image (i.e. @pyret{width / 2} and @pyret{height / 2}).
   }
+
+  @section[#:tag "pinholes"]{Pinholes}
+
+  When combining images with @pyret-id{overlay-align} or related
+  functions, we need to specify which reference point in each image to
+  bring into alignment.  Using the various @pyret-id{XPlace} and
+  @pyret-id{YPlace} options, we can easily refer to the four corners,
+  the four midpoints of the edges, or the center of the image.  But
+  frequently, the "obvious" alignment point is not quite any of
+  those.  Suppose we wanted to create a six-pointed star by overlaying
+  two equilateral triangles:
+
+  @repl-examples[
+   `(@{overlay-align("middle", "center", triangle(50, "solid", "red"),
+                     rotate(180, triangle(50, "solid", "blue")))}
+     ,(overlay/align "middle" "middle" (triangle 50 "solid" "red")
+                     (rotate 180 (triangle 50 "solid" "blue"))))
+   ]
+
+  Unfortunately, the @emph{center} of our triangles isn't the
+  @emph{visual} center of our triangles, but instead is exactly half
+  the triangles' heights.  To fix this, Pyret defines a notion of a
+  @emph{pinhole}, which lets us specify one more point in our images,
+  where we'd like to pin images together.  By default, Pyret's pinhole
+  of polygon images is at the @emph{centroid} of the polygon, which is
+  the average of the coordinates of each corner.
+  
+  If we use our pinholes to align these triangles, we get the more
+  intuitive result:
+
+  @repl-examples[
+   `(@{overlay-align("pinhole", "pinhole", triangle(50, "solid", "red"),
+                     rotate(180, triangle(50, "solid", "blue")))}
+     ,(clear-pinhole
+       (overlay/align "pinhole" "pinhole"
+                      (put-pinhole 25 (* 25 (sqrt 3) 2/3) (triangle 50 "solid" "red"))
+                      (rotate 180 (put-pinhole 25 (* 25 (sqrt 3) 2/3) (triangle 50 "solid" "blue"))))))
+   ]
+
+  When two images are overlaid, the pinhole of the resulting image is
+  the pinhole of the second image.
+
+  @function["move-pinhole"
+            #:contract (a-arrow N N Image Image)
+            #:return Image
+            #:args '(("dx" "") ("dy" "") ("img" ""))]{
+    Produces a new image just like the original, but where the pinhole
+    has been offset down and to the right by @pyret{dx} and @pyret{dy}.
+  }
+
+  @function["place-pinhole"
+            #:contract (a-arrow N N Image Image)
+            #:return Image
+            #:args '(("x" "") ("y" "") ("img" ""))]{
+    Produces a new image just like the original, but where the pinhole
+    has been placed at @pyret{x} and @pyret{y}, relative to the
+    top-left corner of the image.
+  }
+
+  @function["center-pinhole"
+            #:contract (a-arrow Image Image)
+            #:return Image
+            #:args '(("img" ""))]{
+    Produces a new image just like the original, but where the pinhole
+    has been placed at the geometric center of the image (exactly at
+    half its width and half its height).
+  }
+
+  @function["draw-pinhole"
+            #:contract (a-arrow Image Image)
+            #:return Image
+            #:args '(("img" ""))]{
+    Produces a new image just like the original, but draws a small
+    crosshatch at the location of the pinhole.  Useful for debugging
+    where the pinholes of images currently are.
+  }
+
+  @repl-examples[
+   `(@{draw-pinhole(triangle(50, "solid", "red"))}
+     ,(draw-pinhole 0 (/ (- (* 25 (sqrt 3) 2/3) 43) 2) (triangle 50 "solid" "red")))
+   `(@{draw-pinhole(center-pinhole(triangle(50, "solid", "tan")))}
+     ,(draw-pinhole 0 0 (triangle 50 "solid" "tan")))
+   ]
+
+  This last one looks strange, but it is an optical illusion.
+  Flipping the image vertically reveals that the pinhole really is centered:
+
+  @repl-examples[
+   `(@{beside(
+         draw-pinhole(center-pinhole(triangle(50, "solid", "tan"))),
+         draw-pinhole(rotate(180, center-pinhole(triangle(50, "solid" , "tan")))))}
+     ,(beside (draw-pinhole 0 0 (triangle 50 "solid" "tan"))
+              (draw-pinhole 0 0 (rotate 180 (triangle 50 "solid" "tan")))))
+   ]
+            
+  
   @section{Image Properties}
   @function[
     "image-width"
@@ -1284,6 +1920,30 @@
    `(@{image-baseline(rectangle(30, 40, "solid", "red"))} @,pyret{40})
    `(@{image-baseline(text("Pyret", 30, "green"))} @,pyret{30})
   ]
+  @function[
+    "image-pinhole-x"
+            #:contract (a-arrow Image N)
+            #:return N
+            #:args (list '("img" ""))]{
+    Returns the distance from the left of @pyret{img} to its pinhole.
+  }
+  @repl-examples[
+   `(@{image-pinhole-x(circle(30, "solid", "red"))} @,pyret{30})
+   `(@{image-pinhole-x(text("Pyret", 30, "green"))} @,pyret{40.5})
+  ]
+  @function[
+    "image-pinhole-y"
+            #:contract (a-arrow Image N)
+            #:return N
+            #:args (list '("img" ""))]{
+    Returns the distance from the top of @pyret{img} to its pinhole.
+  }
+  @repl-examples[
+   `(@{image-pinhole-y(circle(30, "solid", "red"))} @,pyret{30})
+   `(@{image-height(star(40, "solid", "green"))} @,pyret{62})
+   `(@{image-pinhole-y(star(40, "solid", "green"))}
+     @,pyret{34 # NOTE: lower than the center, which would be (62 / 2) == 31})
+  ]
   @section{Image Predicates}
   @function[
     "is-image"
@@ -1304,7 +1964,10 @@
             #:contract (a-arrow A B)
             #:return B
             #:args (list '("maybe-color" ""))]{
-    Checks if @pyret{maybe-color} can be used as a color. Strings, if names of colors (e.g. @pyret{"red"} or @pyret{"green"}) can also be used, if they exist in the color database.
+    Checks if @pyret{maybe-color} can be used as a color. Strings, if
+           names of colors (e.g. @pyret{"red"} or @pyret{"green"}) can
+           also be used, if they exist in the color database.
+           @bold{This function is only defined in the @pyret{image} library.}
   }
   @function[
     "is-y-place"
@@ -1314,7 +1977,8 @@
     Checks if @pyret{maybe-y-place} can be used as y-place in appropriate
     functions. Valid strings are @pyret{"top"}, @pyret{"bottom"},
     @pyret{"middle"}, @pyret{"center"}, @pyret{"baseline"} and
-    @pyret{"pinhole"}.
+    @pyret{"pinhole"}. @bold{This function is only defined in the @pyret{image} library.}
+
   }
   @function[
     "is-x-place"
@@ -1324,6 +1988,7 @@
     Checks if @pyret{maybe-x-place} can be used as x-place in appropriate
     functions. Valid strings are @pyret{"left"}, @pyret{"right"},
     @pyret{"middle"}, @pyret{"center"} and @pyret{"pinhole"}.
+    @bold{This function is only defined in the @pyret{image} library.}
   }
   @function[
     "is-angle"

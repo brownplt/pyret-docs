@@ -16,6 +16,7 @@
          scribble/basic
          scribble/html-properties
          (only-in scriblib/footnote note)
+         scribble/private/manual-tech
          (for-syntax racket/base racket/syntax)
          racket/bool
          racket/file
@@ -37,9 +38,12 @@
          prod-ref
          custom-index-block
 
+         (all-from-out scribble/private/manual-tech)
+
          docmodule
          function
          value
+         form
          render-fun-helper
          re-export from
          pyret pyret-id pyret-method pyret-block
@@ -366,7 +370,7 @@
 @(define (tag-name . args)
    (apply string-append (add-between args "_")))
 
-@(define (type-spec type-name tyvars #:private (private #f) . body)
+@(define (type-spec type-name tyvars #:private (private #f) #:no-toc (no-toc #f). body)
   (when (not private) (set-documented! (curr-module-name) type-name))
   (define name-part (make-header-elt-for (seclink (xref (curr-module-name) type-name) (tt type-name)) type-name))
   (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ", ") (list ">")) ""))
@@ -374,16 +378,17 @@
   (define index-tags (list (pyret type-name) (curr-module-name)))
   ;;(define blurb (first content-text))
   (list
-     (let ((tag (make-generated-tag)))
-       (make-index-element #f
-                           (list (make-target-element #f '() `(idx ,tag)))
-                           `(idx ,tag)
-                           (cons type-name (rest index-tags))
-                           index-tags
-                           #f))
-     (para #:style (div-style "boxed")
-           (list name-part (tt vars)))
-     body))
+   (if no-toc '()
+       (let ((tag (make-generated-tag)))
+         (make-index-element #f
+                             (list (make-target-element #f '() `(idx ,tag)))
+                             `(idx ,tag)
+                             (cons type-name (rest index-tags))
+                             index-tags
+                             #f)))
+   (para #:style (div-style "boxed")
+         (list name-part (tt vars)))
+   body))
 
 @(define-syntax (data-spec2 stx)
   (syntax-case stx()
@@ -397,9 +402,10 @@
   (define tag (list 'part (tag-name (curr-module-name) name)))
   (toc-target-element code-style elt tag))
 
-@(define (data-spec-internal2 data-name tyvars variants #:private (private #f))
+@(define (data-spec-internal2 data-name tyvars variants #:private (private #f) #:no-toc (no-toc #f))
   (when (not private) (set-documented! (curr-module-name) data-name))
-  (define name-part (make-header-elt-for (seclink (xref (curr-module-name) data-name) (tt data-name)) data-name))
+  (define name-part ((if no-toc (lambda(link name) link) make-header-elt-for)
+                     (seclink (xref (curr-module-name) data-name) (tt data-name)) data-name))
   (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ", ") (list ">")) ""))
     (nested #:style (div-style "boxed")
       (list
@@ -407,12 +413,12 @@
         (apply para #:style (dl-style "multiline-args") variants)
         (tt "end"))))
 
-@(define (singleton-doc data-name variant-name return . body)
+@(define (singleton-doc data-name variant-name return #:style (style "boxed") . body)
   (define name-elt (make-header-elt-for (seclink (xref (curr-module-name) variant-name) (tt variant-name)) variant-name))
   (define detector-name (string-append "is-" variant-name))
   (append
     (list
-      (para #:style (div-style "boxed") (tt name-elt " :: " return))
+      (para #:style (div-style style) (tt name-elt " :: " return))
       #;(render-fun-helper
        '(fun) detector-name
        (list 'part (tag-name (curr-module-name) detector-name))
@@ -420,7 +426,7 @@
        (a-id "Boolean" (xref "<global>" "Boolean")) (list (list "value" #f)) '() '() '()))
     body))
 
-@(define (constructor-doc data-name variant-name members return #:private (private #f) . body)
+@(define (constructor-doc data-name variant-name members return #:private (private #f) #:style (style "boxed pyret-header") . body)
   (when (not private) (set-documented! (curr-module-name) variant-name))
   (define name-part (make-header-elt-for variant-name variant-name))
   (define member-types (map (lambda (m) (cdr (assoc "contract" (rest m)))) members))
@@ -432,7 +438,7 @@
        '(fun) variant-name
        (list 'part (curr-module-name) variant-name)
        (apply a-arrow (append member-types (list return)))
-       return members-as-args '() '() '())
+       return members-as-args '()  #:style style '() '())
       #;(render-fun-helper
        '(fun) detector-name
        (list 'part (tag-name (curr-module-name) detector-name))
@@ -666,7 +672,7 @@
   (add-between args ", "))
 
 ;; render documentation for a function
-@(define (render-fun-helper spec name part-tags contract-in return-in args alt-docstrings examples contents)
+@(define (render-fun-helper spec name part-tags contract-in return-in args alt-docstrings #:style (style "boxed pyret-header") examples contents)
    (when (not (cons? spec))
     (error (format "Could not find spec for ~a" name)))
    (when (and (cons? args) (not (cons? (first args))))
@@ -727,7 +733,7 @@
              (define header-part
                (cond
                 [(and (< (length argnames) 3) no-descrs)
-                 (apply para #:style (div-style "boxed pyret-header")
+                 (apply para #:style (div-style style)
                    (append
                     (list (tt name-elt " :: " "("))
                     (render-singleline-args argnames input-types)
@@ -735,7 +741,7 @@
                       (list (tt ")" " -> " return))
                       (list (tt ")")))))]
                 [else
-                 (nested #:style (div-style "boxed pyret-header")
+                 (nested #:style (div-style style)
                  (apply para #:style (dl-style "multiline-args")
                    (append
                     (list (dt name-elt " :: " "("))
@@ -823,7 +829,29 @@
      (when (not private) (set-documented! (curr-module-name) name))
      ans))
 
-(define (value name ann #:private (private #f) . contents)
+(define (form name text #:private (private #f) . contents)
+  (when (not private) (set-documented! (curr-module-name) name))
+   (let ([processing-module (curr-module-name)])
+     (define part-tag (list 'part (tag-name (curr-module-name) name)))
+     (define pyret-text (seclink (xref processing-module name) (pyret text)))
+     (define pyret-elt (toc-target-element code-style (list pyret-text) part-tag))
+     (interleave-parbreaks/all
+      (list
+        (traverse-block ; use this to build xrefs on an early pass through docs
+         (lambda (get set!)
+           (set! 'doc-xrefs (cons (list name processing-module)
+                                  (get 'doc-xrefs '())))
+           (define header-part
+               (apply para #:style (div-style "boxed pyret-header")
+                  (list pyret-elt)))
+           (nested #:style (div-style "value")
+                   (cons
+                     header-part
+                     (interleave-parbreaks/all
+                      (append
+                        (list (nested #:style (div-style "description") contents))))))))))))
+
+(define (value name ann #:private (private #f) #:style (style "boxed pyret-header") . contents)
   (when (not private) (set-documented! (curr-module-name) name))
    (let ([processing-module (curr-module-name)])
      (define part-tag (list 'part (tag-name (curr-module-name) name)))
@@ -836,7 +864,7 @@
            (set! 'doc-xrefs (cons (list name processing-module)
                                   (get 'doc-xrefs '())))
            (define header-part
-               (apply para #:style (div-style "boxed pyret-header")
+               (apply para #:style (div-style style)
                  (list (tt name-elt " :: " ann))))
            (nested #:style (div-style "value")
                    (cons

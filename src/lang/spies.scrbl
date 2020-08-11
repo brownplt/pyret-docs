@@ -106,7 +106,7 @@ If we want to @tt{spy} on an expression, rather than just names, we can give
 the expression a name within the @tt{spy} statement:
 
 @pyret-block{
-fun reverse(lst, sofar):
+fun <A> reverse(lst :: List<A>, sofar :: List<A>) -> List<A>:
   spy "lengths":
     lst-length: lst.length(),
     sofar-length: sofar.length(),

@@ -345,3 +345,107 @@ Like @pyret-id{raises-satisfies}, but the predicate must return
 @pyret{false}.  Still fails if no exception is raised.
 
 }
+
+@section{Reasons for tests: @pyret{because} clauses}
+
+@test-index-tag{because}
+
+When writing a test case, we may have several goals in mind: we might want to
+demonstrate @emph{whether} a particular function works properly, or we might
+want to explore @emph{why} a particular function works the way it does.
+Consider the following two test cases: when reading them, what meaning do they
+convey?
+
+@examples{
+check:
+  distance-to-origin(3, 4) is 5
+  distance-to-origin(3, 4) is num-sqrt(num-sqr(3) + num-sqr(4))
+end
+}
+
+Reading the first test case is concise and clear: the expected distance is
+simply 5.  But why?  Nothing in the expected output gives any insight into how
+the function works.  By contrast, the second test case gives far more insight,
+and ``shows our work''...but it is also much lengthier.  Writing many such test
+cases would get very tedious, very quickly.  Additionally, there's nothing
+tying the two test cases together: we have to notice that the two tests are
+adjacent in our program and their left sides are identical, to notice that both
+tests are about the same input scenario.
+
+Pyret allows us to write test cases in a slightly different way, that addresses
+both of these concerns:
+
+@examples{
+check:
+  distance-to-origin(3, 4) is-roughly 5
+    because num-sqrt(num-sqr(3) + num-sqr(4))
+end
+}
+
+Read this aloud as ``The distance to origin of (3, 4) is roughly 5, because the
+square-root of three squared plus four squared is roughly 5.''  The @pyret{because}
+clause lets us show work, while also connecting the explanation to the original
+test case.
+
+Now that there are potentially @emph{three} components to writing a single test
+case, there are multiple ways a test case can fail:
+
+@itemlist[
+@item{The explanation could be wrong, and so the expected value and the
+explanation do not match.}
+@item{The expected value could be wrong, and so the explanation does not match
+the expected value even if the explanation is correct.}
+@item{The function itself could be wrong, and so the left-hand side produces the wrong
+value and does not match the expected value.}
+@item{The expected value could be wrong, and so the left-hand side does not
+match the right-hand side even if the function behaves properly.}
+]
+
+As an example of the first case, suppose we had a typo in our explanation (we
+used @pyret{num-sqrt} instead of @pyret{num-sqr}):
+
+@pyret-block[#:style "bad-ex"]{
+check:
+  distance-to-origin(3, 4) is-roughly 5
+    because num-sqrt(num-sqrt(3) + num-sqr(4))
+end
+}
+
+Pyret will show us
+
+@image[#:scale 0.5]{src/lang/test-inconsistent.png}
+
+Here, even if the function is defined properly, the explanation and the
+expected result are inconsistent.  Pyret will show this inconsistency as a test
+failure, even if the left-hand side and the expected value do match --- after
+all, we might simply have gotten lucky, and the explanation is more accurate!
+A test case using a @pyret{because} clause will pass only if the explanation
+matches the expected value @emph{and} the left-hand side matches the expected
+value.
+
+Using a @pyret{because} clause is optional, and is most helpful to illustrate a
+few select examples to demonstrate how we think a function should be working.
+Once we have a few test cases are passing, we can easily add several more and
+leave out the @pyret{because} clauses for them...but if any of them
+unexpectedly fail, we can easily add a @pyret{because} clause to them to help
+debug the failure.
+
+@subsection{Using @pyret{because} with other testing operators}
+
+For an arbitrary test case @pyret{expr1 <test-op> expr2 because expr3}, read
+this aloud as ``@pyret{expr1 <test-op> expr2} because @pyret{expr3 <test-op>
+expr2}.''  So for example:
+
+@itemlist[
+@item{@pyret{times-two(3) is 6 because 2 * 3} reads as ``@pyret{times-two} of 3
+is 6, because two times 3 is 6.''  Note that this reads analogously for
+@pyret{is-roughly}, @pyret{is==}, @pyret{is=~}, @pyret{is<=>}, and @pyret{is%(...)}.}
+@item{@pyret{times-two(3) satisfies is-even because 2 * 3} reads as
+``@pyret{times-two} of 3 should be even, because two times 3 should be even.''}
+@item{@pyret{reciprocal(0) raises "division by zero" because 1 / 0} reads as
+``The reciprocal of zero raises a division-by-zero error, because @pyret{1 / 0}
+raises a division-by-zero error.''}
+]
+
+The other testing operators also work with @pyret{because} in the same way,
+though it is a bit harder to read them aloud.
