@@ -32,7 +32,6 @@
   (fun-spec (name "is-side-count") (arity 1))
   (fun-spec (name "is-step-count") (arity 1))
   (fun-spec (name "is-image") (arity 1))
-  (fun-spec (name "bitmap-url") (arity 1))
   (fun-spec (name "image-url") (arity 1))
   (fun-spec (name "images-equal") (arity 2))
   (fun-spec (name "images-difference") (arity 2))
@@ -1712,13 +1711,6 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     `(@{image-url("https://www.pyret.org/img/pyret-banner.png")}
       ,(html:image "https://www.pyret.org/img/pyret-banner.png"))
   ]
-  @function[
-    "bitmap-url"
-            #:contract (a-arrow S Image)
-            #:return Image
-            #:args (list '("url" ""))]{
-    Same as @pyret-id{image-url}
-  }
   @function[
     "color-at-position"
             #:contract (a-arrow Image
