@@ -1097,7 +1097,7 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
 
   @function[
     "overlay-onto-offset"
-            #:contract (a-arrow Image XPlace YPlace N N XPlace YPlace Image Image Image)
+            #:contract (a-arrow Image XPlace YPlace N N Image XPlace YPlace Image)
             #:return Image
             #:args (list '("img1" "")
                          '("place-x1" "") 
