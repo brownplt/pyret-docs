@@ -19,7 +19,7 @@ You should indent your code blocks using two spaces (not tabs).
 
 @subsection{Line Length}
 
-Try to keep the total length of your lines under 80 characters.
+Try to keep the total length of your lines under 100 characters.
 
 For overly long lines, it's actually really hard to figure out where
 to put in good line breaks. This is in every language. Look for
