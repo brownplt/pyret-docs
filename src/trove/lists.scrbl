@@ -1721,6 +1721,8 @@ check:
   find(num-is-integer,  [list: 2.5, 3.5, 100, 2, 4.5]) is some(100)
   find(num-is-rational, [list: 2.5, 3.5, 100, 2, 4.5]) is some(2.5)
   find(num-is-negative, [list: 2.5, 3.5, 100, 2, 4.5]) is none
+  find(lam(n): n < 3 end, [list: 2.5, 3.5, 100, 2, 4.5]) is some(2)
+  find(lam(n): n < 1 end, [list: 2.5, 3.5, 100, 2, 4.5]) is none
 end
     }
 
