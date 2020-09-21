@@ -1717,11 +1717,10 @@ end
     "find"]
 @examples{
 check:
-  find(num-is-integer, [list: 2.5, 1, 2]) is some(1)
-  find(num-is-rational, [list: 2.5, 1, 2]) is some(2.5)
-  find(num-is-negative, [list: 2.5, 1, 2]) is none
-  find(lam(elt): elt > 1 end, [list: 1, 2, 3]) is some(2)
-  find(lam(elt): elt > 4 end, [list: 1, 2, 3]) is none
+check:
+  find(num-is-integer,  [list: 2.5, 3.5, 100, 2, 4.5]) is some(100)
+  find(num-is-rational, [list: 2.5, 3.5, 100, 2, 4.5]) is some(2.5)
+  find(num-is-negative, [list: 2.5, 3.5, 100, 2, 4.5]) is none
 end
     }
 
