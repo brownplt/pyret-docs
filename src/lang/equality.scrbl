@@ -1059,7 +1059,6 @@ check:
   equal-always3(f, 5) satisfies is-NotEqual
   equal-now3(f, f) is Unknown
   equal-now3("a", f) satisfies is-NotEqual
-  identical3("a", f) satisfies is-NotEqual
   identical3(f, f) is Unknown
   identical3("a", f) satisfies is-NotEqual
 end

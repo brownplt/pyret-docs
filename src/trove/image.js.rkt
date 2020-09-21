@@ -1083,14 +1083,17 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
     dx, dy, img2, "left", "top")}.
   }
   @repl-examples[
-    `(@{overlay-xy(0, 0,
-          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+    `(@{overlay-xy(square(30, "solid", "bisque"),
+          0, 0,
+          square(50, "solid", "dark-green"))}
       ,(overlay/xy (square 30 "solid" "bisque") 0 0 (square 50 "solid" "darkgreen")))
-    `(@{overlay-xy(30, 20, # Move green square right 30 and down 20
-          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+    `(@{overlay-xy(square(30, "solid", "bisque"),
+          30, 20, # Move green square right 30 and down 20
+          square(50, "solid", "dark-green"))}
       ,(overlay/xy (square 30 "solid" "bisque") 30 20 (square 50 "solid" "darkgreen")))
-    `(@{overlay-xy(-10, -20, # Move green square left 10 and up 20
-          square(30, "solid", "bisque"), square(50, "solid", "dark-green"))}
+    `(@{overlay-xy(square(30, "solid", "bisque"),
+          -10, -20, # Move green square left 10 and up 20
+          square(50, "solid", "dark-green"))}
       ,(overlay/xy (square 30 "solid" "bisque") -10 -20 (square 50 "solid" "darkgreen")))
   ]
 
