@@ -1717,9 +1717,9 @@ end
     "find"]
 @examples{
 check:
-  find(is-string, [list: 1, 2, 3, 'a']) is some('a')
-  find(is-number, [list: 1, 2, 3, 'a']) is some(1)
-  find(is-array, [list: 1, 2, 3, 'a']) is none 
+  find(num-is-integer, [list: 2.5, 1, 2]) is some(1)
+  find(num-is-rational, [list: 2.5, 1, 2]) is some(2.5)
+  find(num-is-negative, [list: 2.5, 1, 2]) is none
   find(lam(elt): elt > 1 end, [list: 1, 2, 3]) is some(2)
   find(lam(elt): elt > 4 end, [list: 1, 2, 3]) is none
 end
