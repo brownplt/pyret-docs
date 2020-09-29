@@ -1234,8 +1234,12 @@ we define both of these components.  See @secref{brands} for more information
 about branders.
 
 @section[#:tag "s:contracts"]{Contracts}
+
+
 As part of its support for the systematic design of functions, Pyret allows
 developers to specify an annotation for a name, before that name is defined.
+The general grammar for standalone contracts is:
+
 For example,
 
 @pyret-block[#:style "good-ex"]{
@@ -1244,17 +1248,27 @@ the-answer = 42
 
 double :: String -> String
 fun double(s): s + s end
+
+vals-to-string :: <T, S> (S, T -> String)
+fun vals-to-string(val1, val2):
+  to-string(val1) + ", " + to-string(val2)
+end
 }
 
-In both of these cases, the definition itself (of @pyret{the-answer} and
-@pyret{double}) is preceded by a @emph{contract} statement, asserting the
-signature of the definition to follow.  Pyret treats these contracts specially,
-and weaves them in to the definitions: the previous examples are equivalent to
+In all of these cases, the definition itself (of @pyret{the-answer},
+@pyret{double}, and @pyret{vals-to-string}) is preceded by a @emph{contract}
+statement, asserting the signature of the definition to follow.  Pyret treats
+these contracts specially, and weaves them in to the definitions: the previous
+examples are equivalent to
 
 @pyret-block[#:style "good-ex"]{
 the-answer :: Number = 42
 
 fun double(s :: String) -> String: s + s end
+
+fun vals-to-string<T,S>(val1 :: T, val2 :: S) -> String:
+  to-string(val1) + ", " + to-string(val2)
+end
 }
 
 The grammar for these contracts looks nearly identical to that of
@@ -1267,7 +1281,7 @@ THINARROW: "->"
 COLONCOLON: "::"
 LPAREN: "("
 RPAREN: ")"
-contract: NAME COLONCOLON ann | NAME COLONCOLON contract-arrow-ann
+contract: NAME COLONCOLON ty-params ann | NAME COLONCOLON ty-params contract-arrow-ann
 contract-arrow-ann: (ann COMMA)* ann THINARROW ann 
               | LPAREN (NAME COLONCOLON ann COMMA)* NAME COLONCOLON ann RPAREN THINARROW ann
 }
