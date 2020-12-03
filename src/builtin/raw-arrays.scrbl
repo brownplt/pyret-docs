@@ -44,6 +44,11 @@
       (args ("lst"))
       (doc ""))
     (fun-spec
+      (name "raw-array-build")
+      (arity 2)
+      (args ("f" "size"))
+      (doc ""))
+    (fun-spec
       (name "raw-array-fold")
       (arity 4)
       (args ("f" "init" "array" "start-index"))
@@ -194,6 +199,18 @@ end
 
     Converts a @pyret-id["List" "lists"] to a @pyret-id{RawArray} containing
     the same elements in the same order.
+
+  @function["raw-array-build" #:contract (a-arrow (a-arrow N "a") N (RA-of "a")) #:return (RA-of "a")]
+
+    Constructs an array of length @pyret{size}, and fills it with the result of
+    calling the function @pyret{f} with each index from @pyret{0} to @pyret{size - 1}.
+
+  @examples{
+check:
+  fun sq(x): x * x end
+  raw-array-build(sq, 4) is=~ [raw-array: sq(0), sq(1), sq(2), sq(3)]
+end
+  }
 
 
   @function["raw-array-fold" #:contract (a-arrow (a-arrow "b" "a" N "b") "b" (RA-of "a") N "b") #:return "b"]
