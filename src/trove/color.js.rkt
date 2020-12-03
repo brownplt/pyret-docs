@@ -440,11 +440,23 @@
     ;; ~color13(47, 79, 79, 1)
     )
   (unknown-item
+    (name "dark-slate-grey")
+    ;; ~color13(47, 79, 79, 1)
+    )
+  (unknown-item
     (name "light-slate-gray")
     ;; ~color13(119, 136, 153, 1)
     )
   (unknown-item
+    (name "light-slate-grey")
+    ;; ~color13(119, 136, 153, 1)
+    )
+  (unknown-item
     (name "slate-gray")
+    ;; ~color13(112, 128, 144, 1)
+    )
+  (unknown-item
+    (name "slate-grey")
     ;; ~color13(112, 128, 144, 1)
     )
   (unknown-item
@@ -584,6 +596,10 @@
     ;; ~color13(211, 211, 211, 1)
     )
   (unknown-item
+    (name "light-grey")
+    ;; ~color13(211, 211, 211, 1)
+    )
+  (unknown-item
     (name "silver")
     ;; ~color13(192, 192, 192, 1)
     )
@@ -592,11 +608,23 @@
     ;; ~color13(190, 190, 190, 1)
     )
   (unknown-item
+    (name "grey")
+    ;; ~color13(190, 190, 190, 1)
+    )
+  (unknown-item
     (name "dark-gray")
     ;; ~color13(169, 169, 169, 1)
     )
   (unknown-item
+    (name "dark-grey")
+    ;; ~color13(169, 169, 169, 1)
+    )
+  (unknown-item
     (name "dim-gray")
+    ;; ~color13(105, 105, 105, 1)
+    )
+  (unknown-item
+    (name "dim-grey")
     ;; ~color13(105, 105, 105, 1)
     )
   (unknown-item
@@ -747,8 +775,11 @@
     @render-color["sky-blue" 135 206 235 1]
     @render-color["cadet-blue" 95 158 160 1]
     @render-color["dark-slate-gray" 47 79 79 1]
+    @render-color["dark-slate-grey" 47 79 79 1]
     @render-color["light-slate-gray" 119 136 153 1]
+    @render-color["light-slate-grey" 119 136 153 1]
     @render-color["slate-gray" 112 128 144 1]
+    @render-color["slate-grey" 112 128 144 1]
     @render-color["light-steel-blue" 176 196 222 1]
     @render-color["light-blue" 173 216 230 1]
     @render-color["powder-blue" 176 224 230 1]
@@ -783,10 +814,14 @@
     @render-color["white-smoke" 245 245 245 1]
     @render-color["gainsboro" 220 220 220 1]
     @render-color["light-gray" 211 211 211 1]
+    @render-color["light-grey" 211 211 211 1]
     @render-color["silver" 192 192 192 1]
     @render-color["gray" 190 190 190 1]
+    @render-color["grey" 190 190 190 1]
     @render-color["dark-gray" 169 169 169 1]
+    @render-color["dark-grey" 169 169 169 1]
     @render-color["dim-gray" 105 105 105 1]
+    @render-color["dim-grey" 105 105 105 1]
     @render-color["black" 0 0 0 1]
     @render-color["transparent" 0 0 0 0]
   ]
