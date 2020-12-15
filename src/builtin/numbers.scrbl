@@ -44,6 +44,8 @@
       (name "NumNonNegative")
       (variants)
       (shared))
+    (value-spec
+      (name "PI"))
     (fun-spec
       (name "num-equal")
       (arity 2)

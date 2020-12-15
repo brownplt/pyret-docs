@@ -857,6 +857,8 @@
      (define part-tag (list 'part (tag-name (curr-module-name) name)))
      (define name-tt (seclink (xref processing-module name) (tt name)))
      (define name-elt (toc-target-element code-style (list name-tt) part-tag))
+     (define part-tags (list 'part (curr-module-name) name))
+     (define index-tags (cons (pyret name) (filter (lambda(e) (not (or (equal? e name) (equal? e "")))) (rest part-tags))))
      (interleave-parbreaks/all
       (list
         (traverse-block ; use this to build xrefs on an early pass through docs
@@ -871,7 +873,15 @@
                      header-part
                      (interleave-parbreaks/all
                       (append
-                        (list (nested #:style (div-style "description") contents))))))))))))
+                        (list
+                             (let ((tag (make-generated-tag)))
+                               (make-index-element #f
+                                                   (list (make-target-element #f '() `(idx ,tag)))
+                                                   `(idx ,tag)
+                                                   (cons name (rest index-tags))
+                                                   index-tags
+                                                   #f))
+                             (nested #:style (div-style "description") contents))))))))))))
 
 
 ;; starts empty, different modules will add bindings
