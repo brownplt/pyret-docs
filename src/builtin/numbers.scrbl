@@ -411,6 +411,13 @@ They are integers, fractions or decimals, with an optional exponent.
 ranges between 0 and 1.7976931348623157e+308 (JavaScript’s Number.MAX_VALUE) with a
 granularity of 5e-324 (JavaScript’s Number.MIN_VALUE).
 
+@section{Number Constants}
+
+@value["PI" RN]
+
+The mathematical constant π, approximated as a @pyret-id["Roughnum"], or
+@pyret{~3.141592653589793}.
+
 @section{Number Functions}
 
 @function["num-equal" #:contract (a-arrow N N B) #:return B]{
