@@ -219,7 +219,7 @@
           (arity 2)
           (params ())
           (contract (a-arrow ,Self ,S ,ChartWindow))
-          (args ("self" "tiltle"))
+          (args ("self" "title"))
           (return ,ChartWindow)
           (doc ("Construct a new " ,ChartWindow " with a new title. "
                 "By default, the title will empty")))
