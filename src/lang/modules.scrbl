@@ -2,8 +2,6 @@
 
 @(require "../../scribble-api.rkt")
 @(append-gen-docs
-  `(module "type-check" (path "src/arr/compiler/type-check.arr")))
-@(append-gen-docs
   `(module "modules" (path #f)
     (form-spec (name "<id-import>"))
     (form-spec (name "file"))

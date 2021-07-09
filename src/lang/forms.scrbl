@@ -487,7 +487,7 @@ not allowed, for instance:
 PI = ~3.14 :: Number
 }
 
-@subsection{Shadowing}
+@subsection[#:tag "s:shadowing"]{Shadowing}
 
 Pyret does not permit a program to implicitly bind the same name
 multiple times in the same scope, as this can be confusing or
