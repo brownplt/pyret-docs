@@ -27,11 +27,7 @@ The @tt{<import>} part of  @tt{use context} line can use any of the
 @seclink["s:modules:finding-modules" "dependency types"].
 }
 
-There are a number of scenarios where @tt{use context} can help.
-
-
-
-For example, consider an assignment where students write their own
+As an example, consider an assignment where students write their own
 implementation of lists, defining functions named @tt{map}, @tt{filter}, and so
 on. In this case, the context they use should not be the default context
 (because it already has @tt{map} and so on):
@@ -53,6 +49,7 @@ it as a @tt{shared-gdrive} module:
 
 @pyret-block[#:style "good-ex"]{
 # In file "list-assignment-context.arr"
+use context global # This is a good default environment to use when constructing namespaces
 # Basic functions/types like num-max, to-string, Number, String
 import global as G
 provide from G: *, type * end
@@ -83,7 +80,7 @@ end
 
 
 
-@section[#:tag "s:use:compat"]{Backwards and Forwards Compatibility}
+@subsection[#:tag "s:use:compat"]{Backwards and Forwards Compatibility}
 
 By default, until @tt{use context} was released, all Pyret programs had a
 single default context. It had provided common names related to, for example,
@@ -116,6 +113,7 @@ This means that sometimes programmers will want to manually update the year in
 a context, if it's convenient for getting access to some new library function.
 Of course, they could always add the appropriate @tt{import} statement to
 access it directly.
+
 
 }
 
