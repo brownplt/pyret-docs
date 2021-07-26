@@ -4,6 +4,7 @@
 @(define eq '(a-id "EqualityResult" (xref "equality" "EqualityResult")))
 @(define eqfun `(a-arrow ,A ,A ,B))
 @(define eq3fun `(a-arrow ,A ,A ,eq))
+@(define numpred `(a-arrow ,N ,N ,B))
 
 @(append-gen-docs
   `(module "numbers"
@@ -215,13 +216,19 @@
       (name "num-within-abs")
       (arity 1)
       (args ("tol"))
-      (return ,eqfun)
+      (return ,numpred)
       (doc ""))
     (fun-spec
       (name "num-within-rel")
       (arity 1)
       (args ("tol"))
-      (return ,eqfun)
+      (return ,numpred)
+      (doc ""))
+    (fun-spec
+      (name "num-within")
+      (arity 1)
+      (args ("tol"))
+      (return ,numpred)
       (doc ""))
     (fun-spec
       (name "within-abs")
@@ -934,7 +941,7 @@ check:
 end
 }
   }
-  @function["num-within-abs" #:contract (a-arrow N eqfun)]{
+  @function["num-within-abs" #:contract (a-arrow N (a-arrow N N B))]{
 
 Returns a predicate that checks if the difference of its two
 arguments is less than @pyret{tol}.
@@ -955,13 +962,12 @@ end
 }
 
   }
-  @function["num-within-rel" #:contract (a-arrow N eqfun)]{
+  @function["num-within-rel" #:contract (a-arrow N (a-arrow N N B))]{
 
 Returns a predicate that checks that its first number argument
 is no more than the fraction @pyret{tol} off from its second
 argument.
 
-This function is a.k.a. @pyret{num-within}.
 
 @examples{
 check:
@@ -970,6 +976,12 @@ check:
 end
 }
   }
+
+  @function["num-within" #:contract (a-arrow N (a-arrow N N B))]{
+An alias for @pyret-id["num-within-rel" "numbers"], much as @pyret-id["within"
+"equality"] and @pyret-id["within-rel" "equality"] are synonyms.
+}
+
 
   @function["within" #:contract (a-arrow N eqfun)]
   @function["within-abs" #:contract (a-arrow N eqfun)]
