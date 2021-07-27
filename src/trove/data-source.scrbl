@@ -146,12 +146,18 @@ This datatype describes Pyret's
 
 @section{Sanitizers}
 @type-spec["Sanitizer" (list "A" "B")]{
-A @pyret{Sanitizer<A, B>} is a function with signature @pyret-id{CellContent}@pyret{<A>, }@g-id{String}@pyret{, }@g-id{Number}@pyret{ -> B}.
+A @pyret{Sanitizer<A, B>} is a function with signature
+@pyret{(}@pyret-id{CellContent}@pyret{<A>, }@g-id{String}@pyret{,
+}@g-id{Number}@pyret{ -> B}@pyret{)}.  It takes in the contents of a cell, as
+well as the coordinates (column name, as given by the @seclink["s:tables:loading"]{@pyret{load-table}
+header}, and zero-indexed row number) of that cell, and attempts to parse the
+contents of that cell to a value of the intended Pyret type.  If a cell's
+contents cannot be parsed, the sanitizer may raise an error explaining the problem.
 }
 
 @subsection{Pre-defined sanitizers}
 @function["string-sanitizer"
-  #:contract (a-arrow (CC-of "A") N N S)
+  #:contract (a-arrow (CC-of "A") S N S)
   #:args `(("x" "") ("col" "") ("row" ""))
   #:return S
 ]
@@ -160,7 +166,7 @@ This sanitizer tries to convert @pyret-id{CellContent}s containing anything to
 a @g-id{String}, by calling @g-id{tostring} on it.
 
 @function["num-sanitizer"
-  #:contract (a-arrow (CC-of "A") N N N)
+  #:contract (a-arrow (CC-of "A") S N N)
   #:args `(("x" "") ("col" "") ("row" ""))
   #:return N
 ]
@@ -171,7 +177,7 @@ True and false convert to 1 and 0 respectively.  Any other values are rejected,
 including blank cells.
 
 @function["bool-sanitizer"
-  #:contract (a-arrow (CC-of "A") N N B)
+  #:contract (a-arrow (CC-of "A") S N B)
   #:args `(("x" "") ("col" "") ("row" ""))
   #:return B
 ]
@@ -183,7 +189,7 @@ and @pyret{"false"} convert appropriately.  Any other values are rejected,
 including blank cells.
 
 @function["strict-num-sanitizer"
-  #:contract (a-arrow (CC-of "A") N N N)
+  #:contract (a-arrow (CC-of "A") S N N)
   #:args `(("x" "") ("col" "") ("row" ""))
   #:return N
 ]
@@ -193,7 +199,7 @@ numbers to a @g-id{Number}.  Strings are attempted to be parsed.  Any other
 values are rejected, including blank cells.
 
 @function["strings-only"
-  #:contract (a-arrow (CC-of "A") N N S)
+  #:contract (a-arrow (CC-of "A") S N S)
   #:args `(("x" "") ("col" "") ("row" ""))
   #:return S
 ]
@@ -202,7 +208,7 @@ This sanitizer accepts @pyret-id{CellContent}s containing strings only, and
 rejects all other values, including blank cells.
 
 @function["booleans-only"
-  #:contract (a-arrow (CC-of "A") N N B)
+  #:contract (a-arrow (CC-of "A") S N B)
   #:args `(("x" "") ("col" "") ("row" ""))
   #:return B
 ]
@@ -211,7 +217,7 @@ This sanitizer accepts @pyret-id{CellContent}s containing booleans only, and
 rejects all other values, including blank cells.
 
 @function["numbers-only"
-  #:contract (a-arrow (CC-of "A") N N N)
+  #:contract (a-arrow (CC-of "A") S N N)
   #:args `(("x" "") ("col" "") ("row" ""))
   #:return N
 ]
@@ -220,7 +226,7 @@ This sanitizer accepts @pyret-id{CellContent}s containing numbers only, and
 rejects all other values, including blank cells.
 
 @function["empty-only"
-  #:contract (a-arrow (CC-of "A") N N N)
+  #:contract (a-arrow (CC-of "A") S N N)
   #:args `(("x" "") ("col" "") ("row" ""))
   #:return (O-of "A")
 ]
