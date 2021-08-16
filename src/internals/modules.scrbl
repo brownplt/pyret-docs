@@ -389,6 +389,37 @@ dependencies when the module is loaded.}
 
 ]
 
+@subsection[#:tag "s:js-interop-example"]{JavaScript Interop Example (node)}
+
+In command-line Pyret, the module import form @tt{js-file} will look for a
+(relative) path to a JavaScript file in the JavaScript module format, and
+load it. Here is an example:
+
+@verbatim{
+$ ls
+lib.js     test.arr
+$ cat lib.js
+({
+  requires: [],
+  nativeRequires: [],
+  provides: {
+    values: { "from-a-library": "String" }
+  },
+  theModule: function(runtime, _, uri) {
+    return runtime.makeModuleReturn({
+      "from-a-library": "I'm from a library!"
+    }, {});
+  }
+})
+$ cat test.arr
+import js-file("lib") as L
+
+print(L.from-a-library + "\n")
+⤇ pyret -q test.arr
+I'm from a library!
+The program didn't define any tests.
+}
+
 @subsection[#:tag "s:complete"]{Complete Programs}
 
 Modules as described in @secref["s:single-module"] lack the necessary

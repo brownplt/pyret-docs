@@ -22,6 +22,8 @@ Pyret-specific libraries and concepts, like @seclink["testing"] and
 
 @include-section["lang/modules.scrbl"]
 
+@include-section["lang/use.scrbl"]
+
 @include-section["lang/brands.scrbl"]
 
 @include-section["lang/type-check.scrbl"]
