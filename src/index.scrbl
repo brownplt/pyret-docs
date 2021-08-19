@@ -30,9 +30,23 @@ to post a message on the
 list"], and we'll be happy to help.}
 
 @nested{If you want to learn about (or teach!) programming and computer science
-using Pyret, check out @link["http://papl.cs.brown.edu/2015/" "Programming and
+using Pyret, check out @link["http://papl.cs.brown.edu/2020/" "Programming and
 Programming Languages (PAPL)"], which is a textbook on programming with all its
 examples in Pyret.}
+
+@nested{Previous release notes documents have useful information on major
+updates over time.
+
+@itemlist[
+  @item{@hyperlink["https://www.pyret.org/release-notes/summer-2021.html"]{Summer 2021}}
+  @item{@hyperlink["https://www.pyret.org/release-notes/summer-2020.html"]{Summer 2020}}
+  @item{@hyperlink["https://groups.google.com/g/pyret-discuss/c/kUr3iIYsheE/m/Z7FTW9ZcEwAJ"]{Fall 2017}}
+  @item{@hyperlink["https://groups.google.com/g/pyret-discuss/c/n4yAxubXHyY/m/EJr0yMlwAAAJ"]{Fall 2016}}
+  @item{@hyperlink["https://groups.google.com/g/pyret-discuss/c/i1qMU_YP9Tw/m/j67PlQx0CQAJ"]{Summer 2016}}
+  @item{@hyperlink["https://www.pyret.org/release-notes/v0.5.html"]{Summer 2014}}
+]
+
+}
 
 @include-section["getting-started.scrbl"]
 
