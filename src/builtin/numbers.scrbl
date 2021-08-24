@@ -312,7 +312,7 @@ Pyret numbers are of two kinds: exact numbers, or @pyret{Exactnum}s,
 and rough numbers or @pyret{Roughnum}s. Both are 
 real; finite; and written in base ten.
 
-@margin-note{Note that imagaginary numbers were implemented in earlier versions of Pyret,
+@margin-note{Note that imaginary numbers were implemented in earlier versions of Pyret,
 but are not currently supported.}
 
 @pyret{Exactnum}s are arbitrarily precise rational numbers, including
