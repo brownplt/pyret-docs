@@ -30,9 +30,8 @@ to post a message on the
 list"], and we'll be happy to help.}
 
 @nested{If you want to learn about (or teach!) programming and computer science
-using Pyret, check out @link["http://papl.cs.brown.edu/2020/" "Programming and
-Programming Languages (PAPL)"], which is a textbook on programming with all its
-examples in Pyret.}
+using Pyret, check out @link["https://dcic-world.org" "A Data Centric Introduction to Computing"], which is a textbook on programming starting with
+Pyret.}
 
 @nested{Previous release notes documents have useful information on major
 updates over time.
