@@ -2168,7 +2168,7 @@ check:
     | empty => "empty"
     | else => "else"
   end
-  result2 is else
+  result2 is "else"
 
   result3 = cases(List) empty:
     | empty => "empty"
