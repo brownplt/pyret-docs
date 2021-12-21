@@ -7,6 +7,7 @@
 @(define Self A)
 @(define Color (a-id "Color" (xref "color" "Color")))
 @(define Image (a-id "Image" (xref "image" "Image")))
+@(define Option (a-id "Option" (xref "option" "Option")))
 @(define DataSeries (in-link "DataSeries"))
 @(define ChartWindow (in-link "ChartWindow"))
 @(define opaque '(("<opaque>" ("type" "normal") ("contract" #f))))
@@ -23,6 +24,268 @@
     (contract (a-arrow ,Self ,Color ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with a new " ,Color ". By default, "
           "the color will be auto-generated."))))
+
+@(define bar-chart-colors-meth
+  `(method-spec
+    (name "colors")
+    (arity 2)
+    (params ())
+    (args ("self" "colors"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of Color) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new " ,Color " for each relevant component. By default, "
+          "the colors will be auto-generated. If the " ,(L-of Color) " contains less elements than "
+          "the number of components then the rest will be colored the default color (Can be changed by 
+          using the " ,(in-link "bar-chart-series") ". color method). If the " ,(L-of Color) " contains more elements than the number of components
+          , only the number of components of colors will be used"))))
+
+@(define multi-bar-chart-colors-meth
+  `(method-spec
+    (name "colors")
+    (arity 2)
+    (params ())
+    (args ("self" "colors"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of Color) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new " ,Color " for each relevant component. By default, "
+          "the colors will be auto-generated. If the " ,(L-of Color) " contains less elements than "
+          "the number of components then the rest will be colored Black. If the " ,(L-of Color)
+          " contains more elements than the number of components, only the number of components of colors will be used"))))
+          
+@(define bar-chart-sort-meth
+  `(method-spec
+    (name "sort")
+    (arity 1)
+    (params ())
+    (args ("self"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " where the components of the " ,(in-link "bar-chart-series") 
+          " are sorted by height using a comparison operator of < (ascending order) and equality operator of ==. 
+          See more details at " ,L "." ,(a-id "sort" (xref "lists" "sort")) "." ))))
+
+@(define multi-bar-chart-sort-meth
+  `(method-spec
+    (name "sort")
+    (arity 1)
+    (params ())
+    (args ("self"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " where the components of the " ,(in-link "multi-bar-chart-series") 
+          " are sorted by the sum of their heights using a comparison operator of < (ascending order) 
+          and equality operator of ==. See more details at " ,L "." ,(a-id "sort" (xref "lists" "sort")) "." ))))
+
+@(define bar-chart-sort-by-meth
+  `(method-spec
+    (name "sort-by")
+    (arity 3)
+    (params ())
+    (args ("self" "cmp" "eq"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self (a-arrow ,N ,N ,B) (a-arrow ,N ,N ,B) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " where the components of the " ,(in-link "bar-chart-series") 
+          " are sorted by height using custom comparison and equality operators. See more details at " 
+          ,L "." ,(a-id "sort-by" (xref "lists" "sort-by")) "." ))))
+
+@(define multi-bar-chart-sort-by-meth
+  `(method-spec
+    (name "sort-by")
+    (arity 3)
+    (params ())
+    (args ("self" "cmp" "eq"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self (a-arrow ,N ,N ,B) (a-arrow ,N ,N ,B) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " where the components of the " ,(in-link "multi-bar-chart-series") 
+          " are sorted by the sum of their heights using custom comparison and equality operators. 
+          See more details at " ,L "." ,(a-id "sort-by" (xref "lists" "sort-by")) "." ))))
+
+@(define bar-chart-sort-by-label-meth
+  `(method-spec
+    (name "sort-by-label")
+    (arity 3)
+    (params ())
+    (args ("self" "cmp" "eq"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self (a-arrow ,S ,S ,B) (a-arrow ,S ,S ,B) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " where the components of the " ,(in-link "bar-chart-series") 
+          " are sorted by labels using custom comparison and equality operators. See more details at " 
+          ,L "." ,(a-id "sort-by" (xref "lists" "sort-by")) "." ))))
+
+@(define multi-bar-chart-sort-by-label-meth
+  `(method-spec
+    (name "sort-by-label")
+    (arity 3)
+    (params ())
+    (args ("self" "cmp" "eq"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self (a-arrow ,S ,S ,B) (a-arrow ,S ,S ,B) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " where the components of the " ,(in-link "multi-bar-chart-series") 
+          " are sorted by labels using custom comparison and equality operators. 
+          See more details at " ,L "." ,(a-id "sort-by" (xref "lists" "sort-by")) "." ))))
+
+@(define multi-bar-chart-sort-by-data-meth
+  `(method-spec
+    (name "sort-by-data")
+    (arity 4)
+    (params ())
+    (args ("self" "scorer" "cmp" "eq"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self (a-arrow ,(L-of N) "A") (a-arrow "A" "A" ,B) (a-arrow "A" "A" ,B) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " where  the components of the " ,(in-link "multi-bar-chart-series") 
+          " are scored by the scorer and then sorted by their score using custom comparison and equality operators. 
+          See more details at " ,L "." ,(a-id "sort-by" (xref "lists" "sort-by")) "." ))))
+
+@(define pointer-meth
+  `(method-spec
+    (name "add-pointers")
+    (arity 3)
+    (params ())
+    (args ("self" "ticks" "labels"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of N) ,(L-of S) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new pointers at certain ticks on the axis to highlight lines of interest"
+          "Be sure to space out the pointers because one of the labels will disappear if they are too close. Also add-pointers
+           currently does not work in conjunction with " ,(in-link "bar-chart-series") ".sort_by"))))
+
+@(define pointer-color-meth
+  `(method-spec
+    (name "pointer-color")
+    (arity 2)
+    (params ())
+    (args ("self" "color"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,Color ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new color for the pointers added by " ,(in-link "bar-chart-series") "."
+          "add pointers."))))
+
+@(define format-axis-meth
+  `(method-spec
+    (name "format-axis")
+    (arity 2)
+    (params ())
+    (args ("self" "formatter"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self (a-arrow ,N ,S) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with new tick labels on the axis."))))
+
+@(define scale-meth
+  `(method-spec
+    (name "scale")
+    (arity 2)
+    (params ())
+    (args ("self" "scale-function"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self (a-arrow ,N ,N) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with all the data scaled by the scale-function"))))
+
+@(define multi-bar-chart-stacking-meth
+  `(method-spec
+    (name "stacking-type")
+    (arity 2)
+    (params ())
+    (args ("self" "stack-type"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,S ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " for a " ,(in-link "multi-bar-chart-series") " where the stacking-type of "
+          "the series is specified to be one of the following options: ['none', 'absolute', 'relative', 'percent']"
+          "By Default the stacking type will be 'none' or 'absolute' depending on whether the " 
+          ,(in-link "multi-bar-chart-series") " was constructed with " ,(in-link "from-list.grouped-bar-chart") " or "
+          ,(in-link "from-list.stacked-bar-chart")))))
+
+@(define horizontal-meth
+  `(method-spec
+    (name "horizontal")
+    (arity 2)
+    (params ())
+    (args ("self" "horizontal"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,B ,DataSeries))
+    (doc ("Applies to " ,(in-link "bar-chart-series") " and " ,(in-link "multi-bar-chart-series") ": Construct a new " 
+          ,DataSeries " with all the bars set to be horizontal or vertical. By Default the bars are vertical."))))
+
+@(define bar-chart-annotations-meth
+  `(method-spec
+    (name "annotations")
+    (arity 2)
+    (params ())
+    (args ("self" "annotations"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of (O-of S)) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with annotations on all the bars of a " ,(in-link "bar-chart-series")
+          ". Use none to have no annotations on a specific bar. See " ,Option))))
+
+@(define multi-bar-chart-annotations-meth
+  `(method-spec
+    (name "annotations")
+    (arity 2)
+    (params ())
+    (args ("self" "annotations"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of (L-of (O-of S))) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with annotations on all the bars of a " ,(in-link "multi-bar-chart-series")
+          ". Use none to have no annotations on a specific bar. See " ,Option " for more information. Advice: Use "
+          "annotations sparingly to reduce the amount of overlap between annotations."))))
+
+@(define bar-chart-intervals-meth
+  `(method-spec
+    (name "intervals")
+    (arity 2)
+    (params ())
+    (args ("self" "intervals"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of (L-of N)) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with intervals on all the bars of a " ,(in-link "bar-chart-series")
+          ". Note: Saving the chart as an image might result in some of the intervals being cut off."))))
+
+@(define multi-bar-chart-intervals-meth
+  `(method-spec
+    (name "intervals")
+    (arity 2)
+    (params ())
+    (args ("self" "intervals"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of (L-of (L-of N))) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with intervals on all the bars of a " ,(in-link "multi-bar-chart-series")
+          ". Note: Saving the chart as an image might result in some of the intervals being cut off."))))
+
+@(define bar-chart-error-bars-meth
+  `(method-spec
+    (name "error-bars")
+    (arity 2)
+    (params ())
+    (args ("self" "error-bars"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of (L-of N)) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with error-bars on all the bars of a " ,(in-link "bar-chart-series")
+          ". Note: Saving the chart as an image might result in some of the intervals being cut off. Error bars are"
+          ,L  "s of length 2 [lower, upper]"))))
+
+@(define multi-bar-chart-error-bars-meth
+  `(method-spec
+    (name "error-bars")
+    (arity 2)
+    (params ())
+    (args ("self" "error-bars"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of (L-of (L-of N))) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with error-barss on all the bars of a " ,(in-link "multi-bar-chart-series")
+          ". Note: Saving the chart as an image might result in some of the intervals being cut off. Error bars are"
+          ,L  "s of length 2 [lower, upper]."))))
+
+@(define interval-color-meth
+  `(method-spec
+    (name "interval-color")
+    (arity 2)
+    (params ())
+    (args ("self" "color"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,Color ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new color for the intervals added by " ,(in-link "bar-chart-series") ".intervals, " 
+          ,(in-link "bar-chart-series") ".error_bars" 
+          ,(in-link "multi-bar-chart-series") ".intervals, or" 
+          ,(in-link "multi-bar-chart-series") ".error-bars."))))
+
 @(define legend-meth
   `(method-spec
     (name "legend")
@@ -177,6 +440,7 @@
     (fun-spec (name "from-list.labeled-scatter-plot") (arity 1))
     (fun-spec (name "from-list.bar-chart") (arity 2))
     (fun-spec (name "from-list.grouped-bar-chart") (arity 3))
+    (fun-spec (name "from-list.stacked-bar-chart") (arity 3))
     (fun-spec (name "from-list.freq-bar-chart") (arity 1))
     (fun-spec (name "from-list.pie-chart") (arity 2))
     (fun-spec (name "from-list.exploding-pie-chart") (arity 3))
@@ -195,7 +459,17 @@
       (with-members (,color-meth ,legend-meth ,point-size-meth)))
     (constr-spec
       (name "bar-chart-series")
-      (with-members ()))
+      (with-members (,color-meth ,bar-chart-colors-meth ,bar-chart-sort-meth ,bar-chart-sort-by-meth
+                     ,bar-chart-sort-by-label-meth ,pointer-meth ,pointer-color-meth ,format-axis-meth
+                     ,scale-meth ,horizontal-meth ,bar-chart-annotations-meth ,bar-chart-intervals-meth
+                     ,bar-chart-error-bars-meth ,interval-color-meth)))
+    (constr-spec
+      (name "multi-bar-chart-series")
+      (with-members (,multi-bar-chart-colors-meth ,multi-bar-chart-sort-meth ,multi-bar-chart-sort-by-meth
+                     ,multi-bar-chart-sort-by-label-meth ,multi-bar-chart-sort-by-data-meth ,pointer-meth
+                     ,pointer-color-meth ,format-axis-meth ,scale-meth ,multi-bar-chart-stacking-meth
+                     ,horizontal-meth ,multi-bar-chart-annotations-meth ,multi-bar-chart-intervals-meth
+                     ,multi-bar-chart-error-bars-meth ,interval-color-meth)))
     (constr-spec
       (name "pie-chart-series")
       (with-members ()))
@@ -207,7 +481,7 @@
       (name "DataSeries")
       (type-vars ())
       (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
-                 "bar-chart-series" "pie-chart-series" "histogram-series"))
+                 "bar-chart-series" "multi-bar-chart-series" "pie-chart-series" "histogram-series"))
       (shared))
     (data-spec
       (name "ChartWindow")
@@ -409,9 +683,11 @@ an-image = a-chart-window.get-image()
     @examples{
 NUM_E = ~2.71828
 f-series = from-list.function-plot(lam(x): 1 - num-expt(NUM_E, 0 - x) end)
+f-series
     }
+    @(in-image "function-plot-constructor")
   }
-
+  
   @function["from-list.line-plot"
     #:contract (a-arrow (L-of N) (L-of N) DataSeries)
     #:args '(("xs" #f) ("ys" #f))
@@ -425,7 +701,9 @@ f-series = from-list.function-plot(lam(x): 1 - num-expt(NUM_E, 0 - x) end)
 a-series = from-list.line-plot(
   [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
   [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
+a-series
     }
+    @(in-image "line-plot-constructor")
   }
 
   @function["from-list.scatter-plot"
@@ -441,7 +719,9 @@ a-series = from-list.line-plot(
 a-series = from-list.scatter-plot(
   [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
   [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
+a-series
     }
+    @(in-image "scatter-plot-constructor")
   }
 
   @function["from-list.labeled-scatter-plot"
@@ -452,14 +732,18 @@ a-series = from-list.scatter-plot(
 
     Constructing a scatter plot series from @pyret{xs} and @pyret{ys}, representing x and y
     coordinates of points, and @pyret{labels} whose element representing a label for each point.
+    The labels will show up when you display the chart and hover over the points. 
     See more details at @(in-link "scatter-plot-series").
+
 
     @examples{
 a-series = from-list.labeled-scatter-plot(
   [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
   [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
   [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
+a-series
     }
+    @(in-image "labeled-scatter-plot-constructor")
   }
 
   @function["from-list.bar-chart"
@@ -476,22 +760,40 @@ a-series = from-list.labeled-scatter-plot(
 a-series = from-list.bar-chart(
   [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
   [list: 10,       6,       1,   3,     5,       8,        9])
+a-series
 # This data is obtained by randomization. They have no meaning whatsoever.
 # (though we did run a few trials so that the result doesn't look egregious)
     }
+  @(in-image "bar-chart-constructor")
+  }
+
+  @function["from-list.freq-bar-chart"
+    #:contract (a-arrow (L-of S) DataSeries)
+    #:args '(("values" #f))
+    #:return (a-pred DataSeries (in-link "bar-chart-series"))
+  ]{
+    Constructing a bar chart series based on the frequencies of elements in
+    @pyret{values}. See more details at @(in-link "bar-chart-series").
+
+    @examples{
+a-series = from-list.freq-bar-chart(
+  [list: "Pyret", "OCaml", "Pyret", "Java", " Pyret", "Racket", "Coq", "Coq"])
+a-series
+    }
+    @(in-image "freq-bar-chart-constructor")
   }
 
   @function["from-list.grouped-bar-chart"
     #:contract (a-arrow (L-of S) (L-of (L-of N)) (L-of S) DataSeries)
     #:args '(("labels" #f) ("value-lists" #f) ("legends" #f))
-    #:return (a-pred DataSeries (in-link "bar-chart-series"))
+    #:return (a-pred DataSeries (in-link "multi-bar-chart-series"))
   ]{
 
     Constructing a bar chart series. A @pyret{value-list} in @pyret{value-lists} is
     a list of numbers, representing bars in a label but with different legends. The length
     of @pyret{value-lists} must match the length of @pyret{labels}, and the length of each
-    @pyret{value-list} must match the length of @pyret{legends}. See more details at
-    @(in-link "bar-chart-series").
+    @pyret{value-list} must match the length of @pyret{legends}. Bars in a label are grouped 
+    next to each other. See more details at@(in-link "multi-bar-chart-series").
 
     @examples{
 a-series = from-list.grouped-bar-chart(
@@ -511,21 +813,44 @@ a-series = from-list.grouped-bar-chart(
     '25 to 44 Years',
     '45 to 64 Years',
     '65 Years and Over'])
+a-series
     }
+    @(in-image "grouped-bar-chart-constructor")
   }
 
-  @function["from-list.freq-bar-chart"
-    #:contract (a-arrow (L-of S) DataSeries)
-    #:args '(("values" #f))
-    #:return (a-pred DataSeries (in-link "bar-chart-series"))
+  @function["from-list.stacked-bar-chart"
+    #:contract (a-arrow (L-of S) (L-of (L-of N)) (L-of S) DataSeries)
+    #:args '(("labels" #f) ("value-lists" #f) ("legends" #f))
+    #:return (a-pred DataSeries (in-link "multi-bar-chart-series"))
   ]{
-    Constructing a bar chart series based on the frequencies of elements in
-    @pyret{values}. See more details at @(in-link "bar-chart-series").
+
+    Constructing a bar chart series. A @pyret{value-list} in @pyret{value-lists} is
+    a list of numbers, representing bars in a label but with different legends. The length
+    of @pyret{value-lists} must match the length of @pyret{labels}, and the length of each
+    @pyret{value-list} must match the length of @pyret{legends}. Bars in a label are stacked
+    on top of each other. See more details at @(in-link "multi-bar-chart-series").
 
     @examples{
-a-series = from-list.freq-bar-chart(
-  [list: "Pyret", "OCaml", "Pyret", "Java", " Pyret", "Racket", "Coq", "Coq"])
+a-series = from-list.stacked-bar-chart(
+  [list: 'CA', 'TX', 'NY', 'FL', 'IL', 'PA'],
+  [list:
+    [list: 2704659,4499890,2159981,3853788,10604510,8819342,4114496],
+    [list: 2027307,3277946,1420518,2454721,7017731,5656528,2472223],
+    [list: 1208495,2141490,1058031,1999120,5355235,5120254,2607672],
+    [list: 1140516,1938695,925060,1607297,4782119,4746856,3187797],
+    [list: 894368,1558919,725973,1311479,3596343,3239173,1575308],
+    [list: 737462,1345341,679201,1203944,3157759,3414001,1910571]],
+  [list:
+    'Under 5 Years',
+    '5 to 13 Years',
+    '14 to 17 Years',
+    '18 to 24 Years',
+    '25 to 44 Years',
+    '45 to 64 Years',
+    '65 Years and Over'])
+a-series
     }
+    @(in-image "stacked-bar-chart-constructor")
   }
 
   @function["from-list.pie-chart"
@@ -541,7 +866,11 @@ a-series = from-list.freq-bar-chart(
 a-series = from-list.pie-chart(
   [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
   [list: 10,       6,       1,   3,     5,       8,        9])
+# This data is obtained by randomization. They have no meaning whatsoever.
+# (though we did run a few trials so that the result doesn't look egregious)
+a-series
     }
+    @(in-image "pie-chart-constructor")
   }
 
   @function["from-list.exploding-pie-chart"
@@ -559,7 +888,11 @@ a-series = from-list.exploding-pie-chart(
   [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
   [list: 10,       6,       1,   3,     5,       8,        9],
   [list: 0.2,      0,       0,   0,     0,       0.1,      0])
+# This data is obtained by randomization. They have no meaning whatsoever.
+# (though we did run a few trials so that the result doesn't look egregious)
+a-series
     }
+    @(in-image "exploding-pie-chart-constructor")
   }
 
   @function["from-list.histogram"
@@ -571,8 +904,10 @@ a-series = from-list.exploding-pie-chart(
     See more details at @(in-link "histogram-series").
 
     @examples{
-a-series = from-list.labeled-histogram(range(1, 100).map(lam(_): num-random(1000) end))
+a-series = from-list.histogram(range(1, 100).map(lam(_): num-random(1000) end))
+a-series
     }
+    @(in-image "histogram-constructor")
   }
 
   @function["from-list.labeled-histogram"
@@ -582,13 +917,16 @@ a-series = from-list.labeled-histogram(range(1, 100).map(lam(_): num-random(1000
   ]{
     Constructing a histogram series, grouping @pyret{values} into bins.
     Each element of @pyret{labels} is attached to the corresponding value in
-    the bin. See more details at @(in-link "histogram-series").
+    the bin. The labels will show up when you display the chart and hover over the boxes. 
+    See more details at @(in-link "histogram-series").
 
     @examples{
 a-series = from-list.labeled-histogram(
   range(1, 100).map(lam(x): "foo " + num-to-string(x) end),
   range(1, 100).map(lam(_): num-random(1000) end))
+a-series
     }
+  @(in-image "labeled-histogram-constructor")
   }
 
   @;############################################################################
@@ -599,6 +937,7 @@ a-series = from-list.labeled-histogram(
   @constructor-spec["DataSeries" "line-plot-series" opaque]
   @constructor-spec["DataSeries" "scatter-plot-series" opaque]
   @constructor-spec["DataSeries" "bar-chart-series" opaque]
+  @constructor-spec["DataSeries" "multi-bar-chart-series" opaque]
   @constructor-spec["DataSeries" "pie-chart-series" opaque]
   @constructor-spec["DataSeries" "histogram-series" opaque]
   )]
@@ -616,18 +955,23 @@ a-series = from-list.labeled-histogram(
     we let users increase sample sizes, allowing the function to be rendered
     more accurately.
   }
+  
+  @repl-examples[
+   `(@{NUM_E = ~2.71828
+a-series = from-list.function-plot(lam(x): 1 - num-expt(NUM_E, 0 - x) end)
+render-chart(a-series).display()} ,(in-image "function-plot-example"))
+  ]
 
   @method-doc["DataSeries" "function-plot-series" "color"]
-  @method-doc["DataSeries" "function-plot-series" "legend"]
+  @repl-examples[
+   `(@{include color
+     render-chart(a-series.color(orange)).display()} ,(in-image "function-plot-color-example"))
+  ]
 
-  @examples{
-NUM_E = ~2.71828
-f-series = from-list.function-plot(lam(x): 1 - num-expt(NUM_E, 0 - x) end)
-  .color(C.orange)
-  .legend("My legend")
-render-chart(f-series).display()
-  }
-  @(in-image "function-plot")
+  @method-doc["DataSeries" "function-plot-series" "legend"]
+  @repl-examples[
+   `(@{render-chart(a-series.legend("My Legend")).display()} ,(in-image "function-plot-legend-example"))
+  ]
 
   @;################################
   @subsection{Line Plot Series}
@@ -635,19 +979,22 @@ render-chart(f-series).display()
   @constructor-doc["DataSeries" "line-plot-series" opaque DataSeries]{
     A line plot series
   }
-
-  @method-doc["DataSeries" "line-plot-series" "color"]
-  @method-doc["DataSeries" "line-plot-series" "legend"]
-
-  @examples{
-a-series = from-list.line-plot(
+  @repl-examples[
+   `(@{a-series = from-list.line-plot(
   [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
   [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
-  .color(C.orange)
-  .legend("My legend")
-render-chart(a-series).display()
-  }
-  @(in-image "line-plot")
+render-chart(a-series).display()} ,(in-image "line-plot-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "color"]
+  @repl-examples[
+   `(@{include color
+render-chart(a-series.color(orange)).display()} ,(in-image "line-plot-color-example"))
+  ]
+  @method-doc["DataSeries" "line-plot-series" "legend"]
+  @repl-examples[
+   `(@{render-chart(a-series.legend("My Legend")).display()} ,(in-image "line-plot-legend-example"))
+  ]
 
   @;################################
   @subsection{Scatter Plot Series}
@@ -656,28 +1003,231 @@ render-chart(a-series).display()
     A scatter plot series. If a data point has a label, then hovering over the
     point in the interactive dialog will show the label.
   }
-
-  @method-doc["DataSeries" "scatter-plot-series" "color"]
-  @method-doc["DataSeries" "scatter-plot-series" "legend"]
-  @method-doc["DataSeries" "scatter-plot-series" "point-size"]
-
-  @examples{
-a-series = from-list.labeled-scatter-plot(
+   @repl-examples[
+   `(@{a-series = from-list.labeled-scatter-plot(
   [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
   [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
   [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
-  .color(C.orange)
-  .legend("My legend")
-render-chart(a-series).display()
-  }
-  @(in-image "scatter-plot")
+render-chart(a-series).display()} ,(in-image "scatter-plot-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "color"]
+  @repl-examples[
+   `(@{include color
+   render-chart(a-series.color(orange)).display()} ,(in-image "scatter-plot-color-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "legend"]
+  @repl-examples[
+   `(@{render-chart(a-series.legend("My Legend")).display()} ,(in-image "scatter-plot-legend-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "point-size"]
+  @repl-examples[
+   `(@{render-chart(a-series.point-size(10)).display()} ,(in-image "scatter-plot-ptsize-example"))
+  ]
 
   @;################################
   @subsection{Bar Chart Series}
 
   @constructor-doc["DataSeries" "bar-chart-series" opaque DataSeries]{
-    A bar chart series. In a label, there could be several bars.
+    A bar chart series. In a label, there can only be a single bar.
   }
+  @repl-examples[
+   `(@{a-series = from-list.bar-chart(
+  [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
+  [list: 10,       6,       1,   3,     5,       8,        9])
+# This data is obtained by randomization. They have no meaning whatsoever.
+# (though we did run a few trials so that the result doesn't look egregious)
+render-chart(a-series).display()} ,(in-image "bar-chart-example"))
+  ]
+  @method-doc["DataSeries" "bar-chart-series" "color"]
+  @repl-examples[
+   `(@{include color
+  render-chart(a-series.color(red)).display()} ,(in-image "bar-chart-color-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "colors"]
+  @repl-examples[
+   `(@{render-chart(a-series.colors([list: red, orange, blue])).display()} ,(in-image "bar-chart-colors-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "sort"]
+  @repl-examples[
+   `(@{render-chart(a-series.sort()).display()} ,(in-image "bar-chart-sort-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "sort-by"]
+  @repl-examples[
+   `(@{descending-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(a-series.sort-by(descending-cmp, eq)).display()} ,(in-image "bar-chart-sort-by-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "sort-by-label"]
+  @repl-examples[
+   `(@{descending-str-len = {(a, b): string-length(a) > string-length(b)}
+   eq = {(a, b): a == b}
+   render-chart(a-series.sort-by-label(descending-str-len, eq)).display()} ,(in-image "bar-chart-sort-by-label-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "add-pointers"]
+  @repl-examples[
+   `(@{render-chart(a-series.add-pointers([list: 6, 7], 
+                                          [list: "median", "mean + 1"]))
+                            .display()} ,(in-image "bar-chart-pointers-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "pointer-color"]
+  @repl-examples[
+   `(@{render-chart(a-series.add-pointers([list: 6, 7], 
+                                          [list: "median", "mean + 1"])
+                            .pointer-color(orange))
+                            .display()} ,(in-image "bar-chart-pointer-color-example"))
+  ]
+  
+  @method-doc["DataSeries" "bar-chart-series" "format-axis"]
+  @repl-examples[
+   `(@{render-chart(a-series.format-axis({(n): num-to-string(n) + " votes"}))
+                            .display()} ,(in-image "bar-chart-format-axis-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "scale"]
+  @repl-examples[
+   `(@{render-chart(a-series.scale({(n): n * n}))
+                            .display()} ,(in-image "bar-chart-scale-example"))
+  ]
+  
+  @method-doc["DataSeries" "bar-chart-series" "horizontal"]
+  @repl-examples[
+   `(@{render-chart(a-series.horizontal(true))
+                            .display()} ,(in-image "bar-chart-horizontal-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "annotations"]
+  @repl-examples[
+   `(@{render-chart(a-series.annotations([list: some("P"), some("O"), some("C"),
+      none, some("P"), some("R"), some("SM")]))
+                            .display()} ,(in-image "bar-chart-annotations-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "intervals"]
+  @repl-examples[
+   `(@{render-chart(a-series.intervals([list: [list: 9, 11],
+      [list: 1, 2, 3, 4, 5], [list: -1, -2], empty, empty, empty, empty]))
+                            .display()} ,(in-image "bar-chart-intervals-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "error-bars"]
+  @repl-examples[
+   `(@{render-chart(a-series.error-bars([list: [list: -1, 1], [list: -1, 1],
+      [list: -1, 2], [list: -1, 1], [list: -1, 1], [list: -1, 1],
+      [list: -1, 1]]))
+                            .display()} ,(in-image "bar-chart-error-bars-example"))
+  ]
+
+  @method-doc["DataSeries" "bar-chart-series" "interval-color"]
+  @repl-examples[
+   `(@{render-chart(a-series.error-bars([list: [list: -1, 1], [list: -1, 1],
+      [list: -1, 2], [list: -1, 1], [list: -1, 1], [list: -1, 1],
+      [list: -1, 1]])       
+                            .interval-color(orange))
+                            .display()} ,(in-image "bar-chart-interval-color-example"))
+  ]
+
+  @;################################
+  @subsection{Multi Bar Chart Series}
+
+  @constructor-doc["DataSeries" "multi-bar-chart-series" opaque DataSeries]{
+    A bar chart series. In a label, there could be several bars (grouped or stacked).
+  }
+
+  @repl-examples[
+   `(@{grouped-series = from-list.grouped-bar-chart(
+  [list: 'CA', 'TX', 'NY', 'FL', 'IL', 'PA'],
+  [list:
+    [list: 2704659,4499890,2159981,3853788,10604510,8819342,4114496],
+    [list: 2027307,3277946,1420518,2454721,7017731,5656528,2472223],
+    [list: 1208495,2141490,1058031,1999120,5355235,5120254,2607672],
+    [list: 1140516,1938695,925060,1607297,4782119,4746856,3187797],
+    [list: 894368,1558919,725973,1311479,3596343,3239173,1575308],
+    [list: 737462,1345341,679201,1203944,3157759,3414001,1910571]],
+  [list:
+    'Under 5 Years',
+    '5 to 13 Years',
+    '14 to 17 Years',
+    '18 to 24 Years',
+    '25 to 44 Years',
+    '45 to 64 Years',
+    '65 Years and Over'])
+    render-chart(grouped-series).display()} ,(in-image "grouped-bar-chart-example"))
+  `(@{stacked-series = from-list.stacked-bar-chart(
+  [list: 'CA', 'TX', 'NY', 'FL', 'IL', 'PA'],
+  [list:
+    [list: 2704659,4499890,2159981,3853788,10604510,8819342,4114496],
+    [list: 2027307,3277946,1420518,2454721,7017731,5656528,2472223],
+    [list: 1208495,2141490,1058031,1999120,5355235,5120254,2607672],
+    [list: 1140516,1938695,925060,1607297,4782119,4746856,3187797],
+    [list: 894368,1558919,725973,1311479,3596343,3239173,1575308],
+    [list: 737462,1345341,679201,1203944,3157759,3414001,1910571]],
+  [list:
+    'Under 5 Years',
+    '5 to 13 Years',
+    '14 to 17 Years',
+    '18 to 24 Years',
+    '25 to 44 Years',
+    '45 to 64 Years',
+    '65 Years and Over'])
+    render-chart(stacked-series).display()} ,(in-image "stacked-bar-chart-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "colors"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.colors([list: red, orange, blue])).display()} ,(in-image "grouped-bar-chart-colors-example"))
+   `(@{render-chart(stacked-series.colors([list: red, orange, blue])).display()} ,(in-image "stacked-bar-chart-colors-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "sort"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.sort()).display()} ,(in-image "grouped-bar-chart-sort-example"))
+   `(@{render-chart(stacked-series.sort()).display()} ,(in-image "stacked-bar-chart-sort-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "sort-by"]
+  @repl-examples[
+   `(@{descending-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(grouped-series.sort-by(descending-cmp, eq)).display()} ,(in-image "grouped-bar-chart-sort-by-example"))
+   `(@{descending-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(stacked-series.sort-by(descending-cmp, eq)).display()} ,(in-image "stacked-bar-chart-sort-by-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "sort-by-label"]
+  @repl-examples[
+   `(@{descending-str-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(grouped-series.sort-by-label(descendong-str-cmp, eq))
+                              .display()} ,(in-image "grouped-bar-chart-sort-by-label-example"))
+    `(@{descendong-str-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(stacked-series.sort-by-label(descend-str-cmp, eq))
+                              .display()} ,(in-image "stacked-bar-chart-sort-by-label-example"))
+  ]
+
+   @method-doc["DataSeries" "multi-bar-chart-series" "sort-by-data"]
+  @repl-examples[
+   `(@{get-last = {(l): l.get(6)}
+   ascending-cmp = {(a, b): a < b}
+   eq = {(a, b): a == b}
+   render-chart(grouped-series.sort-by-data(get-last, ascending-cmp, eq))
+                              .display()} ,(in-image "grouped-bar-chart-sort-by-data-example"))
+    `(@{get-last = {(l): l.get(6)}
+   ascending-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(stacked-series.sort-by-data(get-last, ascending-cmp, eq))
+                              .display()} ,(in-image "stacked-bar-chart-sort-by-data-example"))
+  ]
 
   @examples{
 a-series = from-list.grouped-bar-chart(
@@ -753,6 +1303,7 @@ render-chart(a-series).display()
     @item{@in-link{line-plot-series} creates a @in-link{plot-chart-window}}
     @item{@in-link{scatter-plot-series} creates a @in-link{plot-chart-window}}
     @item{@in-link{bar-chart-series} creates a @in-link{bar-chart-window}}
+    ;@item{@in-link{multi-bar-chart-series} creates a @in-link{multi-bar-chart-window}}
     @item{@in-link{pie-chart-series} creates a @in-link{pie-chart-window}}
     @item{@in-link{histogram-series} creates a @in-link{histogram-chart-window}}
     ]
