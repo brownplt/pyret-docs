@@ -189,8 +189,8 @@
     (return ,DataSeries)
     (contract (a-arrow ,Self ,S ,DataSeries))
     (doc ("Construct a new " ,DataSeries " for a " ,(in-link "multi-bar-chart-series") " where the stacking-type of "
-          "the series is specified to be one of the following options: ['none', 'absolute', 'relative', 'percent']. "
-          "By default the stacking type will be 'none' or 'absolute' depending on whether the " 
+          "the series is specified to be one of the following options: [\"none\", \"absolute\", \"relative\", \"percent\"]. "
+          "By default the stacking type will be \"none\" or \"absolute\" depending on whether the " 
           ,(in-link "multi-bar-chart-series") " was constructed with " ,(in-link "from-list.grouped-bar-chart") " or "
           ,(in-link "from-list.stacked-bar-chart") " function."))))
 
@@ -744,10 +744,10 @@ f-series
     coordinates of points. See more details at @(in-link "line-plot-series").
 
     @examples{
-a-example-line-plot-series = from-list.line-plot(
+an-example-line-plot-series = from-list.line-plot(
   [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
   [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
-a-example-line-plot-series
+an-example-line-plot-series
     }
     @(in-image "line-plot-constructor")
   }
@@ -762,10 +762,10 @@ a-example-line-plot-series
     coordinates of points. See more details at @(in-link "scatter-plot-series").
 
     @examples{
-a-example-scatter-plot-series = from-list.scatter-plot(
+an-example-scatter-plot-series = from-list.scatter-plot(
   [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
   [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
-a-example-scatter-plot-series
+an-example-scatter-plot-series
     }
     @(in-image "scatter-plot-constructor")
   }
@@ -783,11 +783,11 @@ a-example-scatter-plot-series
 
 
     @examples{
-a-example-labeled-scatter-plot-series = from-list.labeled-scatter-plot(
+an-example-labeled-scatter-plot-series = from-list.labeled-scatter-plot(
   [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
   [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
   [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
-a-example-labeled-scatter-plot-series
+an-example-labeled-scatter-plot-series
     }
     @(in-image "labeled-scatter-plot-constructor")
   }
@@ -805,7 +805,7 @@ a-example-labeled-scatter-plot-series
 
 
     @examples{
-a-example-image-scatter-plot-series = from-list.image-scatter-plot(
+an-example-image-scatter-plot-series = from-list.image-scatter-plot(
   [list: circle(30, "outline", "red"), circle(30, "solid", "red"),
          circle(30, "outline", "blue"), circle(30, "solid", "blue"), 
          circle(30, "outline", "green"), circle(30, "solid", "green"), 
@@ -813,7 +813,7 @@ a-example-image-scatter-plot-series = from-list.image-scatter-plot(
          circle(30, "outline", "black"), circle(30, "solid", "black")],
   [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
   [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
-a-example-image-scatter-plot-series
+an-example-image-scatter-plot-series
     }
     @(in-image "image-scatter-plot-constructor")
   }
@@ -830,10 +830,10 @@ a-example-image-scatter-plot-series
     @(in-link "bar-chart-series").
 
     @examples{
-a-example-bar-chart-series = from-list.bar-chart(
+an-example-bar-chart-series = from-list.bar-chart(
   [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
   [list: 10,       6,       1,   3,     5,       8,        9])
-a-example-bar-chart-series
+an-example-bar-chart-series
 # This data is obtained by randomization. They have no meaning whatsoever.
 # (though we did run a few trials so that the result doesn't look egregious)
     }
@@ -849,9 +849,9 @@ a-example-bar-chart-series
     @pyret{values}. See more details at @(in-link "bar-chart-series").
 
     @examples{
-a-example-frequency-chart-series = from-list.freq-bar-chart(
+an-example-frequency-chart-series = from-list.freq-bar-chart(
   [list: "Pyret", "OCaml", "Pyret", "Java", " Pyret", "Racket", "Coq", "Coq"])
-a-example-frequency-chart-series
+an-example-frequency-chart-series
     }
     @(in-image "freq-bar-chart-constructor")
   }
@@ -956,13 +956,13 @@ a-pie-chart-series
     must be in range 0 and 1. See more details at @(in-link "pie-chart-series").
 
     @examples{
-a-exploding-pie-chart-series = from-list.exploding-pie-chart(
+an-exploding-pie-chart-series = from-list.exploding-pie-chart(
   [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
   [list: 10,       6,       1,   3,     5,       8,        9],
   [list: 0.2,      0,       0,   0,     0,       0.1,      0])
 # This data is obtained by randomization. They have no meaning whatsoever.
 # (though we did run a few trials so that the result doesn't look egregious)
-a-exploding-pie-chart-series
+an-exploding-pie-chart-series
     }
     @(in-image "exploding-pie-chart-constructor")
   }
@@ -1375,22 +1375,24 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "multi-bar-chart-series" "stacking-type"]
   @repl-examples[
-   `(@{render-chart(grouped-bars.stacking-type('none'))
-                                .display()
-       render-chart(grouped-bars.stacking-type('absolute'))
-                                .display()
-       render-chart(grouped-bars.stacking-type('relative'))
-                                .display()
-       render-chart(grouped-bars.stacking-type('percent'))
-                                .display()
-       render-chart(stacked-bars.stacking-type('none'))
-                                .display()
-       render-chart(stacked-bars.stacking-type('absolute'))
-                                .display()
-       render-chart(stacked-bars.stacking-type('relative'))
-                                .display()
-       render-chart(stacked-bars.stacking-type('percent'))
-                                .display()} ,(in-image "stacking-type-example"))
+   `(@{render-chart(grouped-series.stacking-type('none'))
+                                  .display()
+       render-chart(grouped-series.stacking-type('absolute'))
+                                  .display()
+       render-chart(grouped-series.stacking-type('relative'))
+                                  .display()
+       render-chart(grouped-series.stacking-type('percent'))
+                                  .display()
+                      
+       # The following produces the same output as the ones above
+       render-chart(stacked-series.stacking-type('none'))
+                                  .display()
+       render-chart(stacked-series.stacking-type('absolute'))
+                                  .display()
+       render-chart(stacked-series.stacking-type('relative'))
+                                  .display()
+       render-chart(stacked-series.stacking-type('percent'))
+                                  .display()} ,(in-image "stacking-type-example"))
   ]
 
   @method-doc["DataSeries" "multi-bar-chart-series" "horizontal"]
