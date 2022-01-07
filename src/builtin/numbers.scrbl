@@ -4,6 +4,7 @@
 @(define eq '(a-id "EqualityResult" (xref "equality" "EqualityResult")))
 @(define eqfun `(a-arrow ,A ,A ,B))
 @(define eq3fun `(a-arrow ,A ,A ,eq))
+@(define numpred `(a-arrow ,N ,N ,B))
 
 @(append-gen-docs
   `(module "numbers"
@@ -44,6 +45,8 @@
       (name "NumNonNegative")
       (variants)
       (shared))
+    (value-spec
+      (name "PI"))
     (fun-spec
       (name "num-equal")
       (arity 2)
@@ -213,13 +216,19 @@
       (name "num-within-abs")
       (arity 1)
       (args ("tol"))
-      (return ,eqfun)
+      (return ,numpred)
       (doc ""))
     (fun-spec
       (name "num-within-rel")
       (arity 1)
       (args ("tol"))
-      (return ,eqfun)
+      (return ,numpred)
+      (doc ""))
+    (fun-spec
+      (name "num-within")
+      (arity 1)
+      (args ("tol"))
+      (return ,numpred)
       (doc ""))
     (fun-spec
       (name "within-abs")
@@ -303,7 +312,7 @@ Pyret numbers are of two kinds: exact numbers, or @pyret{Exactnum}s,
 and rough numbers or @pyret{Roughnum}s. Both are 
 real; finite; and written in base ten.
 
-@margin-note{Note that imagaginary numbers were implemented in earlier versions of Pyret,
+@margin-note{Note that imaginary numbers were implemented in earlier versions of Pyret,
 but are not currently supported.}
 
 @pyret{Exactnum}s are arbitrarily precise rational numbers, including
@@ -410,6 +419,13 @@ They are integers, fractions or decimals, with an optional exponent.
 @pyret{Roughnum}s cannot be made arbitrarily precise. The absolute value
 ranges between 0 and 1.7976931348623157e+308 (JavaScript’s Number.MAX_VALUE) with a
 granularity of 5e-324 (JavaScript’s Number.MIN_VALUE).
+
+@section{Number Constants}
+
+@value["PI" RN]
+
+The mathematical constant π, approximated as a @pyret-id["Roughnum"], or
+@pyret{~3.141592653589793}.
 
 @section{Number Functions}
 
@@ -925,7 +941,7 @@ check:
 end
 }
   }
-  @function["num-within-abs" #:contract (a-arrow N eqfun)]{
+  @function["num-within-abs" #:contract (a-arrow N (a-arrow N N B))]{
 
 Returns a predicate that checks if the difference of its two
 arguments is less than @pyret{tol}.
@@ -946,13 +962,12 @@ end
 }
 
   }
-  @function["num-within-rel" #:contract (a-arrow N eqfun)]{
+  @function["num-within-rel" #:contract (a-arrow N (a-arrow N N B))]{
 
 Returns a predicate that checks that its first number argument
 is no more than the fraction @pyret{tol} off from its second
 argument.
 
-This function is a.k.a. @pyret{num-within}.
 
 @examples{
 check:
@@ -961,6 +976,12 @@ check:
 end
 }
   }
+
+  @function["num-within" #:contract (a-arrow N (a-arrow N N B))]{
+An alias for @pyret-id["num-within-rel" "numbers"], much as @pyret-id["within"
+"equality"] and @pyret-id["within-rel" "equality"] are synonyms.
+}
+
 
   @function["within" #:contract (a-arrow N eqfun)]
   @function["within-abs" #:contract (a-arrow N eqfun)]

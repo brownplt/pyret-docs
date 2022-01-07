@@ -2533,7 +2533,7 @@ end
 
 
 @subsection[#:tag "s:binding-expressions"]{Expression forms of bindings}
-Every definition is Pyret is visible until the end of its scope, which is
+Every definition in Pyret is visible until the end of its scope, which is
 usually the nearest enclosing block.  To limit that scope, you can wrap
 definitions in explicit @py-prod{user-block-expr}s, but this is sometimes awkward to
 read.  Pyret allows for three additional forms that combine bindings with

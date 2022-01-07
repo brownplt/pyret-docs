@@ -443,13 +443,13 @@
     (arity 3)
     (params [list: leaf("a")])
     (args ("lst" "n" "v"))
-    (return "a")
+    (return (a-app (a-id "List" (xref "lists" "List")) "a"))
     (contract
       (a-arrow
         (a-app (a-id "List" (xref "lists" "List")) "a")
         (a-id "Number" (xref "<global>" "Number"))
-        "Any"
-        "a"))
+        "a"
+        (a-app (a-id "List" (xref "lists" "List")) "a")))
     (doc
       "Returns a new list with the same values as the given list but with the nth element\n        set to the given value, or raises an error if n is out of range"))
   (fun-spec
@@ -1720,6 +1720,8 @@ check:
   find(num-is-integer,  [list: 2.5, 3.5, 100, 2, 4.5]) is some(100)
   find(num-is-rational, [list: 2.5, 3.5, 100, 2, 4.5]) is some(2.5)
   find(num-is-negative, [list: 2.5, 3.5, 100, 2, 4.5]) is none
+  find(lam(n): n <= 2 end, [list: 2.5, 3.5, 100, 2, 4.5]) is some(2)
+  find(lam(n): n < 1 end, [list: 2.5, 3.5, 100, 2, 4.5]) is none
 end
     }
 

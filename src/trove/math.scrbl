@@ -41,7 +41,7 @@
 
   @examples{
     check:
-      sum([list: ]) raises "Empty List"
+      sum([list: ]) is 0
       sum([list: 0, 2, 4]) is 6
       sum([list: -1, 1, ~2]) is-roughly ~2
     end
