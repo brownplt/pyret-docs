@@ -1313,9 +1313,9 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
   @repl-examples[
    `(@{descending-str-cmp = {(a, b): a > b}
    eq = {(a, b): a == b}
-   render-chart(grouped-series.sort-by-label(descendong-str-cmp, eq))
+   render-chart(grouped-series.sort-by-label(descending-str-cmp, eq))
                               .display()} ,(in-image "grouped-bar-chart-sort-by-label-example"))
-    `(@{descendong-str-cmp = {(a, b): a > b}
+    `(@{descending-str-cmp = {(a, b): a > b}
    eq = {(a, b): a == b}
    render-chart(stacked-series.sort-by-label(descend-str-cmp, eq))
                               .display()} ,(in-image "stacked-bar-chart-sort-by-label-example"))
