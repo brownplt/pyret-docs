@@ -212,7 +212,7 @@
       (name "DataSeries")
       (type-vars ())
       (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
-                 "bar-chart-series" "pie-chart-series" "histogram-series"))
+                 "bar-chart-series" "pie-chart-series" "histogram-series" "geochart-series"))
       (shared))
     (data-spec
       (name "ChartWindow")
@@ -797,6 +797,7 @@ render-chart(an-example-geochart-series).display()
     @item{@in-link{bar-chart-series} creates a @in-link{bar-chart-window}}
     @item{@in-link{pie-chart-series} creates a @in-link{pie-chart-window}}
     @item{@in-link{histogram-series} creates a @in-link{histogram-chart-window}}
+    @item{@in-link{geochart-series} creates a @in-link{geochart-chart-window}}
     ]
 
     @examples{
@@ -890,4 +891,12 @@ a-chart-window = render-charts([list: series-1, series-2])
   @method-doc["ChartWindow" "histogram-chart-window" "y-max"]
   @method-doc["ChartWindow" "histogram-chart-window" "x-axis"]
   @method-doc["ChartWindow" "histogram-chart-window" "y-axis"]
+
+  @;################################
+  @subsection{GeochartChart Window}
+
+  @constructor-doc["ChartWindow" "geochart-chart-window" opaque ChartWindow]{
+    A geochart chart window.
+  }
+  
 }
