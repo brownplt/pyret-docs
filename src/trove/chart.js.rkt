@@ -9,7 +9,6 @@
 @(define Image (a-id "Image" (xref "image" "Image")))
 @(define DataSeries (in-link "DataSeries"))
 @(define ChartWindow (in-link "ChartWindow"))
-@(define GeoChart (in-link "GeoChart"))
 @(define opaque '(("<opaque>" ("type" "normal") ("contract" #f))))
 @(define (method-data-series variant name)
   (method-doc "DataSeries" variant name))
@@ -275,6 +274,9 @@
       (with-members (,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
     (constr-spec
       (name "pie-chart-window")
+      (with-members ()))
+    (constr-spec
+      (name "geochart-chart-window")
       (with-members ()))
   ))
 
@@ -898,5 +900,5 @@ a-chart-window = render-charts([list: series-1, series-2])
   @constructor-doc["ChartWindow" "geochart-chart-window" opaque ChartWindow]{
     A geochart chart window.
   }
-  
+
 }
