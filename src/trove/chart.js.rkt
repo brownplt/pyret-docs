@@ -182,6 +182,7 @@
     (fun-spec (name "from-list.exploding-pie-chart") (arity 3))
     (fun-spec (name "from-list.histogram") (arity 2))
     (fun-spec (name "from-list.labeled-histogram") (arity 3))
+    (fun-spec (name "from-list.geochart") (arity 3))
     (fun-spec (name "render-chart") (arity 1))
     (fun-spec (name "render-charts") (arity 1))
     (constr-spec
@@ -203,11 +204,14 @@
       (name "histogram-series")
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
                      ,num-bins-meth)))
+    (constr-spec
+      (name "geochart-series")
+      (with-members ()))
     (data-spec
       (name "DataSeries")
       (type-vars ())
       (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
-                 "bar-chart-series" "pie-chart-series" "histogram-series"))
+                 "bar-chart-series" "pie-chart-series" "histogram-series" "geochart-series"))
       (shared))
     (data-spec
       (name "ChartWindow")
@@ -270,6 +274,9 @@
       (with-members (,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
     (constr-spec
       (name "pie-chart-window")
+      (with-members ()))
+    (constr-spec
+      (name "geochart-chart-window")
       (with-members ()))
   ))
 
