@@ -183,6 +183,7 @@
     (fun-spec (name "from-list.exploding-pie-chart") (arity 3))
     (fun-spec (name "from-list.histogram") (arity 2))
     (fun-spec (name "from-list.labeled-histogram") (arity 3))
+    (fun-spec (name "from-list.geochart") (arity 2))
     (fun-spec (name "render-chart") (arity 1))
     (fun-spec (name "render-charts") (arity 1))
     (constr-spec
@@ -204,6 +205,9 @@
       (name "histogram-series")
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
                      ,num-bins-meth)))
+    (constr-spec
+      (name "geochart-series")
+      (with-members ()))
     (data-spec
       (name "DataSeries")
       (type-vars ())
@@ -592,6 +596,22 @@ a-series = from-list.labeled-histogram(
     }
   }
 
+  @function["from-list.geochart"
+    #:contract (a-arrow (L-of S) (L-of N) DataSeries)
+    #:args '(("region-labels" #f) ("values" #f))
+    #:return (a-pred DataSeries (in-link "geochart-series"))
+  ]{
+    Constructing a geochart series, which makes a map of the world and highlights @pyret{region-labels} on the map
+    in a range according to its @pyret{value}. Note that a given region-labels and value have the same index number in their respective lists. 
+    The geochart will also show the range of values on the various regions, which higher values having a different color than lower values. See more details at @(in-link "geochart").
+
+    @examples{
+an-example-geochart-series = from-list.geochart(
+[list: "US", "India","Pakistan", "Philippines", "Nigeria"],
+[list: 251388301, 125344736, 110041604, 89800800, 79000000])
+    }
+  }
+
   @;############################################################################
   @section{DataSeries}
 
@@ -602,6 +622,7 @@ a-series = from-list.labeled-histogram(
   @constructor-spec["DataSeries" "bar-chart-series" opaque]
   @constructor-spec["DataSeries" "pie-chart-series" opaque]
   @constructor-spec["DataSeries" "histogram-series" opaque]
+  @constructor-spec["DataSeries" "geochart-series" opaque]
   )]
 
   @;################################
@@ -750,12 +771,12 @@ render-chart(a-series).display()
   @method-doc["DataSeries" "geochart-series" "values"]
 
   @examples{
-a-series = from-list.geochart(
+an-example-geochart-series = from-list.geochart(
 [list: "US", "India","Pakistan", "Philippines", "Nigeria"],
 [list: 251388301, 125344736, 110041604, 89800800, 79000000])
 
   
-render-chart(a-series).display()
+render-chart(an-example-geochart-series).display()
   }
   @(in-image "geochart")
 
@@ -869,3 +890,4 @@ a-chart-window = render-charts([list: series-1, series-2])
   @method-doc["ChartWindow" "histogram-chart-window" "y-max"]
   @method-doc["ChartWindow" "histogram-chart-window" "x-axis"]
   @method-doc["ChartWindow" "histogram-chart-window" "y-axis"]
+}
