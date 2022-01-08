@@ -9,6 +9,7 @@
 @(define Image (a-id "Image" (xref "image" "Image")))
 @(define DataSeries (in-link "DataSeries"))
 @(define ChartWindow (in-link "ChartWindow"))
+@(define GeoChart (in-link "GeoChart"))
 @(define opaque '(("<opaque>" ("type" "normal") ("contract" #f))))
 @(define (method-data-series variant name)
   (method-doc "DataSeries" variant name))
@@ -738,6 +739,26 @@ render-chart(a-series).display()
   }
   @(in-image "labeled-histogram")
 
+  @;################################
+  @subsection{GeoChart Series}
+
+  @constructor-doc["DataSeries" "geochart-series" opaque DataSeries]{
+    A geochart series.
+  }
+
+  @method-doc["DataSeries" "geochart-series" "region-labels"]
+  @method-doc["DataSeries" "geochart-series" "values"]
+
+  @examples{
+a-series = from-list.geochart(
+[list: "US", "India","Pakistan", "Philippines", "Nigeria"],
+[list: 251388301, 125344736, 110041604, 89800800, 79000000])
+
+  
+render-chart(a-series).display()
+  }
+  @(in-image "geochart")
+
   @;############################################################################
   @section{Renderers}
 
@@ -848,4 +869,3 @@ a-chart-window = render-charts([list: series-1, series-2])
   @method-doc["ChartWindow" "histogram-chart-window" "y-max"]
   @method-doc["ChartWindow" "histogram-chart-window" "x-axis"]
   @method-doc["ChartWindow" "histogram-chart-window" "y-axis"]
-}
