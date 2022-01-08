@@ -204,14 +204,14 @@
       (name "histogram-series")
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
                      ,num-bins-meth)))
-    (constr-spec
-      (name "geochart-series")
-      (with-members ()))
+    ;;; (constr-spec
+    ;;;   (name "geochart-series")
+    ;;;   (with-members ()))
     (data-spec
       (name "DataSeries")
       (type-vars ())
       (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
-                 "bar-chart-series" "pie-chart-series" "histogram-series" "geochart-series"))
+                 "bar-chart-series" "pie-chart-series" "histogram-series"))
       (shared))
     (data-spec
       (name "ChartWindow")
@@ -275,9 +275,9 @@
     (constr-spec
       (name "pie-chart-window")
       (with-members ()))
-    (constr-spec
-      (name "geochart-chart-window")
-      (with-members ()))
+    ;;; (constr-spec
+    ;;;   (name "geochart-chart-window")
+    ;;;   (with-members ()))
   ))
 
 @docmodule["chart"]{
@@ -895,7 +895,7 @@ a-chart-window = render-charts([list: series-1, series-2])
   @method-doc["ChartWindow" "histogram-chart-window" "y-axis"]
 
   @;################################
-  @subsection{GeochartChart Window}
+  @subsection{Geochart Chart Window}
 
   @constructor-doc["ChartWindow" "geochart-chart-window" opaque ChartWindow]{
     A geochart chart window.
