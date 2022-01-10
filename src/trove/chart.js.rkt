@@ -621,7 +621,7 @@ num-speakers = [list: 251388301, 125344736, 110041604,  89800800,      79000000]
   Getting from this data to a data series is simple: use a @emph{chart constructor} -- here, the bar chart constructor @pyret{from-list.bar-chart} -- to create a @|DataSeries|:
 
   @pyret-block{
-a-pie-chart-series = from-list.bar-chart(countries, num-speakers)
+a-bar-chart-series = from-list.bar-chart(countries, num-speakers)
   }
 
   As another example, consider the typical high-school math task of ``graphing a function'', that is, plotting the values of a function for some range of inputs. Another chart constructor, @pyret{from-list.function-plot}, would create the relevant @|DataSeries|:
