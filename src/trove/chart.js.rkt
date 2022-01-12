@@ -204,19 +204,19 @@
       (name "histogram-series")
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
                      ,num-bins-meth)))
-    ;;; (constr-spec
-    ;;;   (name "geochart-series")
-    ;;;   (with-members ()))
+    (constr-spec
+      (name "geochart-series")
+      (with-members ()))
     (data-spec
       (name "DataSeries")
       (type-vars ())
       (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
-                 "bar-chart-series" "pie-chart-series" "histogram-series"))
+                 "bar-chart-series" "pie-chart-series" "histogram-series" "geochart-series"))
       (shared))
     (data-spec
       (name "ChartWindow")
       (type-vars ())
-      (variants ("bar-chart-window"))
+      (variants ("bar-chart-window" "plot-chart-window" "histogram-chart-window" "pie-chart-window" "geochart-window"))
       (shared
         ((method-spec
           (name "title")
@@ -275,9 +275,9 @@
     (constr-spec
       (name "pie-chart-window")
       (with-members ()))
-    ;;; (constr-spec
-    ;;;   (name "geochart-chart-window")
-    ;;;   (with-members ()))
+    (constr-spec
+      (name "geochart-window")
+      (with-members ()))
   ))
 
 @docmodule["chart"]{
@@ -769,9 +769,6 @@ render-chart(a-series).display()
     A geochart series.
   }
 
-  @method-doc["DataSeries" "geochart-series" "region-labels"]
-  @method-doc["DataSeries" "geochart-series" "values"]
-
   @examples{
 an-example-geochart-series = from-list.geochart(
 [list: "US", "India","Pakistan", "Philippines", "Nigeria"],
@@ -837,6 +834,7 @@ a-chart-window = render-charts([list: series-1, series-2])
   @constructor-spec["ChartWindow" "bar-chart-window" opaque]
   @constructor-spec["ChartWindow" "histogram-chart-window" opaque]
   @constructor-spec["ChartWindow" "plot-chart-window" opaque]
+  @constructor-spec["ChartWindow" "geochart-window" opaque]
   )]
 
   @;################################
@@ -900,5 +898,5 @@ a-chart-window = render-charts([list: series-1, series-2])
   @constructor-doc["ChartWindow" "geochart-chart-window" opaque ChartWindow]{
     A geochart chart window.
   }
-
+  
 }
