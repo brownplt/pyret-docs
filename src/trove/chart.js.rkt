@@ -777,7 +777,7 @@ an-example-geochart-series = from-list.geochart(
   
 render-chart(an-example-geochart-series).display()
   }
-  @(in-image "geochart-series")
+  @(in-image "geochart")
 
   @;############################################################################
   @section{Renderers}
@@ -796,7 +796,7 @@ render-chart(an-example-geochart-series).display()
     @item{@in-link{bar-chart-series} creates a @in-link{bar-chart-window}}
     @item{@in-link{pie-chart-series} creates a @in-link{pie-chart-window}}
     @item{@in-link{histogram-series} creates a @in-link{histogram-chart-window}}
-    @item{@in-link{geochart-series} creates a @in-link{geochart-chart-window}}
+    @item{@in-link{geochart-series} creates a @in-link{geochart-window}}
     ]
 
     @examples{
@@ -895,7 +895,7 @@ a-chart-window = render-charts([list: series-1, series-2])
   @;################################
   @subsection{Geochart Chart Window}
 
-  @constructor-doc["ChartWindow" "geochart-chart-window" opaque ChartWindow]{
+  @constructor-doc["ChartWindow" "geochart-window" opaque ChartWindow]{
     A geochart chart window.
   }
   
