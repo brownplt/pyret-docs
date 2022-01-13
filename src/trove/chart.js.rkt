@@ -605,7 +605,7 @@ a-series = from-list.labeled-histogram(
   ]{
     Constructing a geochart series, which makes a map of the world and highlights @pyret{region-labels} on the map
     in a range according to its @pyret{value}. Note that a given region-labels and value have the same index number in their respective lists. 
-    The geochart will also show the range of values on the various regions, which higher values having a different color than lower values. See more details at @(in-link "geochart").
+    The geochart will also show the range of values on the various regions, which higher values having a different color than lower values. See more details at @(in-link "geochart-series").
 
     @examples{
 an-example-geochart-series = from-list.geochart(
@@ -777,7 +777,7 @@ an-example-geochart-series = from-list.geochart(
   
 render-chart(an-example-geochart-series).display()
   }
-  @(in-image "geochart")
+  @(in-image "geochart-series")
 
   @;############################################################################
   @section{Renderers}
