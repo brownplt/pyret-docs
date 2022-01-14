@@ -10,6 +10,7 @@
 @(define Option (a-id "Option" (xref "option" "Option")))
 @(define DataSeries (in-link "DataSeries"))
 @(define ChartWindow (in-link "ChartWindow"))
+@(define StackType (in-link "StackType"))
 @(define opaque '(("<opaque>" ("type" "normal") ("contract" #f))))
 @(define (method-data-series variant name)
   (method-doc "DataSeries" variant name))
@@ -187,10 +188,10 @@
     (params ())
     (args ("self" "stack-type"))
     (return ,DataSeries)
-    (contract (a-arrow ,Self ,S ,DataSeries))
+    (contract (a-arrow ,Self ,StackType ,DataSeries))
     (doc ("Construct a new " ,DataSeries " for a " ,(in-link "multi-bar-chart-series") " where the stacking-type of "
-          "the series is specified to be one of the following options: [\"none\", \"absolute\", \"relative\", \"percent\"]. "
-          "By default the stacking type will be \"none\" or \"absolute\" depending on whether the " 
+          "the series is specified to be one of the following options: [grouped, absolute, relative, percent]. "
+          "By default the stacking type will be grouped or absolute depending on whether the " 
           ,(in-link "multi-bar-chart-series") " was constructed with " ,(in-link "from-list.grouped-bar-chart") " or "
           ,(in-link "from-list.stacked-bar-chart") " function."))))
 
@@ -518,6 +519,14 @@
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
                      ,num-bins-meth)))
     (data-spec
+      (name "StackType")
+      (variants ("grouped" "absolute" "relative" "percent"))
+      (shared))
+    (singleton-spec (name "grouped") (with-members))
+    (singleton-spec (name "absolute") (with-members))
+    (singleton-spec (name "relative") (with-members))
+    (singleton-spec (name "percent") (with-members))
+    (data-spec
       (name "DataSeries")
       (type-vars ())
       (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
@@ -621,7 +630,7 @@ num-speakers = [list: 251388301, 125344736, 110041604,  89800800,      79000000]
   Getting from this data to a data series is simple: use a @emph{chart constructor} -- here, the bar chart constructor @pyret{from-list.bar-chart} -- to create a @|DataSeries|:
 
   @pyret-block{
-a-pie-chart-series = from-list.bar-chart(countries, num-speakers)
+a-bar-chart-series = from-list.bar-chart(countries, num-speakers)
   }
 
   As another example, consider the typical high-school math task of ``graphing a function'', that is, plotting the values of a function for some range of inputs. Another chart constructor, @pyret{from-list.function-plot}, would create the relevant @|DataSeries|:
@@ -1035,6 +1044,37 @@ a-labeled-box-plot-series
   }
 
   @;############################################################################
+  @section{Other Data Types}
+  This section defines the other data types used in the chart library.
+
+  @type-spec["StackType" (list) #:private #t]{
+    @nested{@|StackType| is an enumerated data definition for multi-bar-chart-series:
+                         
+    @data-spec2["StackType" (list) #:no-toc #t
+              (list
+                (singleton-spec2 "StackType" "grouped")
+                (singleton-spec2 "StackType" "absolute")
+                (singleton-spec2 "StackType" "relative")
+                (singleton-spec2 "StackType" "percent"))]}
+
+    @nested{@singleton-doc["StackType" "grouped" StackType #:style ""]{
+      The Grouped StackType is for when related bar chart values are placed next to each other.}}
+
+    @nested{@singleton-doc["StackType" "absolute" StackType #:style ""]{
+      The absolute StackType is for when related bar chart values are placed on top of each other.}}
+
+    @nested{@singleton-doc["StackType" "relative" StackType #:style ""]{
+      The relative StackType is for when related bar chart values are placed on top of each other.
+      Each related bar chart value is formatted as a fraction of 1 (the total stack). 
+      }}
+    
+    @nested{@singleton-doc["StackType" "percent" StackType #:style ""]{
+      The relative StackType is for when related bar chart values are placed on top of each other.
+      Each related bar chart value is formatted as a percentage of the total stack. 
+      }}
+    }
+
+  @;############################################################################
   @section{DataSeries}
 
   @data-spec2["DataSeries" (list) (list
@@ -1086,20 +1126,20 @@ render-chart(f-series).display()} ,(in-image "function-plot-example"))
     A line plot series
   }
   @repl-examples[
-   `(@{ine-plot-series = from-list.line-plot(
+   `(@{lineplot-series = from-list.line-plot(
   [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
   [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
-render-chart(line-plot-series).display()} ,(in-image "line-plot-example"))
+render-chart(lineplot-series).display()} ,(in-image "line-plot-example"))
   ]
 
   @method-doc["DataSeries" "line-plot-series" "color"]
   @repl-examples[
    `(@{include color
-render-chart(line-plot-series.color(orange)).display()} ,(in-image "line-plot-color-example"))
+render-chart(lineplot-series.color(orange)).display()} ,(in-image "line-plot-color-example"))
   ]
   @method-doc["DataSeries" "line-plot-series" "legend"]
   @repl-examples[
-   `(@{render-chart(line-plot-series.legend("My Legend")).display()} ,(in-image "line-plot-legend-example"))
+   `(@{render-chart(lineplot-series.legend("My Legend")).display()} ,(in-image "line-plot-legend-example"))
   ]
 
   @;################################
@@ -1110,27 +1150,27 @@ render-chart(line-plot-series.color(orange)).display()} ,(in-image "line-plot-co
     point in the interactive dialog will show the label.
   }
    @repl-examples[
-   `(@{scatter-plot-series = from-list.labeled-scatter-plot(
+   `(@{scatterplot-series = from-list.labeled-scatter-plot(
   [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
   [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
   [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
-render-chart(scatter-plot-series).display()} ,(in-image "scatter-plot-example"))
+render-chart(scatterplot-series).display()} ,(in-image "scatter-plot-example"))
   ]
 
   @method-doc["DataSeries" "scatter-plot-series" "color"]
   @repl-examples[
    `(@{include color
-   render-chart(scatter-plot-series.color(orange)).display()} ,(in-image "scatter-plot-color-example"))
+   render-chart(scatterplot-series.color(orange)).display()} ,(in-image "scatter-plot-color-example"))
   ]
 
   @method-doc["DataSeries" "scatter-plot-series" "legend"]
   @repl-examples[
-   `(@{render-chart(scatter-plot-series.legend("My Legend")).display()} ,(in-image "scatter-plot-legend-example"))
+   `(@{render-chart(scatterplot-series.legend("My Legend")).display()} ,(in-image "scatter-plot-legend-example"))
   ]
 
   @method-doc["DataSeries" "scatter-plot-series" "point-size"]
   @repl-examples[
-   `(@{render-chart(scatter-plot-series.point-size(10)).display()} ,(in-image "scatter-plot-ptsize-example"))
+   `(@{render-chart(scatterplot-series.point-size(10)).display()} ,(in-image "scatter-plot-ptsize-example"))
   ]
 
   @;################################
@@ -1155,7 +1195,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "bar-chart-series" "colors"]
   @repl-examples[
-   `(@{render-chart(barchart-series.colors([list: red, orange, purple])).display()} ,(in-image "bar-chart-colors-example"))
+   `(@{include color
+     render-chart(barchart-series.colors([list: red, orange, purple])).display()} ,(in-image "bar-chart-colors-example"))
   ]
 
   @method-doc["DataSeries" "bar-chart-series" "sort"]
@@ -1186,7 +1227,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "bar-chart-series" "pointer-color"]
   @repl-examples[
-   `(@{render-chart(barchart-series.add-pointers([list: 6, 7], 
+   `(@{include color
+       render-chart(barchart-series.add-pointers([list: 6, 7], 
                                           [list: "median", "mean + 1"])
                             .pointer-color(orange))
                             .display()} ,(in-image "bar-chart-pointer-color-example"))
@@ -1234,7 +1276,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "bar-chart-series" "interval-color"]
   @repl-examples[
-   `(@{render-chart(barchart-series.error-bars([list: [list: -1, 1], [list: -1, 1],
+   `(@{include color
+       render-chart(barchart-series.error-bars([list: [list: -1, 1], [list: -1, 1],
       [list: -1, 2], [list: -1, 1], [list: -1, 1], [list: -1, 1],
       [list: -1, 1]])       
                             .interval-color(orange))
@@ -1289,8 +1332,10 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "multi-bar-chart-series" "colors"]
   @repl-examples[
-   `(@{render-chart(grouped-series.colors([list: red, orange, blue])).display()} ,(in-image "grouped-bar-chart-colors-example"))
-   `(@{render-chart(stacked-series.colors([list: red, orange, blue])).display()} ,(in-image "stacked-bar-chart-colors-example"))
+   `(@{include color
+     render-chart(grouped-series.colors([list: red, orange, blue])).display()} ,(in-image "grouped-bar-chart-colors-example"))
+   `(@{include color
+     render-chart(stacked-series.colors([list: red, orange, blue])).display()} ,(in-image "stacked-bar-chart-colors-example"))
   ]
 
   @method-doc["DataSeries" "multi-bar-chart-series" "sort"]
@@ -1313,11 +1358,11 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
   @repl-examples[
    `(@{descending-str-cmp = {(a, b): a > b}
    eq = {(a, b): a == b}
-   render-chart(grouped-series.sort-by-label(descendong-str-cmp, eq))
+   render-chart(grouped-series.sort-by-label(descending-str-cmp, eq))
                               .display()} ,(in-image "grouped-bar-chart-sort-by-label-example"))
-    `(@{descendong-str-cmp = {(a, b): a > b}
+    `(@{descending-str-cmp = {(a, b): a > b}
    eq = {(a, b): a == b}
-   render-chart(stacked-series.sort-by-label(descend-str-cmp, eq))
+   render-chart(stacked-series.sort-by-label(descending-str-cmp, eq))
                               .display()} ,(in-image "stacked-bar-chart-sort-by-label-example"))
   ]
 
@@ -1347,11 +1392,13 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "multi-bar-chart-series" "pointer-color"]
   @repl-examples[
-   `(@{render-chart(grouped-series.add-pointers([list: 1874094, 41417373 / 14], 
+   `(@{include color
+       render-chart(grouped-series.add-pointers([list: 1874094, 41417373 / 14], 
                                               [list: "median", "mean"])
                                   .pointer-color(blue))
                                   .display()} ,(in-image "grouped-bar-chart-pointer-color-example"))
-   `(@{render-chart(stacked-series.add-pointers([list: 18409317.5, 20708686.5],
+   `(@{include color
+       render-chart(stacked-series.add-pointers([list: 18409317.5, 20708686.5],
                                                [list: "median", "mean"])
                                   .pointer-color(red))
                                   .display()} ,(in-image "stacked-bar-chart-pointer-color-example"))
@@ -1375,23 +1422,23 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "multi-bar-chart-series" "stacking-type"]
   @repl-examples[
-   `(@{render-chart(grouped-series.stacking-type('none'))
+   `(@{render-chart(grouped-series.stacking-type(grouped))
                                   .display()
-       render-chart(grouped-series.stacking-type('absolute'))
+       render-chart(grouped-series.stacking-type(absolute))
                                   .display()
-       render-chart(grouped-series.stacking-type('relative'))
+       render-chart(grouped-series.stacking-type(relative))
                                   .display()
-       render-chart(grouped-series.stacking-type('percent'))
+       render-chart(grouped-series.stacking-type(percent))
                                   .display()
                       
        # The following produces the same output as the ones above
-       render-chart(stacked-series.stacking-type('none'))
+       render-chart(stacked-series.stacking-type(grouped))
                                   .display()
-       render-chart(stacked-series.stacking-type('absolute'))
+       render-chart(stacked-series.stacking-type(absolute))
                                   .display()
-       render-chart(stacked-series.stacking-type('relative'))
+       render-chart(stacked-series.stacking-type(relative))
                                   .display()
-       render-chart(stacked-series.stacking-type('percent'))
+       render-chart(stacked-series.stacking-type(percent))
                                   .display()} ,(in-image "stacking-type-example"))
   ]
 
@@ -1479,7 +1526,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "multi-bar-chart-series" "interval-color"]
   @repl-examples[
-   `(@{grouped-small-data = from-list.grouped-bar-chart(
+   `(@{include color
+       grouped-small-data = from-list.grouped-bar-chart(
                             [list: "Year 1", "Year 2"],
                             [list:
                               [list: 50, 20, 10],
@@ -1491,7 +1539,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
        render-chart(grouped-small-data.intervals(intervals)
                                       .interval-color(yellow))
                                       .display()} ,(in-image "grouped-bar-chart-interval-color-example"))
-   `(@{stacked-small-data = from-list.stacked-bar-chart(
+   `(@{include color
+       stacked-small-data = from-list.stacked-bar-chart(
                             [list: "Year 1", "Year 2"],
                             [list:
                               [list: 50, 20, 10],
