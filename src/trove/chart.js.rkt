@@ -8,9 +8,12 @@
 @(define Color (a-id "Color" (xref "color" "Color")))
 @(define Image (a-id "Image" (xref "image" "Image")))
 @(define Option (a-id "Option" (xref "option" "Option")))
+@(define NumInteger (a-id "NumInteger" (xref "numbers" "NumInteger")))
 @(define DataSeries (in-link "DataSeries"))
 @(define ChartWindow (in-link "ChartWindow"))
 @(define StackType (in-link "StackType"))
+@(define TrendlineType (in-link "TrendlineType"))
+@(define PointShape (in-link "PointShape"))
 @(define opaque '(("<opaque>" ("type" "normal") ("contract" #f))))
 @(define (method-data-series variant name)
   (method-doc "DataSeries" variant name))
@@ -471,6 +474,8 @@
 
     (fun-spec (name "from-list.function-plot") (arity 1))
     (fun-spec (name "from-list.line-plot") (arity 2))
+    (fun-spec (name "from-list.labeled-line-plot") (arity 3))
+    (fun-spec (name "from-list.image-line-plot") (arity 3))
     (fun-spec (name "from-list.scatter-plot") (arity 2))
     (fun-spec (name "from-list.labeled-scatter-plot") (arity 3))
     (fun-spec (name "from-list.image-scatter-plot") (arity 3))
@@ -486,6 +491,43 @@
     (fun-spec (name "from-list.labeled-box-plot") (arity 2))
     (fun-spec (name "render-chart") (arity 1))
     (fun-spec (name "render-charts") (arity 1))
+
+    (data-spec
+      (name "StackType")
+      (variants ("grouped" "absolute" "relative" "percent"))
+      (shared))
+    (singleton-spec (name "grouped") (with-members))
+    (singleton-spec (name "absolute") (with-members))
+    (singleton-spec (name "relative") (with-members))
+    (singleton-spec (name "percent") (with-members))
+
+    (data-spec
+      (name "TrendlineType")
+      (variants ("no-trendline" "linear" "exponential" "polynomial"))
+      (shared))
+    (singleton-spec (name "no-trendline") (with-members))
+    (singleton-spec (name "linear") (with-members))
+    (singleton-spec (name "exponential") (with-members))
+    (constr-spec
+      (name "polynomial")
+      (members (("degree" (type normal) (contract "NumInteger")))))
+
+    (data-spec
+      (name "PointShape")
+      (variants ("circle-shape" "regular-polygon"))
+      (shared))
+    (singleton-spec (name "circle-shape") (with-members))
+    (constr-spec
+      (name "regular-polygon")
+      (members (("sides" (type normal) (contract "NumInteger")
+                ("dent" (type normal) (contract "Number"))))))
+
+    (data-spec
+      (name "DataSeries")
+      (type-vars ())
+      (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
+                 "bar-chart-series" "multi-bar-chart-series" "pie-chart-series" "histogram-series"))
+      (shared))
     (constr-spec
       (name "function-plot-series")
       (with-members (,color-meth ,legend-meth)))
@@ -518,20 +560,7 @@
       (name "histogram-series")
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
                      ,num-bins-meth)))
-    (data-spec
-      (name "StackType")
-      (variants ("grouped" "absolute" "relative" "percent"))
-      (shared))
-    (singleton-spec (name "grouped") (with-members))
-    (singleton-spec (name "absolute") (with-members))
-    (singleton-spec (name "relative") (with-members))
-    (singleton-spec (name "percent") (with-members))
-    (data-spec
-      (name "DataSeries")
-      (type-vars ())
-      (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
-                 "bar-chart-series" "multi-bar-chart-series" "pie-chart-series" "histogram-series"))
-      (shared))
+  
     (data-spec
       (name "ChartWindow")
       (type-vars ())
@@ -761,6 +790,55 @@ an-example-line-plot-series
     @(in-image "line-plot-constructor")
   }
 
+  @function["from-list.labeled-line-plot"
+    #:contract (a-arrow (L-of S) (L-of N) (L-of N) DataSeries)
+    #:args '(("labels" #f) ("xs" #f) ("ys" #f))
+    #:return (a-pred DataSeries (in-link "line-plot-series"))
+  ]{
+
+    Constructing a line plot series from @pyret{xs} and @pyret{ys}, representing x and y
+    coordinates of points, and @pyret{labels} whose element representing a label for each point.
+    The labels will show up when you display the chart and hover over the points. 
+    See more details at @(in-link "line-plot-series").
+
+
+    @examples{
+an-example-labeled-line-plot-series = from-list.labeled-line-plot(
+  [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+  [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
+  [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
+an-example-labeled-line-plot-series
+    }
+    @(in-image "labeled-line-plot-constructor")
+  }
+
+  @function["from-list.image-line-plot"
+    #:contract (a-arrow (L-of Image) (L-of N) (L-of N) DataSeries)
+    #:args '(("images" #f) ("xs" #f) ("ys" #f))
+    #:return (a-pred DataSeries (in-link "line-plot-series"))
+  ]{
+
+    Constructing a line plot series from @pyret{xs} and @pyret{ys}, representing x and y
+    coordinates of points, and @pyret{images} whose element representing a image-label for each point.
+    The image-labels will show up when you display the chart and hover over the points. 
+    See more details at @(in-link "line-plot-series").
+
+
+    @examples{
+include image
+an-example-image-line-plot-series = from-list.image-line-plot(
+  [list: circle(30, "outline", "red"), circle(30, "solid", "red"),
+         circle(30, "outline", "blue"), circle(30, "solid", "blue"), 
+         circle(30, "outline", "green"), circle(30, "solid", "green"), 
+         circle(30, "outline", "purple"), circle(30, "solid", "purple"),
+         circle(30, "outline", "black"), circle(30, "solid", "black")],
+  [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
+  [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
+an-example-image-line-plot-series
+    }
+    @(in-image "image-line-plot-constructor")
+  }
+
   @function["from-list.scatter-plot"
     #:contract (a-arrow (L-of N) (L-of N) DataSeries)
     #:args '(("xs" #f) ("ys" #f))
@@ -814,6 +892,7 @@ an-example-labeled-scatter-plot-series
 
 
     @examples{
+include image
 an-example-image-scatter-plot-series = from-list.image-scatter-plot(
   [list: circle(30, "outline", "red"), circle(30, "solid", "red"),
          circle(30, "outline", "blue"), circle(30, "solid", "blue"), 
@@ -1048,7 +1127,7 @@ a-labeled-box-plot-series
   This section defines the other data types used in the chart library.
 
   @type-spec["StackType" (list) #:private #t]{
-    @nested{@|StackType| is an enumerated data definition for multi-bar-chart-series:
+    @nested{@|StackType| is an enumerated data definition for @in-link["multi-bar-chart-series"]. It describes the method which related bar chart values are displayed together. 
                          
     @data-spec2["StackType" (list) #:no-toc #t
               (list
@@ -1057,23 +1136,80 @@ a-labeled-box-plot-series
                 (singleton-spec2 "StackType" "relative")
                 (singleton-spec2 "StackType" "percent"))]}
 
-    @nested{@singleton-doc["StackType" "grouped" StackType #:style ""]{
-      The Grouped StackType is for when related bar chart values are placed next to each other.}}
+    @nested[#:style 'inset]{
+      @singleton-doc["StackType" "grouped" StackType]{
+        The grouped @|StackType| is for when related bar chart values are placed next to each other. This is the default @|StackType| created with @in-link["from-list.grouped-bar-chart"].
+      }
 
-    @nested{@singleton-doc["StackType" "absolute" StackType #:style ""]{
-      The absolute StackType is for when related bar chart values are placed on top of each other.}}
+      @singleton-doc["StackType" "absolute" StackType]{
+        The absolute @|StackType| is for when related bar chart values are placed on top of each other. This is the default @|StackType| created with @in-link["from-list.stacked-bar-chart"].
+      }
 
-    @nested{@singleton-doc["StackType" "relative" StackType #:style ""]{
-      The relative StackType is for when related bar chart values are placed on top of each other.
-      Each related bar chart value is formatted as a fraction of 1 (the total stack). 
-      }}
-    
-    @nested{@singleton-doc["StackType" "percent" StackType #:style ""]{
-      The relative StackType is for when related bar chart values are placed on top of each other.
-      Each related bar chart value is formatted as a percentage of the total stack. 
-      }}
+      @singleton-doc["StackType" "relative" StackType]{
+        The relative @|StackType| is for when related bar chart values are placed on top of each other.
+        Each related bar chart value is formatted as a fraction of 1 (the total stack). 
+      }
+      
+      @singleton-doc["StackType" "percent" StackType]{
+        The percent @|StackType| is for when related bar chart values are placed on top of each other.
+        Each related bar chart value is formatted as a percentage of the total stack. 
+      }
     }
+  }
 
+  @type-spec["TrendlineType" (list) #:private #t]{
+    @nested{@|TrendlineType| is an enumerated data definition for @in-link["line-plot-series"] and @in-link["scatter-plot-series"]. 
+            It describes the function type to draw the estimated trendline. 
+                         
+    @data-spec2["TrendlineType" (list) #:no-toc #t
+              (list
+                (singleton-spec2 "TrendlineType" "no-trendline")
+                (singleton-spec2 "TrendlineType" "linear")
+                (singleton-spec2 "TrendlineType" "exponential")
+                (constructor-spec "TrendlineType" "polynomial" (list `("degree" ("type" "normal") ("contract" ,NumInteger)))))]}
+
+    @nested[#:style 'inset]{
+      @singleton-doc["TrendlineType" "no-trendline" TrendlineType]{
+        The no-trendline @|TrendlineType| is for when we dont want to create a trendline. This is the default @|TrendlineType|. 
+      }
+
+      @singleton-doc["TrendlineType" "linear" TrendlineType]{
+        The linear @|TrendlineType| is for when we want to create a linear trendline. This is equivalent to polynomial(1). 
+      }
+
+      @singleton-doc["TrendlineType" "exponential" TrendlineType]{
+        The exponential @|TrendlineType| is for when we want to create a exponential trendline.
+      }
+      
+      @constructor-doc["TrendlineType" "polynomial" (list `("degree" ("type" "normal") ("contract" ,NumInteger))) TrendlineType]{
+        The polynomial @|TrendlineType| is for when we want to create a polynomial trendline with a power of @emph{degree}.
+        The degree must be non-negative. 
+      }
+    }
+  }
+
+  @type-spec["PointShape" (list) #:private #t]{
+    @nested{@|PointShape| is an enumerated data definition for @in-link["line-plot-series"] and @in-link["scatter-plot-series"]. 
+            It describes the shape of the points on these plot series. 
+                         
+    @data-spec2["PointShape" (list) #:no-toc #t
+              (list
+                (singleton-spec2 "PointShape" "circle-shape")
+                (constructor-spec "PointShape" "regular-polygon" (list `("sides" ("type" "normal") ("contract" ,NumInteger))
+                                                                       `("dent" ("type" "normal") ("contract" ,N)))))]}
+
+    @nested[#:style 'inset]{
+      @singleton-doc["PointShape" "circle-shape" PointShape]{
+        The circle-shape @|PointShape| is for when we want our points to just be circles. This is the default @|PointShape|. 
+      }
+
+      @constructor-doc["PointShape" "regular-polygon" (list `("sides" ("type" "normal") ("contract" ,NumInteger))
+                                                            `("dent" ("type" "normal") ("contract" ,N))) PointShape]{
+        The regular-polygon @|PointShape| is for when we want to create a regular-polygon of @emph{sides} number of sides and 
+        with the sides offset by @emph{dent} either inward or outward. For examples see TODO: use pyret-method on pointshape method. 
+      }
+    }
+  }
   @;############################################################################
   @section{DataSeries}
 
@@ -1734,8 +1870,6 @@ a-chart-window = render-charts([list: series-1, series-2])
   @constructor-doc["ChartWindow" "box-chart-window" opaque ChartWindow]{
     A box plot chart window.
   }
-  @method-doc["ChartWindow" "box-chart-window" "y-min"]
-  @method-doc["ChartWindow" "box-chart-window" "y-max"]
   @method-doc["ChartWindow" "box-chart-window" "x-axis"]
   @method-doc["ChartWindow" "box-chart-window" "y-axis"]
 
