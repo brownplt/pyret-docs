@@ -897,7 +897,7 @@
             (args ("self" "color"))
             (return ,ChartWindow)
             (doc ("Construct a new " ,ChartWindow " with a new background color. "
-                  "By default, the color will be white")))
+                  "By default, the color will be transparent")))
           (method-spec
             (name "border-size")
             (arity 2)
