@@ -754,7 +754,7 @@
     (params ())
     (args ("self" "multiple"))
     (return ,ChartWindow)
-    (contract (a-arrow ,Self ,Color ,ChartWindow))
+    (contract (a-arrow ,Self ,B ,ChartWindow))
     (doc ("Construct a new " ,ChartWindow " where the user can select multiple points. 
           By default, multiple is false so the user can only select a single point at a time."))))
 
