@@ -413,7 +413,7 @@
     (return ,DataSeries)
     (contract (a-arrow ,Self ,(L-of N) ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with the lines dashed with a style with an on-and-off pattern for dashed lines.
-          For example: [5, 1, 3] will repeat a 5-length dash, a 1-length gap, a 3-length dash, a 5-length gap, 
+          For example: [list: 5, 1, 3] will repeat a 5-length dash, a 1-length gap, a 3-length dash, a 5-length gap, 
           a 1-length dash, and a 3-length gap. Will automatically turn on dashed line if the dashed line is off.
           By default the dashed lines have a style of [list: 2]."))))
         
