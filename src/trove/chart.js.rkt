@@ -608,7 +608,8 @@ a-series = from-list.labeled-histogram(
     The geochart will also show the range of values on the various regions, which higher values having a different color than lower values. 
     Note that the @pyret{region-labels} and @pyret{value} must be the same length. See more details at @(in-link "geochart-series"). 
 
-    Also, look at https://developers.google.com/chart/interactive/docs/gallery/geochart#continent-hierarchy-and-codes to see all valid @pyret{region-labels} and their locations on the geochart. 
+    A list of all the valid @pyret{region-labels} and their locations on the geochart can be found @link["https://developers.google.com/chart/interactive/docs/gallery/geochart#continent-hierarchy-and-codes" "here from Google Charts"].
+    For example, adding "US" as a region label would color the United States of America, while "ZA" would color the region of South Africa. 
 
     @examples{
 an-example-geochart-series = from-list.geochart(
