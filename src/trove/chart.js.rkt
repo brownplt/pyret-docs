@@ -8,8 +8,12 @@
 @(define Color (a-id "Color" (xref "color" "Color")))
 @(define Image (a-id "Image" (xref "image" "Image")))
 @(define Option (a-id "Option" (xref "option" "Option")))
+@(define NumInteger (a-id "NumInteger" (xref "numbers" "NumInteger")))
 @(define DataSeries (in-link "DataSeries"))
 @(define ChartWindow (in-link "ChartWindow"))
+@(define StackType (in-link "StackType"))
+@(define TrendlineType (in-link "TrendlineType"))
+@(define PointShape (in-link "PointShape"))
 @(define opaque '(("<opaque>" ("type" "normal") ("contract" #f))))
 @(define (method-data-series variant name)
   (method-doc "DataSeries" variant name))
@@ -187,10 +191,10 @@
     (params ())
     (args ("self" "stack-type"))
     (return ,DataSeries)
-    (contract (a-arrow ,Self ,S ,DataSeries))
+    (contract (a-arrow ,Self ,StackType ,DataSeries))
     (doc ("Construct a new " ,DataSeries " for a " ,(in-link "multi-bar-chart-series") " where the stacking-type of "
-          "the series is specified to be one of the following options: [\"none\", \"absolute\", \"relative\", \"percent\"]. "
-          "By default the stacking type will be \"none\" or \"absolute\" depending on whether the " 
+          "the series is specified to be one of the following options: [grouped, absolute, relative, percent]. "
+          "By default the stacking type will be grouped or absolute depending on whether the " 
           ,(in-link "multi-bar-chart-series") " was constructed with " ,(in-link "from-list.grouped-bar-chart") " or "
           ,(in-link "from-list.stacked-bar-chart") " function."))))
 
@@ -317,8 +321,147 @@
     (args ("self" "show"))
     (return ,DataSeries)
     (contract (a-arrow ,Self ,B ,DataSeries))
-    (doc ("Construct a new " ,DataSeries " with the outliers shown on the box-plot"))))
+    (doc ("Construct a new " ,DataSeries " with the outliers shown on the box-plot."))))
 
+@(define curved-meth
+  `(method-spec
+    (name "curved")
+    (arity 2)
+    (params ())
+    (args ("self" "curved"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,B ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with the lines curved between points (if true) and straight (if false)."))))
+
+@(define linewidth-meth
+  `(method-spec
+    (name "linewidth")
+    (arity 2)
+    (params ())
+    (args ("self" "width"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,N ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " where the lines have a linewidth of width."))))
+
+@(define trendline-type-meth
+  `(method-spec
+    (name "trendline-type")
+    (arity 2)
+    (params ())
+    (args ("self" "type"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,TrendlineType ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new trendline (estimated using datapoints). The " ,TrendlineType " can be one of [" 
+    ,(a-id "no-trendline" (xref "chart" "no-trendline")) ", "
+    ,(a-id "linear" (xref "chart" "linear")) ", " 
+    ,(a-id "exponential" (xref "chart" "exponential")) ", " 
+    ,(a-id "polynomial(degree)" (xref "chart" "polynomial")) "]. See images below for examples. By default, the trendline
+    type is " ,(a-id "no-trendline" (xref "chart" "no-trendline")) " so no trendline is displayed."))))
+
+@(define trendline-color-meth
+  `(method-spec
+    (name "trendline-color")
+    (arity 2)
+    (params ())
+    (args ("self" "color"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,Color ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new color for the trendline added by."
+          ,(in-link "line-plot-series") "." ,(a-id "trendline-type" (xref "chart" "DataSeries" "line-plot-series" "trendline-type")) ", or " 
+          ,(in-link "scatter-plot-series") "." ,(a-id "trendline-type" (xref "chart" "DataSeries" "scatter-plot-series" "trendline-type")) "."))))
+
+@(define trendline-width-meth
+  `(method-spec
+    (name "trendline-width")
+    (arity 2)
+    (params ())
+    (args ("self" "width"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,N ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new width for the trendline added by."
+          ,(in-link "line-plot-series") "." ,(a-id "trendline-type" (xref "chart" "DataSeries" "line-plot-series" "trendline-type")) ", or " 
+          ,(in-link "scatter-plot-series") "." ,(a-id "trendline-type" (xref "chart" "DataSeries" "scatter-plot-series" "trendline-type")) "."))))
+
+@(define trendline-opacity-meth
+  `(method-spec
+    (name "trendline-opacity")
+    (arity 2)
+    (params ())
+    (args ("self" "opacity"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,N ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new opacity for the trendline added by."
+          ,(in-link "line-plot-series") "." ,(a-id "trendline-type" (xref "chart" "DataSeries" "line-plot-series" "trendline-type")) ", or " 
+          ,(in-link "scatter-plot-series") "." ,(a-id "trendline-type" (xref "chart" "DataSeries" "scatter-plot-series" "trendline-type")) "."))))
+
+@(define dashed-line-meth
+  `(method-spec
+    (name "dashed-line")
+    (arity 2)
+    (params ())
+    (args ("self" "dashed"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,B ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with the lines dashed (if true) and solid (if false)."))))
+
+@(define dashline-style-meth
+  `(method-spec
+    (name "dashline-style")
+    (arity 2)
+    (params ())
+    (args ("self" "style"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of N) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with the lines dashed with a style with an on-and-off pattern for dashed lines.
+          For example: [list: 5, 1, 3] will repeat a 5-length dash, a 1-length gap, a 3-length dash, a 5-length gap, 
+          a 1-length dash, and a 3-length gap. Will automatically turn on dashed line if the dashed line is off.
+          By default the dashed lines have a style of [list: 2]."))))
+        
+@(define labels-meth
+  `(method-spec
+    (name "labels")
+    (arity 2)
+    (params ())
+    (args ("self" "labels"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of S) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with labels whose element representing a label for each point. 
+    The labels will show up when you display the chart and hover over the points."))))
+
+@(define box-labels-meth
+  `(method-spec
+    (name "labels")
+    (arity 2)
+    (params ())
+    (args ("self" "labels"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of S) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with labels whose element representing a label for each box. 
+    The labels will show up when you display the chart and hover over the box."))))
+
+@(define image-labels-meth
+  `(method-spec
+    (name "image-labels")
+    (arity 2)
+    (params ())
+    (args ("self" "images"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of Image) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with images whose element representing a image-label for each point. 
+    The image-labels will show up when you display the chart and hover over the points."))))
+
+@(define pointshape-meth
+  `(method-spec
+    (name "point-shape")
+    (arity 2)
+    (params ())
+    (args ("self" "shape"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,PointShape ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new point shape for each data point. The " ,PointShape " can be one of [" 
+    ,(a-id "circle-shape" (xref "chart" "circle-shape")) ", "
+    ,(a-id "regular-polygon-shape(sides, dent)" (xref "chart" "regular-polygon-shape")) "]. See images below for examples. By default, the point shape
+     is " ,(a-id "circle-shape" (xref "chart" "circle-shape")) "."))))
 
 @(define legend-meth
   `(method-spec
@@ -331,7 +474,7 @@
     (doc ("Construct a new " ,DataSeries " with a new legend. By default, "
           "the legend will be auto-generated in the form `Plot <number>'."))))
 
-@(define point-size-meth
+@(define scatter-point-size-meth
   `(method-spec
     (name "point-size")
     (arity 2)
@@ -341,6 +484,89 @@
     (contract (a-arrow ,Self ,N ,DataSeries))
     (doc ("Construct a new " ,DataSeries " with a new point size. By default, "
           "the point size is 7."))))
+
+@(define line-point-size-meth
+  `(method-spec
+    (name "point-size")
+    (arity 2)
+    (params ())
+    (args ("self" "point-size"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,N ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new point size. By default, "
+          "the point size is 0."))))
+
+@(define pie-chart-explode-meth
+  `(method-spec
+    (name "explode")
+    (arity 2)
+    (params ())
+    (args ("self" "offsets"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of N) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with pie chart slices offset by offsets. 
+    Offsets indicates the offset from the center of the chart for each slice. 
+    Each offset must be in range 0 and 1."))))
+
+@(define pie-chart-colors-meth
+  `(method-spec
+    (name "colors")
+    (arity 2)
+    (params ())
+    (args ("self" "colors"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,(L-of Color) ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a new " ,Color " for each pie slice. By default, "
+          "the colors will be auto-generated. If the " ,(L-of Color) " contains less elements than "
+          "the number of slices then the rest will be colored the default google chart colors. If the " 
+          ,(L-of Color) " contains more elements than the number of components, only the number of components "
+          "of colors will be used."))))
+
+@(define pie-chart-threeD-meth
+  `(method-spec
+    (name "threeD")
+    (arity 2)
+    (params ())
+    (args ("self" "three-d"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,B ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a 3D pie chart (true) or 2D pie chart (false). By default, 
+    three-d is false so a 2D pie chart is displayed. Does not work with " ,(in-link "pie-chart-series") "."
+    ,(a-id "piehole" (xref "chart" "DataSeries" "pie-chart-series" "piehole")) "."))))
+
+@(define pie-chart-piehole-meth
+  `(method-spec
+    (name "piehole")
+    (arity 2)
+    (params ())
+    (args ("self" "hole"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,N ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with a hole between 0 (No hole) and 1 (All hole) to create a donut. 
+    By default hole is 0. Does not work with " ,(in-link "pie-chart-series") "."
+    ,(a-id "threeD" (xref "chart" "DataSeries" "pie-chart-series" "threeD")) "."))))
+  
+  @(define pie-chart-rotate-meth
+  `(method-spec
+    (name "rotate")
+    (arity 2)
+    (params ())
+    (args ("self" "angle"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,N ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with the pie slices generated starting from angle (in degrees) away clockwise from the 12:00 position
+    (the line from the center to the top of the circle). By default the angle is 0."))))
+
+  @(define pie-chart-collapse-threshold-meth
+  `(method-spec
+    (name "collapse-threshold")
+    (arity 2)
+    (params ())
+    (args ("self" "threshold"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,N ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " with the pie slices containing a lower porportion of the total pie (out of 1) than the threshold collapsed
+    into an OTHER slice."))))
 
 @(define bin-width-meth
   `(method-spec
@@ -464,12 +690,83 @@
           "configuration to be used when rendering all "
           ,(in-link "function-plot-series") "s in the chart."))))
 
+@(define gridlines-minspacing-meth
+  `(method-spec
+    (name "gridlines-minspacing")
+    (arity 2)
+    (params ())
+    (args ("self" "min-spacing"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new minimum spacing between major gridlines. 
+          By default, the value will be calculated so that there are 5 major gridlines."))))
+
+@(define gridlines-color-meth
+  `(method-spec
+    (name "gridlines-color")
+    (arity 2)
+    (params ())
+    (args ("self" "color"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,Color ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new color for major gridlines. 
+          By default, the color will be grey."))))
+
+@(define show-minor-gridlines-meth
+  `(method-spec
+    (name "show-minor-gridlines")
+    (arity 2)
+    (params ())
+    (args ("self" "show"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,B ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new minor gridlines displayed. 
+          By default, the value will be false, so no minor gridlines are displayed."))))
+
+@(define minor-gridlines-minspacing-meth
+  `(method-spec
+    (name "minor-gridlines-minspacing")
+    (arity 2)
+    (params ())
+    (args ("self" "min-spacing"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new minimum spacing between minor gridlines. 
+          Will set show-minor-gridlines to true if it was false, displaying minor gridlines. 
+          By default, the value will be 10."))))
+
+@(define minor-gridlines-color-meth
+  `(method-spec
+    (name "minor-gridlines-color")
+    (arity 2)
+    (params ())
+    (args ("self" "color"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,Color ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new color for minor gridlines. 
+          Will set show-minor-gridlines to true if it was false, displaying minor gridlines. 
+          By default, the color will be grey."))))
+
+@(define select-multiple-meth
+  `(method-spec
+    (name "select-multiple")
+    (arity 2)
+    (params ())
+    (args ("self" "multiple"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,B ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " where the user can select multiple points. 
+          By default, multiple is false so the user can only select a single point at a time."))))
+
+
 @(append-gen-docs
   `(module "chart"
     (path "src/arr/trove/chart.arr")
 
     (fun-spec (name "from-list.function-plot") (arity 1))
     (fun-spec (name "from-list.line-plot") (arity 2))
+    (fun-spec (name "from-list.labeled-line-plot") (arity 3))
+    (fun-spec (name "from-list.image-line-plot") (arity 3))
     (fun-spec (name "from-list.scatter-plot") (arity 2))
     (fun-spec (name "from-list.labeled-scatter-plot") (arity 3))
     (fun-spec (name "from-list.image-scatter-plot") (arity 3))
@@ -485,15 +782,55 @@
     (fun-spec (name "from-list.labeled-box-plot") (arity 2))
     (fun-spec (name "render-chart") (arity 1))
     (fun-spec (name "render-charts") (arity 1))
+
+    (data-spec
+      (name "StackType")
+      (variants ("grouped" "absolute" "relative" "percent"))
+      (shared))
+    (singleton-spec (name "grouped") (with-members))
+    (singleton-spec (name "absolute") (with-members))
+    (singleton-spec (name "relative") (with-members))
+    (singleton-spec (name "percent") (with-members))
+
+    (data-spec
+      (name "TrendlineType")
+      (variants ("no-trendline" "linear" "exponential" "polynomial"))
+      (shared))
+    (singleton-spec (name "no-trendline") (with-members))
+    (singleton-spec (name "linear") (with-members))
+    (singleton-spec (name "exponential") (with-members))
+    (constr-spec
+      (name "polynomial")
+      (members (("degree" (type normal) (contract "NumInteger")))))
+
+    (data-spec
+      (name "PointShape")
+      (variants ("circle-shape" "regular-polygon-shape"))
+      (shared))
+    (singleton-spec (name "circle-shape") (with-members))
+    (constr-spec
+      (name "regular-polygon-shape")
+      (members (("sides" (type normal) (contract "NumInteger")
+                ("dent" (type normal) (contract "Number"))))))
+
+    (data-spec
+      (name "DataSeries")
+      (type-vars ())
+      (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
+                 "bar-chart-series" "multi-bar-chart-series" "pie-chart-series" "histogram-series"))
+      (shared))
     (constr-spec
       (name "function-plot-series")
       (with-members (,color-meth ,legend-meth)))
     (constr-spec
       (name "line-plot-series")
-      (with-members (,color-meth ,legend-meth)))
+      (with-members (,color-meth ,legend-meth ,labels-meth ,image-labels-meth ,curved-meth ,linewidth-meth ,trendline-type-meth 
+                     ,trendline-color-meth ,trendline-width-meth ,trendline-opacity-meth ,dashed-line-meth ,dashline-style-meth 
+                     ,pointshape-meth ,line-point-size-meth)))
     (constr-spec
       (name "scatter-plot-series")
-      (with-members (,color-meth ,legend-meth ,point-size-meth)))
+      (with-members (,color-meth ,legend-meth ,labels-meth ,image-labels-meth ,scatter-point-size-meth ,trendline-type-meth
+                     ,pointshape-meth ,trendline-color-meth ,trendline-width-meth ,trendline-opacity-meth)))
     (constr-spec
       (name "bar-chart-series")
       (with-members (,color-meth ,bar-chart-colors-meth ,bar-chart-sort-meth ,bar-chart-sort-by-meth
@@ -509,26 +846,23 @@
                      ,multi-bar-chart-error-bars-meth ,interval-color-meth)))
     (constr-spec
       (name "box-chart-series")
-      (with-members (,box-chart-horizontal-meth ,show-outliers-meth)))
+      (with-members (,box-chart-horizontal-meth ,show-outliers-meth ,box-labels-meth ,color-meth)))
     (constr-spec
       (name "pie-chart-series")
-      (with-members ()))
+      (with-members (,pie-chart-explode-meth ,pie-chart-colors-meth ,pie-chart-threeD-meth ,pie-chart-piehole-meth
+                     ,pie-chart-rotate-meth ,pie-chart-collapse-threshold-meth)))
     (constr-spec
       (name "histogram-series")
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
-                     ,num-bins-meth)))
-    (data-spec
-      (name "DataSeries")
-      (type-vars ())
-      (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
-                 "bar-chart-series" "multi-bar-chart-series" "pie-chart-series" "histogram-series"))
-      (shared))
+                     ,num-bins-meth ,box-labels-meth ,color-meth)))
+  
     (data-spec
       (name "ChartWindow")
       (type-vars ())
       (variants ("bar-chart-window"))
       (shared
-        ((method-spec
+        (
+          (method-spec
           (name "title")
           (arity 2)
           (params ())
@@ -537,45 +871,73 @@
           (return ,ChartWindow)
           (doc ("Construct a new " ,ChartWindow " with a new title. "
                 "By default, the title will empty")))
-        (method-spec
-          (name "width")
-          (arity 2)
-          (params ())
-          (contract (a-arrow ,Self ,N ,ChartWindow))
-          (args ("self" "width"))
-          (return ,ChartWindow)
-          (doc ("Construct a new " ,ChartWindow " with a new width. "
-                "By default, the width will be 800")))
-        (method-spec
-          (name "height")
-          (arity 2)
-          (params ())
-          (contract (a-arrow ,Self ,N ,ChartWindow))
-          (args ("self" "height"))
-          (return ,ChartWindow)
-          (doc ("Construct a new " ,ChartWindow " with a new height. "
-                "By default, the height will 600")))
-        (method-spec
-          (name "display")
-          (arity 1)
-          (params ())
-          (contract (a-arrow ,Self ,Image))
-          (args ("self"))
-          (return ,Image)
-          (doc ("Display the chart on an interactive dialog, "
-                "and produce an " ,Image " after the dialog is closed.")))
-        (method-spec
-          (name "get-image")
-          (arity 1)
-          (params ())
-          (contract (a-arrow ,Self ,Image))
-          (args ("self"))
-          (return ,Image)
-          (doc ("Produce an " ,Image " of the chart"))))))
+          (method-spec
+            (name "width")
+            (arity 2)
+            (params ())
+            (contract (a-arrow ,Self ,N ,ChartWindow))
+            (args ("self" "width"))
+            (return ,ChartWindow)
+            (doc ("Construct a new " ,ChartWindow " with a new width. "
+                  "By default, the width will be 800")))
+          (method-spec
+            (name "height")
+            (arity 2)
+            (params ())
+            (contract (a-arrow ,Self ,N ,ChartWindow))
+            (args ("self" "height"))
+            (return ,ChartWindow)
+            (doc ("Construct a new " ,ChartWindow " with a new height. "
+                  "By default, the height will 600")))
+          (method-spec
+            (name "background-color")
+            (arity 2)
+            (params ())
+            (contract (a-arrow ,Self ,Color ,ChartWindow))
+            (args ("self" "color"))
+            (return ,ChartWindow)
+            (doc ("Construct a new " ,ChartWindow " with a new background color. "
+                  "By default, the color will be transparent")))
+          (method-spec
+            (name "border-size")
+            (arity 2)
+            (params ())
+            (contract (a-arrow ,Self ,N ,ChartWindow))
+            (args ("self" "border"))
+            (return ,ChartWindow)
+            (doc ("Construct a new " ,ChartWindow " with a new border size. "
+                  "By default, the border size will be 0 (No border).")))
+          (method-spec
+            (name "border-color")
+            (arity 2)
+            (params ())
+            (contract (a-arrow ,Self ,Color ,ChartWindow))
+            (args ("self" "color"))
+            (return ,ChartWindow)
+            (doc ("Construct a new " ,ChartWindow " with a new border color. "
+                  "By default, the color will be grey")))
+          (method-spec
+            (name "display")
+            (arity 1)
+            (params ())
+            (contract (a-arrow ,Self ,Image))
+            (args ("self"))
+            (return ,Image)
+            (doc ("Display the chart on an interactive dialog, "
+                  "and produce an " ,Image " after the dialog is closed.")))
+          (method-spec
+            (name "get-image")
+            (arity 1)
+            (params ())
+            (contract (a-arrow ,Self ,Image))
+            (args ("self"))
+            (return ,Image)
+            (doc ("Produce an " ,Image " of the chart"))))))
     (constr-spec
       (name "plot-chart-window")
       (with-members (,x-min-meth ,x-max-meth ,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth
-                     ,num-samples-meth)))
+                     ,num-samples-meth ,gridlines-minspacing-meth ,gridlines-color-meth ,show-minor-gridlines-meth 
+                     ,minor-gridlines-minspacing-meth ,minor-gridlines-color-meth ,select-multiple-meth)))
     (constr-spec
       (name "histogram-chart-window")
       (with-members (,x-min-meth ,x-max-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
@@ -621,7 +983,7 @@ num-speakers = [list: 251388301, 125344736, 110041604,  89800800,      79000000]
   Getting from this data to a data series is simple: use a @emph{chart constructor} -- here, the bar chart constructor @pyret{from-list.bar-chart} -- to create a @|DataSeries|:
 
   @pyret-block{
-a-pie-chart-series = from-list.bar-chart(countries, num-speakers)
+a-bar-chart-series = from-list.bar-chart(countries, num-speakers)
   }
 
   As another example, consider the typical high-school math task of ``graphing a function'', that is, plotting the values of a function for some range of inputs. Another chart constructor, @pyret{from-list.function-plot}, would create the relevant @|DataSeries|:
@@ -752,6 +1114,55 @@ an-example-line-plot-series
     @(in-image "line-plot-constructor")
   }
 
+  @function["from-list.labeled-line-plot"
+    #:contract (a-arrow (L-of S) (L-of N) (L-of N) DataSeries)
+    #:args '(("labels" #f) ("xs" #f) ("ys" #f))
+    #:return (a-pred DataSeries (in-link "line-plot-series"))
+  ]{
+
+    Constructing a line plot series from @pyret{xs} and @pyret{ys}, representing x and y
+    coordinates of points, and @pyret{labels} whose element representing a label for each point.
+    The labels will show up when you display the chart and hover over the points. 
+    See more details at @(in-link "line-plot-series").
+
+
+    @examples{
+an-example-labeled-line-plot-series = from-list.labeled-line-plot(
+  [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+  [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
+  [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
+an-example-labeled-line-plot-series
+    }
+    @(in-image "labeled-line-plot-constructor")
+  }
+
+  @function["from-list.image-line-plot"
+    #:contract (a-arrow (L-of Image) (L-of N) (L-of N) DataSeries)
+    #:args '(("images" #f) ("xs" #f) ("ys" #f))
+    #:return (a-pred DataSeries (in-link "line-plot-series"))
+  ]{
+
+    Constructing a line plot series from @pyret{xs} and @pyret{ys}, representing x and y
+    coordinates of points, and @pyret{images} whose element representing a image-label for each point.
+    The image-labels will show up when you display the chart and hover over the points. 
+    See more details at @(in-link "line-plot-series").
+
+
+    @examples{
+include image
+an-example-image-line-plot-series = from-list.image-line-plot(
+  [list: circle(30, "outline", "red"), circle(30, "solid", "red"),
+         circle(30, "outline", "blue"), circle(30, "solid", "blue"), 
+         circle(30, "outline", "green"), circle(30, "solid", "green"), 
+         circle(30, "outline", "purple"), circle(30, "solid", "purple"),
+         circle(30, "outline", "black"), circle(30, "solid", "black")],
+  [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
+  [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
+an-example-image-line-plot-series
+    }
+    @(in-image "image-line-plot-constructor")
+  }
+
   @function["from-list.scatter-plot"
     #:contract (a-arrow (L-of N) (L-of N) DataSeries)
     #:args '(("xs" #f) ("ys" #f))
@@ -805,6 +1216,7 @@ an-example-labeled-scatter-plot-series
 
 
     @examples{
+include image
 an-example-image-scatter-plot-series = from-list.image-scatter-plot(
   [list: circle(30, "outline", "red"), circle(30, "solid", "red"),
          circle(30, "outline", "blue"), circle(30, "solid", "blue"), 
@@ -1035,6 +1447,96 @@ a-labeled-box-plot-series
   }
 
   @;############################################################################
+  @section{Other Data Types}
+  This section defines the other data types used in the chart library.
+
+  @type-spec["StackType" (list) #:private #t]{
+    @nested{@|StackType| is an enumerated data definition for @in-link["multi-bar-chart-series"]. It describes the method which related bar chart values are displayed together. 
+                         
+    @data-spec2["StackType" (list) #:no-toc #t
+              (list
+                (singleton-spec2 "StackType" "grouped")
+                (singleton-spec2 "StackType" "absolute")
+                (singleton-spec2 "StackType" "relative")
+                (singleton-spec2 "StackType" "percent"))]}
+
+    @nested[#:style 'inset]{
+      @singleton-doc["StackType" "grouped" StackType]{
+        The grouped @|StackType| is for when related bar chart values are placed next to each other. This is the default @|StackType| created with @in-link["from-list.grouped-bar-chart"].
+      }
+
+      @singleton-doc["StackType" "absolute" StackType]{
+        The absolute @|StackType| is for when related bar chart values are placed on top of each other. This is the default @|StackType| created with @in-link["from-list.stacked-bar-chart"].
+      }
+
+      @singleton-doc["StackType" "relative" StackType]{
+        The relative @|StackType| is for when related bar chart values are placed on top of each other.
+        Each related bar chart value is formatted as a fraction of 1 (the total stack). 
+      }
+      
+      @singleton-doc["StackType" "percent" StackType]{
+        The percent @|StackType| is for when related bar chart values are placed on top of each other.
+        Each related bar chart value is formatted as a percentage of the total stack. 
+      }
+    }
+  }
+
+  @type-spec["TrendlineType" (list) #:private #t]{
+    @nested{@|TrendlineType| is an enumerated data definition for @in-link["line-plot-series"] and @in-link["scatter-plot-series"]. 
+            It describes the function type to draw the estimated trendline. 
+                         
+    @data-spec2["TrendlineType" (list) #:no-toc #t
+              (list
+                (singleton-spec2 "TrendlineType" "no-trendline")
+                (singleton-spec2 "TrendlineType" "linear")
+                (singleton-spec2 "TrendlineType" "exponential")
+                (constructor-spec "TrendlineType" "polynomial" (list `("degree" ("type" "normal") ("contract" ,NumInteger)))))]}
+
+    @nested[#:style 'inset]{
+      @singleton-doc["TrendlineType" "no-trendline" TrendlineType]{
+        The no-trendline @|TrendlineType| is for when we dont want to create a trendline. This is the default @|TrendlineType|. 
+      }
+
+      @singleton-doc["TrendlineType" "linear" TrendlineType]{
+        The linear @|TrendlineType| is for when we want to create a linear trendline. This is equivalent to polynomial(1). 
+      }
+
+      @singleton-doc["TrendlineType" "exponential" TrendlineType]{
+        The exponential @|TrendlineType| is for when we want to create a exponential trendline.
+      }
+      
+      @constructor-doc["TrendlineType" "polynomial" (list `("degree" ("type" "normal") ("contract" ,NumInteger))) TrendlineType]{
+        The polynomial @|TrendlineType| is for when we want to create a polynomial trendline with a power of @emph{degree}.
+        The degree must be non-negative. 
+      }
+    }
+  }
+
+  @type-spec["PointShape" (list) #:private #t]{
+    @nested{@|PointShape| is an enumerated data definition for @in-link["line-plot-series"] and @in-link["scatter-plot-series"]. 
+            It describes the shape of the points on these plot series. 
+                         
+    @data-spec2["PointShape" (list) #:no-toc #t
+              (list
+                (singleton-spec2 "PointShape" "circle-shape")
+                (constructor-spec "PointShape" "regular-polygon-shape" (list `("sides" ("type" "normal") ("contract" ,NumInteger))
+                                                                       `("dent" ("type" "normal") ("contract" ,N)))))]}
+
+    @nested[#:style 'inset]{
+      @singleton-doc["PointShape" "circle-shape" PointShape]{
+        The circle-shape @|PointShape| is for when we want our points to just be circles. This is the default @|PointShape|. 
+      }
+
+      @constructor-doc["PointShape" "regular-polygon-shape" (list `("sides" ("type" "normal") ("contract" ,NumInteger))
+                                                            `("dent" ("type" "normal") ("contract" ,N))) PointShape]{
+        The regular-polygon-shape @|PointShape| is for when we want to create a regular polygon of @emph{sides} number of sides and 
+        with the sides offset by @emph["dent"] multiplied by the apothem of the regular polygon either inward (negative) or outward (positive). 
+        For examples see @in-link["line-plot-series"]@pyret-method["DataSeries" "line-plot-series" "point-shape"] or 
+        @in-link["scatter-plot-series"]@pyret-method["DataSeries" "scatter-plot-series" "point-shape"]. 
+      }
+    }
+  }
+  @;############################################################################
   @section{DataSeries}
 
   @data-spec2["DataSeries" (list) (list
@@ -1086,20 +1588,113 @@ render-chart(f-series).display()} ,(in-image "function-plot-example"))
     A line plot series
   }
   @repl-examples[
-   `(@{ine-plot-series = from-list.line-plot(
+   `(@{lineplot-series = from-list.line-plot(
   [list: 0,  1, 2,  3, 6, 7,  10, 13, 16, 20],
   [list: 18, 2, 28, 9, 7, 29, 25, 26, 29, 24])
-render-chart(line-plot-series).display()} ,(in-image "line-plot-example"))
+render-chart(lineplot-series).display()} ,(in-image "line-plot-example"))
   ]
 
   @method-doc["DataSeries" "line-plot-series" "color"]
   @repl-examples[
    `(@{include color
-render-chart(line-plot-series.color(orange)).display()} ,(in-image "line-plot-color-example"))
+render-chart(lineplot-series.color(orange)).display()} ,(in-image "line-plot-color-example"))
   ]
+
   @method-doc["DataSeries" "line-plot-series" "legend"]
   @repl-examples[
-   `(@{render-chart(line-plot-series.legend("My Legend")).display()} ,(in-image "line-plot-legend-example"))
+   `(@{render-chart(lineplot-series.legend("My Legend")).display()} ,(in-image "line-plot-legend-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "labels"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.labels(
+                    [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"])
+                   ).display()} ,(in-image "line-plot-labels-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "image-labels"]
+  @repl-examples[
+  `(@{include image
+      render-chart(lineplot-series.image-labels(
+                    [list: circle(30, "outline", "red"), 
+                           circle(30, "solid", "red"),
+                           circle(30, "outline", "blue"), 
+                           circle(30, "solid", "blue"),
+                           circle(30, "outline", "green"), 
+                           circle(30, "solid", "green"),
+                           circle(30, "outline", "purple"), 
+                           circle(30, "solid", "purple"),
+                           circle(30, "outline", "black"),
+                           circle(30, "solid", "black")])
+                  ).display()} ,(in-image "line-plot-image-labels-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "curved"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.curved(true)).display()} ,(in-image "line-plot-curved-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "linewidth"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.linewidth(20)).display()} ,(in-image "line-plot-linewidth-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "dashed-line"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.dashed-line(true)).display()} ,(in-image "line-plot-dashed-line-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "dashline-style"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.dashline-style([list: 5, 1, 3])).display()} ,(in-image "line-plot-dashline-style-example"))
+  ]
+  
+  @method-doc["DataSeries" "line-plot-series" "point-shape"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.point-shape(circle-shape)).display()
+       render-chart(lineplot-series.point-shape(regular-polygon-shape(3, 0)))
+                   .display()
+       render-chart(lineplot-series.point-shape(regular-polygon-shape(5, 0)))
+                   .display()
+       render-chart(lineplot-series.point-shape(regular-polygon-shape(5, -1)))
+                   .display()
+       render-chart(lineplot-series.point-shape(regular-polygon-shape(5, -0.5)))
+                   .display()
+       render-chart(lineplot-series.point-shape(regular-polygon-shape(5, 5)))
+                   .display()} ,(in-image "line-plot-point-shape-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "point-size"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.point-size(10)).display()} ,(in-image "line-plot-ptsize-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "trendline-type"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.trendline-type(no-trendline)).display()
+       render-chart(lineplot-series.trendline-type(linear)).display()
+       render-chart(lineplot-series.trendline-type(exponential)).display()
+       render-chart(lineplot-series.trendline-type(polynomial(0))).display()
+       render-chart(lineplot-series.trendline-type(polynomial(3))).display()
+       render-chart(lineplot-series.trendline-type(polynomial(4))).display()} ,(in-image "line-plot-trendline-type-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "trendline-color"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.trendline-type(linear)
+                                   .trendline-color(purple)).display()} ,(in-image "line-plot-trendline-color-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "trendline-width"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.trendline-type(exponential)
+                                   .trendline-width(10)).display()} ,(in-image "line-plot-trendline-width-example"))
+  ]
+
+  @method-doc["DataSeries" "line-plot-series" "trendline-opacity"]
+  @repl-examples[
+   `(@{render-chart(lineplot-series.trendline-type(exponential)
+                                   .trendline-opacity(0.1)).display()} ,(in-image "line-plot-trendline-opacity-example"))
   ]
 
   @;################################
@@ -1110,27 +1705,93 @@ render-chart(line-plot-series.color(orange)).display()} ,(in-image "line-plot-co
     point in the interactive dialog will show the label.
   }
    @repl-examples[
-   `(@{scatter-plot-series = from-list.labeled-scatter-plot(
-  [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+   `(@{scatterplot-series = from-list.scatter-plot(
   [list: 0,   1,   2,   3,   6,   7,   10, 13,   16,  20],
   [list: 18,  2,   28,  9,   7,   29,  25, 26,   29,  24])
-render-chart(scatter-plot-series).display()} ,(in-image "scatter-plot-example"))
+render-chart(scatterplot-series).display()} ,(in-image "scatter-plot-example"))
   ]
 
   @method-doc["DataSeries" "scatter-plot-series" "color"]
   @repl-examples[
    `(@{include color
-   render-chart(scatter-plot-series.color(orange)).display()} ,(in-image "scatter-plot-color-example"))
+   render-chart(scatterplot-series.color(orange)).display()} ,(in-image "scatter-plot-color-example"))
   ]
 
   @method-doc["DataSeries" "scatter-plot-series" "legend"]
   @repl-examples[
-   `(@{render-chart(scatter-plot-series.legend("My Legend")).display()} ,(in-image "scatter-plot-legend-example"))
+   `(@{render-chart(scatterplot-series.legend("My Legend")).display()} ,(in-image "scatter-plot-legend-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "labels"]
+  @repl-examples[
+   `(@{render-chart(scatterplot-series.labels(
+                    [list: "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"])
+                   ).display()} ,(in-image "scatter-plot-labels-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "image-labels"]
+  @repl-examples[
+   `(@{include image
+      render-chart(scatterplot-series.image-labels(
+                    [list: circle(30, "outline", "red"), 
+                           circle(30, "solid", "red"),
+                           circle(30, "outline", "blue"), 
+                           circle(30, "solid", "blue"),
+                           circle(30, "outline", "green"), 
+                           circle(30, "solid", "green"),
+                           circle(30, "outline", "purple"), 
+                           circle(30, "solid", "purple"),
+                           circle(30, "outline", "black"),
+                           circle(30, "solid", "black")])
+                  ).display()} ,(in-image "scatter-plot-image-labels-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "point-shape"]
+  @repl-examples[
+   `(@{render-chart(scatterplot-series.point-shape(circle-shape)).display()
+       render-chart(scatterplot-series.point-shape(regular-polygon-shape(3, 0)))
+                   .display()
+       render-chart(scatterplot-series.point-shape(regular-polygon-shape(5, 0)))
+                   .display()
+       render-chart(scatterplot-series.point-shape(regular-polygon-shape(5, -1)))
+                   .display()
+       render-chart(scatterplot-series.point-shape(regular-polygon-shape(5, -0.5)))
+                   .display()
+       render-chart(scatterplot-series.point-shape(regular-polygon-shape(5, 5)))
+                   .display()} ,(in-image "scatter-plot-point-shape-example"))
   ]
 
   @method-doc["DataSeries" "scatter-plot-series" "point-size"]
   @repl-examples[
-   `(@{render-chart(scatter-plot-series.point-size(10)).display()} ,(in-image "scatter-plot-ptsize-example"))
+   `(@{render-chart(scatterplot-series.point-size(10)).display()} ,(in-image "scatter-plot-ptsize-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "trendline-type"]
+  @repl-examples[
+   `(@{render-chart(scatterplot-series.trendline-type(no-trendline)).display()
+       render-chart(scatterplot-series.trendline-type(linear)).display()
+       render-chart(scatterplot-series.trendline-type(exponential)).display()
+       render-chart(scatterplot-series.trendline-type(polynomial(0))).display()
+       render-chart(scatterplot-series.trendline-type(polynomial(3))).display()
+       render-chart(scatterplot-series.trendline-type(polynomial(4))).display()} ,(in-image "scatter-plot-trendline-type-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "trendline-color"]
+  @repl-examples[
+   `(@{render-chart(scatterplot-series.trendline-type(linear)
+                                   .trendline-color(purple)).display()} ,(in-image "scatter-plot-trendline-color-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "trendline-width"]
+  @repl-examples[
+   `(@{render-chart(scatterplot-series.trendline-type(exponential)
+                                   .trendline-width(10)).display()} ,(in-image "scatter-plot-trendline-width-example"))
+  ]
+
+  @method-doc["DataSeries" "scatter-plot-series" "trendline-opacity"]
+  @repl-examples[
+   `(@{render-chart(scatterplot-series.trendline-type(exponential)
+                                   .trendline-opacity(0.1)).display()} ,(in-image "scatter-plot-trendline-opacity-example"))
   ]
 
   @;################################
@@ -1147,6 +1808,7 @@ render-chart(scatter-plot-series).display()} ,(in-image "scatter-plot-example"))
 # (though we did run a few trials so that the result doesn't look egregious)
 render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
   ]
+
   @method-doc["DataSeries" "bar-chart-series" "color"]
   @repl-examples[
    `(@{include color
@@ -1155,7 +1817,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "bar-chart-series" "colors"]
   @repl-examples[
-   `(@{render-chart(barchart-series.colors([list: red, orange, purple])).display()} ,(in-image "bar-chart-colors-example"))
+   `(@{include color
+     render-chart(barchart-series.colors([list: red, orange, purple])).display()} ,(in-image "bar-chart-colors-example"))
   ]
 
   @method-doc["DataSeries" "bar-chart-series" "sort"]
@@ -1186,7 +1849,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "bar-chart-series" "pointer-color"]
   @repl-examples[
-   `(@{render-chart(barchart-series.add-pointers([list: 6, 7], 
+   `(@{include color
+       render-chart(barchart-series.add-pointers([list: 6, 7], 
                                           [list: "median", "mean + 1"])
                             .pointer-color(orange))
                             .display()} ,(in-image "bar-chart-pointer-color-example"))
@@ -1234,7 +1898,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "bar-chart-series" "interval-color"]
   @repl-examples[
-   `(@{render-chart(barchart-series.error-bars([list: [list: -1, 1], [list: -1, 1],
+   `(@{include color
+       render-chart(barchart-series.error-bars([list: [list: -1, 1], [list: -1, 1],
       [list: -1, 2], [list: -1, 1], [list: -1, 1], [list: -1, 1],
       [list: -1, 1]])       
                             .interval-color(orange))
@@ -1289,8 +1954,10 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "multi-bar-chart-series" "colors"]
   @repl-examples[
-   `(@{render-chart(grouped-series.colors([list: red, orange, blue])).display()} ,(in-image "grouped-bar-chart-colors-example"))
-   `(@{render-chart(stacked-series.colors([list: red, orange, blue])).display()} ,(in-image "stacked-bar-chart-colors-example"))
+   `(@{include color
+     render-chart(grouped-series.colors([list: red, orange, blue])).display()} ,(in-image "grouped-bar-chart-colors-example"))
+   `(@{include color
+     render-chart(stacked-series.colors([list: red, orange, blue])).display()} ,(in-image "stacked-bar-chart-colors-example"))
   ]
 
   @method-doc["DataSeries" "multi-bar-chart-series" "sort"]
@@ -1317,7 +1984,7 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
                               .display()} ,(in-image "grouped-bar-chart-sort-by-label-example"))
     `(@{descending-str-cmp = {(a, b): a > b}
    eq = {(a, b): a == b}
-   render-chart(stacked-series.sort-by-label(descend-str-cmp, eq))
+   render-chart(stacked-series.sort-by-label(descending-str-cmp, eq))
                               .display()} ,(in-image "stacked-bar-chart-sort-by-label-example"))
   ]
 
@@ -1347,11 +2014,13 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "multi-bar-chart-series" "pointer-color"]
   @repl-examples[
-   `(@{render-chart(grouped-series.add-pointers([list: 1874094, 41417373 / 14], 
+   `(@{include color
+       render-chart(grouped-series.add-pointers([list: 1874094, 41417373 / 14], 
                                               [list: "median", "mean"])
                                   .pointer-color(blue))
                                   .display()} ,(in-image "grouped-bar-chart-pointer-color-example"))
-   `(@{render-chart(stacked-series.add-pointers([list: 18409317.5, 20708686.5],
+   `(@{include color
+       render-chart(stacked-series.add-pointers([list: 18409317.5, 20708686.5],
                                                [list: "median", "mean"])
                                   .pointer-color(red))
                                   .display()} ,(in-image "stacked-bar-chart-pointer-color-example"))
@@ -1375,23 +2044,23 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "multi-bar-chart-series" "stacking-type"]
   @repl-examples[
-   `(@{render-chart(grouped-series.stacking-type('none'))
+   `(@{render-chart(grouped-series.stacking-type(grouped))
                                   .display()
-       render-chart(grouped-series.stacking-type('absolute'))
+       render-chart(grouped-series.stacking-type(absolute))
                                   .display()
-       render-chart(grouped-series.stacking-type('relative'))
+       render-chart(grouped-series.stacking-type(relative))
                                   .display()
-       render-chart(grouped-series.stacking-type('percent'))
+       render-chart(grouped-series.stacking-type(percent))
                                   .display()
                       
        # The following produces the same output as the ones above
-       render-chart(stacked-series.stacking-type('none'))
+       render-chart(stacked-series.stacking-type(grouped))
                                   .display()
-       render-chart(stacked-series.stacking-type('absolute'))
+       render-chart(stacked-series.stacking-type(absolute))
                                   .display()
-       render-chart(stacked-series.stacking-type('relative'))
+       render-chart(stacked-series.stacking-type(relative))
                                   .display()
-       render-chart(stacked-series.stacking-type('percent'))
+       render-chart(stacked-series.stacking-type(percent))
                                   .display()} ,(in-image "stacking-type-example"))
   ]
 
@@ -1479,7 +2148,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
 
   @method-doc["DataSeries" "multi-bar-chart-series" "interval-color"]
   @repl-examples[
-   `(@{grouped-small-data = from-list.grouped-bar-chart(
+   `(@{include color
+       grouped-small-data = from-list.grouped-bar-chart(
                             [list: "Year 1", "Year 2"],
                             [list:
                               [list: 50, 20, 10],
@@ -1491,7 +2161,8 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
        render-chart(grouped-small-data.intervals(intervals)
                                       .interval-color(yellow))
                                       .display()} ,(in-image "grouped-bar-chart-interval-color-example"))
-   `(@{stacked-small-data = from-list.stacked-bar-chart(
+   `(@{include color
+       stacked-small-data = from-list.stacked-bar-chart(
                             [list: "Year 1", "Year 2"],
                             [list:
                               [list: 50, 20, 10],
@@ -1514,24 +2185,48 @@ render-chart(barchart-series).display()} ,(in-image "bar-chart-example"))
     A pie chart series. Each slice could be offset from the center.
   }
 
-  @examples{
-piechart-series = from-list.pie-chart(
-  [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
-  [list: 10,       6,       1,   3,     5,       8,        9])
-# This data is obtained by randomization. They have no meaning whatsoever.
-# (though we did run a few trials so that the result doesn't look egregious)
-render-chart(piechart-series).display()
-    }
-  @(in-image "pie-chart")
+  @repl-examples[
+    `(@{piechart-series = from-list.pie-chart(
+    [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
+    [list: 10,       6,       1,   3,     5,       8,        9])
+  # This data is obtained by randomization. They have no meaning whatsoever.
+  # (though we did run a few trials so that the result doesn't look egregious)
+  render-chart(piechart-series).display()} ,(in-image "pie-chart-example"))
+    ]
 
-  @examples{
-exploding-piechart-series = from-list.exploding-pie-chart(
-  [list: "Pyret", "OCaml", "C", "C++", "Python", "Racket", "Smalltalk"],
-  [list: 10,       6,       1,   3,     5,       8,        9],
-  [list: 0.2,      0,       0,   0,     0,       0.1,      0])
-render-chart(exploding-piechart-series).display()
-  }
-  @(in-image "exploding-pie-chart")
+  @method-doc["DataSeries" "pie-chart-series" "explode"]
+  @repl-examples[
+   `(@{render-chart(piechart-series.explode([list: 0.2, 0, 0, 0, 0, 0.1, 0]))
+                   .display()} ,(in-image "pie-chart-explode-example"))
+  ]
+
+  @method-doc["DataSeries" "pie-chart-series" "colors"]
+  @repl-examples[
+   `(@{render-chart(piechart-series.colors([list: red, blue, green, purple]))
+                   .display()} ,(in-image "pie-chart-colors-example"))
+  ]
+
+  @method-doc["DataSeries" "pie-chart-series" "threeD"]
+  @repl-examples[
+   `(@{render-chart(piechart-series.threeD(true)).display()} ,(in-image "pie-chart-threeD-example"))
+  ]
+
+  @method-doc["DataSeries" "pie-chart-series" "piehole"]
+  @repl-examples[
+   `(@{render-chart(piechart-series.piehole(0.35)).display()} ,(in-image "pie-chart-piehole-example"))
+  ]
+
+  @method-doc["DataSeries" "pie-chart-series" "rotate"]
+  @repl-examples[
+   `(@{render-chart(piechart-series.rotate(-30)).display()} ,(in-image "pie-chart-rotate-example"))
+  ]
+
+  @method-doc["DataSeries" "pie-chart-series" "collapse-threshold"]
+  @repl-examples[
+   `(@{render-chart(piechart-series.collapse-threshold(0.12))
+                   .display()} ,(in-image "pie-chart-collapse-threshold-example"))
+  ]
+
 
 
   @;################################
@@ -1541,18 +2236,52 @@ render-chart(exploding-piechart-series).display()
     A histogram series.
   }
 
-  @method-doc["DataSeries" "histogram-series" "bin-width"]
-  @method-doc["DataSeries" "histogram-series" "max-num-bins"]
-  @method-doc["DataSeries" "histogram-series" "min-num-bins"]
-  @method-doc["DataSeries" "histogram-series" "num-bins"]
+  @repl-examples[
+    `(@{example-histogram-series = from-list.histogram(
+          range(1, 100).map(lam(_): num-random(1000) end)
+        )
+        render-chart(example-histogram-series).display()} ,(in-image "histogram-example"))
+  ]
 
-  @examples{
-histogram-series = from-list.labeled-histogram(
-  range(1, 100).map(lam(x): "foo " + num-to-string(x) end),
-  range(1, 100).map(lam(_): num-random(1000) end))
-render-chart(histogram-series).display()
-  }
-  @(in-image "labeled-histogram")
+  @method-doc["DataSeries" "histogram-series" "labels"]
+  @repl-examples[
+   `(@{render-chart(example-histogram-series.labels( 
+                      range(1, 100).map(lam(x): "foo " + num-to-string(x) end)
+                    ))
+                   .display()} ,(in-image "histogram-labels-example"))
+  ]
+
+  @method-doc["DataSeries" "histogram-series" "color"]
+  @repl-examples[
+   `(@{include color
+       render-chart(example-histogram-series.color(green))
+                   .display()} ,(in-image "histogram-color-example"))
+  ]
+
+  @method-doc["DataSeries" "histogram-series" "bin-width"]
+  @repl-examples[
+   `(@{render-chart(example-histogram-series.bin-width(25))
+                   .display()} ,(in-image "histogram-bin-width-example"))
+  ]
+  
+  @method-doc["DataSeries" "histogram-series" "max-num-bins"]
+  @repl-examples[
+   `(@{render-chart(example-histogram-series.max-num-bins(10))
+                   .display()} ,(in-image "histogram-max-num-bins-example"))
+  ]
+
+  @method-doc["DataSeries" "histogram-series" "min-num-bins"]
+  @repl-examples[
+   `(@{render-chart(example-histogram-series.min-num-bins(20))
+                   .display()} ,(in-image "histogram-min-num-bins-example"))
+  ]
+  
+  @method-doc["DataSeries" "histogram-series" "num-bins"]
+  @repl-examples[
+   `(@{render-chart(example-histogram-series.num-bins(3))
+                   .display()} ,(in-image "histogram-num-bins-example"))
+  ]
+
 
   @;################################
   @subsection{Box Plot Chart Series}
@@ -1571,6 +2300,18 @@ render-chart(histogram-series).display()
   @method-doc["DataSeries" "box-chart-series" "horizontal"]
   @repl-examples[
    `(@{render-chart(a-box-plot-series.horizontal(true)).display()} ,(in-image "horizontal-box-chart-example"))
+  ]
+
+  @method-doc["DataSeries" "box-chart-series" "labels"]
+  @repl-examples[
+   `(@{render-chart(a-box-plot-series
+                    .labels([list: "One", "Two", "Three"]))
+                  .display()} ,(in-image "box-chart-labels-example"))
+  ]
+
+  @method-doc["DataSeries" "box-chart-series" "color"]
+  @repl-examples[
+   `(@{render-chart(a-box-plot-series.color(green)).display()} ,(in-image "box-chart-color-example"))
   ]
   @;############################################################################
   @section{Renderers}
@@ -1638,6 +2379,9 @@ a-chart-window = render-charts([list: series-1, series-2])
   @method-doc["ChartWindow" #f "title"]
   @method-doc["ChartWindow" #f "width"]
   @method-doc["ChartWindow" #f "height"]
+  @method-doc["ChartWindow" #f "background-color"]
+  @method-doc["ChartWindow" #f "border-size"]
+  @method-doc["ChartWindow" #f "border-color"]
   @method-doc["ChartWindow" #f "display"]
   @method-doc["ChartWindow" #f "get-image"]
 
@@ -1656,6 +2400,12 @@ a-chart-window = render-charts([list: series-1, series-2])
   @method-doc["ChartWindow" "plot-chart-window" "num-samples"]
   @method-doc["ChartWindow" "plot-chart-window" "x-axis"]
   @method-doc["ChartWindow" "plot-chart-window" "y-axis"]
+  @method-doc["ChartWindow" "plot-chart-window" "gridlines-minspacing"]
+  @method-doc["ChartWindow" "plot-chart-window" "gridlines-color"]
+  @method-doc["ChartWindow" "plot-chart-window" "show-minor-gridlines"]
+  @method-doc["ChartWindow" "plot-chart-window" "minor-gridlines-minspacing"]
+  @method-doc["ChartWindow" "plot-chart-window" "minor-gridlines-color"]
+  @method-doc["ChartWindow" "plot-chart-window" "select-multiple"]
 
   @;################################
   @subsection{Bar Chart Window}
@@ -1685,8 +2435,6 @@ a-chart-window = render-charts([list: series-1, series-2])
   @constructor-doc["ChartWindow" "box-chart-window" opaque ChartWindow]{
     A box plot chart window.
   }
-  @method-doc["ChartWindow" "box-chart-window" "y-min"]
-  @method-doc["ChartWindow" "box-chart-window" "y-max"]
   @method-doc["ChartWindow" "box-chart-window" "x-axis"]
   @method-doc["ChartWindow" "box-chart-window" "y-axis"]
 
