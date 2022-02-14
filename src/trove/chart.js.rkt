@@ -571,7 +571,7 @@ a-series = from-list.exploding-pie-chart(
     See more details at @(in-link "histogram-series").
 
     @examples{
-a-series = from-list.labeled-histogram(range(1, 100).map(lam(_): num-random(1000) end))
+a-series = from-list.histogram(range(1, 100).map(lam(_): num-random(1000) end))
     }
   }
 
