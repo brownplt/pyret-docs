@@ -89,6 +89,30 @@
     (doc ("Construct a new " ,DataSeries " with a new number of bins. "
           "By default, the number will be inferred."))))
 
+@(define horizontal-meth
+  `(method-spec
+    (name "horizontal")
+    (arity 2)
+    (params ())
+    (args ("self" "horizontal"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,N ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " that will be displayed horizontally. "
+          "By default, box-plot-series will display vertically."))))
+
+@(define show-outliers-meth
+  `(method-spec
+    (name "show-outliers")
+    (arity 2)
+    (params ())
+    (args ("self" "show-outliers"))
+    (return ,DataSeries)
+    (contract (a-arrow ,Self ,N ,DataSeries))
+    (doc ("Construct a new " ,DataSeries " that will display outliers "
+          "as small circles, beyond the whiskers of a box-plot. When the "
+          "value is false, the whiskers will be extended to the full "
+          "range of the dataset. Note: the default value is true."))))
+
 @(define x-axis-meth
   `(method-spec
     (name "x-axis")
@@ -110,6 +134,28 @@
     (contract (a-arrow ,Self ,S ,ChartWindow))
     (doc ("Construct a new " ,ChartWindow " with a new y-axis label. "
           "By default, the label is empty."))))
+
+@(define min-meth
+  `(method-spec
+    (name "min")
+    (arity 2)
+    (params ())
+    (args ("self" "min"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "min is changed. By default, the value will be inferred."))))
+
+@(define max-meth
+  `(method-spec
+    (name "max")
+    (arity 2)
+    (params ())
+    (args ("self" "max"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "max is changed. By default, the value will be inferred."))))
 
 @(define x-min-meth
   `(method-spec
@@ -182,6 +228,8 @@
     (fun-spec (name "from-list.exploding-pie-chart") (arity 3))
     (fun-spec (name "from-list.histogram") (arity 2))
     (fun-spec (name "from-list.labeled-histogram") (arity 3))
+    (fun-spec (name "from-list.box-plot") (arity 2))
+    (fun-spec (name "from-list.labeled-box-plot") (arity 3))
     (fun-spec (name "render-chart") (arity 1))
     (fun-spec (name "render-charts") (arity 1))
     (constr-spec
@@ -203,11 +251,15 @@
       (name "histogram-series")
       (with-members (,bin-width-meth ,max-num-bins-meth ,min-num-bins-meth
                      ,num-bins-meth)))
+    (constr-spec
+      (name "box-plot-series")
+      (with-members (,horizontal-meth ,show-outliers-meth)))
     (data-spec
       (name "DataSeries")
       (type-vars ())
       (variants ("function-plot-series" "line-plot-series" "scatter-plot-series"
-                 "bar-chart-series" "pie-chart-series" "histogram-series"))
+                 "bar-chart-series" "pie-chart-series" "histogram-series"
+                 "box-plot-series"))
       (shared))
     (data-spec
       (name "ChartWindow")
@@ -265,6 +317,9 @@
     (constr-spec
       (name "histogram-chart-window")
       (with-members (,x-min-meth ,x-max-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
+    (constr-spec
+      (name "box-plot-chart-window")
+      (with-members (,min-meth ,max-meth)))
     (constr-spec
       (name "bar-chart-window")
       (with-members (,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
@@ -591,6 +646,38 @@ a-series = from-list.labeled-histogram(
     }
   }
 
+    @function["from-list.box-plot"
+    #:contract (a-arrow (L-of (L-of N)) DataSeries)
+    #:args '(("value-lists" #f))
+    #:return (a-pred DataSeries (in-link "box-plot-series"))
+  ]{
+    Constructing a box-plot series from @pyret{value-lists}. 
+    This series will contain two box-plots.
+
+    @examples{
+valuesA = range(1, 100).map(lam(_): num-random(1000) end)
+valuesB = range(1, 100).map(lam(_): num-random(42) end)
+a-series = from-list.box-plot([list: valuesA, valueB])
+    }
+  }
+
+  @function["from-list.labeled-box-plot"
+    #:contract (a-arrow (L-of S) (L-of (L-of N)) DataSeries)
+    #:args '(("labels" #f) ("value-lists" #f))
+    #:return (a-pred DataSeries (in-link "box-plot-series"))
+  ]{
+    Constructing a box-plot series from @pyret{value-lists}. 
+    This series will contain two box-plots, labeled with strings
+    from @pyret{labels}.
+
+    @examples{
+valuesA = range(1, 100).map(lam(_): num-random(1000) end)
+valuesB = range(1, 100).map(lam(_): num-random(42) end)
+labels = [list: "valuesA", "valuesB"]
+a-series = from-list.box-plot(labels, [list: valuesA, valueB])
+    }
+  }
+
   @;############################################################################
   @section{DataSeries}
 
@@ -601,6 +688,7 @@ a-series = from-list.labeled-histogram(
   @constructor-spec["DataSeries" "bar-chart-series" opaque]
   @constructor-spec["DataSeries" "pie-chart-series" opaque]
   @constructor-spec["DataSeries" "histogram-series" opaque]
+  @constructor-spec["DataSeries" "box-plot-series" opaque]
   )]
 
   @;################################
@@ -738,6 +826,21 @@ render-chart(a-series).display()
   }
   @(in-image "labeled-histogram")
 
+  @;################################
+  @subsection{Box-Plot Series}
+
+  @constructor-doc["DataSeries" "box-plot-series" opaque DataSeries]{
+    A box-plot series. Note: this series can contain multiple box-plots!
+  }
+
+  @method-doc["DataSeries" "box-plot-series" "horizontal"]
+  @method-doc["DataSeries" "box-plot-series" "show-outliers"]
+
+@examples{
+a-series = from-list.box-plot(range(1, 100))
+render-chart(a-series).display()
+  }
+
   @;############################################################################
   @section{Renderers}
 
@@ -755,6 +858,7 @@ render-chart(a-series).display()
     @item{@in-link{bar-chart-series} creates a @in-link{bar-chart-window}}
     @item{@in-link{pie-chart-series} creates a @in-link{pie-chart-window}}
     @item{@in-link{histogram-series} creates a @in-link{histogram-chart-window}}
+    @item{@in-link{box-plot-series} creates a @in-link{box-plot-chart-window}}
     ]
 
     @examples{
@@ -792,6 +896,7 @@ a-chart-window = render-charts([list: series-1, series-2])
   @constructor-spec["ChartWindow" "bar-chart-window" opaque]
   @constructor-spec["ChartWindow" "histogram-chart-window" opaque]
   @constructor-spec["ChartWindow" "plot-chart-window" opaque]
+  @constructor-spec["ChartWindow" "box-plot-chart-window" opaque]
   )]
 
   @;################################
@@ -848,4 +953,13 @@ a-chart-window = render-charts([list: series-1, series-2])
   @method-doc["ChartWindow" "histogram-chart-window" "y-max"]
   @method-doc["ChartWindow" "histogram-chart-window" "x-axis"]
   @method-doc["ChartWindow" "histogram-chart-window" "y-axis"]
+
+    @;################################
+  @subsection{Box-Plot Chart Window}
+
+  @constructor-doc["ChartWindow" "box-plot-chart-window" opaque ChartWindow]{
+    A box-plot chart window.
+  }
+  @method-doc["ChartWindow" "box-plot-chart-window" "min"]
+  @method-doc["ChartWindow" "box-plot-chart-window" "max"]
 }
