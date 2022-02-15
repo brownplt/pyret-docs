@@ -356,7 +356,7 @@ num-speakers = [list: 251388301, 125344736, 110041604,  89800800,      79000000]
   Getting from this data to a data series is simple: use a @emph{chart constructor} -- here, the bar chart constructor @pyret{from-list.bar-chart} -- to create a @|DataSeries|:
 
   @pyret-block{
-a-pie-chart-series = from-list.bar-chart(countries, num-speakers)
+a-bar-chart-series = from-list.bar-chart(countries, num-speakers)
   }
 
   As another example, consider the typical high-school math task of ``graphing a function'', that is, plotting the values of a function for some range of inputs. Another chart constructor, @pyret{from-list.function-plot}, would create the relevant @|DataSeries|:
@@ -785,10 +785,227 @@ a-series = from-list.grouped-bar-chart(
     '25 to 44 Years',
     '45 to 64 Years',
     '65 Years and Over'])
-render-chart(a-series).display()
-  }
-  @(in-image "grouped-bar-chart")
+    render-chart(stacked-series).display()} ,(in-image "stacked-bar-chart-example"))
+  ]
 
+  @method-doc["DataSeries" "multi-bar-chart-series" "colors"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.colors([list: red, orange, blue])).display()} ,(in-image "grouped-bar-chart-colors-example"))
+   `(@{render-chart(stacked-series.colors([list: red, orange, blue])).display()} ,(in-image "stacked-bar-chart-colors-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "sort"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.sort()).display()} ,(in-image "grouped-bar-chart-sort-example"))
+   `(@{render-chart(stacked-series.sort()).display()} ,(in-image "stacked-bar-chart-sort-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "sort-by"]
+  @repl-examples[
+   `(@{descending-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(grouped-series.sort-by(descending-cmp, eq)).display()} ,(in-image "grouped-bar-chart-sort-by-example"))
+   `(@{descending-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(stacked-series.sort-by(descending-cmp, eq)).display()} ,(in-image "stacked-bar-chart-sort-by-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "sort-by-label"]
+  @repl-examples[
+   `(@{descending-str-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(grouped-series.sort-by-label(descending-str-cmp, eq))
+                              .display()} ,(in-image "grouped-bar-chart-sort-by-label-example"))
+    `(@{descending-str-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(stacked-series.sort-by-label(descend-str-cmp, eq))
+                              .display()} ,(in-image "stacked-bar-chart-sort-by-label-example"))
+  ]
+
+   @method-doc["DataSeries" "multi-bar-chart-series" "sort-by-data"]
+  @repl-examples[
+   `(@{get-last = {(l): l.get(6)}
+   ascending-cmp = {(a, b): a < b}
+   eq = {(a, b): a == b}
+   render-chart(grouped-series.sort-by-data(get-last, ascending-cmp, eq))
+                              .display()} ,(in-image "grouped-bar-chart-sort-by-data-example"))
+    `(@{get-last = {(l): l.get(6)}
+   ascending-cmp = {(a, b): a > b}
+   eq = {(a, b): a == b}
+   render-chart(stacked-series.sort-by-data(get-last, ascending-cmp, eq))
+                              .display()} ,(in-image "stacked-bar-chart-sort-by-data-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "add-pointers"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.add-pointers([list: 1874094, 41417373 / 14], 
+                                              [list: "median", "mean"]))
+                                  .display()} ,(in-image "grouped-bar-chart-pointers-example"))
+   `(@{render-chart(stacked-series.add-pointers([list: 18409317.5, 20708686.5],
+                                               [list: "median", "mean"]))
+                                  .display()} ,(in-image "stacked-bar-chart-pointers-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "pointer-color"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.add-pointers([list: 1874094, 41417373 / 14], 
+                                              [list: "median", "mean"])
+                                  .pointer-color(blue))
+                                  .display()} ,(in-image "grouped-bar-chart-pointer-color-example"))
+   `(@{render-chart(stacked-series.add-pointers([list: 18409317.5, 20708686.5],
+                                               [list: "median", "mean"])
+                                  .pointer-color(red))
+                                  .display()} ,(in-image "stacked-bar-chart-pointer-color-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "format-axis"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.format-axis({(n): num-to-string(n) + " votes"}))
+                                  .display()} ,(in-image "grouped-bar-chart-format-axis-example"))
+   `(@{render-chart(stacked-series.format-axis({(n): num-to-string(n) + " votes"}))
+                                  .display()} ,(in-image "stacked-bar-chart-format-axis-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "scale"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.scale(num-log))
+                                  .display()} ,(in-image "grouped-bar-chart-scale-example"))
+   `(@{render-chart(stacked-series.scale(num-log))
+                                  .display()} ,(in-image "stacked-bar-chart-scale-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "stacking-type"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.stacking-type('none'))
+                                  .display()
+       render-chart(grouped-series.stacking-type('absolute'))
+                                  .display()
+       render-chart(grouped-series.stacking-type('relative'))
+                                  .display()
+       render-chart(grouped-series.stacking-type('percent'))
+                                  .display()
+                      
+       # The following produces the same output as the ones above
+       render-chart(stacked-series.stacking-type('none'))
+                                  .display()
+       render-chart(stacked-series.stacking-type('absolute'))
+                                  .display()
+       render-chart(stacked-series.stacking-type('relative'))
+                                  .display()
+       render-chart(stacked-series.stacking-type('percent'))
+                                  .display()} ,(in-image "stacking-type-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "horizontal"]
+  @repl-examples[
+   `(@{render-chart(grouped-series.horizontal(true))
+                                  .display()} ,(in-image "grouped-bar-chart-horizontal-example"))
+   `(@{render-chart(stacked-series.horizontal(true))
+                                  .display()} ,(in-image "stacked-bar-chart-horizontal-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "annotations"]
+  @repl-examples[
+   `(@{some-annotations = [list: 
+        [list: some('0.82%'), none, none, none, some('3.23%'), none, none], 
+        [list: none, some('1.00%'), none, none, none, some('1.72%'), none],
+        [list: none, none, some('0.32%'), none, none, none, some('0.79%')],
+        [list: some('0.35%'), none, none, none, some('1.46%'), none, none],
+        [list: none, some('0.47%'), none, none, none, some('0.99%'), none],
+        [list: none, none, some('0.21%'), none, none, none, some('0.58%')]]
+      render-chart(grouped-series.annotations(some-annotations))
+                                 .display()} ,(in-image "grouped-bar-chart-annotations-example"))
+   `(@{some-annotations = [list: 
+        [list: some('0.82%'), none, none, none, some('3.23%'), none, none], 
+        [list: none, some('1.00%'), none, none, none, some('1.72%'), none],
+        [list: none, none, some('0.32%'), none, none, none, some('0.79%')],
+        [list: some('0.35%'), none, none, none, some('1.46%'), none, none],
+        [list: none, some('0.47%'), none, none, none, some('0.99%'), none],
+        [list: none, none, some('0.21%'), none, none, none, some('0.58%')]]
+      render-chart(stacked-series.annotations(some-annotations))
+                                 .display()} ,(in-image "stacked-bar-chart-annotations-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "intervals"]
+  @repl-examples[
+   `(@{grouped-small-data = from-list.grouped-bar-chart(
+                            [list: "Year 1", "Year 2"],
+                            [list:
+                              [list: 50, 20, 10],
+                              [list: 20, 40, 10]],
+                            [list: "Mail", "Phone", "Fax"])
+       intervals = [list:
+            [list: [list: 45, 55], [list: 15, 17, 23, 24], [list: ]],
+            [list: [list: 25],     [list: ],               [list: ]]]
+       render-chart(grouped-small-data.intervals(intervals))
+                                      .display()} ,(in-image "grouped-bar-chart-intervals-example"))
+   `(@{stacked-small-data = from-list.stacked-bar-chart(
+                            [list: "Year 1", "Year 2"],
+                            [list:
+                              [list: 50, 20, 10],
+                              [list: 20, 40, 10]],
+                            [list: "Mail", "Phone", "Fax"])
+       intervals = [list:
+            [list: [list: 45, 55], [list: 15, 17, 23, 24], [list: ]],
+            [list: [list: 25],     [list: ],               [list: ]]]
+       render-chart(stacked-small-data.intervals(intervals))
+                                      .display()} ,(in-image "stacked-bar-chart-intervals-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "error-bars"]
+  @repl-examples[
+   `(@{grouped-small-data = from-list.grouped-bar-chart(
+                            [list: "Year 1", "Year 2"],
+                            [list:
+                              [list: 50, 20, 10],
+                              [list: 20, 40, 10]],
+                            [list: "Mail", "Phone", "Fax"])
+       error-amounts = [list:
+                [list: [list: -5, 2], [list: -4, 2], [list: -3, 2]],
+                [list: [list: -3, 6], [list: -1, 4], [list: -5, 5]]]
+       render-chart(grouped-small-data.error-bars(error-amounts))
+                                      .display()} ,(in-image "grouped-bar-chart-error-bars-example"))
+   `(@{stacked-small-data = from-list.stacked-bar-chart(
+                            [list: "Year 1", "Year 2"],
+                            [list:
+                              [list: 50, 20, 10],
+                              [list: 20, 40, 10]],
+                            [list: "Mail", "Phone", "Fax"])
+       error-amounts = [list:
+                [list: [list: -5, 2], [list: -4, 2], [list: -3, 2]],
+                [list: [list: -3, 6], [list: -1, 4], [list: -5, 5]]]
+       render-chart(stacked-small-data.error-bars(error-amounts))
+                                      .display()} ,(in-image "stacked-bar-chart-error-bars-example"))
+  ]
+
+  @method-doc["DataSeries" "multi-bar-chart-series" "interval-color"]
+  @repl-examples[
+   `(@{grouped-small-data = from-list.grouped-bar-chart(
+                            [list: "Year 1", "Year 2"],
+                            [list:
+                              [list: 50, 20, 10],
+                              [list: 20, 40, 10]],
+                            [list: "Mail", "Phone", "Fax"])
+       intervals = [list:
+            [list: [list: 45, 55], [list: 15, 17, 23, 24], [list: ]],
+            [list: [list: 25],     [list: ],               [list: ]]]
+       render-chart(grouped-small-data.intervals(intervals)
+                                      .interval-color(yellow))
+                                      .display()} ,(in-image "grouped-bar-chart-interval-color-example"))
+   `(@{stacked-small-data = from-list.stacked-bar-chart(
+                            [list: "Year 1", "Year 2"],
+                            [list:
+                              [list: 50, 20, 10],
+                              [list: 20, 40, 10]],
+                            [list: "Mail", "Phone", "Fax"])
+       intervals = [list:
+            [list: [list: 45, 55], [list: 15, 17, 23, 24], [list: ]],
+            [list: [list: 25],     [list: ],               [list: ]]]
+       render-chart(stacked-small-data.intervals(intervals)
+                                      .interval-color(purple))
+                                      .display()} ,(in-image "stacked-bar-chart-interval-color-example"))
+  ]
+  
   @;################################
   @subsection{Pie Chart Series}
 
