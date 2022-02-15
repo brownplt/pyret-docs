@@ -211,8 +211,9 @@
   (if (or (empty? indefns) (not indefns))
       #f
       (let ([d (findf (lambda (d)
-                        (and (list? (spec-fields d))
-                             (equal? for-val (field-val (assoc by-field (spec-fields d)))))) indefns)])
+                        (with-handlers [(exn:fail:contract? (lambda(e) #f))]
+                          (and (list? (spec-fields d))
+                               (equal? for-val (field-val (assoc by-field (spec-fields d))))))) indefns)])
         d)))
 
 
@@ -222,8 +223,9 @@
   (if (or (empty? indefns) (not indefns))
       #f
       (let ([d (findf (lambda (d)
-                        (and (list? (spec-fields d))
-                             (equal? for-val (field-val (assoc by-field (spec-fields d)))))) indefns)])
+                        (with-handlers [(exn:fail:contract? (lambda(e) #f))]
+                          (and (list? (spec-fields d))
+                               (equal? for-val (field-val (assoc by-field (spec-fields d))))))) indefns)])
         (unless d
           (warning 'find-defn (format "No definition for field '~a = \"~a\" in module ~s" by-field for-val indefns)))
         d)))
