@@ -216,16 +216,20 @@ enumerated values.  This second library is encouraged for use with the
 @seclink["type-check"]{type checker}, as it can give more precise
 feedback.  To use this version of the library:
 
-  @pyret{include image}
+  @pyret{include image-typed}
   
-  @pyret{import image as ...}
+  @pyret{import image-typed as ...}
 
   }
             ]
 
   While you cannot @pyret{include} both versions of the library
 simultaneously, you @emph{can} @pyret{import} them both, if you would
-like to migrate from one version of the library to the other.
+like to migrate from one version of the library to the other.  (Note:
+The @seclink["s:use:compat"]{@pyret{essentials2021} context} already
+@pyret{include}s the untyped image library, so if you are using that
+context and want to use the typed image library, you must
+@pyret{import} it.)
 
 Note that most of the examples below use the @pyret{image} version of
 this library, with arguments as strings.
