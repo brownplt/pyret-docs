@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "codemirror": "^5.48.4",
-    "pyret-codemirror-mode": "git://github.com/brownplt/pyret-codemirror-mode.git#horizon"
+    "pyret-codemirror-mode": "https://github.com/brownplt/pyret-codemirror-mode.git#horizon"
   },
   "scripts": {
     "build": "make"
