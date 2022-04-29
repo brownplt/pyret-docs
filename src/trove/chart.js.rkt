@@ -678,6 +678,28 @@
     (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
           "y-max is changed. By default, the value will be inferred."))))
 
+@(define min-meth
+  `(method-spec
+    (name "min")
+    (arity 2)
+    (params ())
+    (args ("self" "min"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "min is changed. By default, the value will be inferred."))))
+
+@(define max-meth
+  `(method-spec
+    (name "max")
+    (arity 2)
+    (params ())
+    (args ("self" "max"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "max is changed. By default, the value will be inferred."))))
+
 @(define num-samples-meth
   `(method-spec
     (name "num-samples")
@@ -949,7 +971,7 @@
       (with-members (,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
     (constr-spec
       (name "box-chart-window")
-      (with-members (,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
+      (with-members (,min-meth ,max-meth)))
     (constr-spec
       (name "pie-chart-window")
       (with-members ()))
@@ -2435,8 +2457,8 @@ a-chart-window = render-charts([list: series-1, series-2])
   @constructor-doc["ChartWindow" "box-chart-window" opaque ChartWindow]{
     A box plot chart window.
   }
-  @method-doc["ChartWindow" "box-chart-window" "x-axis"]
-  @method-doc["ChartWindow" "box-chart-window" "y-axis"]
+  @method-doc["ChartWindow" "box-chart-window" "min"]
+  @method-doc["ChartWindow" "box-chart-window" "max"]
 
   @;################################
   @subsection{Pie Chart Window}
