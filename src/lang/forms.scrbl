@@ -2083,7 +2083,7 @@ An @pyret{ask} expression is a different way of writing an @pyret{if}
 expression that can be easier to read in some cases.
 
 @bnf['Pyret]{
-             ASKCOLON: "ask"
+             ASK: "ask"
              BLOCK: "block"
              COLON: ":"
              BAR: "|"
