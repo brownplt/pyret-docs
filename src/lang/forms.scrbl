@@ -2338,7 +2338,7 @@ COLON: ":"
 COMMA: ","
 END: "end"
 table-order: TABLE-ORDER expr COLON column-order END
-column-order: NAME ((ASCENDING | DESCENDING))
+column-order: NAME ASCENDING | NAME DESCENDING
 }
 
 @subsubsection[#:tag "s:tables:transform"]{Transforming Table Rows}
