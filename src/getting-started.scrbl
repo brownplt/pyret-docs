@@ -11,11 +11,6 @@ If you're interested in a textbook, you can try out
 @link["http://papl.cs.brown.edu/2020/" "Programming and Programming Languages
 (PAPL)"], which has all its programs in Pyret.
 
-You can follow a short tour of Pyret's features to get a feel for the language,
-and for a more in-depth introduction, this documentation comes with a tutorial
-that you can follow to build up a simple animated game:
-
 @(table-of-contents)
 
 @include-section["tour.scrbl"]
-@include-section["Pyret-Tutorial/lander.scrbl"]
