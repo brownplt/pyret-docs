@@ -2002,6 +2002,24 @@ of three things:
         the-m-method-closed-over-o(5) is 27
       end
     }
+
+    Note that a method binding is not a itself a method value.
+    Creating new objects from method bindings will not behave the same
+    as using method values directly.
+
+    For example:
+
+    @pyret-block{
+      code = method(self, x): self.y + x end
+      p = { y: 10, m: code }
+      q = p.{ y: 15 }
+      r = { y: 20, m: p.m } # m given method binding, not a method
+      check:
+        p.m(5) is 15
+        q.m(5) is 20 # self.y dynamically resolved when code runs
+        r.m(5) is 15 # but this is not 25, because r.m is p.m
+      end
+    }
   }
 ]
 
