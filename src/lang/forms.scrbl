@@ -903,6 +903,7 @@ LANGLE: "<"
 RANGLE: ">"
 COMMA: ","
 LPAREN: "("
+RPAREN: ")"
 THINARROW: "->"
 DOC: "doc:"
 WHERE: "where:"
@@ -2100,7 +2101,7 @@ An @pyret{ask} expression is a different way of writing an @pyret{if}
 expression that can be easier to read in some cases.
 
 @bnf['Pyret]{
-             ASKCOLON: "ask"
+             ASK: "ask"
              BLOCK: "block"
              COLON: ":"
              BAR: "|"
@@ -2355,7 +2356,7 @@ COLON: ":"
 COMMA: ","
 END: "end"
 table-order: TABLE-ORDER expr COLON column-order END
-column-order: NAME ((ASCENDING | DESCENDING))
+column-order: NAME ASCENDING | NAME DESCENDING
 }
 
 @subsubsection[#:tag "s:tables:transform"]{Transforming Table Rows}
