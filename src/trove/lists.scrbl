@@ -2093,7 +2093,7 @@ end
 
   ]{
 
-@pyret{fold} computes @pyret{f(last-elt, ... f(second-elt, f(first-elt, base))...)}.  For
+@pyret{fold} computes @pyret{f(... f(f(base, first-elt), second-elt) ..., last-elt)}.  For
 @pyret-id{empty}, returns @pyret{base}.
 
 In other words, @pyret{fold} uses the function @tt{f}, starting with the @tt{base}
@@ -2116,7 +2116,7 @@ end
   @function["foldl"]
   Another name for @pyret-id["fold"].
   @function["foldr"]
-Computes @pyret{f(f(f(base, last-elt) ..., second-elt), first-elt)}.  For
+Computes @pyret{f(f(... f(base, last-elt) ..., second-elt), first-elt)}.  For
 @pyret-id{empty}, returns @pyret{base}.  In other words, it uses
 @pyret{f} to combine @pyret{base} with each item in the @pyret{List} starting from the right.
 
