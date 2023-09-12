@@ -155,6 +155,28 @@
     (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
           "y-max is changed. By default, the value will be inferred."))))
 
+@(define min-meth
+  `(method-spec
+    (name "min")
+    (arity 2)
+    (params ())
+    (args ("self" "min"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "min is changed. By default, the value will be inferred."))))
+
+@(define max-meth
+  `(method-spec
+    (name "max")
+    (arity 2)
+    (params ())
+    (args ("self" "max"))
+    (return ,ChartWindow)
+    (contract (a-arrow ,Self ,N ,ChartWindow))
+    (doc ("Construct a new " ,ChartWindow " with a new window dimension where "
+          "max is changed. By default, the value will be inferred."))))
+
 @(define num-samples-meth
   `(method-spec
     (name "num-samples")
@@ -268,6 +290,12 @@
     (constr-spec
       (name "bar-chart-window")
       (with-members (,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
+    (constr-spec
+      (name "multi-bar-chart-window")
+      (with-members (,y-min-meth ,y-max-meth ,x-axis-meth ,y-axis-meth)))
+    (constr-spec
+      (name "box-chart-window")
+      (with-members (,min-meth ,max-meth)))
     (constr-spec
       (name "pie-chart-window")
       (with-members ()))
@@ -829,6 +857,26 @@ a-chart-window = render-charts([list: series-1, series-2])
   @method-doc["ChartWindow" "bar-chart-window" "y-max"]
   @method-doc["ChartWindow" "bar-chart-window" "x-axis"]
   @method-doc["ChartWindow" "bar-chart-window" "y-axis"]
+
+  @;################################
+  @subsection{Multi Bar Chart Window}
+
+  @constructor-doc["ChartWindow" "multi-bar-chart-window" opaque ChartWindow]{
+    A multi bar chart window.
+  }
+  @method-doc["ChartWindow" "multi-bar-chart-window" "y-min"]
+  @method-doc["ChartWindow" "multi-bar-chart-window" "y-max"]
+  @method-doc["ChartWindow" "multi-bar-chart-window" "x-axis"]
+  @method-doc["ChartWindow" "multi-bar-chart-window" "y-axis"]
+
+  @;################################
+  @subsection{Box Plot Chart Window}
+
+  @constructor-doc["ChartWindow" "box-chart-window" opaque ChartWindow]{
+    A box plot chart window.
+  }
+  @method-doc["ChartWindow" "box-chart-window" "min"]
+  @method-doc["ChartWindow" "box-chart-window" "max"]
 
   @;################################
   @subsection{Pie Chart Window}

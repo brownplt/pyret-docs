@@ -333,7 +333,7 @@ title :: @S
 The string is used instead of "reactor" in the title bar of the interaction
 window.
 
-@section[#:tag "s:manual-events"]{Reacting to Events Manually}
+@section[#:tag "s:manual-events"]{Reacting to Events Programmatically}
 
 Several functions are provided to programmatically trigger the various handlers
 of a reactor.  This can be used to simulate an interaction for testing or
