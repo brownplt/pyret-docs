@@ -1,17 +1,8 @@
-function getQueryStringMap(){
-    var assoc = {};
-    window.location.search.substring(1).split('&').forEach(function(v) {
-        var pair = v.split('=');
-        assoc[pair[0]] = pair[1];
-    });
-    return assoc;
-}
-
 $(function(){
     var header = $('a[name="(part._.Glossary)"]');
     if (header.length == 0) return;
 
-    var qs = getQueryStringMap();
+    const qs = new URLSearchParams(window.location.search);
 
     var content = $('.content-body');
     var alphaRow = $('.alpha-row');
@@ -19,7 +10,7 @@ $(function(){
         'class': 'searchbox large',
         placeholder: '...search manual...',
     })
-        .val(qs.q ? qs.q : '')
+        .val(qs.get('q') || '')
         .on('input', function() {
             var query = inputBox.val();
             if (query != '') {
