@@ -779,7 +779,7 @@ Produces a list of strings containing the names of the columns in the row.
 @examples{
 check:
   r = [raw-row: {"city"; "NYC"}, {"pop"; 8500000}]
-  r.get-column-names() is [list: "NYC", "pop"]
+  r.get-column-names() is [list: "city", "pop"]
 end
 }
 
