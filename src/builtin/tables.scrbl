@@ -337,8 +337,8 @@ end
 
 This example will first sort the data in increasing order on @tt{column1}.  If there
 are any duplicate values in @tt{column1}, each such group of rows will be sorted in
-decreasing order by @tt{column2}.  If there are any duplicates in both columns,
-each remaining group will be sorted in increasing order by @tt{column3}.
+decreasing order by @tt{column3}.  If there are any duplicates in both columns,
+each remaining group will be sorted in increasing order by @tt{column2}.
 
   @section{Transforming Tables}
 
@@ -779,7 +779,7 @@ Produces a list of strings containing the names of the columns in the row.
 @examples{
 check:
   r = [raw-row: {"city"; "NYC"}, {"pop"; 8500000}]
-  r.get-column-names() is [list: "NYC", "pop"]
+  r.get-column-names() is [list: "city", "pop"]
 end
 }
 

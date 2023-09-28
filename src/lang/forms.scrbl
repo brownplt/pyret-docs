@@ -903,6 +903,7 @@ LANGLE: "<"
 RANGLE: ">"
 COMMA: ","
 LPAREN: "("
+RPAREN: ")"
 THINARROW: "->"
 DOC: "doc:"
 WHERE: "where:"
@@ -2002,6 +2003,24 @@ of three things:
         the-m-method-closed-over-o(5) is 27
       end
     }
+
+    Note that a method binding is not a itself a method value.
+    Creating new objects from method bindings will not behave the same
+    as using method values directly.
+
+    For example:
+
+    @pyret-block{
+      code = method(self, x): self.y + x end
+      p = { y: 10, m: code }
+      q = p.{ y: 15 }
+      r = { y: 20, m: p.m } # m given method binding, not a method
+      check:
+        p.m(5) is 15
+        q.m(5) is 20 # self.y dynamically resolved when code runs
+        r.m(5) is 15 # but this is not 25, because r.m is p.m
+      end
+    }
   }
 ]
 
@@ -2082,7 +2101,7 @@ An @pyret{ask} expression is a different way of writing an @pyret{if}
 expression that can be easier to read in some cases.
 
 @bnf['Pyret]{
-             ASKCOLON: "ask"
+             ASK: "ask"
              BLOCK: "block"
              COLON: ":"
              BAR: "|"
@@ -2337,7 +2356,7 @@ COLON: ":"
 COMMA: ","
 END: "end"
 table-order: TABLE-ORDER expr COLON column-order END
-column-order: NAME ((ASCENDING | DESCENDING))
+column-order: NAME ASCENDING | NAME DESCENDING
 }
 
 @subsubsection[#:tag "s:tables:transform"]{Transforming Table Rows}
