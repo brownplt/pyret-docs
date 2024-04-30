@@ -808,6 +808,7 @@
     @render-color["violet" 238 130 238 1]
     @render-color["plum" 221 160 221 1]
     @render-color["lavender" 230 230 250 1]
+    @render-color["rebecca-purple" 102 51 153 1]
     @render-color["thistle" 216 191 216 1]
     @render-color["ghost-white" 248 248 255 1]
     @render-color["white" 255 255 255 1]
