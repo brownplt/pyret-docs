@@ -2521,7 +2521,7 @@ type Constructor<A> = {
   make2 :: (Any, Any -> A),
   make3 :: (Any, Any, Any -> A),
   make4 :: (Any, Any, Any, Any -> A),
-  make5 :: (Any, Any, Any, Any, Any -> A)
+  make5 :: (Any, Any, Any, Any, Any -> A),
   make  :: (RawArray<Any> -> A),
 }
 }
