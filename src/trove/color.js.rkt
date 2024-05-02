@@ -632,6 +632,10 @@
     ;; ~color13(0, 0, 0, 1)
     )
   (unknown-item
+    (name "rebecca-purple")
+    ;; ~color13(102, 51, 153, 1)
+    )
+  (unknown-item
     (name "transparent")
     ;; ~color13(0, 0, 0, 1)
     )))
