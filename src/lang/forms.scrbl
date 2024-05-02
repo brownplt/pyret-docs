@@ -2542,7 +2542,7 @@ weird :: Constructor<String> = {
 check:
   [weird: ] is "nothing at all"
   [weird: true] is "just true"
-  [weird: 5, 6.24] is "5 and 6.24"
+  [weird: 5, 6.24] is "5 and 156/25"
   [weird: true, false, 5] is "several things"
   [weird: 1, 2, 3, 4] is "four things"
   [weird: 1, 1, 1, 1, 1] is "five things"
