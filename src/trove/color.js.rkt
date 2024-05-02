@@ -667,6 +667,8 @@
     @constructor-doc["Color" "color" color-args (a-id "Color" (xref "color" "Color"))]{
       The values for red, green, and blue should be in the range 0--255, inclusive.
       The values for alpha should be in the range 0--1, and indicates how transparent the color is, with 0 as fully transparent and 1 as fully opaque.
+
+      Note that the library does not @emph{enforce} these range restrictions when constructing custom colors, so that you can manipulate colors arithmetically (e.g. modeling ``additive color'' by literally adding components together).  The @emph{rendering} of these colors will clamp the values into those ranges, so e.g. @pyret{color(500, 255, 0, 1)} will look the same as @pyret{yellow} itself, but the values will not be equal.
     }
   }
 
