@@ -663,6 +663,11 @@
 @docmodule["color"]{
   @; Ignored type testers
   @ignore[(list "is-color")]
+  @emph{@bold{Note:}} it is discouraged to use the @pyret{include} form of importing this library,
+  since this library defines many names, some of which will likely conflict with existing names.
+  (For instance, @pyret{tan} is both a color and a mathematical function.)  Use the @pyret{import}
+  form instead. See @secref["s:modules:import"] for more detail.
+  
   @section[#:tag "color_DataTypes"]{Data types}
   @data-spec2["Color" (list) (list
     @constructor-spec["Color" "color" color-args]
