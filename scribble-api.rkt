@@ -764,7 +764,7 @@
                                     (para (bold "Examples:"))
                                     (apply pyret-block examples)))))))))))))))
 
-@(define (collection-doc name #:contract contract #:private (private #f))
+@(define (collection-doc name #:contract contract #:private (private #f) #:show-ellipses (show-ellipses? #t))
   (when (not private) (set-documented! (curr-module-name) name))
   (define name-part (make-header-elt-for (seclink (xref (curr-module-name) name) (tt name)) name))
   (define (arrow-args arr) (reverse (rest (reverse (rest arr)))))
@@ -783,15 +783,19 @@
           (define curried-args (render-singleline-args curried-argnames (map interp curried-argtypes)))
           (define-values (argnames argtypes) (unzip2 (arrow-args (arrow-ret contract))))
           (define patterns (render-singleline-args argnames (map interp argtypes)))
+          (define maybe-ellipses
+            (if show-ellipses? ", ..." ""))
           (define return (interp (arrow-ret (arrow-ret contract))))
           (para #:style (div-style "boxed pyret-header")
-            (tt "[" name-part "(" curried-args ")" ": " patterns ", ..." "] -> " return))]
+            (tt "[" name-part "(" curried-args ")" ": " patterns maybe-ellipses "] -> " return))]
         [else
           (define-values (argnames argtypes) (unzip2 (arrow-args contract)))
           (define patterns (render-singleline-args argnames (map interp argtypes)))
+          (define maybe-ellipses
+            (if show-ellipses? ", ..." ""))
           (define return (interp (arrow-ret contract)))
           (para #:style (div-style "boxed pyret-header")
-            (tt "[" name-part ": " patterns ", ..." "] -> " return))])]
+            (tt "[" name-part ": " patterns maybe-ellipses "] -> " return))])]
     [else
       (warning 'collection-doc "Didn't provide an a-arrow as a contract!")
       (para #:style (div-style "boxed pyret-header")
