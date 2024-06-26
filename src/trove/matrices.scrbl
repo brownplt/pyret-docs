@@ -15,6 +15,8 @@
 @(define mtx-type (a-id "Matrix" (xref "matrices" "Matrix")))
 @(define vec-type (a-id "Vector" (xref "matrices" "Vector")))
 @(define vec3d-type (a-id "Vector3D" (xref "matrices" "Vector3D")))
+@(define Nat (a-id "Nat" (xref "matrices" "Nat")))
+@(define NonZeroNat (a-id "NonZeroNat" (xref "matrices" "NonZeroNat")))
 @(define (L-of typ) `(a-app (a-id "List" (xref "lists" "List")) ,typ))
 
 @; Creates a LaTeX inline environment
@@ -95,19 +97,31 @@
       (arity 1)
       (args ("n"))
       (return ,mtx-type)
-      (contract (a-arrow ,N ,mtx-type)))
+      (contract (a-arrow ,NonZeroNat ,mtx-type)))
     (fun-spec
       (name "make-matrix")
       (arity 3)
       (args ("rows" "cols" "elt"))
       (return ,mtx-type)
-      (contract (a-arrow ,N ,N ,N ,mtx-type)))
+      (contract (a-arrow ,NonZeroNat ,NonZeroNat ,N ,mtx-type)))
+    (fun-spec
+      (name "zero-matrix")
+      (arity 3)
+      (args ("rows" "cols" "elt"))
+      (return ,mtx-type)
+      (contract (a-arrow ,NonZeroNat ,NonZeroNat ,mtx-type)))
+    (fun-spec
+      (name "zero-matrix")
+      (arity 2)
+      (args ("rows" "cols"))
+      (return ,mtx-type)
+      (contract (a-arrow ,NonZeroNat ,NonZeroNat ,mtx-type)))
     (fun-spec
       (name "build-matrix")
       (arity 3)
       (args ("rows" "cols" "proc"))
       (return ,mtx-type)
-      (contract (a-arrow ,N ,N (a-arrow ,N ,N ,N) ,mtx-type)))
+      (contract (a-arrow ,NonZeroNat ,NonZeroNat (a-arrow ,N ,N ,N) ,mtx-type)))
     (fun-spec
       (name "vector-to-matrix")
       (arity 1)
@@ -119,7 +133,7 @@
       (arity 3)
       (args ("rows" "cols" "lst"))
       (return ,mtx-type)
-      (contract (a-arrow ,N ,N (a-app (a-id "List" (xref "lists" "List")) ,N) ,mtx-type)))
+      (contract (a-arrow ,NonZeroNat ,NonZeroNat (a-app (a-id "List" (xref "lists" "List")) ,N) ,mtx-type)))
     (fun-spec
       (name "list-to-row-matrix")
       (arity 1)
@@ -155,7 +169,7 @@
      (arity 2)
      (args ("v" "index"))
      (return ,N)
-     (contract (a-arrow ,vec-type ,N ,N)))
+     (contract (a-arrow ,vec-type ,Nat ,N)))
     (fun-spec
      (name "vec-dot")
      (arity 2)
@@ -203,7 +217,7 @@
      (arity 3)
      (args ("m" "i" "j"))
      (return ,N)
-     (contract (a-arrow ,mtx-type ,N ,N ,N)))
+     (contract (a-arrow ,mtx-type ,Nat ,Nat ,N)))
     (fun-spec 
      (name "mtx-to-list")
      (arity 1)
@@ -233,21 +247,27 @@
      (arity 2)
      (args ("m" "i"))
      (return ,mtx-type)
-     (contract (a-arrow ,mtx-type ,N ,mtx-type)))
+     (contract (a-arrow ,mtx-type ,Nat ,mtx-type)))
     (fun-spec 
      (name "mtx-col")
      (arity 2)
      (args ("m" "j"))
      (return ,mtx-type)
-     (contract (a-arrow ,mtx-type ,N ,mtx-type)))
+     (contract (a-arrow ,mtx-type ,Nat ,mtx-type)))
     (fun-spec 
      (name "mtx-submatrix")
      (arity 3)
      (args ("m" "loi" "loj"))
      (return ,mtx-type)
-     (contract (a-arrow ,mtx-type ,(L-of N) ,(L-of N) ,mtx-type)))
+     (contract (a-arrow ,mtx-type ,(L-of Nat) ,(L-of Nat) ,mtx-type)))
     (fun-spec 
      (name "mtx-transpose")
+     (arity 1)
+     (args ("m"))
+     (return ,mtx-type)
+     (contract (a-arrow ,mtx-type ,mtx-type)))
+    (fun-spec 
+     (name "mtx-hermitian")
      (arity 1)
      (args ("m"))
      (return ,mtx-type)
@@ -288,6 +308,12 @@
      (args ("func" "m"))
      (return ,mtx-type)
      (contract (a-arrow (a-arrow ,N ,N) ,mtx-type ,mtx-type)))
+    (fun-spec 
+     (name "mtx-map2")
+     (arity 3)
+     (args ("func" "m" "n"))
+     (return ,mtx-type)
+     (contract (a-arrow (a-arrow ,N ,N ,N) ,mtx-type ,mtx-type ,mtx-type)))
     (fun-spec 
      (name "mtx-row-map")
      (arity 2)
@@ -353,7 +379,7 @@
      (arity 2)
      (args ("m" "power"))
      (return ,mtx-type)
-     (contract (a-arrow ,mtx-type ,N ,mtx-type)))
+     (contract (a-arrow ,mtx-type ,Nat ,mtx-type)))
     (fun-spec 
      (name "mtx-determinant")
      (arity 1)
@@ -362,6 +388,12 @@
      (contract (a-arrow ,mtx-type ,N)))
     (fun-spec 
      (name "mtx-is-invertible")
+     (arity 1)
+     (args ("m"))
+     (return ,B)
+     (contract (a-arrow ,mtx-type ,B)))
+    (fun-spec 
+     (name "mtx-is-orthonormal")
      (arity 1)
      (args ("m"))
      (return ,B)
@@ -429,6 +461,8 @@
      (return ,mtx-type)
      (contract (a-arrow ,mtx-type ,mtx-type)))
     (data-spec (name "Vector3D"))
+    (data-spec (name "Nat"))
+    (data-spec (name "NonZeroNat"))
     (unknown-item
       (name "matrix")
       ;; maker of matrices
@@ -449,7 +483,7 @@
           (arity 2)
           (args ("self" "index"))
           (return ,N)
-          (contract (a-arrow ,vec-type ,N ,N)))
+          (contract (a-arrow ,vec-type ,Nat ,N)))
         (method-spec
           (name "dot")
           (arity 2)
@@ -480,24 +514,36 @@
           (args ("self" "scalar"))
           (return ,vec-type)
           (contract (a-arrow ,vec-type ,N ,vec-type)))
-        (method-spec
-          (name "_plus")
-          (arity 2)
-          (args ("self" "other"))
-          (return ,vec-type)
-          (contract (a-arrow ,vec-type ,vec-type ,vec-type)))
-        (method-spec
-          (name "_minus")
-          (arity 2)
-          (args ("self" "other"))
-          (return ,vec-type)
-          (contract (a-arrow ,vec-type ,vec-type ,vec-type)))
+        @; (method-spec
+        @;   (name "_plus")
+        @;   (arity 2)
+        @;   (args ("self" "other"))
+        @;   (return ,vec-type)
+        @;   (contract (a-arrow ,vec-type ,vec-type ,vec-type)))
+        @; (method-spec
+        @;   (name "_minus")
+        @;   (arity 2)
+        @;   (args ("self" "other"))
+        @;   (return ,vec-type)
+        @;   (contract (a-arrow ,vec-type ,vec-type ,vec-type)))
         (method-spec
           (name "length")
           (arity 1)
           (args ("self"))
           (return ,N)
-          (contract (a-arrow ,vec-type ,N))))))
+          (contract (a-arrow ,vec-type ,N)))
+        (method-spec
+          (name "to-row-matrix")
+          (arity 1)
+          (args ("self"))
+          (return ,mtx-type)
+          (contract (a-arrow ,mtx-type)))
+        (method-spec
+          (name "to-col-matrix")
+          (arity 1)
+          (args ("self"))
+          (return ,mtx-type)
+          (contract (a-arrow ,mtx-type))))))
     (data-spec
       (name "Matrix")
       (variants ("matrix"))
@@ -507,7 +553,7 @@
             (arity 3)
             (args ("self" "i" "j"))
             (return ,N)
-            (contract (a-arrow ,mtx-type ,N ,N ,N)))
+            (contract (a-arrow ,mtx-type ,Nat ,Nat ,N)))
           (method-spec 
             (name "to-list")
             (arity 1)
@@ -537,21 +583,27 @@
             (arity 2)
             (args ("self" "i"))
             (return ,mtx-type)
-            (contract (a-arrow ,mtx-type ,N ,mtx-type)))
+            (contract (a-arrow ,mtx-type ,Nat ,mtx-type)))
           (method-spec 
             (name "col")
             (arity 2)
             (args ("self" "j"))
             (return ,mtx-type)
-            (contract (a-arrow ,mtx-type ,N ,mtx-type)))
+            (contract (a-arrow ,mtx-type ,Nat ,mtx-type)))
           (method-spec 
             (name "submatrix")
             (arity 3)
             (args ("self" "loi" "loj"))
             (return ,mtx-type)
-            (contract (a-arrow ,mtx-type ,(L-of N) ,(L-of N) ,mtx-type)))
+            (contract (a-arrow ,mtx-type ,(L-of Nat) ,(L-of Nat) ,mtx-type)))
           (method-spec 
             (name "transpose")
+            (arity 1)
+            (args ("self"))
+            (return ,mtx-type)
+            (contract (a-arrow ,mtx-type ,mtx-type)))
+          (method-spec 
+            (name "hermitian")
             (arity 1)
             (args ("self"))
             (return ,mtx-type)
@@ -592,6 +644,12 @@
             (args ("self" "func"))
             (return ,mtx-type)
             (contract (a-arrow ,mtx-type (a-arrow ,N ,N) ,mtx-type)))
+          (method-spec 
+            (name "map2")
+            (arity 3)
+            (args ("self" "other" "func"))
+            (return ,mtx-type)
+            (contract (a-arrow ,mtx-type ,mtx-type (a-arrow ,N ,N ,N) ,mtx-type)))
           (method-spec 
             (name "row-map")
             (arity 2)
@@ -634,18 +692,18 @@
             (args ("self" "other"))
             (return ,N)
             (contract (a-arrow ,mtx-type ,mtx-type ,N)))
-          (method-spec 
-            (name "_plus")
-            (arity 2)
-            (args ("self" "other"))
-            (return ,mtx-type)
-            (contract (a-arrow ,mtx-type ,mtx-type ,mtx-type)))
-          (method-spec 
-            (name "_minus")
-            (arity 2)
-            (args ("self" "other"))
-            (return ,mtx-type)
-            (contract (a-arrow ,mtx-type ,mtx-type ,mtx-type)))
+          @; (method-spec 
+          @;   (name "_plus")
+          @;   (arity 2)
+          @;   (args ("self" "other"))
+          @;   (return ,mtx-type)
+          @;   (contract (a-arrow ,mtx-type ,mtx-type ,mtx-type)))
+          @; (method-spec 
+          @;   (name "_minus")
+          @;   (arity 2)
+          @;   (args ("self" "other"))
+          @;   (return ,mtx-type)
+          @;   (contract (a-arrow ,mtx-type ,mtx-type ,mtx-type)))
           (method-spec 
             (name "_times")
             (arity 2)
@@ -666,6 +724,12 @@
             (contract (a-arrow ,mtx-type ,N)))
           (method-spec 
             (name "is-invertible")
+            (arity 1)
+            (args ("self"))
+            (return ,B)
+            (contract (a-arrow ,mtx-type ,B)))
+          (method-spec 
+            (name "is-orthonormal")
             (arity 1)
             (args ("self"))
             (return ,B)
@@ -727,6 +791,14 @@
             (contract (a-arrow ,mtx-type ,(a-record (a-field "Q" mtx-type)
                                                     (a-field "R" mtx-type)))))
           (method-spec 
+            (name "lu-decomposition")
+            (arity 1)
+            (args ("self"))
+            (return ,(a-record (a-field "L" mtx-type)
+                               (a-field "U" mtx-type)))
+            (contract (a-arrow ,mtx-type ,(a-record (a-field "L" mtx-type)
+                                                    (a-field "U" mtx-type)))))
+          (method-spec 
             (name "gram-schmidt")
             (arity 1)
             (args ("self"))
@@ -739,12 +811,6 @@
             (return ,S)
             (contract (a-arrow ,mtx-type ,S)))
           (method-spec 
-            (name "equalTo") ;TODO: Get rid of camelCase
-            (arity 2)
-            (args ("self" "other"))
-            (return ,B)
-            (contract (a-arrow ,mtx-type ,mtx-type ,B)))
-          (method-spec 
             (name "_equals")
             (arity 2)
             (args ("self" "other"))
@@ -753,6 +819,18 @@
           )))))
 
 @docmodule["matrices"]{
+@hyperlink["https://en.wikipedia.org/wiki/Matrix_(mathematics)"]{@emph{Matrices}}
+are rectangular grids of numbers, which define many useful mathematical
+operations.  Matrices can manipulate each other, and are also used to
+manipulate
+@hyperlink["https://en.wikipedia.org/wiki/Vector_(mathematics_and_physics)"]{@emph{vectors}},
+which are lists of numbers that likewise define many useful mathematical
+operations.
+
+This library defines both the @pyret-id["Vector"] datatype and the
+@pyret-id["Matrix"] datatype.  All functionality in this library is defined
+both as methods on the data values and as analogous functions.
+
 @section{The Vector Datatype}
 
 @type-spec["Vector" '()]{
@@ -767,6 +845,9 @@ Like @pyret{Vector}, but only allows 3-dimensional vectors.
 
 }
 
+@type-spec["Nat" '()]{The type of natural numbers, i.e. non-negative integers.}
+@type-spec["NonZeroNat" '()]{The type of positive integers.}
+
 @collection-doc["vector" #:contract `(a-arrow ("elt" ,N) ,vec-type)]
 
 Vector constructor which creates a vector instance with the given elements.
@@ -774,6 +855,34 @@ Vector constructor which creates a vector instance with the given elements.
 @collection-doc["vector3d" #:contract `(a-arrow ("elt1" ,N) ("elt2" ,N) ("elt3" ,N) ,vec-type) #:show-ellipses #f]
 
 Vector constructor which only creates three-dimensional vector instances.
+
+
+Vectors are defined to permit using addition and subtraction operators on them,
+whenever the lengths of the vectors are the same:
+
+@examples{
+check:
+  [vector: 1, 2, 3] + [vector: 4, 5, 6] is [vector: 5, 7, 9]
+  [vector: 1] + [vector: 1, 2] raises "vectors of different lengths"
+  [vector: 1, 2, 3] - [vector: 4, 5, 6] is [vector: -3, -3, -3]
+  [vector: 1] - [vector: 1, 2] raises "vectors of different lengths"
+end
+}
+
+See also @pyret-id{vec-add} and @pyret-id{vec-sub}.
+
+Two vectors are considered equal when their lengths are the same and their
+corresponding elements are equal, and obeys the same restrictions on comparing
+exact and rough numbers for equality:
+
+@examples{
+check:
+  ([vector: 1] == [vector: 1, 2]) is false
+  ([vector: 1, 2] == [vector: 1, 2]) is true
+  ([vector: ~1, ~2] == [vector: 1, 2]) raises "not allowed"
+  roughly-equal([vector: ~1, ~2], [vector: 1, 2]) is true
+end
+}
 
 @section{Vector Methods}
 
@@ -851,25 +960,23 @@ check:
 end
 }
 
+@vector-method["to-row-matrix"]
 
-@vector-method["_plus"]
-
-Adds the given vector to this one.
+Converts this vector to a one-row matrix.
 
 @examples{
 check:
-  [vector: 1, 2, 3] + [vector: 4, 5, 6] is [vector: 5, 7, 9]
+  [vector: 4, 5, 6].to-row-matrix() is [matrix(1, 3): 4, 5, 6]
 end
 }
 
+@vector-method["to-col-matrix"]
 
-@vector-method["_minus"]
-
-Subtracts the given vector from this one.
+Converts this vector to a one-column matrix.
 
 @examples{
 check:
-  [vector: 1, 2, 3] - [vector: 4, 5, 6] is [vector: -3, -3, -3]
+  [vector: 4, 5, 6].to-row-matrix() is [matrix(3, 1): 4, 5, 6]
 end
 }
 
@@ -885,6 +992,8 @@ check:
 end
 }
 
+See @pyret-method["Vector" "get"].
+
 @function["vec-length"]
 
 Returns the length of the given vector.
@@ -894,6 +1003,8 @@ check:
   vec-length([vector: 1, 2, 3, 4]) is 4
 end
 }
+
+See @pyret-method["Vector" "length"].
 
 @function["vec-dot"]
 
@@ -905,6 +1016,8 @@ check:
 end
 }
 
+See @pyret-method["Vector" "dot"].
+
 @function["vec-magnitude"]
 
 Returns the magnitude of the given vector.
@@ -914,7 +1027,9 @@ Returns the magnitude of the given vector.
     vec-magnitude([vector: 3, 4]) is 5
     vec-magnitude([vector: 4, 0]) is 4
   end
-  }
+}
+
+See @pyret-method["Vector" "magnitude"].
 
 @function["vec-cross"]
 
@@ -926,6 +1041,8 @@ check:
   vec-cross([vector: 2, -3, 1], [vector: -2, 1, 1]) is [vector: -4, -4, -4]
 end
 }
+
+See @pyret-method["Vector" "cross"].
 
 @function["vec-normalize"]
 
@@ -939,6 +1056,8 @@ end
 }
 
 
+See @pyret-method["Vector" "normalize"].
+
 @function["vec-scale"]
 
 Scales the given vector by the given constant.
@@ -949,6 +1068,8 @@ check:
 end
 }
 
+See @pyret-method["Vector" "scale"].
+
 
 @function["vec-add"]
 
@@ -957,6 +1078,7 @@ Adds the second vector to first one.
 @examples{
 check:
   vec-add([vector: 1, 2, 3], [vector: 4, 5, 6]) is [vector: 5, 7, 9]
+  vec-add([vector: 1], [vector: 1, 2]) raises "vectors of different lengths"
 end
 }
 
@@ -968,6 +1090,7 @@ Subtracts the second vector from first one.
 @examples{
 check:
   vec-sub([vector: 1, 2, 3], [vector: 4, 5, 6]) is [vector: -3, -3, -3]
+  vec-sub([vector: 1], [vector: 1, 2]) raises "vectors of different lengths"
 end
 }
 
@@ -982,9 +1105,19 @@ The @pyret{Matrix} type represents mathematical matrices.
 
 }
 
+Every matrix has a @pyret{rows} field and a @pyret{cols} field, which are the
+dimensions of the matrix.
+
+@examples{
+check:
+  [matrix(2, 3): 10, 20, 30, 40, 50, 60].rows is 2
+  [matrix(2, 3): 10, 20, 30, 40, 50, 60].cols is 3
+end
+}
+
 @section{Matrix Constructors}
 
-@collection-doc["matrix" #:contract `(a-arrow ("rows" ,N) ("cols" ,N)
+@collection-doc["matrix" #:contract `(a-arrow ("rows" ,NonZeroNat) ("cols" ,NonZeroNat)
                                               (a-arrow ("elt" ,N) ,mtx-type))]
 
 Publicly exposed constructor which constructs a matrix of size 
@@ -994,6 +1127,15 @@ The following example represents the matrix @math-imtx{1 & 2 & 3 \\ 4 & 5 & 6}:
 
 @examples{
 [matrix(2,3): 1, 2, 3, 4, 5, 6]
+}
+
+Supplying an inconsistent quantity of elements for a given matrix dimension
+will produce an error:
+
+@examples{
+check:
+  [matrix(4, 2): 100] raises "Invalid 1x2 Matrix"
+end
 }
 
 @collection-doc["row-matrix" #:contract `(a-arrow ("elt" ,N) ,mtx-type)]
@@ -1022,12 +1164,15 @@ end
 
 @function["identity-matrix"]
 
-Constructs an @pyret{n}@math-in{\times}@pyret{n} identity matrix.
+Constructs an @math-in{n \times n} identity matrix.
 
 @examples{
 check:
-  identity-matrix(2) is [matrix(2,2): 1, 0, 0, 1]
-  identity-matrix(3) is [matrix(3,3): 1, 0, 0, 0, 1, 0, 0, 0, 1]
+  identity-matrix(2) is [matrix(2,2): 1, 0,
+                                      0, 1]
+  identity-matrix(3) is [matrix(3,3): 1, 0, 0,
+                                      0, 1, 0,
+                                      0, 0, 1]
 end
 }
 
@@ -1037,10 +1182,25 @@ Constructs a matrix of the given size using only the given element.
 
 @examples{
 check:
-  make-matrix(2, 3, 1) is [matrix(2,3): 1, 1, 1, 1, 1, 1]
-  make-matrix(3, 2, 5) is [matrix(3,2): 5, 5, 5, 5, 5, 5]
+  make-matrix(2, 3, 1) is [matrix(2,3): 1, 1, 1,
+                                        1, 1, 1]
+  make-matrix(3, 2, 5) is [matrix(3,2): 5, 5,
+                                        5, 5,
+                                        5, 5]
 end
 }
+
+@function["zero-matrix"]
+
+Constructs a matrix of the given size containing only zeroes.
+
+@examples{
+check:
+  zero-matrix(2, 3) is [matrix(2,3): 0, 0, 0,
+                                     0, 0, 0]
+end
+}
+
 
 @function["build-matrix"]
 
@@ -1064,19 +1224,21 @@ Returns the matrix's entry in the @math{i^th} row and the @math{j^th} column.
 check:
   [matrix(3,2): 1, 2, 3, 4, 5, 6].get(1,1) is 4
   [matrix(3,2): 1, 2, 3, 4, 5, 6].get(2,0) is 5
+  [matrix(1,1): 1].get(2, 0) raises "Index out of bounds for matrix dimensions"
 end
 }
 
 @matrix-method["to-list"]
 
-Returns the matrix as a list of numbers (this is just the internal
-@pyret-id["RawArray" "raw-arrays"] representation written as a list).
+Returns the matrix as a list of numbers in row-major order.
 
 For example, given the matrix @math-imtx{2 & 4 & 6 \\ 8 & 10 & 12 \\ 14 & 16 & 18}:
 
 @examples{
 check:
-  [matrix(3,3): 2, 4, 6, 8, 10, 12, 14, 16, 18].to-list()
+  [matrix(3,3): 2, 4, 6,
+                8, 10, 12,
+                14, 16, 18].to-list()
     is [list: 2, 4, 6, 8, 10, 12, 14, 16, 18]
 end
 }
@@ -1089,6 +1251,8 @@ Returns a one-row/one-column matrix as a vector.
 check:
   [matrix(2,1): 4, 5].to-vector() is [vector: 4, 5]
   [matrix(1,2): 4, 5].to-vector() is [matrix(2,1): 4, 5].to-vector()
+  [matrix(2,2): 1, 2, 3, 4].to-vector()
+    raises "Cannot convert non-vector matrix to vector"
 end
 }
 
@@ -1195,6 +1359,11 @@ check:
 end
 }
 
+@matrix-method["hermitian"]
+
+Computes the conjugate-transpose of this matrix.  Since Pyret does not have
+complex numbers, this is synonymous with @pyret-method["Matrix" "transpose"].
+
 @matrix-method["diagonal"]
 
 Returns a one-row matrix containing the matrix's diagonal entries.
@@ -1211,31 +1380,47 @@ end
 
 @matrix-method["upper-triangle"]
 
-Returns the upper triangle of the matrix, if the matrix is square.
+Returns the @emph{upper triangle} of the matrix, if the matrix is square.  This
+consists of all the values on or above the main diagonal, and zeroes below it.
 For example, the upper triangle of @math-imtx{1 & 2 & 3\\ 4 & 5 & 6\\ 7 & 8 & 9}
 would be @math-imtx{1 & 2 & 3\\ 0 & 5 & 6 \\ 0 & 0 & 9}.
 
 @examples{
 check:
-  [matrix(2,2): 1, 2, 3, 4].upper-triangle() is [matrix(2,2): 1, 2, 0 ,4]
+  [matrix(2,2): 1, 2,
+                3, 4].upper-triangle()
+    is [matrix(2,2): 1, 2,
+                     0, 4]
 
-  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].upper-triangle()
-    is [matrix(3,3): 1, 2, 3, 0, 5, 6, 0, 0, 9]
+  [matrix(3,3): 1, 2, 3,
+                4, 5, 6,
+                7, 8, 9].upper-triangle()
+    is [matrix(3,3): 1, 2, 3,
+                     0, 5, 6,
+                     0, 0, 9]
 end
 }
 
 @matrix-method["lower-triangle"]
 
-Returns the lower triangle of the matrix, if the matrix is square.
+Returns the @emph{lower triangle} of the matrix, if the matrix is square.  This
+consists of all the values on or below the main diagonal, and zeroes above it.
 For example, the upper triangle of @math-imtx{1 & 2 & 3\\ 4 & 5 & 6\\ 7 & 8 & 9}
 would be @math-imtx{1 & 0 & 0\\ 4 & 5 & 0\\ 7 & 8 & 9}.
 
 @examples{
 check:
-  [matrix(2,2): 1, 2, 3, 4].lower-triangle() is [matrix(2,2): 1, 0, 3, 4]
+  [matrix(2,2): 1, 2,
+                3, 4].lower-triangle()
+    is [matrix(2,2): 1, 0,
+                     3, 4]
 
-  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].lower-triangle()
-    is [matrix(3,3): 1, 0, 0, 4, 5, 0, 7, 8, 9]
+  [matrix(3,3): 1, 2, 3,
+                4, 5, 6,
+                7, 8, 9].lower-triangle()
+    is [matrix(3,3): 1, 0, 0,
+                     4, 5, 0,
+                     7, 8, 9]
 end
 }
 
@@ -1280,6 +1465,20 @@ check:
 end
 }
 
+@matrix-method["map2"]
+Maps the given function entrywise over corresponding elements of this and the
+given matrix.
+
+@examples{
+check:
+  m1 = [matrix(2,2): 10, 20, 30, 40]
+  m2 = [matrix(2,2): 4, 3, 2, 1]
+  m1.map2(m2, num-expt)
+    is [matrix(2,2): num-expt(10, 4), num-expt(20, 3),
+                     num-expt(30, 2), num-expt(40, 1)]
+end
+}
+
 @matrix-method["row-map"]
 
 Maps the given function over each row in the matrix.
@@ -1315,8 +1514,11 @@ the matrix @math-imtx{3\\ 6} yields the matrix
 
 @examples{
 check:
-  [matrix(2,2): 1, 2, 4, 5].augment([matrix(2,1): 3, 6])
-    is [matrix(2,3): 1, 2, 3, 4, 5, 6]
+  [matrix(2,2): 1, 2,
+                4, 5].augment([matrix(2,1): 3,
+                                            6])
+    is [matrix(2,3): 1, 2, 3,
+                     4, 5, 6]
 end
 }
 
@@ -1330,7 +1532,8 @@ the matrix @math-imtx{4 & 5 & 6} gives the matrix
 @examples{
 check:
   [matrix(1,3): 1, 2, 3].stack([matrix(1,3): 4, 5, 6])
-    is [matrix(2,3): 1, 2, 3, 4, 5, 6]
+    is [matrix(2,3): 1, 2, 3,
+                     4, 5, 6]
 end
 }
 
@@ -1340,8 +1543,11 @@ Returns the trace of the matrix (i.e. the sum of its diagonal values).
 
 @examples{
 check:
-  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].trace() is 15
-  [matrix(2,2): 2, 4, 6, 8].trace() is 10
+  [matrix(3,3): 1, 2, 3,
+                4, 5, 6,
+                7, 8, 9].trace() is (1 + 5 + 9)
+  [matrix(2,2): 2, 4,
+                6, 8].trace() is (2 + 8)
 end
 }
 
@@ -1394,7 +1600,7 @@ end
 @matrix-method["determinant"]
 
 Returns the determinant of the matrix, calculated via a recursive
-implementation of laplace expansion.
+implementation of Laplace expansion.
 
 @examples{
 check:
@@ -1408,7 +1614,16 @@ end
 
 @matrix-method["is-invertible"]
 
-Returns true if the matrix is invertible (i.e. it has a nonzero determinant).
+Returns true if the matrix is invertible, that is, it has a nonzero determinant.
+
+@matrix-method["is-orthonormal"] Returns true if the matrix is
+@hyperlink["https://en.wikipedia.org/wiki/Orthogonal_matrix"]{orthonormal},
+meaning that all rows (when treated as vectors) each have
+@pyret-method["Vector" "magnitude"] 1, are all distinct, and distinct rows
+@pyret-method["Vector" "dot"] of zero.  Mathematically, this computes whether
+@math-in{self * self^T} is the identity matrix.  Since numerical inaccuracy is
+quite likely, this check is performed using @pyret-id["roughly-equal"
+"equality"].
 
 @matrix-method["rref"]
 
@@ -1447,7 +1662,33 @@ matrix on the right side of this inverse).
 
 @matrix-method["least-squares-solve"]
 
-Returns the least squares solution for this and the given matrix, calculated using QR decomposition.
+Returns the least squares solution for this and the given matrix, calculated
+using QR decomposition.
+
+@matrix-method["lu-decomposition"] Computes the
+@hyperlink["https://en.wikipedia.org/wiki/LU_decomposition"]{LU decomposition}
+of this matrix, if possible.  This returns a pair of matrices, @pyret{L} and
+@pyret{U}, that are respectively @seclink[(pyret-method-ref "Matrix"
+"upper-triangle")]{lower-triangular} and @seclink[(pyret-method-ref "Matrix"
+"upper-triangle")]{upper-triangular}, and whose product is this matrix:
+
+@math-disp{
+  \begin{bmatrix}
+    a_{11} & a_{12} & a_{13} \\
+    a_{21} & a_{22} & a_{23} \\
+    a_{31} & a_{32} & a_{33}
+  \end{bmatrix} =
+  \begin{bmatrix}
+    \ell_{11} &         0 & 0         \\
+    \ell_{21} & \ell_{22} & 0         \\
+    \ell_{31} & \ell_{32} & \ell_{33}
+  \end{bmatrix}
+  \begin{bmatrix}
+    u_{11} & u_{12} & u_{13} \\
+         0 & u_{22} & u_{23} \\
+         0 &      0 & u_{33}
+  \end{bmatrix}
+}
 
 @matrix-method["lp-norm"]
 
@@ -1464,55 +1705,52 @@ check:
   a = [matrix(3,1): 1, 2, 3]
   b = [matrix(3,3): 1, 0, 0, 2, 0, 0, 3, 0, 0]
 
-  a.lp-norm(3) is-within(0.00001) num-expt(35, 1/3)
-  b.lp-norm(3) is-within(0.00001) (b * a).lp-norm(3)
+  a.lp-norm(3) is-roughly num-expt(35, 1/3)
+  b.lp-norm(3) is-roughly (b * a).lp-norm(3)
 
-  a.l1-norm()  is-within(0.00001) 6
-  a.l2-norm()  is-within(0.00001) num-sqrt(14)
+  a.l1-norm()  is-roughly 6
+  a.l2-norm()  is-roughly num-sqrt(14)
   a.l-inf-norm() is 3
 end
 }
 
 @matrix-method["qr-decomposition"]
 
-Returns the QR Decomposition of the matrix as a list with two matricies, the first being
-the Q matrix and the second being the R matrix.
+Returns the @hyperlink["https://en.wikipedia.org/wiki/QR_decomposition"]{QR
+decomposition} of this matrix, if possible.  This returns a pair of matrices,
+@pyret{Q} and @pyret{R}, where @pyret{Q} is @seclink[(pyret-method-ref "Matrix"
+"is-orthonormal")]{orthogonal} and @pyret{R} is @seclink[(pyret-method-ref
+"Matrix" "upper-triangle")]{upper-triangular}, whose product is this matrix.
 
 @matrix-method["gram-schmidt"]
 
 Returns an orthogonal matrix whose image is the same as the span of the matrix's columns.
 (The same as the first result of @pyret-method["Matrix" "qr-decomposition"])
 
-@section{@pyret{Matrix} Binary Operations}
+@section[#:tag "s:matrix-binary-ops"]{@pyret{Matrix} Binary Operations}
 
-The following binary operations on matrices are defined:
-
-@matrix-method["_plus"]
-
-Adds the matrix to the given matrix.
+Matrices are defined to permit using addition, subtraction, and multiplication
+operators on them, whenever the dimensions are compatible:
 
 @examples{
 check:
   [matrix(2,2): 1, 2, 3, 4] + [matrix(2,2): 1, 2, 3, 4]
     is [matrix(2,2): 2, 4, 6, 8]
+
+  [matrix(2,2): 1, 2, 3, 4] + [matrix(4, 1): 1, 2, 3, 4]
+    raises "different sized matrices"
 end
 }
-
-@matrix-method["_minus"]
-
-Subtracts the given matrix from the matrix.
 
 @examples{
 check:
   [matrix(2,2): 1, 2, 3, 4] - [matrix(2,2): 0, 2, 3, 3]
     is [matrix(2,2): 1, 0, 0, 1]
+
+  [matrix(2,2): 1, 2, 3, 4] - [matrix(4, 1): 1, 2, 3, 4]
+    raises "different sized matrices"
 end
 }
-
-@matrix-method["_times"]
-
-Multiplies the given matrix on the right of the matrix
-(Reminder: Matrix Multiplication is not commutative)
 
 @examples{
 check:
@@ -1528,476 +1766,213 @@ The following functions are available to be performed on matrices.
 @function["mtx-get"]
 
 Returns the matrix's entry in the @math{i^th} row and the @math{j^th} column.
-
-@examples{
-check:
-  mtx-get([matrix(3,2): 1, 2, 3, 4, 5, 6], 1, 1) is 4
-  mtx-get([matrix(3,2): 1, 2, 3, 4, 5, 6], 2, 0) is 5
-end
-}
+See @pyret-method["Matrix" "get"].
 
 @function["mtx-to-list"]
 
-Returns the matrix as a list of numbers (this is just the internal
-@pyret-id["RawArray" "raw-arrays"] representation written as a list).
-
-For example, given the matrix @math-imtx{2 & 4 & 6 \\ 8 & 10 & 12 \\ 14 & 16 & 18}:
-
-@examples{
-check:
-  mtx-to-list([matrix(3,3): 2, 4, 6, 8, 10, 12, 14, 16, 18])
-    is [list: 2, 4, 6, 8, 10, 12, 14, 16, 18]
-end
-}
+Returns the matrix as a list of numbers in row-major order.  See
+@pyret-method["Matrix" "to-list"].
 
 @function["mtx-to-vector"]
 
-Returns a one-row/one-column matrix as a vector.
-
-@examples{
-check:
-  mtx-to-vector([matrix(2,1): 4, 5]) is [vector: 4, 5]
-  mtx-to-vector([matrix(1,2): 4, 5]) is [matrix(2,1): 4, 5].to-vector()
-end
-}
+Returns a one-row/one-column matrix as a vector.  See @pyret-method["Matrix" "to-vector"].
 
 @function["mtx-to-lists"]
 
 Returns the matrix as a list of lists of numbers, with each list
-corresponding to one row.
-
-@examples{
-check:
-  mtx-to-lists([matrix(2,3): 1, 2, 3, 4, 5, 6])
-    is [list: [list: 1, 2, 3],
-              [list: 4, 5, 6]]
-end
-}
+corresponding to one row.  See @pyret-method["Matrix" "to-lists"].
 
 @function["mtx-to-vectors"]
 
 Returns the matrix as a list of lists of numbers (i.e. a list of
 @pyret-id["Vector" "matrices"]s), 
-with each list corresponding to one column.
-
-For example, the matrix @math-imtx{1 & 2 & 3 \\ 4 & 5 & 6} corresponds to the
-vectors @math-imtx{1 \\ 4}, @math-imtx{2 \\ 5}, and @math-imtx{3 \\ 6}: 
-
-@examples{
-check:
-  mtx-to-vectors([matrix(2,3): 1, 2, 3, 4, 5, 6])
-    is [list: [vector: 1, 4],
-              [vector: 2, 5],
-              [vector: 3, 6]]
-end
-}
+with each list corresponding to one column.  See @pyret-method["Matrix" "to-vectors"].
 
 @function["mtx-row"]
 
-Returns a one-row matrix with the matrix's given row.
-
-@examples{
-check:
-  mtx-row([matrix(2,3): 1, 2, 3, 4, 5, 6], 2)
-    is [matrix(1,3): 4, 5, 6]
-
-  mtx-row([matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9], 3)
-    is [matrix(1,3): 7, 8, 9]
-end
-}
+Returns a one-row matrix with the matrix's given row.  See
+@pyret-method["Matrix" "row"].
 
 @function["mtx-col"]
 
-Returns a one-column matrix with the matrix's given column.
-
-@examples{
-check:
-  mtx-col([matrix(2,3): 1, 2, 3, 4, 5, 6], 2) is [matrix(2,1): 2, 5]
-
-  mtx-col([matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9], 3)
-    is [matrix(3,1): 3, 6, 9]
-end
-}
+Returns a one-column matrix with the matrix's given column.  See
+@pyret-method["Matrix" "col"].
 
 @function["mtx-submatrix"]
 
 Returns the submatrix of the matrix comprised of the intersection
-of the given list of rows and the given list of columns.
-
-For example, if our list of rows is @math-in{\{1, 2\}} and our
-list of columns is @math-in{\{2, 3\}}, then the positions in the
-resulting submatrix will be the elements with @math-in{(row,col)} positions
-@math-in{\{(1, 2), (1, 3), (2, 2), (2, 3)\}}.
-
-@pyret{mtx-submatrix(}@math-in{
-\left[\begin{matrix} 
-            a_{00} & a_{01} & a_{02} \\
-            a_{10} & a_{11} & a_{12} \\
-            a_{20} & a_{21} & a_{22}
-            \end{matrix}\right]}@pyret{, [list: 1,2], [list: 2,3])}
-                                     @math-in{=
-\left[\begin{matrix}
-a_{01} & a_{02} \\
-a_{11} & a_{12}\end{matrix}\right]}
-
-This is shown in the below example:
-
-@examples{
-check:
-  mtx-submatrix([matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                [list: 1, 2], [list: 2, 3])
-    is [matrix(2,2): 2, 3, 4, 5]
-end
-}
+of the given list of rows and the given list of columns.  See
+@pyret-method["Matrix" "submatrix"].
 
 @function["mtx-transpose"]
 
-Returns the transposition of the matrix. For example,
-@math-disp{\begin{bmatrix}1 & 2 & 3 \\ 4 & 5 & 6\end{bmatrix}
-                 \overrightarrow{Transpose}
-                 \begin{bmatrix}1 & 4 \\ 2 & 5 \\ 3 & 6\end{bmatrix}}
+See @pyret-method["Matrix" "transpose"].
 
-@examples{
-check:
-  mtx-transpose([matrix(2,3): 1, 2, 3, 4, 5, 6])
-    is [matrix(3,2): 1, 4, 2, 5, 3, 6]
-end
-}
+@function["mtx-hermitian"]
+
+See @pyret-method["Matrix" "hermitian"].
 
 @function["mtx-diagonal"]
 
-Returns a one-row matrix containing the matrix's diagonal entries.
-
-@examples{
-check:
-  mtx-diagonal([matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9])
-    is [matrix(1,3): 1, 5, 9]
-
-  mtx-diagonal([matrix(3,2): 1, 2, 3, 4, 5, 6])
-    is [matrix(1,2): 1, 5]
-end
-}
+Returns a one-row matrix containing the matrix's diagonal entries.  See
+@pyret-method["Matrix" "diagonal"].
 
 @function["mtx-upper-triangle"]
 
-Returns the upper triangle of the matrix, if the matrix is square.
-For example, the upper triangle of @math-imtx{1 & 2 & 3\\ 4 & 5 & 6\\ 7 & 8 & 9}
-would be @math-imtx{1 & 2 & 3\\ 0 & 5 & 6 \\ 0 & 0 & 9}.
-
-@examples{
-check:
-  mtx-upper-triangle([matrix(2,2): 1, 2, 3, 4])
-    is [matrix(2,2): 1, 2, 0 ,4]
-
-  mtx-upper-triangle([matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9])
-    is [matrix(3,3): 1, 2, 3, 0, 5, 6, 0, 0, 9]
-end
-}
+Returns the @emph{upper triangle} of the matrix, if the matrix is square.  See
+@pyret-method["Matrix" "upper-triangle"].
 
 @function["mtx-lower-triangle"]
 
-Returns the lower triangle of the matrix, if the matrix is square.
-For example, the upper triangle of @math-imtx{1 & 2 & 3\\ 4 & 5 & 6\\ 7 & 8 & 9}
-would be @math-imtx{1 & 0 & 0\\ 4 & 5 & 0\\ 7 & 8 & 9}.
-
-@examples{
-check:
-  mtx-lower-triangle([matrix(2,2): 1, 2, 3, 4])
-    is [matrix(2,2): 1, 0, 3, 4]
-
-  mtx-lower-triangle([matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9])
-    is [matrix(3,3): 1, 0, 0, 4, 5, 0, 7, 8, 9]
-end
-}
+Returns the @emph{lower triangle} of the matrix, if the matrix is square.  See
+@pyret-method["Matrix" "lower-triangle"].
 
 @function["mtx-row-list"]
 
-Returns the matrix as a list of one-row matrices.
-(Very similar to @pyret-id["mtx-to-lists"], except this function
-returns a list of matrices instead.)
-
-@examples{
-check:
-  mtx-row-list([matrix(2,3): 1, 2, 3, 4, 5, 6])
-    is [list: [matrix(1,3): 1, 2, 3],
-              [matrix(1,3): 4, 5, 6]]
-end
-}
+Returns the matrix as a list of one-row matrices.  See @pyret-method["Matrix" "row-list"].
 
 @function["mtx-col-list"]
 
-Returns the matrix as a list of one-column matrices.
-(Very similar to @pyret-id["mtx-to-vectors"], except this function
-returns a list of matrices instead.)
-
-@examples{
-check:
-  mtx-col-list([matrix(2,3): 1, 2, 3, 4, 5, 6])
-    is [list: [matrix(2,1): 1, 4],
-              [matrix(2,1): 2, 5],
-              [matrix(2,1): 3, 6]]
-end
-}
+Returns the matrix as a list of one-column matrices.  See
+@pyret-method["Matrix" "col-list"].
 
 @function["mtx-map"]
 
-Maps the given function entrywise over the matrix.
+Maps the given function entrywise over the matrix.  See @pyret-method["Matrix" "map"].
 
-@examples{
-check:
-  multTwo = lam(x): x * 2 end
-  mtx-map(multTwo, [matrix(2,2): 1, 2, 3, 4])
-    is [matrix(2,2): 2, 4, 6, 8]
-end
-}
+@function["mtx-map2"]
+
+Maps the given function over the corresponding entries of the two given
+matrices.  See @pyret-method["Matrix" "map2"].
 
 @function["mtx-row-map"]
 
-Maps the given function over each row in the matrix.
-
-@examples{
-check:
-  # sumRow :: 1*n matrix
-  # Computes the total sum of all entries in the given row
-  sumRow = lam(row): [matrix(1,1): row.to-vector().foldr(_ + _)] end
-  mtx-row-map(sumRow, [matrix(2,3): 1, 2, 3, 4, 5, 6])
-    is [matrix(2,1): 6, 15]
-end
-}
+Maps the given function over each row in the matrix.  See
+@pyret-method["Matrix" "row-map"].
 
 @function["mtx-col-map"]
 
-Maps the given function over each column in the matrix.
-
-@examples{
-check:
-  # sumCol :: m*1 matrix
-  # Computes the total sum of all entries in the given column
-  sumCol = lam(col): [matrix(1,1): col.to-vector().foldr(_ + _)] end
-  mtx-col-map(sumCol, [matrix(2,3): 1, 2, 3, 4, 5, 6])
-    is [matrix(1,3): 5, 7, 9]
-end
-}
+Maps the given function over each column in the matrix.  See
+@pyret-method["Matrix" "col-map"].
 
 @function["mtx-augment"]
 
-Returns the matrix augmented with the given matrix. For
-example, augmenting the matrix @math-imtx{1 & 2\\4 & 5} with
-the matrix @math-imtx{3\\ 6} yields the matrix
-@math-imtx{1 & 2 & 3\\ 4 & 5 & 6}.
-
-@examples{
-check:
-  mtx-augment([matrix(2,2): 1, 2, 4, 5], [matrix(2,1): 3, 6])
-    is [matrix(2,3): 1, 2, 3, 4, 5, 6]
-end
-}
+Returns the first matrix augmented with the second matrix. See
+@pyret-method["Matrix" "augment"].
 
 @function["mtx-stack"]
 
-Returns the matrix stacked on top of the given matrix. For
-example, stacking the matrix @math-imtx{1 & 2 & 3} on top of
-the matrix @math-imtx{4 & 5 & 6} gives the matrix
-@math-imtx{1 & 2 & 3\\ 4 & 5 & 6}.
-
-@examples{
-check:
-  mtx-stack([matrix(1,3): 1, 2, 3], [matrix(1,3): 4, 5, 6])
-    is [matrix(2,3): 1, 2, 3, 4, 5, 6]
-end
-}
+Returns the first matrix stacked on top of the second matrix. See
+@pyret-method["Matrix" "stack"].
 
 @function["mtx-trace"]
 
-Returns the trace of the matrix (i.e. the sum of its diagonal values).
-
-@examples{
-check:
-  mtx-trace([matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9]) is 15
-  mtx-trace([matrix(2,2): 2, 4, 6, 8]) is 10
-end
-}
+Returns the trace of the matrix (i.e. the sum of its diagonal values).  See
+@pyret-method["Matrix" "trace"].
 
 @function["mtx-scale"]
 
-Multiplies each entry in the matrix by the given value.
-
-@examples{
-check:
-  mtx-scale([matrix(2,2): 1, 2, 3, 4], 2)
-    is [matrix(2,2): 2, 4, 6, 8]
-
-  mtx-scale([matrix(2,2): 2, 4, 6, 8], 1/2)
-    is [matrix(2,2): 1, 2, 3, 4]
-end
-}
+Multiplies each entry in the matrix by the given value.  See
+@pyret-method["Matrix" "scale"].
 
 @function["mtx-dot"]
 
-Returns the Frobenius Product of the matrix with the given matrix (for
-1-dimensional matrices, this is simply the dot product). This is done by
-multiplying the matrix with the transposition of @pyret{other} and taking
-the trace of the result. An example of this calculation (@math-in{\ast} 
-denotes matrix multiplication):
-
-@pyret{mtx-trace(}@math-in{\left(\left[\begin{smallmatrix}1 & 2 & 3\end{smallmatrix}\right]
-\ast\left[\begin{smallmatrix}4\\ 2\\ ^4/_3 \end{smallmatrix}\right]\right)}@pyret{)}
-@math-in{=} @pyret{mtx-trace(}@math-in{
-\underbrace{\left[\begin{smallmatrix}(1\cdot 4)+(2\cdot 2)+(3\cdot \frac{4}{3})\end{smallmatrix}\right]}_{
-1\times 1 \text{ matrix}}}@pyret{)}@math-in{=12}
-
-@examples{
-check:
-  mtx-dot([matrix(1,3): 1, 2, 3], [matrix(1,3): 4, 2, 4/3]) is 12
-  mtx-dot([matrix(1,3): 1, 2, 3], [matrix(1,3): 1, 1, 1]) is 6
-end
-}
+Returns the Frobenius Product of the two matrices.  See @pyret-method["Matrix"
+"dot"].
 
 @function["mtx-expt"]
 
-Multiplies the matrix by itself the given number of times.
-
-@examples{
-check:
-  a = [matrix(2,2): 1, 2, 3, 4]
-  mtx-expt(a, 1) is a
-  mtx-expt(a, 2) is a * a
-  mtx-expt(a, 3) is a * a * a
-end
-}
+Multiplies the matrix by itself the given number of times.  See
+@pyret-method["Matrix" "expt"].
 
 @function["mtx-determinant"]
 
-Returns the determinant of the matrix, calculated via a recursive
-implementation of laplace expansion.
-
-@examples{
-check:
-  mtx-determinant([matrix(5,5): 1, 2, 1, 2, 3,
-                                2, 3, 1, 0, 1,
-                                2, 2, 1, 0, 0,
-                                1, 1, 1, 1, 1,
-                                0,-2, 0,-2,-2]) is -2
-end
-}
+Returns the determinant of the matrix.  See @pyret-method["Matrix"
+"determinant"].
 
 @function["mtx-is-invertible"]
 
-Returns true if the matrix is invertible (i.e. it has a nonzero determinant).
+Returns true if the matrix is invertible.  See @pyret-method["Matrix" "is-invertible"].
+
+@function["mtx-is-orthonormal"]
+
+Returns true if the matrix is orthonormal.  See @pyret-method["Matrix" "is-orthonormal"]. 
 
 @function["mtx-rref"]
 
-Returns the Reduced Row Echelon Form of the matrix. For example:
-@math-disp{\begin{bmatrix}1 & 2 & 3 \\ 4 & 5 & 6\end{bmatrix}
-                 \overrightarrow{RREF}
-                 \begin{bmatrix}1 & 0 & -1\\ 0 & 1 & 2\end{bmatrix}}
-
-@examples{
-check:
-  mtx-rref([matrix(2,3): 1, 2, 3, 4, 5, 6])
-    is [matrix(2,3): 1, 0,-1, 0, 1, 2]
-end
-}
+Returns the Reduced Row Echelon Form of the matrix. See @pyret-method["Matrix"
+"rref"].
 
 @function["mtx-inverse"]
 
-Returns the inverse of the matrix, if it is invertible (found
-by augmenting the matrix with itself and finding the reduced-row
-echelon form). For example:
-@math-disp{\begin{bmatrix}1 & 0 & 4\\ 1 & 1 & 6\\ -3 & 0 & -10\end{bmatrix}^{-1}
-                 = \begin{bmatrix}-5 & 0 & -2\\ -4 & 1 & -1\\ ^3/_2 & 0 & ^1/_2\end{bmatrix}}
-
-@examples{
-check:
-  mtx-inverse([matrix(3,3): 1, 0, 4, 1, 1, 6, -3, 0, -10])
-    is [matrix(3,3): -5, 0, -2, -4, 1, -1, 3/2, 0, 1/2]
-end
-}
+Returns the inverse of the matrix, if it is invertible.  See
+@pyret-method["Matrix" "inverse"].
 
 @function["mtx-solve"]
 
-Returns the matrix which, when multiplied on the right of the first matrix, results in the second matrix.
-In other words, this returns the solution to the system of equations represented by the given matrices.
-This function only works on invertible matrices.
+Returns the matrix which, when multiplied on the right of the first matrix,
+results in the second matrix.  See @pyret-method["Matrix" "solve"].
 
 @function["mtx-least-squares-solve"]
 
 Returns the least squares solution for the first and the second matrix, calculated
-using QR decomposition.
+using QR decomposition.  See @pyret-method["Matrix" "least-squares-solve"].
 
 @function["mtx-lp-norm"]
 
-Computes the @math{L^p} norm of the matrix using the given number.
+Computes the @math{L^p} norm of the matrix using the given number.  See
+@pyret-method["Matrix" "lp-norm"].
 
 @function["mtx-l1-norm"]
 @function["mtx-l2-norm"]
 @function["mtx-l-inf-norm"]
 
-Computes the @math{L^1}, @math{L^2}, and @math{L}@superscript{∞} norms of the matrix, respectively.
-
-@examples{
-check:
-  a = [matrix(3,1): 1, 2, 3]
-  b = [matrix(3,3): 1, 0, 0, 2, 0, 0, 3, 0, 0]
-
-  mtx-lp-norm(a, 3) is-within(0.00001) num-expt(35, 1/3)
-  mtx-lp-norm(b, 3) is-within(0.00001) mtx-lp-norm((b * a), 3)
-
-  mtx-l1-norm(a)  is-within(0.00001) 6
-  mtx-l2-norm(b)  is-within(0.00001) num-sqrt(14)
-  mtxl-inf-norm() is 3
-end
-}
+Computes the @math{L^1}, @math{L^2}, and @math{L}@superscript{∞} norms of the
+matrix, respectively.  See @pyret-method["Matrix" "l1-norm"].
 
 @function["mtx-qr-decomposition"]
 
-Returns the QR Decomposition of the matrix as a list with two matricies, the first being
-the Q matrix and the second being the R matrix.
+See @pyret-method["Matrix" "qr-decomposition"].
 
 @function["mtx-gram-schmidt"]
 
-Returns an orthogonal matrix whose image is the same as the span of the matrix's columns.
-(The same as the first result of @pyret-id["mtx-qr-decomposition"])
+See @pyret-method["Matrix" "gram-schmidt"].
 
 @function["mtx-add"]
-
-Adds the first matrix to the second matrix.
-
-@examples{
-check:
-  mtx-add([matrix(2,2): 1, 2, 3, 4], [matrix(2,2): 1, 2, 3, 4])
-    is [matrix(2,2): 2, 4, 6, 8]
-end
-}
-
 @function["mtx-sub"]
-
-Subtracts the second matrix from the first matrix.
-
-@examples{
-check:
-  mtx-sub([matrix(2,2): 1, 2, 3, 4], [matrix(2,2): 0, 2, 3, 3])
-    is [matrix(2,2): 1, 0, 0, 1]
-end
-}
-
 @function["mtx-mult"]
 
-Multiplies the second matrix on the right of the first matrix
-(Reminder: Matrix Multiplication is not commutative)
-
-@examples{
-check:
-  mtx-mult([matrix(2,2): 1, 2, 3, 4], [matrix(2,2): 3, 0, 0, 3])
-    is [matrix(2,2): 3, 6, 9, 12]
-end
-}
+Adds, subtracts, or multiplies the two matrices.  See @secref{s:matrix-binary-ops}.
 
 @section{Matrix Conversion Functions}
 
-@function["is-row-matrix"]{Returns true if the given matrix has exactly one row.}
-@function["is-col-matrix"]{Returns true if the given matrix has exactly one column.}
+@function["is-row-matrix"]
+Returns whether the matrix has exactly one row:
+@examples{
+check:
+  is-row-matrix([matrix(1, 3): 10, 20, 10]) is true
+  is-row-matrix([matrix(3, 1): 10, 20, 10]) is false
+end
+}
+
+
+@function["is-col-matrix"]
+Returns whether the matrix has exactly one column:
+@examples{
+check:
+  is-row-matrix([matrix(1, 3): 10, 20, 10]) is false
+  is-row-matrix([matrix(3, 1): 10, 20, 10]) is true
+end
+}
 @function["is-square-matrix"]{Returns true if the given matrix has the same number of rows and columns.}
+@examples{
+check:
+  is-square-matrix([matrix(2, 2): 10, 20, 30, 40]) is true
+  is-square-matrix([matrix(4, 1): 10, 20, 30, 40]) is false
+end
+}
+
+
 @function[
   "vector-to-matrix"
   #:examples

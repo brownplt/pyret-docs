@@ -46,7 +46,7 @@
          form
          render-fun-helper
          re-export from
-         pyret pyret-id pyret-method pyret-block
+         pyret pyret-id pyret-method pyret-method-ref pyret-block
          tag-name
          type-spec
          data-spec
@@ -277,14 +277,22 @@
   (elem #:style (span-style real-style) (apply tt body)))
 (define (pyret-id id (mod (curr-module-name)))
   (seclink (xref mod id) (tt id)))
+(define pyret-method-ref
+  (case-lambda
+    [(datatype id)
+     (xref (curr-module-name) datatype "shared methods" id)]
+    [(datatype varname id)
+     (xref (curr-module-name) datatype varname id)]
+    [(datatype varname id mod)
+     (xref mod datatype (or varname "shared methods") id)]))
 (define pyret-method
   (case-lambda
     [(datatype id)
-     (seclink (xref (curr-module-name) datatype "shared methods" id) (tt (string-append "." id)))]
+     (seclink (pyret-method-ref datatype id) (tt (string-append "." id)))]
     [(datatype varname id)
-     (seclink (xref (curr-module-name) datatype varname id) (tt (string-append "." id)))]
+     (seclink (pyret-method-ref datatype varname id) (tt (string-append "." id)))]
     [(datatype varname id mod)
-     (seclink (xref mod datatype (or varname "shared methods") id) (tt (string-append "." id)))]))
+     (seclink (pyret-method-ref datatype varname id mod) (tt (string-append "." id)))]))
 
 ;;;;;;;;;; Cross-Reference Infrastructure ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

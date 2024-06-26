@@ -161,6 +161,12 @@
       (return ,eqfun)
       (doc ""))
     (fun-spec
+      (name "within-now")
+      (arity 1)
+      (args ("tol"))
+      (return ,eqfun)
+      (doc ""))
+    (fun-spec
       (name "within-rel")
       (arity 1)
       (args ("tol"))
@@ -220,6 +226,18 @@
       (args ("val1" "val2"))
       (return ,eq)
       (doc ""))
+    (fun-spec
+      (name "roughly-equal")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name "roughly-equal-now")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc "")))
   ))
 
 @(define code pyret)
@@ -637,9 +655,10 @@ end
 }
 
 Pyret has a family of built-in functions for cases like this, and the default
-is @pyret{within}:
+is @pyret-id{within}.  To explain it precisely, it is clearer to first explain the
+other two functions, @pyret-id{within-rel} and @pyret-id{within-abs}:
 
-@function["within" #:contract (a-arrow N A)]
+@function["within-rel" #:contract (a-arrow N A)]
 
 It takes an argument representing the @emph{relative error}, and returns a
 function that can be used to check equality up to that relative error.  For
@@ -652,13 +671,13 @@ check:
 end
 }
 
-Relative difference is defined by multiplying the @emph{mean} of the two
+Relative difference is defined by multiplying the @emph{smaller} of the two
 numbers by @pyret{tol}, and checking that the result is less than the
 difference between them.  That is, in the expression above, @pyret-id{within}
 checks:
 
 @pyret-block{
-(((9.5 + 10.5) / 2) * 0.1) < (10.5 - 9.5)
+num-abs(9.5 - 10.5) <= (0.1 * num-min(9.5, 10.5))
 }
 
 @note{Converting to exact numbers first avoids overflows on computing the
@@ -669,36 +688,15 @@ errors, we could implement the numeric comparison of @pyret-id{within} as:
 @pyret-block{
 fun my-within(tol):
   lam(left, right):
-    (((num-exact(left) + num-exact(right)) / 2) * num-exact(tol))
-      < num-abs(num-exact(left) - num-exact(right))
+    num-abs(num-exact(left) - num-exact(right))
+      <= num-exact(tol) * num-min(num-abs(left), num-abs(right))
   end
 end
 }
 
 The @pyret{tol} argument must be between @pyret{0} and @pyret{1}.
 
-It's common to use @pyret{within} along with @pyret-id["is%" "testing"] to
-define the binary predicate inline with the test:
-
-@examples{
-check:
-  num-sqrt(10) is%(within(0.1)) 3.2
-  num-sqrt(10) is-not%(within(0.1)) 5
-end
-}
-
-As a convenient shorthand, @pyret{is-roughly} is defined as a shorthand for
-@pyret-id["is%" "testing"](@pyret-id{within}(0.000001)), that is, an error
-tolerance of one-millionth, or six digits of accuracy:
-
-@examples{
-check:
-  num-acos(-1) is-roughly ~3.14159
-  num-acos(-1) is%(within(0.000001)) ~3.14159
-end
-}
-
-Finally, @pyret-id{within} accepts @emph{any} two values, not just numbers.
+Finally, @pyret-id{within-rel} accepts @emph{any} two values, not just numbers.
 On non-numeric arguments, @pyret-id{within} traverses the structures just as
 in @pyret-id{equal-always}, but deferring to the bounds-checking equality when
 a pair of numbers is encountered.  All other values are compared with
@@ -715,10 +713,6 @@ check:
 end
 }
 
-@function["within-rel" #:contract (a-arrow N A)]
-
-An alias for @pyret-id{within}.
-
 @function["within-abs" #:contract (a-arrow N A)]
 
 Like @pyret-id{within-rel}, but compares with @emph{absolute} tolerance rather
@@ -732,6 +726,10 @@ fun my-within-abs(tol):
 end
 }
 
+(Note that the right-hand side of the inequality here is @emph{not} multiplied
+by the magnitude of the values being compared: the tolerance is therefore
+@emph{absolute}, rather than relative to the magnitudes of the values.)
+
 @examples{
 check:
   la = [list: 10]
@@ -743,11 +741,67 @@ check:
 end
 }
 
+@function["within" #:contract (a-arrow N A)]
+@function["roughly-equal" #:contract (a-arrow A A B)]
+
+The definitions above work smoothly, but provide unintuitive behavior when both
+values are tiny.  In particular, there are @emph{no values at all} that are
+relatively close to zero except zero itself, since the magnitude used to scale
+the relative tolerance...is zero.  For many purposes, especially with testing
+(see below) and especially when first developing code, it is common to want to
+specify a rough tolerance and not especially care whether that tolerance is
+relative or absolute.  Accordingly, @pyret-id{within} is a function defined to
+``smoothe'' the behavior of @pyret-id{within-rel} and @pyret-id{within-abs},
+such that the tolerance is treated as @emph{relative} when the numbers are
+large in magnitude, and as @emph{absolute} as they approach zero:
+
+@examples{
+check:
+  # For large numbers, within behaves like within-rel
+  1000 is%(within(0.1)) 1010
+  1000 is-not%(within-abs(0.1)) 1010
+  1000 is%(within-rel(0.1)) 1010
+  # For small numbers, wtihin behaves like within-abs
+  0 is%(within(0.1)) 0.0000001
+  0 is-not%(within-rel(0.1)) 0.000001
+  0 is%(within-abs(0.1)) 0.000001
+end
+}
+
+For even simpler ergonomics, @pyret-id{roughly-equal} is defined to be
+@pyret{within(0.000001)}, that is, an error tolerance of one-millionth, or six
+digits of accuracy.  This tolerance works well in many cases, and the more
+explicit forms are always available, when more precise control over tolerances
+is required.
+
+It's common to use @pyret-id{within} along with @pyret-id["is%" "testing"] to
+define the binary predicate inline with the test:
+
+@examples{
+check:
+  num-sqrt(10) is%(within(0.1)) 3.2
+  num-sqrt(10) is-not%(within(0.1)) 5
+end
+}
+
+As a convenient shorthand, @pyret{is-roughly} is defined as a shorthand for
+@pyret-id["is%" "testing"](@pyret-id{roughly-equal}):
+
+@examples{
+check:
+  num-acos(-1) is-roughly ~3.14159
+  num-acos(-1) is%(roughly-equal) ~3.14159
+  num-acos(-1) is%(within(0.000001)) ~3.14159
+end
+}
+
+@function["within-now" #:contract (a-arrow N A)]
 @function["within-rel-now" #:contract (a-arrow N A)]
 @function["within-abs-now" #:contract (a-arrow N A)]
+@function["roughly-equal-now" #:contract (a-arrow A A B)]
 
-Like @pyret-id{within-rel} and @pyret-id{within-abs}, but they traverse
-mutable structures as in @pyret{equal-now}.
+Like @pyret-id{within}, @pyret-id{within-rel}, @pyret-id{within-abs} and @pyret-id{roughly-equal}, but
+they traverse mutable structures as in @pyret{equal-now}.
 
 @examples{
 check:
@@ -759,8 +813,6 @@ check:
   aa is-not%(within-abs(2))  ab
 end
 }
-
-
 
 
 @section[#:tag "s:undefined-equalities"]{Undefined Equalities}
