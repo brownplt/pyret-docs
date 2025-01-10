@@ -206,6 +206,17 @@ end
     Converts a @pyret-id["List" "lists"] to a @pyret-id{RawArray} containing
     the same elements in the same order.
 
+@examples{
+check:
+  raw-array-from-list(empty) is=~ [raw-array: ]
+  raw-array-from-list(empty) is-not [raw-array: ]
+  
+  raw-array-from-list([list: 1, 2, 3]) is=~ [raw-array: 1, 2, 3]
+  raw-array-from-list([list: 1, 2, 3]) is-not [raw-array: 1, 2, 3]
+end
+}
+
+
   @function["raw-array-build" #:contract (a-arrow (a-arrow N "a") N (RA-of "a")) #:return (RA-of "a")]
 
     Constructs an array of length @pyret{size}, and fills it with the result of

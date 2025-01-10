@@ -362,6 +362,9 @@ end
 }
 
   @function["string-toupper" #:contract (a-arrow S S) #:return S]
+
+  The same as @pyret{string-to-upper}.
+
   @function["string-to-upper" #:contract (a-arrow S S) #:return S]
 
 @margin-note{Pyret uses JavaScript's built-in string operations, and so will
@@ -394,6 +397,9 @@ end
 
 
   @function["string-tolower" #:contract (a-arrow S S) #:return S]
+
+  The same as @pyret{string-to-lower}.
+
   @function["string-to-lower" #:contract (a-arrow S S) #:return S]
 
 Converts a @pyret{String} to all lower case.
