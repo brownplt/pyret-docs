@@ -1158,17 +1158,16 @@ without understanding much, if anything, about how they are
 implemented internally in the language.  
 
 However, in functional languages such as Pyret a particular
-implementation of lists -- the linked list -- has a central
+implementation of lists — the linked list — has a central
 role for both historical and practical reasons, and a fuller
 understanding of linked lists goes hand in hand with a fuller
 understanding of Pyret.  If you have not encountered linked
-lists before and would like to know more, we recommend checking out
-@link["http://papl.cs.brown.edu/2017/processing-lists.html" "the section on
-lists in Programming and Programming Languages (PAPL)"].
+lists before and would like to know more, we recommend reading
+@link["http://dcic-world.org/" "the material on
+lists in DCIC"].
 
 In lieu of a full explanation on this page, here are a few quick points
 to help parse some of the following examples:
-
 @itemlist[@item{A @pyret{List} is made up of elements, usually
 referred to as @tt{elt}s in examples.}
 @item{Elements are of two types: @pyret{link} and @pyret{empty}.}
@@ -1177,7 +1176,22 @@ referred to as @tt{elt}s in examples.}
 @item{The rest of the @pyret{List} is itself a @pyret{link}, or if you
 have reached the end of the @pyret{List}, the rest will be @pyret{empty}.}
 ]
-
+and here are some illustrative examples:
+@examples{
+check:
+  l0 = empty
+  l1 = link(1, l0)
+  l2 = link(2, l1)
+  is-empty(l0) is true
+  is-link(l0) is false
+  
+  is-empty(l1) is false
+  is-link(l1) is true
+  
+  is-empty(l2) is false
+  is-link(l2) is true
+end
+}
 
   }
 
@@ -1199,15 +1213,22 @@ check:
 end
 }
 
-@bold{Note:} Explicitly writing the trailing @pyret-id{empty} is both
-unnecessary and wrong; the constructor notation needs only the
-@emph{elements} of the @pyret{List}.
+Though it is neither required nor enforced by the language,
+conventionally, when writing the empty list using the constructor
+notation, we write an extra spce between the @pyret{:} and @pyret{]}.
+
+@bold{Note:} You should @emph{not} write a trailing @pyret-id{empty}
+when using this constructor notation. Everything you write is an @emph{element} of the list. Thus,
+@examples{
+check:
+  [list: ] is-not [list: empty]
+  link(empty, empty) is [list: empty]
+end
+}
 
 @section{List Methods}
 
-These methods are available on all @pyret{List}s, both @pyret{"link"} and @pyret{"empty"}
-instances and are accessed by dot operators.
-
+These methods are available on all @pyret{List}s whether empty or a link.
 
 @list-method["length"]
 
@@ -2195,8 +2216,21 @@ end
     "member"
   ]
 
-Returns @pyret{true} if @pyret{List} @tt{lst} contains the element @tt{elt}, as compared
+@function["member-always"]
+@function["member-identical"]
+@function["member-now"]
+
+@pyret{member}
+returns @pyret{true} if @pyret{List} @tt{lst} contains the element @tt{elt}, as compared
 by @pyret{==}.
+The other three functions are
+analogous to @pyret-id{member}, but use
+@pyret-id["equal-always" "equality"],
+@pyret-id["identical" "equality"], or
+@pyret-id["equal-now" "equality"]
+to perform the comparison.
+(Thus @pyret{member-always} is the same as @pyret{member}; the name is provided for completeness
+and in case the user wants to make their intent more explicit.)
 
 @margin-note{Passing a @pyret{Roughnum} as @tt{elt} will raise
 an error.}
@@ -2219,9 +2253,23 @@ end
     "member-with"
   ]
 
+@function["member3"]
+@function["member-always3"]
+@function["member-identical3"]
+@function["member-now3"]
+
 @pyret{member} with a custom equality function.  Returns an @pyret{equality.Equal} if
 function @tt{eq} returns @pyret{equality.Equal} for @tt{elt} and any one
 element of @pyret{List} @tt{lst}.
+
+The other three functions are analogous to @pyret-id{member-with}, but use
+@pyret-id["equal-always3" "equality"],
+@pyret-id["identical3" "equality"], or
+@pyret-id["equal-now3" "equality"]
+to perform the comparison.
+(Thus @pyret{member-always3} is the same as @pyret{member3} and also @pyret{member-with};
+the extra names are provided for completeness
+and in case the user wants to make their intent more explicit.)
 
 @examples{
 import lists as L
@@ -2243,24 +2291,6 @@ check:
 end
 }
 
-@function["member-always"]
-@function["member-identical"]
-@function["member-now"]
-Analogous to @pyret-id{member}, but uses @pyret-id["equal-always" "equality"]
-or @pyret-id["identical" "equality"] to perform the comparison.
-
-@function["member3"]
-@function["member-always3"]
-Analogous to @pyret-id{member-with}, but uses @pyret-id["equal-always3" "equality"]
-to perform the comparison.
-
-@function["member-identical3"]
-Analogous to @pyret-id{member-with}, but uses @pyret-id["identical3" "equality"] to perform the comparison.
-
-@function["member-now3"]
-Analogous to @pyret-id{member-with}, but uses @pyret-id["equal-now3"
-"equality"] to perform the comparison.
-  
   @function[
     "reverse"
   ]
