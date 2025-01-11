@@ -2232,44 +2232,49 @@ to perform the comparison.
 (Thus @pyret{member-always} is the same as @pyret{member}; the name is provided for completeness
 and in case the user wants to make their intent more explicit.)
 
-@margin-note{Passing a @pyret{Roughnum} as @tt{elt} will raise
-an error.}
+Note that if a @pyret{Roughnum} is present, these functions will raise exceptions. To avoid that, use
+@pyret-id["member3" "lists"] and the analogous related functions.
 
 @examples{
 check:
   member([list: 1, 2, 3], 2) is true
   member([list: 2, 4, 6], 3) is false
-  [list: ].member(empty) is false
-  [list: 1, 2, 3].member(~1) raises "Roughnums"
-  [list: ~1, 2, 3].member(1) is false
+  member([list: ], empty) is false
+  member([list: 1, 2, 3], ~1) raises "Roughnums"
+  member([list: ~1, 2, 3], 1) raises "Roughnums"
 
-  [list: 'a'].member('a') is true
-  [list: false].member(false) is true
-  [list: nothing].member(nothing) is true
+  member([list: 'a'], 'a') is true
+  member([list: false], false) is true
+  member([list: nothing], nothing) is true
 end
 }
-
-  @function[
-    "member-with"
-  ]
 
 @function["member3"]
 @function["member-always3"]
 @function["member-identical3"]
 @function["member-now3"]
 
-@pyret{member} with a custom equality function.  Returns an @pyret{equality.Equal} if
-function @tt{eq} returns @pyret{equality.Equal} for @tt{elt} and any one
-element of @pyret{List} @tt{lst}.
-
-The other three functions are analogous to @pyret-id{member-with}, but use
+These functions are analogous to @pyret-id{member}, but use
 @pyret-id["equal-always3" "equality"],
 @pyret-id["identical3" "equality"], or
 @pyret-id["equal-now3" "equality"]
-to perform the comparison.
-(Thus @pyret{member-always3} is the same as @pyret{member3} and also @pyret{member-with};
-the extra names are provided for completeness
-and in case the user wants to make their intent more explicit.)
+to perform the comparison. Thus, they do not raise an exception if a @pyret{Roughnum} is present.
+
+@examples{
+check:
+  member3([list: 1, 2, 3], ~1) satisfies EQ.is-Unknown
+  member3([list: ~1, 2, 3], 1) satisfies EQ.is-Unknown
+end
+}
+
+@function[
+    "member-with"
+  ]
+
+@pyret{member-with} is @pyret{member} with a custom equality function.
+Returns an @pyret{equality.Equal} if
+the @tt{eq} parameter returns @pyret{equality.Equal} for @tt{elt} and any one
+element of @pyret{List} @tt{lst}.
 
 @examples{
 import lists as L
