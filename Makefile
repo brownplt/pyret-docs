@@ -17,6 +17,7 @@ docs:
     ++extra src/trove/paint.svg \
     ++extra src/trove/checkers.svg \
     ++extra src/search.js \
+    ++extra src/embed-api.js \
     \
     ++style src/styles.css \
     --prefix src/myprefix.html \

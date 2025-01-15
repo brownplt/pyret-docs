@@ -268,10 +268,18 @@
 (define (dt-style name) (make-style name (list (make-alt-tag "dt"))))
 (define (dd-style name) (make-style name (list (make-alt-tag "dd"))))
 
-(define (pyret-block #:style [style #f] . body)
+(define (pyret-block #:style [style #f] #:show-try-it [show-try-it #f] . body)
   (define real-style (if style (string-append "pyret-highlight " style) "pyret-highlight"))
+  (define code (apply string-append body))
   (nested #:style (pre-style "pyret-block")
-          (nested #:style (pre-style real-style) (apply literal body))))
+    (list
+      (nested #:style (pre-style real-style) (apply literal body))
+      (if show-try-it (make-element
+          (make-style "show-embed" (list
+            (make-alt-tag "a")
+            (attributes (list (cons 'code code)))))
+          "(Try it!)") ""))))
+
 (define (pyret #:style [style #f] . body)
   (define real-style (if style (string-append "pyret-highlight " style) "pyret-highlight"))
   (elem #:style (span-style real-style) (apply tt body)))
@@ -809,10 +817,10 @@
       (para #:style (div-style "boxed pyret-header")
         (tt "[" name-part ": ?] -> " (interp contract)))]))
 
-@(define (examples . body)
+@(define (examples #:show-try-it [show-try-it #f] . body)
   (nested #:style (div-style "examples")
           (para (bold "Examples:"))
-          (apply pyret-block body)))
+          (apply pyret-block #:show-try-it show-try-it body)))
 
 @(define (repl-examples . body)
   (define (repl-ex code ans)

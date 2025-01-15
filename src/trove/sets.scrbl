@@ -196,7 +196,7 @@ provided for lists. The latter are built-in. Therefore, using the @pyret{include
 form is likely to cause name-clashes. It is wiser to import sets using a prefix name and
 use the names below through that prefix.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
