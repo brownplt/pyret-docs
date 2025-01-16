@@ -211,7 +211,7 @@ end
 Constructs a set out of the @pyret{elt}s, representing them as a list. Raises an exception
 if the elements don't support equality.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -231,7 +231,7 @@ An empty set, represented as a list.
 Constructs a set out of the @pyret{elt}s, representing them as a tree. Raises an exception
 if the elements don't support the @pyret{<} operator via @pyret{_lessthan}.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -257,7 +257,7 @@ Another name for @pyret-id{list-set}.
 
 Constructs a list-set out of the elements in the list.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -275,7 +275,7 @@ end
 
 Constructs a tree-set out of the elements in the list.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -299,7 +299,7 @@ Another name for @pyret-id["list-to-list-set"].
 
 Constructs a new set containing the added element if it was not already present.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -319,7 +319,7 @@ end
 Constructs a new set removing the element if it was present. It is @emph{not} an error to
 remove an element that is not in the set; it simply leaves the set unchanged.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -338,7 +338,7 @@ end
 
 Computes the number of elements in the set.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -353,7 +353,7 @@ end
 Checks if @pyret{elt} is contained within this set (checking membership with
 @pyret-id["equal-always" "equality"]).
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -373,7 +373,7 @@ Otherwise it returns a @pyret-id["pick-some" "pick"],
 whose @pyret{elt} field stores the picked value and
 whose @pyret{rest} field stores the rest of the set.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 import pick as P
 
@@ -398,7 +398,7 @@ the order of elements returned from @pyret-method["Set" "pick"] is
 non-deterministic, so multiple calls to @pyret-method["Set" "pick"] may not
 produce the same result for the same set! Thus, in the following program:
 
-@examples{
+@pyret-block[#:show-try-it #t]{
 import sets as S
 import pick as P
 
@@ -412,7 +412,7 @@ Sometimes both tests will pass, sometimes one will pass and the other
 fail, and sometimes both tests will fail! We can, however, write the
 following tests that will @emph{always} pass:
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 import pick as P
 
@@ -429,7 +429,7 @@ end
 
 Computes the union of two sets.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -445,7 +445,7 @@ end
 
 Computes the intersection of two sets.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -461,7 +461,7 @@ end
 
 Computes the difference of two sets.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -477,7 +477,7 @@ end
 
 Computes the symmetric difference of two sets.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -493,7 +493,7 @@ end
 
 Converts the set into a list. There is no guarantee about the order of elements in the list.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
@@ -508,7 +508,7 @@ Applies @pyret{f} to each element of the set along with the accumulator
 (starting with @pyret{base}) to produce a new value.  Traverses elements in an
 unspecified order.
 
-@examples{
+@examples[#:show-try-it #t]{
 import sets as S
 
 check:
