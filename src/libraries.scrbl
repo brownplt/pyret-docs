@@ -9,5 +9,7 @@ This section contains information on libraries that come with Pyret.
 
 @include-section["libraries-general.scrbl"]
 
+@include-section["libraries-archived.scrbl"]
+
 @include-section["libraries-internal.scrbl"]
 
