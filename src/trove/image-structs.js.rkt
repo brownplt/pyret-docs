@@ -10,7 +10,15 @@
     (path "src/arr/trove/image-structs.arr")))
 
 @docmodule["image-structs"]{
-@bold{@emph{This library is deprecated.}}
+
+@centered{
+
+@bold{This library is archived.}
+
+@emph{The @seclink{color} library now provides everything
+this library used to provide. We recommend that you use that instead.}
+
+}
 
 It used to contain the definitions for @pyret-id["Color" "color"],
 which you can now find by importing the @seclink{color} module
