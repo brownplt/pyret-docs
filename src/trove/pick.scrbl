@@ -55,7 +55,7 @@
   }
   
 The primary use of @pyret{pick} is as a way of obtaining values from sets.
-See the documentation of @pyret-method["Set" #f "pick" "sets"]
+See the documentation of @pyret-method["Set" #f "pick" "sets"].
 
 However, nothing precludes other datatypes from also implementing the
 @pyret{Pick} interface. For instance, here's a simple queue definition that
