@@ -54,4 +54,40 @@
   @function["is-pick-some" #:alt-docstrings ""]
   }
   
+The primary use of @pyret{pick} is as a way of obtaining values from sets.
+See the documentation of
+@pyret-id[".pick" "sets"].
+
+However, nothing precludes other datatypes from also implementing the
+@pyret{Pick} interface. For instance, here's a simple queue definition that
+provides a @pyret{pick} method:
+@pyret-block{
+import pick as P
+
+data Queue<T>:
+  | queue(elts :: List<T>) with:
+    method pick(self):
+      cases (List) self.elts:
+        | empty => P.pick-none
+        | link(f, r) => P.pick-some(f, queue(r))
+      end
+    end
+end
+}
+We can then write a function that uses that method to traverse the queue:
+@pyret-block{
+fun sum-queue(q :: Queue) -> Number:
+  cases (P.Pick) q.pick():
+    | pick-none => 0
+    | pick-some(e, r) => e + sum-queue(r)
+  end
+end
+}
+with the expected behavior:
+@examples{
+check:
+  q = queue([list: 1, 2, 3])
+  sum-queue(q) is 6
+end
+}
   }
