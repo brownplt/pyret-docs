@@ -70,13 +70,8 @@
    @type-spec["RawArray" (list "a")]{
 
    A @pyret{RawArray} is a mutable, fixed-length collection indexed
-   by non-negative intgers.  They are a very thin wrapper around native
-   JavaScript arrays, and are manipulated entirely via functions.  They are the
-   implementation mechanism for Pyret @seclink{arrays}, which provide a nicer
-   API for interacting with them.
-
-   @pyret{RawArray}s are widely used internally in Pyret
-   language development.
+   by non-negative intgers. Accessing and mutating a @pyret{RawArray} takes
+   constant time in the size of the array.
  }
 
      @section{RawArray Functions}
