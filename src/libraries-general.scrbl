@@ -18,18 +18,15 @@ These are libraries of general interest to Pyret programmers.
 
 @include-section["trove/lists.scrbl"]
 @include-section["trove/sets.scrbl"]
-@include-section["trove/arrays.scrbl"]
+@include-section["builtin/raw-arrays.scrbl"]
 
 @include-section["trove/string-dict.scrbl"]
 @include-section["builtin/tables.scrbl"]
 @include-section["trove/gdrive-sheets.scrbl"]
-@include-section["trove/data-source.scrbl"]
 
 @include-section["trove/color.js.rkt"]
-@include-section["trove/image-structs.js.rkt"]
 @include-section["trove/image.js.rkt"]
 
-@include-section["trove/world.js.rkt"]
 @include-section["builtin/reactors.scrbl"]
 
 @include-section["trove/chart.js.rkt"]
