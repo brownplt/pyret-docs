@@ -20,21 +20,26 @@
 
 @docmodule["world"]{
 
-Pyret's @secref["world"] and @secref["reactors"] modules both facilitate
+@centered{
+
+@bold{This library is archived.}
+
+@emph{The @seclink{reactors} library provides a significantly improved version of
+this library. We recommend that you use that instead.}
+
+}
+
+Pyret's world library facilitates
 creating animated time-based simulation and interactive programs.
-Using the @pyret{world} module and the @pyret{big-bang} function is
-the quickest way to get a basic simulation or game running.  @pyret{reactors}
-provide more advanced features for exploring, testing and debugging
-reactive programs.
 
 Handler functions written for @pyret{big-bang} are compatible with
 @pyret{reactors}, so it is easy to start with @pyret{big-bang} and
 move to @pyret{reactors} if you need their advanced features.
 
-  @margin-note{The world/reactor model is based on the universe teachpack in HtDP. You
+  @margin-note{The world model is based on the universe teachpack in HtDP. You
   can find documentation for the teachpack here:
 
-  @url["http://docs.racket-lang.org/teachpack/2htdpuniverse.html"]}
+  @url["https://docs.racket-lang.org/teachpack/2htdpuniverse.html"]}
 
 
 @section{Starting a big-bang}
