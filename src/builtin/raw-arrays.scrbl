@@ -49,6 +49,26 @@
       (args ("f" "size"))
       (doc ""))
     (fun-spec
+      (name "raw-array-build-opt")
+      (arity 2)
+      (args ("f" "size"))
+      (doc ""))
+    (fun-spec
+      (name "raw-array-map")
+      (arity 2)
+      (args ("f" "array"))
+      (doc ""))
+    (fun-spec
+      (name "raw-array-sort-nums")
+      (arity 2)
+      (args ("array" "ascending"))
+      (doc ""))
+    (fun-spec
+      (name "raw-array-sort-by")
+      (arity 3)
+      (args ("array" "key" "ascending"))
+      (doc ""))
+    (fun-spec
       (name "raw-array-fold")
       (arity 4)
       (args ("f" "init" "array" "start-index"))
@@ -59,6 +79,7 @@
       (args ("array"))
       (return ,ra-of-a)
       (contract (a-arrow ,ra-of-a ,ra-of-a)))
+      
     (unknown-item
       (name "raw-array")
       ;; { maker of raw-arrays ... }
@@ -224,6 +245,105 @@ check:
 end
   }
 
+
+  @function["raw-array-build-opt" #:contract (a-arrow (a-arrow N (O-of A)) N) #:return (RA-of A)]
+  
+    Constructs an array based on the results of
+    calling the function @pyret{f} with each index from @pyret{0} to @pyret{size
+    - 1}. For each index, if the result of @pyret{f} is @pyret{some(value)},
+    then @pyret{value} is included in the resulting array (it is not included
+    for @pyret{none}). The size of the resulting array is equal to the number of
+    @pyret{some} results.
+    
+    @examples{
+check:
+  fun even(n):
+    if num-modulo(n, 2) == 0: some(n)
+    else: none
+    end
+  end
+  raw-array-build-opt(even, 10) is=~ [raw-array: 0, 2, 4, 6, 8]
+end    
+   } 
+  
+  @function["raw-array-map" #:contract (a-arrow (a-arrow "a" "b") (RA-of "a")) #:return (RA-of "b")]
+
+  Creates a new array by applying @pyret{f} to each element of the array.
+  Similar to @pyret-id["map" "lists"]. Has an argument order that works with
+  @pyret{for}.
+
+  @examples{
+check:
+  a = [raw-array: "apple", "banana", "plum"]
+  lengths = for raw-array-map(s from a):
+    string-length(s)
+  end
+  lengths is=~ [raw-array: 5, 6, 4]
+end
+  }
+  
+  Note that the test uses @pyret-id["is=~" "testing"], because raw arrays are
+  mutable and so the two values in the shown test are not
+  @pyret-id["equal-always" "equality"], they are @pyret-id["equal-now"
+  "equality"].
+  
+  @function["raw-array-filter" #:contract (a-arrow (a-arrow "a" B) (RA-of "a")) #:return (RA-of "a")]
+
+  Applies function @pyret{f} to each element of @pyret{array} from left to right,
+  constructing a new @pyret{RawArray} out of the elements for which @pyret{f}
+  returned @pyret{true}.
+  Similar to @pyret-id["map" "filter"]. Has an argument order that works with
+  @pyret{for}.
+
+  @examples{
+check:
+  a = [raw-array: "apple", "banana", "plum"]
+  p-words = for raw-array-filter(s from a):
+    string-contains(s, "p")
+  end
+  p-words is=~ [raw-array: "apple", "plum"]
+end
+  }
+  
+  @function["raw-array-sort-nums" #:contract (a-arrow (RA-of N) B) #:return (RA-of N)]
+
+  Sorts the given array @emph{in-place} in ascending or descending order
+  according to the @pyret{ascending} parameter. Returns the reference to the
+  original array, which will have its contents mutably updated.
+
+  @examples{
+check:
+  a = [raw-array: 9, 2, 3, 1]
+  asc = raw-array-sort-nums(a, true)
+  a is=~ [raw-array: 1, 2, 3, 9]
+  asc is<=> a
+  
+  desc = raw-array-sort-nums(a, false)
+  a is=~ [raw-array: 9, 3, 2, 1]
+  desc is<=> a
+end
+}
+
+  @function["raw-array-sort-by" #:contract (a-arrow (RA-of "a") (a-arrow A N) B) #:return (RA-of "a")]
+
+  Creates a new array containing the sorted contents of given array. The sort
+  order is determined by calling the @pyret{key} function on each element to
+  get a number, and sorting the elements by their key value (in increasing key
+  order if @pyret{ascending} is @pyret{true}, decreasing if @pyret{false}).
+  
+  according to the @pyret{ascending} parameter. Returns the reference to the
+  original array, which will have its contents mutably updated.
+
+  @examples{
+check:
+  a = [raw-array: "banana", "plum", "apple"]
+  asc = raw-array-sort-by(a, string-length, true)
+  
+  asc is=~ [raw-array: "plum", "apple", "banana"]
+  asc is-not<=> a
+end
+}
+  
 
   @function["raw-array-fold" #:contract (a-arrow (a-arrow "b" "a" N "b") "b" (RA-of "a") N "b") #:return "b"]
 
