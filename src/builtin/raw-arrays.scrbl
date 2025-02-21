@@ -59,6 +59,11 @@
       (args ("f" "array"))
       (doc ""))
     (fun-spec
+      (name "raw-array-filter")
+      (arity 2)
+      (args ("f" "array"))
+      (doc ""))
+    (fun-spec
       (name "raw-array-sort-nums")
       (arity 2)
       (args ("array" "ascending"))
@@ -331,9 +336,6 @@ end
   get a number, and sorting the elements by their key value (in increasing key
   order if @pyret{ascending} is @pyret{true}, decreasing if @pyret{false}).
   
-  according to the @pyret{ascending} parameter. Returns the reference to the
-  original array, which will have its contents mutably updated.
-
   @examples{
 check:
   a = [raw-array: "banana", "plum", "apple"]
