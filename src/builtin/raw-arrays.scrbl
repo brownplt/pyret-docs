@@ -84,7 +84,12 @@
       (args ("array"))
       (return ,ra-of-a)
       (contract (a-arrow ,ra-of-a ,ra-of-a)))
-      
+    (fun-spec
+      (name "raw-array-concat")
+      (arity 2)
+      (args ("array1" "array2"))
+      (return ,ra-of-a)
+      (contract (a-arrow ,ra-of-a ,ra-of-a ,ra-of-a)))
     (unknown-item
       (name "raw-array")
       ;; { maker of raw-arrays ... }
@@ -297,7 +302,7 @@ end
   Applies function @pyret{f} to each element of @pyret{array} from left to right,
   constructing a new @pyret{RawArray} out of the elements for which @pyret{f}
   returned @pyret{true}.
-  Similar to @pyret-id["map" "filter"]. Has an argument order that works with
+  Similar to @pyret-id["filter" "lists"]. Has an argument order that works with
   @pyret{for}.
 
   @examples{
@@ -367,6 +372,26 @@ check:
   str is "a: 0, b: 1, c: 2"
 end
   }
+  
+  @function["raw-array-concat" #:contract (a-arrow (RA-of "a") (RA-of "a" )) #:return (RA-of "a")]
+  
+  Creates a new array with all the elements of @pyret{array1} followed by all
+  the elements of @pyret{array2}.
+  
+@examples{
+check:
+  a1 = [raw-array: 5, 6, 7]
+  a2 = [raw-array: 0, 3, 99, -1, 7]
+
+  c = raw-array-concat(a1, a2)
+  c is=~ [raw-array: 5, 6, 7, 0, 3, 99, -1, 7]
+  
+  a1 is=~ [raw-array: 5, 6, 7]
+  a2 is=~ [raw-array: 0, 3, 99, -1, 7]
+end
+}
+
+  
 
   @function["raw-array-duplicate"]
 
