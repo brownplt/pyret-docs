@@ -3,7 +3,7 @@
 
 @(append-gen-docs
   '(module "timing"
-    (path "src/js/base/runtime-anf.js")
+    (path "src/arr/trove/timing.arr")
     (fun-spec
       (name "time-only")
       (arity 1))
@@ -14,7 +14,9 @@
       (name "time-now")
       (arity 0))))
 
-@docmodule["timing" #:noimport #t #:friendly-title "Timing"]{
+@(define (T-of typ) (a-arrow (list) typ))
+
+@docmodule["timing" #:friendly-title "Timing"]{
 
 @section{Background and Caveat}
 
@@ -86,8 +88,8 @@ positive integer that is similar to the returned time); the other
 produces both the duration and the value produced by the computation.
 
   @function["time-only"
-    #:contract (a-arrow "t")
-    #:args '()
+    #:contract (a-arrow (T-of "T") N)
+    #:args '(("f" #f))
     #:return N
   ]{
 
@@ -107,13 +109,13 @@ end
 }
 
   @function["time-value"
-    #:contract (a-arrow "t")
-    #:args '()
-    #:return N
+    #:contract (a-arrow (T-of "T") (a-tuple "T" N))
+    #:args '(("f" #f))
+    #:return (a-tuple "T" N)
   ]{
 
-Consumes a thunk, runs it, and produces both how long it takes to run
-(in milliseconds) and the value that it produces.
+Consumes a thunk, runs it, and produces both the value that it produces and how
+long it takes to run (in milliseconds).
   
 @examples[#:show-try-it #t]{
 include timing
@@ -130,7 +132,7 @@ end
 }
 
   @function["time-now"
-    #:contract (a-arrow "t")
+    #:contract (a-arrow N)
     #:args '()
     #:return N
   ]{
