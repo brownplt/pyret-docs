@@ -124,8 +124,8 @@ check:
   produce-0-to-9 = {(): range(0, 10)}
   fun takes-less-than-1-second(t): t < 1000 end
   {t; v} = time-value(produce-0-to-9)
-  t satisfies takes-less-than-1-second
   # NOTE: may fail on a sufficiently slooooow machine!
+  t satisfies takes-less-than-1-second
   v is [list: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 end
 }
