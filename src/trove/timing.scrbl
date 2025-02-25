@@ -109,13 +109,13 @@ end
 }
 
   @function["time-value"
-    #:contract (a-arrow (T-of "T") (a-tuple "T" N))
+    #:contract (a-arrow (T-of "T") (a-tuple N "T"))
     #:args '(("f" #f))
-    #:return (a-tuple "T" N)
+    #:return (a-tuple N "T")
   ]{
 
-Consumes a thunk, runs it, and produces both the value that it produces and how
-long it takes to run (in milliseconds).
+Consumes a thunk, runs it, and produces both how
+long it takes to run (in milliseconds) and the value that it produces.
   
 @examples[#:show-try-it #t]{
 include timing
