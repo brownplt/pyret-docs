@@ -21,6 +21,13 @@
       (shared (
         (method-spec (name "get-now"))
         (method-spec (name "set-now"))
+        (method-spec (name "filter"))
+        (method-spec (name "map"))
+        (method-spec (name "fold"))
+        (method-spec (name "concat"))
+        (method-spec (name "duplicate"))
+        (method-spec (name "sort-nums"))
+        (method-spec (name "sort-by"))
         (method-spec (name "length"))
         (method-spec (name "to-list-now"))
         )))
@@ -66,6 +73,41 @@
       (name "array-to-list-now")
       (arity 1)
       (args ("array"))
+      (doc ""))
+    (fun-spec
+      (name "array-filter")
+      (arity 2)
+      (args ("f" "array"))
+      (doc ""))
+    (fun-spec
+      (name "array-map")
+      (arity 2)
+      (args ("f" "array"))
+      (doc ""))
+    (fun-spec
+      (name "array-fold")
+      (arity 4)
+      (args ("f" "init" "array" "start-index"))
+      (doc ""))
+    (fun-spec
+      (name "array-concat")
+      (arity 2)
+      (args ("array1" "array2"))
+      (doc ""))
+    (fun-spec
+      (name "array-duplicate")
+      (arity 1)
+      (args ("array"))
+      (doc ""))
+    (fun-spec
+      (name "array-sort-nums")
+      (arity 2)
+      (args ("array" "asc"))
+      (doc ""))
+    (fun-spec
+      (name "array-sort-by")
+      (arity 3)
+      (args ("array" "key" "asc"))
       (doc ""))
 ))
 
@@ -254,6 +296,42 @@ check:
 end
 }
 
+@a-method["filter"
+    #:contract (a-arrow (A-of "a") (a-arrow "a" B) (A-of "a"))
+    #:args (list (list "self" #f) (list "f" #f))
+    #:return (A-of "a")]
+    
+  Applies function @pyret{f} to each element of @pyret{self} from left to right,
+  constructing a new @pyret{Array} out of the elements for which @pyret{f}
+  returned @pyret{true}.
+  Similar to @pyret-id["filter" "lists"] and @pyret-id["raw-array-filter" "raw-arrays"].
+
+  @examples{
+check:
+  a = [array: "apple", "banana", "plum"]
+  p-words = a.filter(lam(s):
+      string-contains(s, "p")
+    end)
+  p-words is=~ [array: "apple", "plum"]
+end
+  }
+  
+@a-method["map"
+    #:contract (a-arrow (A-of "a") (a-arrow "a" "b") (A-of "b"))
+    #:args (list (list "self" #f) (list "f" #f))
+    #:return (A-of "b")]
+    
+  Creates a new array by applying @pyret{f} to each element of the array.
+  Similar to @pyret-id["map" "lists"] and @pyret-id["raw-array-map" "raw-arrays"].
+
+  @examples{
+check:
+  a = [array: "apple", "banana", "plum"]
+  lengths = a.map(string-length)
+  lengths is=~ [array: 5, 6, 4]
+end
+  }
+
 @a-method["to-list-now"
   #:contract (a-arrow (A-of "a") (L-of "a"))
   #:args (list (list "self" #f))
@@ -335,6 +413,7 @@ check:
   l is [list: "a", "b", "a"]
 end
 }
+
 @function["array-length"
   #:contract (a-arrow (A-of "a") N)
   #:args (list (list "array" #f))
@@ -350,4 +429,65 @@ check:
   array-length(a) is 3
 end
 }
+
+@function["array-filter"
+  #:contract (a-arrow (a-arrow "a" B) (A-of "a"))
+  #:args (list (list "f" #f) (list "array" #f))
+  #:return (A-of "a")
+]
+
+Equivalent to @pyret{array}@a-ref["filter"]@pyret{(f)}, with an argument order
+designed for @pyret{for}.
+
+
+@function["array-map"
+  #:contract (a-arrow (a-arrow "a" "b") (A-of "a"))
+  #:args (list (list "f" #f) (list "array" #f))
+  #:return (A-of "b")
+]
+
+Equivalent to @pyret{array}@a-ref["map"]@pyret{(f)}, with an argument order
+designed for @pyret{for}.
+
+@function["array-fold"
+  #:contract (a-arrow (a-arrow "b" "a" N) "b" (A-of "a") N)
+  #:args (list (list "f" #f) (list "init" #f) (list "array" #f) (list "start-index" #f))
+  #:return "b"
+]
+
+Equivalent to @pyret{array}@a-ref["fold"]@pyret{(f, init, start-index)}, with an argument order
+designed for @pyret{for}.
+
+@function["array-concat"
+  #:contract (a-arrow (A-of "a") (A-of "a"))
+  #:args (list (list "array1" #f) (list "array2" #f))
+  #:return (A-of "a")
+]
+
+Equivalent to @pyret{array1}@a-ref["concat"]@pyret{(array2)}.
+
+@function["array-duplicate"
+  #:contract (a-arrow (A-of "a"))
+  #:args (list (list "array" #f))
+  #:return (A-of "a")
+]
+
+Equivalent to @pyret{array1}@a-ref["duplicate"]@pyret{()}.
+
+@function["array-sort-nums"
+  #:contract (a-arrow (A-of "a") B)
+  #:args (list (list "array" #f) (list "asc" #f))
+  #:return (A-of "a")
+]
+
+Equivalent to @pyret{array1}@a-ref["sort-nums"]@pyret{(asc)}.
+
+@function["array-sort-by"
+  #:contract (a-arrow (A-of "a") (a-arrow "a" N) B)
+  #:args (list (list "array" #f) (list "key" #f) (list "asc" #f))
+  #:return (A-of "a")
+]
+
+Equivalent to @pyret{array1}@a-ref["sort-by"]@pyret{(key, asc)}.
+
 }
