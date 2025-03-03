@@ -238,16 +238,23 @@ end
   #:return "a"
 ]
 
-Returns the value at the given @tt{index}.  If the index is too large, is
-negative, or isn't a whole number, an error is raised.  This method has a
+Returns the value at the given @tt{index}.  
+
+This method has a
 @pyret{-now} suffix because its answer can change from one call to the next if,
 for example, @a-ref["set-now"] is used.
+
+Using an index too large, negative, or not a whole number raises an error.
 
 @examples{
 check:
   a = [array: "a", "b", "c"]
   a.get-now(0) is "a"
   a.get-now(1) is "b"
+
+  a.get-now(4) raises "index"
+  a.get-now(-1) raises "index"
+  a.get-now(1.2) raises "index"
 end
 }
 
@@ -258,23 +265,32 @@ end
 ]
 
 Updates the value at the given @tt{index}, returning @pyret-id["Nothing"
-"<global>"].  The update is stateful, so all references to the array see the
-update.  This also justifies the @pyret{-now} suffix; in the example below
+"<global>"].
+
+The update is stateful, so all references to the array see the
+update.  Hence the @pyret{-now} suffix; in the example below,
 calling @pyret{a.get-now()} at two different points
 in the program produces two different results.
+
+Using an index too large, negative, or not a whole number raises an error.
 
 @examples{
 check:
   a = [array: "a", "b", "c"]
   a.get-now(0) is "a"
+  
+  a.set-now(0, "d")
+  a.get-now(0) is "d"
 
   b = a
-  a.set-now(0, "d")
-  a is=~ [array: "d", "b", "c"]
-  b is=~ [array: "d", "b", "c"]
-  
+  a.set-now(0, "f")
+  a is=~ [array: "f", "b", "c"]
+  b is=~ [array: "f", "b", "c"]
+
   c = b.set-now(0, 'z')
   c is nothing
+  
+  b.set-now(4, "hi") raises "index"
 end
 }
 
@@ -309,9 +325,7 @@ end
   @examples{
 check:
   a = [array: "apple", "banana", "plum"]
-  p-words = a.filter(lam(s):
-      string-contains(s, "p")
-    end)
+  p-words = a.filter({(s): string-contains(s, "p")})
   p-words is=~ [array: "apple", "plum"]
 end
   }
@@ -323,6 +337,22 @@ end
     
   Creates a new array by applying @pyret{f} to each element of the array.
   Similar to @pyret-id["map" "lists"] and @pyret-id["raw-array-map" "raw-arrays"].
+
+  @examples{
+check:
+  a = [array: "apple", "banana", "plum"]
+  lengths = a.map(string-length)
+  lengths is=~ [array: 5, 6, 4]
+end
+  }
+
+@a-method["fold"
+    #:contract (a-arrow (A-of "a") (a-arrow "a" "b") (A-of "b"))
+    #:args (list (list "self" #f) (list "f" #f))
+    #:return (A-of "b")]
+    
+  Creates a new array by applying @pyret{f} to each element of the array and a running accumulator.
+  Similar to @pyret-id["fold" "lists"] and @pyret-id["raw-array-fold" "raw-arrays"].
 
   @examples{
 check:
@@ -354,8 +384,13 @@ check:
   a2 = array-of([array:], 3)
   a2.to-list-now() is=~ [list: [array:], [array:], [array:]]
   a2.to-list-now() is-not=~ [list: [list:], [list:], [list:]]
+
+  a.set-now(0, 5)
+  a.to-list-now() is [list: 5, 2, 3]
 end
 }
+
+
 
 @section{Array Functions}
 
@@ -390,27 +425,6 @@ check:
 
   array-set-now(a, 1, "b")
   a is=~ [array: "a", "b", "a"]
-end
-}
-
-@function["array-to-list-now"
-  #:contract (a-arrow (A-of "a") (L-of "a"))
-  #:args (list (list "array" #f))
-  #:return (L-of "a")
-]
-
-Equivalent to @pyret{array}@a-ref["to-list-now"]@pyret{()}.
-
-@examples{
-check:
-  a = array-of("a", 3)
-  a is=~ [array: "a", "a", "a"]
-
-  array-set-now(a, 1, "b")
-  a is=~ [array: "a", "b", "a"]
-
-  l = array-to-list-now(a)
-  l is [list: "a", "b", "a"]
 end
 }
 
@@ -489,5 +503,26 @@ Equivalent to @pyret{array1}@a-ref["sort-nums"]@pyret{(asc)}.
 ]
 
 Equivalent to @pyret{array1}@a-ref["sort-by"]@pyret{(key, asc)}.
+
+@function["array-to-list-now"
+  #:contract (a-arrow (A-of "a") (L-of "a"))
+  #:args (list (list "array" #f))
+  #:return (L-of "a")
+]
+
+Equivalent to @pyret{array}@a-ref["to-list-now"]@pyret{()}.
+
+@examples{
+check:
+  a = array-of("a", 3)
+  a is=~ [array: "a", "a", "a"]
+
+  array-set-now(a, 1, "b")
+  a is=~ [array: "a", "b", "a"]
+
+  l = array-to-list-now(a)
+  l is [list: "a", "b", "a"]
+end
+}
 
 }
