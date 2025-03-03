@@ -362,6 +362,17 @@ check:
 end
   }
 
+
+
+
+
+fold
+concat
+duplicate
+sort-nums
+sort-by
+
+
 @a-method["to-list-now"
   #:contract (a-arrow (A-of "a") (L-of "a"))
   #:args (list (list "self" #f))
