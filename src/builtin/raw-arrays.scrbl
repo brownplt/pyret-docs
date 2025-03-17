@@ -66,12 +66,12 @@
     (fun-spec
       (name "raw-array-sort-nums")
       (arity 2)
-      (args ("array" "ascending"))
+      (args ("array" "asc"))
       (doc ""))
     (fun-spec
       (name "raw-array-sort-by")
       (arity 3)
-      (args ("array" "key" "ascending"))
+      (args ("array" "key" "asc"))
       (doc ""))
     (fun-spec
       (name "raw-array-fold")
@@ -337,7 +337,7 @@ end
   @function["raw-array-sort-nums" #:contract (a-arrow (RA-of N) B) #:return (RA-of N)]
 
   Sorts the given array @emph{in-place} in ascending or descending order
-  according to the @pyret{ascending} parameter. Returns the reference to the
+  according to the @pyret{asc} parameter. Returns a reference to the
   original array, which will have its contents mutably updated.
 
   @examples{
@@ -358,7 +358,7 @@ end
   Creates a new array containing the sorted contents of given array. The sort
   order is determined by calling the @pyret{key} function on each element to
   get a number, and sorting the elements by their key value (in increasing key
-  order if @pyret{ascending} is @pyret{true}, decreasing if @pyret{false}).
+  order if @pyret{asc} is @pyret{true}, decreasing if @pyret{false}).
   
   @examples{
 check:
