@@ -404,7 +404,31 @@ end
 
 }
 
-@;duplicate
+@a-method["duplicate"
+    #:contract (a-arrow (A-of "a"))
+    #:args (list (list "self" #f))
+    #:return (A-of "a")]
+
+  Returns a copy of the given array, such that corresponding elements in the
+  result are @seclink["Identical"] to those in the source array.
+
+@examples{
+
+data Person: p(ref name :: String, ref age :: Number) end
+
+check:
+  ps1 = [array: p("Alice", 30), p("Bob", 40)]
+
+  ps2 = ps1.duplicate()
+  
+  ps2.get-now(0) is ps1.get-now(0)
+
+  ps2.get-now(1)!{age: 57}
+  ps1.get-now(1)!age is 57
+end
+
+}
+
 @;sort-nums
 @;sort-by
 
