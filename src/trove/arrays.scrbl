@@ -389,7 +389,7 @@ end
 @a-method["concat"
     #:contract (a-arrow (A-of "a") (A-of "a") (A-of "a"))
     #:args (list (list "self" #f) (list "other" #f))
-    #:return "concatenated"]
+    #:return (A-of "a")]
 
   Creates a new array with all the elements of the current array
   followed by all the elements of @pyret{other}.
