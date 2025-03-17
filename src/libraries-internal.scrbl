@@ -10,6 +10,7 @@ the developer team; if you are, ask us for help directly.
 
 @(table-of-contents)
 
+@include-section["builtin/raw-arrays.scrbl"]
 @include-section["trove/data-source.scrbl"]
 @include-section["trove/srcloc.js.rkt"]
 @include-section["trove/pprint.js.rkt"]

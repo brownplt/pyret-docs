@@ -100,6 +100,25 @@
 @docmodule["raw-arrays" #:noimport #t #:friendly-title "RawArray"]{
    @type-spec["RawArray" (list "a")]{
 
+@centered{
+
+@bold{This is an internal library.}
+
+@emph{The @seclink{arrays} library provides the user-facing version of
+this library.}
+
+By default, Pyret users should use @seclink{arrays} instead. It is
+primarily designed to be user-facing. This library provides higher
+performance, but is instead primarily meant for internal use and for
+building other libaries. Only use this if @pyret{Array}s are not
+sufficiently performant for your needs. This library may not provide
+all the same functionality as @seclink{arrays}, so you may need to
+modify your code to use it: i.e., you can't simply replace
+an @pyret{array} with a @pyret{RawArray} and expect the program to
+continue to work.
+
+}
+
    A @pyret{RawArray} is a mutable, fixed-length collection indexed
    by non-negative intgers. Accessing and mutating a @pyret{RawArray} takes
    constant time in the size of the array.

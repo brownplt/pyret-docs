@@ -18,7 +18,7 @@ These are libraries of general interest to Pyret programmers.
 
 @include-section["trove/lists.scrbl"]
 @include-section["trove/sets.scrbl"]
-@include-section["builtin/raw-arrays.scrbl"]
+@include-section["trove/arrays.scrbl"]
 
 @include-section["trove/string-dict.scrbl"]
 @include-section["builtin/tables.scrbl"]

@@ -115,17 +115,17 @@
 @docmodule["arrays" #:noimport #t]{
    @type-spec["Array" (list)]{
 
-@centered{
+A @pyret{array} is a mutable, fixed-length collection indexed
+by non-negative intgers. Accessing and mutating a @pyret{array} takes
+constant time in the size of the array.
 
-@bold{This library is archived.}
-
-@emph{The @seclink{raw-arrays} library provides a significantly improved version of
-this library. We recommend that you use that instead.}
+By default, Pyret users should use this library. If, however, you need
+a higher-performant but potentially less ergonomic array library, look at
+@seclink{raw-arrays} instead, which is primarily reserved for internal
+use and for building other libraries. However, do not use that library
+unless you really cannot get what you need out of this one.
 
 }
-
-An @pyret{Array} is a mutable, fixed-length collection indexed
-by non-negative intgers.}
 
 @section{Array Creation Functions}
 
