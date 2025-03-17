@@ -358,7 +358,8 @@ end
   Creates a new array containing the sorted contents of given array. The sort
   order is determined by calling the @pyret{key} function on each element to
   get a number, and sorting the elements by their key value (in increasing key
-  order if @pyret{asc} is @pyret{true}, decreasing if @pyret{false}).
+  order if @pyret{asc} is @pyret{true}, decreasing if @pyret{false}). Ties are
+  broken by the order in which the element is present in the initial array.
   
   @examples{
 check:
