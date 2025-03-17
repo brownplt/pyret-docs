@@ -429,6 +429,28 @@ end
 
 }
 
+@a-method["sort-nums"
+    #:contract (a-arrow (A-of "a") B (A-of "a"))
+    #:args (list (list "self" #f) (list "asc" #f) (list "return" #f))
+    #:return (A-of "a")]
+
+  Sorts the given array @emph{in-place} in ascending or descending order
+  according to the @pyret{asc} parameter. Returns a reference to the
+  original array, which will have its contents mutably updated.
+
+@examples{
+
+check:
+  a = [array: 3, 1, 4, 1, 5, 9, 2]
+  a2 = a.sort-nums(true)
+  a2 is a
+  a is=~ [array: 1, 1, 2, 3, 4, 5, 9]
+  a.sort-nums(false)
+  a is=~ [array: 9, 5, 4, 3, 2, 1, 1]
+end
+
+}
+
 @;sort-nums
 @;sort-by
 
