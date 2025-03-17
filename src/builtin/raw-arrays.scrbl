@@ -353,7 +353,7 @@ check:
 end
 }
 
-  @function["raw-array-sort-by" #:contract (a-arrow (RA-of "a") (a-arrow A N) B) #:return (RA-of "a")]
+  @function["raw-array-sort-by" #:contract (a-arrow (RA-of "a") (a-arrow "a" N) B) #:return (RA-of "a")]
 
   Creates a new array containing the sorted contents of given array. The sort
   order is determined by calling the @pyret{key} function on each element to
