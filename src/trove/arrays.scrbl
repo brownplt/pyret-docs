@@ -430,8 +430,8 @@ end
 }
 
 @a-method["sort-nums"
-    #:contract (a-arrow (A-of "a") B (A-of "a"))
-    #:args (list (list "self" #f) (list "asc" #f) (list "return" #f))
+    #:contract (a-arrow (A-of "a") B)
+    #:args (list (list "self" #f) (list "asc" #f))
     #:return (A-of "a")]
 
   Sorts the given array @emph{in-place} in ascending or descending order
