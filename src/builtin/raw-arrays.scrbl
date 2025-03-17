@@ -374,9 +374,11 @@ end
   @function["raw-array-fold" #:contract (a-arrow (a-arrow "b" "a" N "b") "b" (RA-of "a") N "b") #:return "b"]
 
   Combines the elements in the array with a function that accumulates each
-  element with an intermediate result.  Similar to @pyret-id["fold_n" "lists"].
-  Has an argument order that works with @pyret{for}.  The numeric argument to
+  element with an intermediate result.
+  The numeric argument to
   the accumulator is the index of the current element.
+
+  Similar to @pyret-id["fold_n" "lists"].
 
   @examples{
 check:
