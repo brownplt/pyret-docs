@@ -125,6 +125,9 @@ a higher-performant but potentially less ergonomic array library, look at
 use and for building other libraries. However, do not use that library
 unless you really cannot get what you need out of this one.
 
+Because arrays are @emph{mutable}, equality is not straightforward.
+Learn more at @seclink["equality"].
+
 }
 
 @section{Array Creation Functions}
