@@ -238,7 +238,7 @@
       (args ("val1" "val2"))
       (return ,boolean)
       (doc "")))
-  ))
+  )
 
 @(define code pyret)
 
