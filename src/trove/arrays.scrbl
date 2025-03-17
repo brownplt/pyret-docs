@@ -451,8 +451,32 @@ end
 
 }
 
-@;sort-nums
-@;sort-by
+@a-method["sort-by"
+    #:contract (a-arrow (A-of "a") (a-arrow "a" N) B)
+    #:args (list (list "self" #f) (list "key" #f) (list "asc" #f))
+    #:return (A-of "a")]
+
+  Creates a new array containing the sorted contents of given array. The sort
+  order is determined by calling the @pyret{key} function on each element to
+  get a number, and sorting the elements by their key value (in increasing key
+  order if @pyret{asc} is @pyret{true}, decreasing if @pyret{false}). Ties are
+  broken by the order in which the element is present in the initial array.
+
+@examples{
+
+check:
+  a = [array: "let", "us", "go", "you", "and", "i"]
+  
+  a2 = a.sort-by(string-length, true)
+  a2 is=~ [array: "i", "us", "go", "let", "you", "and"]
+  
+  a3 = a.sort-by(string-length, false)
+  a3 is=~ [array: "let", "you", "and", "us", "go", "i"]
+
+  a is=~ [array: "let", "us", "go", "you", "and", "i"]
+end
+
+}
 
 
 @a-method["to-list-now"
