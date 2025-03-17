@@ -383,8 +383,24 @@ check:
 end
   }
 
-@;fold
-@;concat
+@a-method["concat"
+    #:contract (a-arrow (A-of "a") (A-of "a") (A-of "a"))
+    #:args (list (list "self" #f) (list "other" #f))
+    #:return "concatenated"]
+
+  Creates a new array with all the elements of the current array
+  followed by all the elements of @pyret{other}.
+
+@examples{
+
+check:
+  a = [array: "To", "be", "or"]
+  a.concat([array: "not", "to", "be"])
+    is=~ [array: "To", "be", "or", "not", "to", "be"]
+end
+
+}
+
 @;duplicate
 @;sort-nums
 @;sort-by
