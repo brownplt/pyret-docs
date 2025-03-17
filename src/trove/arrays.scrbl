@@ -347,30 +347,47 @@ end
   }
 
 @a-method["fold"
-    #:contract (a-arrow (A-of "a") (a-arrow "a" "b") (A-of "b"))
-    #:args (list (list "self" #f) (list "f" #f))
-    #:return (A-of "b")]
+    #:contract (a-arrow (A-of "a") (a-arrow "b" "a" N "b") "b" N "b")
+    #:args (list (list "self" #f) (list "f" #f) (list "init" #f) (list "start-index" #f))
+    #:return "b"]
     
-  Creates a new array by applying @pyret{f} to each element of the array and a running accumulator.
-  Similar to @pyret-id["fold" "lists"] and @pyret-id["raw-array-fold" "raw-arrays"].
+Combines the elements in the array with a function that accumulates
+each element with an intermediate result. Has an
+argument order that works with @pyret{for}. The numeric argument to the
+accumulator is the index of the current element.
+
+Similar to @pyret-id["fold" "lists"] and @pyret-id["raw-array-fold" "raw-arrays"].
 
   @examples{
+fun sum-even-minus-odd(a :: Array<Number>):
+  fun is-even(n): (n / 2) == num-floor(n / 2) end
+  
+  fun sum-ith(sum-so-far :: Number, new-n :: Number, idx :: Number):
+    if is-even(idx):
+      sum-so-far + new-n
+    else:
+      sum-so-far - new-n
+    end
+  end
+  
+  a.fold(sum-ith, 0, 0)
+end
+
 check:
-  a = [array: "apple", "banana", "plum"]
-  lengths = a.map(string-length)
-  lengths is=~ [array: 5, 6, 4]
+  sum-even-minus-odd([array: ]) is 0
+  sum-even-minus-odd([array: 1]) is 1
+  sum-even-minus-odd([array: 1, 2]) is (1 - 2)
+  sum-even-minus-odd([array: 1, 2, 3]) is (1 + 3) - 2
+  sum-even-minus-odd([array: 1, 2, 3, 4]) is
+  ((1 + 3) - (2 + 4))
 end
   }
 
-
-
-
-
-fold
-concat
-duplicate
-sort-nums
-sort-by
+@;fold
+@;concat
+@;duplicate
+@;sort-nums
+@;sort-by
 
 
 @a-method["to-list-now"
