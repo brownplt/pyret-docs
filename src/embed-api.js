@@ -1,4 +1,4 @@
-const CPO = "https://pyret-horizon.herokuapp.com/editor#controlled=true";
+const CPO = "https://pyret-horizon.herokuapp.com/editor#controlled=true&footerStyle=hide&warnOnExit=false";
 //const CPO = "http://localhost:4999/editor#controlled=true";
 //const CPO = "https://pyret-vmt-dfb765867402.herokuapp.com/editor#controlled=true";
 
