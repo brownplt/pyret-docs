@@ -126,7 +126,7 @@ continue to work.
 
      @section{RawArray Functions}
 
-@collection-doc["raw-array" #:contract `(a-arrow ("elt" "a") ,(RA-of "a"))]
+@collection-doc["raw-array" #:contract `(a-arrow ("value" "a") ,(RA-of "a"))]
 
 Constructs a @pyret{RawArray} array of length @tt{count}, whose elements are
 the values specified in the construction expression.
@@ -154,7 +154,7 @@ end
   @function["raw-array-of" #:contract (a-arrow "a" N (RA-of "a"))]
 
 Constructs an @pyret{RawArray} of length @tt{count}, where every element is the value
-given as @pyret{elt}.
+given as @pyret{value}.
 
 Note that @pyret{value} is not @emph{copied}, so,
 the elements of @pyret{RawArray}s created with @pyret-id{raw-array-of} will always be
@@ -184,8 +184,9 @@ end
 
   @function["raw-array-get" #:contract (a-arrow (RA-of "a") N "a") #:return "a"]
 
-Returns the value at the given @tt{index}.  If the index is too large, is
-negative, or isn't a whole number, an error is raised.
+Returns the value at the given @tt{index}.
+
+Using an index too large, negative, or not a whole number raises an error.
   
 @examples{
 check:
@@ -201,6 +202,8 @@ end
 Updates the value at the given @tt{index}, returning the new value.  The update is stateful,
 so all references to the @pyret{RawArray} see the update.  
 
+Using an index too large, negative, or not a whole number raises an error.
+  
 @examples{
 check:
   a = [raw-array: "a", "b", "c"]

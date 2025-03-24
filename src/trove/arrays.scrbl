@@ -132,7 +132,7 @@ Learn more at @seclink["equality"].
 
 @section{Array Creation Functions}
 
-@collection-doc["array" #:contract `(a-arrow ("elt" "a") ,(A-of "a"))]
+@collection-doc["array" #:contract `(a-arrow ("value" "a") ,(A-of "a"))]
 
 Creates an @pyret-id{Array} with the given elements.  Note that
 @pyret-id{Array}s are mutable, so comparisons using @pyret{==}
@@ -155,16 +155,21 @@ end
 
 @function["array-of"
   #:contract (a-arrow "a" N (A-of "a"))
-  #:args (list (list "elt" #f) (list "count" #f))
+  #:args (list (list "value" #f) (list "count" #f))
   #:return (A-of "a")
 ]
 
 Constructs an @pyret{Array} of length @tt{count}, where every element is the value
-given as @pyret{elt}.
+given as @pyret{value}.
 
 Note that @pyret{value} is not @emph{copied}, so,
 the elements of @pyret{Array}s created with @pyret-id{array-of} will always be
 @pyret-id["identical" "equality"].
+
+To create an array of arrays where each sub-array is independent of the other, use
+@pyret-id{build-array}.
+
+Similar to @pyret-id["raw-array-of" "raw-arrays"].
 
 @examples{
 check:
@@ -187,20 +192,23 @@ end
 
 }
 
-To create an array of arrays where each array is new and independent, use
-@pyret-id{build-array}.
-
 @function["build-array"
   #:contract (a-arrow (a-arrow N "a") N (A-of "a"))
-  #:args (list (list "f" #f) (list "count" #f))
+  #:args (list (list "f" #f) (list "size" #f))
   #:return (A-of "a")
 ]
 
-Takes a function (@pyret{f}) that creates a new element when given a number,
-and a number to count up to (@pyret{count}), and calls @pyret{f} on each number
-from @pyret{0} to @pyret{count - 1}, creating an array out of the results.
+Constructs an array of length @pyret{size}, and fills it with the result of
+calling the function @pyret{f} with each index from @pyret{0} to @pyret{size - 1}.
+
+Similar to @pyret-id["raw-array-build" "raw-arrays"].
 
 @examples{
+check:
+  fun sq(x): x * x end
+  build-array(sq, 4) is=~ [array: sq(0), sq(1), sq(2), sq(3)]
+end
+
 check:
   fun build(n :: Number) -> Array<String>:
     array-of("_", 3)
@@ -227,7 +235,10 @@ end
   #:args (list (list "l" #f))
   #:return (A-of "a")]
 
-Converts a list of items into an array of items.
+Converts a @pyret-id["List" "lists"] to an @pyret-id{Array} containing the same elements in the same order.
+
+Similar to @pyret-id["raw-array-from-list" "raw-arrays"].
+
 @examples{
 check:
   array-from-list([list: 1, 2, 3]) is=~ [array: 1, 2, 3]
@@ -248,6 +259,8 @@ This method has a
 for example, @a-ref["set-now"] is used.
 
 Using an index too large, negative, or not a whole number raises an error.
+
+Similar to @pyret-id["get" "lists"] and @pyret-id["raw-array-get" "raw-arrays"].
 
 @examples{
 check:
@@ -276,6 +289,8 @@ calling @pyret{a.get-now()} at two different points
 in the program produces two different results.
 
 Using an index too large, negative, or not a whole number raises an error.
+
+Similar to @pyret-id["raw-array-set" "raw-arrays"].
 
 @examples{
 check:
@@ -306,6 +321,8 @@ end
 Returns the length of the array.  The length of an array is set when it is
 created and cannot be changed.
 
+Similar to @pyret-id["length" "lists"] and @pyret-id["raw-array-length" "raw-arrays"].
+
 @examples{
 check:
   a = [array: "a", "b"]
@@ -323,7 +340,8 @@ end
   Applies function @pyret{f} to each element of @pyret{self} from left to right,
   constructing a new @pyret{Array} out of the elements for which @pyret{f}
   returned @pyret{true}.
-  Similar to @pyret-id["filter" "lists"] and @pyret-id["raw-array-filter" "raw-arrays"].
+
+Similar to @pyret-id["filter" "lists"] and @pyret-id["raw-array-filter" "raw-arrays"].
 
   @examples{
 check:
@@ -339,7 +357,8 @@ end
     #:return (A-of "b")]
     
   Creates a new array by applying @pyret{f} to each element of the array.
-  Similar to @pyret-id["map" "lists"] and @pyret-id["raw-array-map" "raw-arrays"].
+
+Similar to @pyret-id["map" "lists"] and @pyret-id["raw-array-map" "raw-arrays"].
 
   @examples{
 check:
@@ -394,12 +413,18 @@ end
   Creates a new array with all the elements of the current array
   followed by all the elements of @pyret{other}.
 
+Similar to @pyret-id["append" "lists"] and @pyret-id["raw-array-concat" "raw-arrays"].
+
 @examples{
 
 check:
   a = [array: "To", "be", "or"]
   a.concat([array: "not", "to", "be"])
     is=~ [array: "To", "be", "or", "not", "to", "be"]
+
+  a is=~ [array: "To", "be", "or"]
+
+  a is-not=~ [array: "To", "be", "or", "not", "to", "be"]
 end
 
 }
@@ -411,6 +436,8 @@ end
 
   Returns a copy of the given array, such that corresponding elements in the
   result are @seclink["Identical"] to those in the source array.
+
+Similar to @pyret-id["raw-array-duplicate" "raw-arrays"].
 
 @examples{
 
@@ -438,6 +465,8 @@ end
   according to the @pyret{asc} parameter. Returns a reference to the
   original array, which will have its contents mutably updated.
 
+Similar to @pyret-id["raw-array-sort-nums" "raw-arrays"].
+
 @examples{
 
 check:
@@ -461,6 +490,8 @@ end
   get a number, and sorting the elements by their key value (in increasing key
   order if @pyret{asc} is @pyret{true}, decreasing if @pyret{false}). Ties are
   broken by the order in which the element is present in the initial array.
+
+Similar to @pyret-id["raw-array-sort-by" "raw-arrays"].
 
 @examples{
 
@@ -493,6 +524,8 @@ for example, @a-ref["set-now"] is subsequently used.
     Note that it does @emph{not} recursively convert @pyret-id{Array}s;
     only the top-level is converted.
 
+Similar to @pyret-id["raw-array-to-list" "raw-arrays"].
+
 @examples{
 check:
   a = [array: 1, 2, 3]
@@ -517,7 +550,7 @@ end
   #:return "a"
 ]
 
-Equivalent to @pyret{array}@a-ref["get-now"]@pyret{(index)}
+Equivalent to @pyret{array}@a-ref["get-now"]@pyret{(index)}.
 
 @examples{
 check:
@@ -551,7 +584,7 @@ end
   #:return N
 ]
 
-Equivalent to @pyret{array}@a-ref["length"]@pyret{()}
+Equivalent to @pyret{array}@a-ref["length"]@pyret{()}.
 
 @examples{
 check:
