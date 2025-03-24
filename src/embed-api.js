@@ -64,6 +64,8 @@ function makeEmbed(id, container) {
   const { promise, resolve, reject } = Promise.withResolvers();
   setTimeout(() => reject(new Error("Timeout waiting for Pyret to load")), 60000);
 
+  const onChangeCallbacks = [];
+
   window.addEventListener('message', message => {
     if(message.data.protocol !== 'pyret') {
       return;
@@ -72,10 +74,14 @@ function makeEmbed(id, container) {
       return;
     }
     const pyretMessage = message.data;
-    if(pyretMessage.data.type === 'pyret-init') {
+    const typ = pyretMessage.data.type;
+    if(typ === 'pyret-init') {
       console.log("Sending gainControl", pyretMessage);
       gainControl(frame);
       resolve(makeEmbedAPI(frame));
+    }
+    else if(typ === "changeRepl" || typ === "change") {
+      onChangeCallbacks.forEach(cb => cb(pyretMessage));
     }
     else {
       messageNumber = pyretMessage.state.messageNumber;
@@ -86,7 +92,8 @@ function makeEmbed(id, container) {
       sendReset: (state) => sendReset(frame, state),
       postMessage: (message) => directPostMessage(frame, message),
       getFrame: () => frame,
-      setInteractions: (text) => setInteractions(frame, text)
+      setInteractions: (text) => setInteractions(frame, text),
+      onChange: (callback) => onChangeCallbacks.push(callback)
     }
   }
   return promise;
@@ -106,6 +113,9 @@ async function embedFromPage(tryItLink, code) {
       container.style = `height: ${height}; display: block`;
       tryItLink.innerText = "(Close)";
       const embed = await makeEmbed("editor" + (++currentId), container);
+      embed.onChange((_) => {
+        tryItLink.innerText = "(Close [changes will not be saved])";
+      });
       embed.sendReset({
         definitionsAtLastRun: code,
         interactionsSinceLastRun: [],
