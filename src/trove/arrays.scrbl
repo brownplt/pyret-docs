@@ -636,7 +636,7 @@ Equivalent to @pyret{array1}@a-ref["concat"]@pyret{(array2)}.
   #:return (A-of "a")
 ]
 
-Equivalent to @pyret{array1}@a-ref["duplicate"]@pyret{()}.
+Equivalent to @pyret{array}@a-ref["duplicate"]@pyret{()}.
 
 @function["array-sort-nums"
   #:contract (a-arrow (A-of "a") B)
