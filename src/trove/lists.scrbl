@@ -1366,9 +1366,11 @@ Using an index too large, negative, or not a whole number raises an error.
 
 @examples{
 check:
-  [list: 1, 2, 3].get(0) is 1
-  [list: ].get(0) raises "too large"
-  [list: 1, 2, 3].get(-1) raises "invalid argument"
+  l = [list: 1, 2, 3]
+
+  l.get(0) is 1
+  l.get(4) raises "too large"
+  l.get(-1) raises "invalid argument"
 end
 }
 
@@ -1569,10 +1571,13 @@ end
     #:examples
     '@{
 import lists as L
+
 check:
-  L.get([list: 1, 2, 3], 0) is 1
-  L.get([list: ], 0) raises "too large"
-  L.get([list: 1, 2, 3], -1) raises "invalid argument"
+  l = [list: 1, 2, 3]
+
+  L.get(l, 0) is 1
+  L.get(l, 4) raises "too large"
+  L.get(l, -1) raises "invalid argument"
 end
     }
   ]
