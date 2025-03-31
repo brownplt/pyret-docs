@@ -1360,7 +1360,10 @@ end
 }
 
 @list-method["get"]
-Returns the @tt{n}th element of the given @pyret{List}, or raises an error if @tt{n} is out of range.
+Returns the @tt{n}th element of the given @pyret{List}.
+
+Using an index too large, negative, or not a whole number raises an error.
+
 @examples{
 check:
   [list: 1, 2, 3].get(0) is 1
