@@ -485,7 +485,7 @@ end
     #:args (list (list "self" #f) (list "key" #f) (list "asc" #f))
     #:return (A-of "a")]
 
-  Creates a new array containing the sorted contents of given array. The sort
+  Creates a new array containing the sorted contents of the given array. The sort
   order is determined by calling the @pyret{key} function on each element to
   get a number, and sorting the elements by their key value (in increasing key
   order if @pyret{asc} is @pyret{true}, decreasing if @pyret{false}). Ties are
@@ -494,19 +494,18 @@ end
 Similar to @pyret-id["raw-array-sort-by" "raw-arrays"].
 
 @examples{
-
 check:
-  a = [array: "let", "us", "go", "you", "and", "i"]
-  
-  a2 = a.sort-by(string-length, true)
-  a2 is=~ [array: "i", "us", "go", "let", "you", "and"]
-  
-  a3 = a.sort-by(string-length, false)
-  a3 is=~ [array: "let", "you", "and", "us", "go", "i"]
+  a = [array: "let", "us", "go", "then", "you", "and", "i"]
 
-  a is=~ [array: "let", "us", "go", "you", "and", "i"]
+  asc = a.sort-by(string-length, true)
+  asc is=~ [array: "i", "us", "go", "let", "you", "and", "then"]
+  asc is-not=~ a
+
+  desc = a.sort-by(string-length, false)
+  desc is=~ [array: "then", "let", "you", "and", "us", "go", "i"]
+
+  a is=~ [array: "let", "us", "go", "then", "you", "and", "i"]
 end
-
 }
 
 
@@ -667,7 +666,24 @@ end
   #:return (A-of "a")
 ]
 
-Equivalent to @pyret{array1}@a-ref["sort-by"]@pyret{(key, asc)}.
+Equivalent to @pyret{array}@a-ref["sort-by"]@pyret{(key, asc)}.
+
+@examples{
+import arrays as A
+
+check:
+  a = [array: "let", "us", "go", "then", "you", "and", "i"]
+
+  asc = A.array-sort-by(a, string-length, true)
+  asc is=~ [array: "i", "us", "go", "let", "you", "and", "then"]
+  asc is-not=~ a
+
+  desc = A.array-sort-by(a, string-length, false)
+  desc is=~ [array: "then", "let", "you", "and", "us", "go", "i"]
+
+  a is=~ [array: "let", "us", "go", "then", "you", "and", "i"]
+end
+}
 
 @function["array-to-list-now"
   #:contract (a-arrow (A-of "a") (L-of "a"))

@@ -358,7 +358,7 @@ end
 
   @function["raw-array-sort-by" #:contract (a-arrow (RA-of "a") (a-arrow "a" N) B) #:return (RA-of "a")]
 
-  Creates a new array containing the sorted contents of given array. The sort
+  Creates a new array containing the sorted contents of the given array. The sort
   order is determined by calling the @pyret{key} function on each element to
   get a number, and sorting the elements by their key value (in increasing key
   order if @pyret{asc} is @pyret{true}, decreasing if @pyret{false}). Ties are
@@ -366,11 +366,16 @@ end
   
   @examples{
 check:
-  a = [raw-array: "banana", "plum", "apple"]
+  a = [raw-array: "let", "us", "go", "then", "you", "and", "i"]
+
   asc = raw-array-sort-by(a, string-length, true)
-  
-  asc is=~ [raw-array: "plum", "apple", "banana"]
-  asc is-not<=> a
+  asc is=~ [raw-array: "i", "us", "go", "let", "you", "and", "then"]
+  asc is-not=~ a
+
+  desc = raw-array-sort-by(a, string-length, false)
+  desc is=~ [raw-array: "then", "let", "you", "and", "us", "go", "i"]
+
+  a is=~ [raw-array: "let", "us", "go", "then", "you", "and", "i"]
 end
 }
   
