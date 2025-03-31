@@ -437,7 +437,7 @@
         (a-id "Number" (xref "<global>" "Number"))
         "a"))
     (doc
-      "Returns the nth element of the given list, or raises an error if n is out of range"))
+      "Equivalent to @pyret{list}@a-ref["get"]@pyret{(n)}."))
   (fun-spec
     (name "set")
     (arity 3)
