@@ -345,14 +345,14 @@ end
 
   @examples{
 check:
-  a = [raw-array: 9, 2, 3, 1]
+  a = [raw-array: 3, 1, 4, 1, 5, 9, 2]
+
   asc = raw-array-sort-nums(a, true)
-  a is=~ [raw-array: 1, 2, 3, 9]
   asc is<=> a
-  
-  desc = raw-array-sort-nums(a, false)
-  a is=~ [raw-array: 9, 3, 2, 1]
-  desc is<=> a
+  a is=~ [raw-array: 1, 1, 2, 3, 4, 5, 9]
+
+  raw-array-sort-nums(a, false)
+  a is=~ [raw-array: 9, 5, 4, 3, 2, 1, 1]
 end
 }
 

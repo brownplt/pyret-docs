@@ -468,16 +468,16 @@ end
 Similar to @pyret-id["raw-array-sort-nums" "raw-arrays"].
 
 @examples{
-
 check:
   a = [array: 3, 1, 4, 1, 5, 9, 2]
-  a2 = a.sort-nums(true)
-  a2 is a
+
+  asc = a.sort-nums(true)
+  asc is<=> a
   a is=~ [array: 1, 1, 2, 3, 4, 5, 9]
+
   a.sort-nums(false)
   a is=~ [array: 9, 5, 4, 3, 2, 1, 1]
 end
-
 }
 
 @a-method["sort-by"
@@ -644,7 +644,22 @@ Equivalent to @pyret{array1}@a-ref["duplicate"]@pyret{()}.
   #:return (A-of "a")
 ]
 
-Equivalent to @pyret{array1}@a-ref["sort-nums"]@pyret{(asc)}.
+Equivalent to @pyret{array}@a-ref["sort-nums"]@pyret{(asc)}.
+
+@examples{
+import arrays as A
+
+check:
+  a = [array: 3, 1, 4, 1, 5, 9, 2]
+
+  asc = A.array-sort-nums(a, true)
+  asc is<=> a
+  a is=~ [array: 1, 1, 2, 3, 4, 5, 9]
+
+  A.array-sort-nums(a, false)
+  a is=~ [array: 9, 5, 4, 3, 2, 1, 1]
+end
+}
 
 @function["array-sort-by"
   #:contract (a-arrow (A-of "a") (a-arrow "a" N) B)
