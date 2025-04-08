@@ -1,10 +1,6 @@
 #lang scribble/base
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 
-@(define (g-id name) (seclink (xref "<global>" name)))
-
-@(define (CC-of a) (a-app (a-id "CellContent" (xref "data-source" "CellContent")) a))
-@(define (San-of a) (a-app (a-id "Sanitizer" (xref "data-source" "Sanitizer")) a))
 @(define TL (a-id "TableLoader" (xref "tables" "TableLoader")))
 
 @(append-gen-docs

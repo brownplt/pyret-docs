@@ -38,3 +38,5 @@ These are libraries of general interest to Pyret programmers.
 @include-section["trove/matrices.scrbl"]
 
 @include-section["trove/timing.scrbl"]
+
+@include-section["trove/fetch.scrbl"]
