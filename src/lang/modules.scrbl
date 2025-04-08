@@ -197,7 +197,6 @@ the import acts just like a @tt{file} import with the given @tt{<rel-path>} as
 the path. If no file is present at this path, the import acts just like a
 @tt{url} import with the concatenation of @tt{<url>} and @tt{<rel-path>} as the
 URL.}
-}
 ]
 
 The default setting (and what serves most student-facing use cases) is
