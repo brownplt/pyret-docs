@@ -255,10 +255,11 @@ applications.
 
 @type-spec["TableLoader" (list)]
 
-The type of values that can be loaded using @pyret{load-table}:
+The type of values that can be loaded using @pyret{load-table}. Common ways to
+generate a @pyret{TableLoader} are:
 
 @itemlist[
-  @item{@pyret-method["Spreadsheet" "shared methods" "sheet-by-name" "gdrive-sheets"]}
+  @item{@pyret-method["Spreadsheet" "shared methods" "sheet-by-name" "gdrive-sheets"] and @pyret-method["Spreadsheet" "shared methods" "sheet-by-index" "gdrive-sheets"]}
   @item{@pyret-id["csv-table-str" "csv"] and @pyret-id["csv-table-file" "csv"]}
 ]
 
