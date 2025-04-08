@@ -388,7 +388,7 @@
 @(define (tag-name . args)
    (apply string-append (add-between args "_")))
 
-@(define (type-spec type-name tyvars #:private (private #f) #:no-toc (no-toc #f). body)
+@(define (type-spec type-name tyvars #:alias (alias #f) #:private (private #f) #:no-toc (no-toc #f). body)
   (when (not private) (set-documented! (curr-module-name) type-name))
   (define name-part (make-header-elt-for (seclink (xref (curr-module-name) type-name) (tt type-name)) type-name))
   (define vars (if (cons? tyvars) (append (list "<") (add-between tyvars ", ") (list ">")) ""))
@@ -405,7 +405,7 @@
                              index-tags
                              #f)))
    (para #:style (div-style "boxed")
-         (list name-part (tt vars)))
+         (list name-part (tt vars) (if alias (tt " = " alias) '())))
    body))
 
 @(define-syntax (data-spec2 stx)

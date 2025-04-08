@@ -23,6 +23,7 @@ These are libraries of general interest to Pyret programmers.
 @include-section["trove/string-dict.scrbl"]
 @include-section["builtin/tables.scrbl"]
 @include-section["trove/gdrive-sheets.scrbl"]
+@include-section["trove/csv.scrbl"]
 
 @include-section["trove/color.js.rkt"]
 @include-section["trove/image.js.rkt"]

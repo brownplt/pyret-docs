@@ -19,6 +19,7 @@
     (fun-spec (name "table-from-columns"))
     (fun-spec (name "table-from-column"))
     
+    (type-spec (name "TableLoader"))
     (data-spec
       (name "Row")
       (variants ("row"))
@@ -121,9 +122,6 @@ program above will display a formatted version of the table:
 
 Pyret supports loading spreadsheets from Google Sheets and
 interpreting them as Pyret tables.
-
-Currently no public interface for creating additional sources
-beyond Google Sheets is supported.
 
 You can import most relevant file types, including .xlsx,
 into Google Sheets, and then into Pyret, so you should be able to
@@ -254,6 +252,15 @@ Note that Google Sheets, and other spreadsheets, themselves
 assign or infer types to data in a way that often is not apparent to the user
 and is a common source of errors when exporting from or between spreadsheet
 applications.
+
+@type-spec["TableLoader" (list)]
+
+The type of values that can be loaded using @pyret{load-table}:
+
+@itemlist[
+  @item{@pyret-method["Spreadsheet" "shared methods" "sheet-by-name" "gdrive-sheets"]}
+  @item{@pyret-id["csv-table-str" "csv"] and @pyret-id["csv-table-file" "csv"]}
+]
 
   @section[#:tag "s:tables:select"]{Selecting Columns}
 
