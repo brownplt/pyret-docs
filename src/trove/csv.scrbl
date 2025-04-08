@@ -13,6 +13,7 @@
     (value (name "default-options"))
     (fun-spec (name "csv-table-str") (arity 2))
     (fun-spec (name "csv-table-file") (arity 2))
+    (fun-spec (name "csv-table-url") (arity 2))
     (type-spec (name "CSVOptions"))))
 
 @(define Opts (a-id "CSVOptions" (xref "csv" "CSVOptions")))
@@ -62,6 +63,26 @@ end
 
   }
 
+@function["csv-table-url"
+  #:contract (a-arrow S Opts TL)
+  #:args '(("csv-url" "") ("options" ""))
+  #:return TL
+  ]{
+
+  Reads CSV data from the url @pyret{csv-url} with the given @pyret{options}, returning
+  a @pyret-id["TableLoader" "tables"] suitable for use with @pyret{load-table:}
+
+  @examples{
+include csv
+animals-csv = csv-table-url("https://raw.githubusercontent.com/brownplt/pyret-lang/refs/heads/horizon/tests/io-tests/tests/animals-ds-2024.csv")
+animals-table = load-table: name, sex, species, age, fixed, legs, weight, weeks
+check:
+  animals-table.row-n(0)["name"] is "Sasha"
+  animals-table.row-n(0)["species"] is "cat"
+end
+  }
+
+  }
 @type-spec["CSVOptions" (list) #:alias @a-record[(a-field "header-row" B)]]
 
 The type of options for processing CSV strings.
