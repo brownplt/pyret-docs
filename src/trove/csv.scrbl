@@ -76,6 +76,8 @@ end
 include csv
 animals-csv = csv-table-url("https://raw.githubusercontent.com/brownplt/pyret-lang/refs/heads/horizon/tests/io-tests/tests/animals-ds-2024.csv")
 animals-table = load-table: name, sex, species, age, fixed, legs, weight, weeks
+  source: animals-csv
+end
 check:
   animals-table.row-n(0)["name"] is "Sasha"
   animals-table.row-n(0)["species"] is "cat"
