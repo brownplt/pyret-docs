@@ -94,6 +94,16 @@
       (args ("original-string" "string-to-find"))
       (doc ""))
     (fun-spec
+      (name "string-find")
+      (arity 2)
+      (args ("original-string" "string-to-find"))
+      (doc ""))
+    (fun-spec
+      (name "string-find-opt")
+      (arity 2)
+      (args ("original-string" "string-to-find"))
+      (doc ""))
+    (fun-spec
       (name "string-to-code-point")
       (arity 1)
       (args ("s"))
