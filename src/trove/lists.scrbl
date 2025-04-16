@@ -1,6 +1,9 @@
 #lang scribble/manual
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 
+@(define (a-ref name)
+  (pyret-method "List" "shared methods" name "lists"))
+
 @; WARNING in report-undocumented: Undocumented export "join-str" from module "lists"
 @; WARNING in report-undocumented: Undocumented export "push" from module "lists"
 
@@ -435,9 +438,7 @@
       (a-arrow
         (a-app (a-id "List" (xref "lists" "List")) "a")
         (a-id "Number" (xref "<global>" "Number"))
-        "a"))
-    (doc
-      "Equivalent to @pyret{list}@a-ref["get"]@pyret{(n)}."))
+        "a")))
   (fun-spec
     (name "set")
     (arity 3)
@@ -1616,8 +1617,11 @@ end
   
   @function[
     "get"
-    #:examples
-    '@{
+  ]
+
+Equivalent to @pyret{list}@a-ref["get"]@pyret{(n)}.
+
+@examples{
 import lists as L
 
 check:
@@ -1628,7 +1632,7 @@ check:
   L.get(l, -1) raises "invalid argument"
 end
     }
-  ]
+
   @function[
     "set"
     #:examples
