@@ -154,7 +154,7 @@ end
 
 @collection-doc["array" #:contract `(a-arrow ("value" "a") ,(A-of "a"))]
 
-Creates an @pyret-id{Array} with the given elements.  Note that
+Constructs an @pyret-id{Array} with the given elements.  Note that
 @pyret-id{Array}s are mutable, so comparisons using @pyret{==}
 (the operator for @pyret-id["equal-always" "equality"]) will only
 return @pyret{true} on @pyret-id{Array}s when they are also
