@@ -376,7 +376,12 @@ end
     #:args (list (list "self" #f) (list "f" #f))
     #:return (A-of "b")]
     
-  Creates a new array by applying @pyret{f} to each element of the array.
+Applies function @pyret{f} to each element of the arrays from left to right, and
+constructs a new @pyret{Array} out of the return values in the corresponding order.
+The original array remains unchanged.
+
+@tt{a} represents the type of the elements in the original @pyret{Array}, @tt{b} is
+the type of the elements in the new @pyret{Array}.
 
 Similar to @pyret-id["map" "lists"] and @pyret-id["raw-array-map" "raw-arrays"].
 
