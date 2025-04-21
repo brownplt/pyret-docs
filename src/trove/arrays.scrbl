@@ -113,7 +113,10 @@
 
 
 @docmodule["arrays" #:noimport #t]{
-   @type-spec["Array" (list)]{
+
+@section{The Array Type}
+
+@type-spec["Array" (list)]{
 
 A @pyret{array} is a mutable, fixed-length collection indexed
 by non-negative intgers. Accessing and mutating a @pyret{array} takes
