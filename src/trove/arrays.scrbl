@@ -133,6 +133,24 @@ Learn more at @seclink["equality"].
 
 }
 
+@section{Using Arrays in Programs}
+
+Some of the names provided for arrays inevitably overlap with those
+provided for other data. Therefore, using the @pyret{include}
+form is likely to cause name-clashes. It is wiser to import arrays using a prefix name and
+use the names below through that prefix.
+
+@examples[#:show-try-it #t]{
+import arrays as A
+
+check:
+  a = A.array-of("a", 3)
+  a is=~ [A.array: "a", "a", "a"]
+  A.array-length(a) is 3
+end
+}
+
+@section{Constructing Arrays}
 
 @collection-doc["array" #:contract `(a-arrow ("value" "a") ,(A-of "a"))]
 
