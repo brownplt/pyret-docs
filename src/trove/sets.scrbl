@@ -180,7 +180,7 @@ below.
 
 
 Some methods, like @pyret-method["Set" "union"], combine multiple sets.  The
-set on the left-hand side is the representation of the result.  For example, in
+kind of set on the left-hand side determines the kind of resulting set.  For example, in
 
 @pyret-block{
   [list-set: 1, 2].union([tree-set: 3, 4])
@@ -191,8 +191,8 @@ the result will be a @pyret{list-set}.
 
 @section{Using Sets in Programs}
 
-Some of the names provided for sets tend to overlap with those
-provided for lists. The latter are built-in. Therefore, using the @pyret{include}
+Some of the names provided for sets inevitably overlap with those
+provided for other data. Therefore, using the @pyret{include}
 form is likely to cause name-clashes. It is wiser to import sets using a prefix name and
 use the names below through that prefix.
 
