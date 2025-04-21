@@ -159,17 +159,19 @@ Constructs an @pyret-id{Array} with the given elements.  Note that
 (the operator for @pyret-id["equal-always" "equality"]) will only
 return @pyret{true} on @pyret-id{Array}s when they are also
 @pyret-id["identical" "equality"], regardless of their contents.  To compare
-the elements, use @pyret-id["equal-now" "equality"]/@pyret{=~},
-and test with @pyret-id["is=~" "testing"].
+the elements use @pyret-id["equal-now" "equality"]/@pyret{=~},
+and test using @pyret-id["is=~" "testing"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = [array: 1, 2, 3]
+  a = [A.array: 1, 2, 3]
   a is a
   a is== a
-  [array: 1, 2, 3] is=~ [array: 1, 2, 3]
-  [array: 1, 2, 3] is-not== [array: 1, 2, 3]
-  [array: 1, 2, 3] is-not [array: 1, 2, 3]
+  [A.array: 1, 2, 3] is=~ [A.array: 1, 2, 3]
+  [A.array: 1, 2, 3] is-not== [A.array: 1, 2, 3]
+  [A.array: 1, 2, 3] is-not [A.array: 1, 2, 3]
 end
 }
 
@@ -191,25 +193,28 @@ To create an array of arrays where each sub-array is independent of the other, u
 
 Similar to @pyret-id["raw-array-of" "raw-arrays"].
 
-@examples{
-check:
-  arr = array-of(true, 2)
-  arr is=~ [array: true, true]
-  arr is-not [array: true, true]
-  array-get-now(arr, 0) is<=> array-get-now(arr, 1)
-  
-  array-set-now(arr, 1, false)
-  arr is=~ [array: true, false]
-  
-  arr-of-arrs = array-of(arr, 3)
-  arr-of-arrs is=~ [array: [array: true, false], [array: true, false],
-    [array: true, false]]
-  
-  array-set-now(arr, 0, false)
-  arr-of-arrs is=~ [array: [array: false, false], [array: false, false],
-    [array: false, false]] 
-end
+@examples[#:show-try-it #t]{
+import arrays as A
 
+check:
+  arr = A.array-of(true, 2)
+  arr is=~ [A.array: true, true]
+  arr is-not [A.array: true, true]
+  A.array-get-now(arr, 0) is<=> A.array-get-now(arr, 1)
+  
+  A.array-set-now(arr, 1, false)
+  arr is=~ [A.array: true, false]
+  
+  arr-of-arrs = A.array-of(arr, 3)
+  arr-of-arrs is=~ 
+  [A.array: 
+    [A.array: true, false], [A.array: true, false], [A.array: true, false]]
+  
+  A.array-set-now(arr, 0, false)
+  arr-of-arrs is=~ 
+  [A.array: 
+    [A.array: false, false], [A.array: false, false], [A.array: false, false]] 
+end
 }
 
 @function["build-array"
@@ -223,30 +228,32 @@ calling the function @pyret{f} with each index from @pyret{0} to @pyret{size - 1
 
 Similar to @pyret-id["raw-array-build" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+
 check:
   fun sq(x): x * x end
-  build-array(sq, 4) is=~ [array: sq(0), sq(1), sq(2), sq(3)]
+  A.build-array(sq, 4) is=~ [A.array: sq(0), sq(1), sq(2), sq(3)]
 end
 
 check:
   fun build(n :: Number) -> Array<String>:
-    array-of("_", 3)
+    A.array-of("_", 3)
   end
-  a = build-array(build, 3)
+  a = A.build-array(build, 3)
   
-  a is=~ [array:
-    [array: "_", "_", "_"],
-    [array: "_", "_", "_"],
-    [array: "_", "_", "_"]]
+  a is=~ [A.array:
+    [A.array: "_", "_", "_"],
+    [A.array: "_", "_", "_"],
+    [A.array: "_", "_", "_"]]
 
   a.get-now(0).set-now(0, "X")
   a.get-now(1).set-now(1, "O")
 
-  a is=~ [array:
-    [array: "X", "_", "_"],
-    [array: "_", "O", "_"],
-    [array: "_", "_", "_"]]
+  a is=~ [A.array:
+    [A.array: "X", "_", "_"],
+    [A.array: "_", "O", "_"],
+    [A.array: "_", "_", "_"]]
 end
 }
 
@@ -259,11 +266,15 @@ Converts a @pyret-id["List" "lists"] to an @pyret-id{Array} containing the same 
 
 Similar to @pyret-id["raw-array-from-list" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+import lists as L
+
 check:
-  array-from-list([list: 1, 2, 3]) is=~ [array: 1, 2, 3]
+  A.array-from-list([L.list: 1, 2, 3]) is=~ [A.array: 1, 2, 3]
 end
 }
+
 @section{Array Methods}
 
 @a-method["get-now"
@@ -282,9 +293,11 @@ Using an index too large, negative, or not a whole number raises an error.
 
 Similar to @pyret-id["get" "lists"] and @pyret-id["raw-array-get" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = [array: "a", "b", "c"]
+  a = [A.array: "a", "b", "c"]
   a.get-now(0) is "a"
   a.get-now(1) is "b"
 
@@ -312,9 +325,11 @@ Using an index too large, negative, or not a whole number raises an error.
 
 Similar to @pyret-id["raw-array-set" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = [array: "a", "b", "c"]
+  a = [A.array: "a", "b", "c"]
   a.get-now(0) is "a"
   
   a.set-now(0, "d")
@@ -322,8 +337,8 @@ check:
 
   b = a
   a.set-now(0, "f")
-  a is=~ [array: "f", "b", "c"]
-  b is=~ [array: "f", "b", "c"]
+  a is=~ [A.array: "f", "b", "c"]
+  b is=~ [A.array: "f", "b", "c"]
 
   c = b.set-now(0, 'z')
   c is nothing
@@ -343,11 +358,13 @@ created and cannot be changed.
 
 Similar to @pyret-id["length" "lists"] and @pyret-id["raw-array-length" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = [array: "a", "b"]
+  a = [A.array: "a", "b"]
   a.length() is 2
-  b = [array:]
+  b = [A.array: ]
   b.length() is 0
 end
 }
@@ -363,11 +380,13 @@ end
 
 Similar to @pyret-id["filter" "lists"] and @pyret-id["raw-array-filter" "raw-arrays"].
 
-  @examples{
+  @examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = [array: "apple", "banana", "plum"]
+  a = [A.array: "apple", "banana", "plum"]
   p-words = a.filter({(s): string-contains(s, "p")})
-  p-words is=~ [array: "apple", "plum"]
+  p-words is=~ [A.array: "apple", "plum"]
 end
   }
   
@@ -385,11 +404,14 @@ the type of the elements in the new @pyret{Array}.
 
 Similar to @pyret-id["map" "lists"] and @pyret-id["raw-array-map" "raw-arrays"].
 
-  @examples{
+  @examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = [array: "apple", "banana", "plum"]
+  a = [A.array: "apple", "banana", "plum"]
   lengths = a.map(string-length)
-  lengths is=~ [array: 5, 6, 4]
+  lengths is=~ [A.array: 5, 6, 4]
+  a is=~ [A.array: "apple", "banana", "plum"]
 end
   }
 
@@ -405,7 +427,9 @@ accumulator is the index of the current element.
 
 Similar to @pyret-id["fold" "lists"] and @pyret-id["raw-array-fold" "raw-arrays"].
 
-  @examples{
+  @examples[#:show-try-it #t]{
+import arrays as A
+
 fun sum-even-minus-odd(a :: Array<Number>):
   fun is-even(n): (n / 2) == num-floor(n / 2) end
   
@@ -421,12 +445,14 @@ fun sum-even-minus-odd(a :: Array<Number>):
 end
 
 check:
-  sum-even-minus-odd([array: ]) is 0
-  sum-even-minus-odd([array: 1]) is 1
-  sum-even-minus-odd([array: 1, 2]) is (1 - 2)
-  sum-even-minus-odd([array: 1, 2, 3]) is (1 + 3) - 2
-  sum-even-minus-odd([array: 1, 2, 3, 4]) is
-  ((1 + 3) - (2 + 4))
+  sum-even-minus-odd([A.array: ]) is 0
+  sum-even-minus-odd([A.array: 1]) is 1
+  sum-even-minus-odd([A.array: 1, 2])
+    is -1 because (1 - 2)
+  sum-even-minus-odd([A.array: 1, 2, 3])
+    is 2 because (1 + 3) - 2
+  sum-even-minus-odd([A.array: 1, 2, 3, 4])
+    is -2 because ((1 + 3) - (2 + 4))
 end
   }
 
@@ -440,16 +466,17 @@ end
 
 Similar to @pyret-id["append" "lists"] and @pyret-id["raw-array-concat" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
 
 check:
-  a = [array: "To", "be", "or"]
-  a.concat([array: "not", "to", "be"])
-    is=~ [array: "To", "be", "or", "not", "to", "be"]
+  a = [A.array: "To", "be", "or"]
+  a.concat([A.array: "not", "to", "be"])
+    is=~ [A.array: "To", "be", "or", "not", "to", "be"]
 
-  a is=~ [array: "To", "be", "or"]
+  a is=~ [A.array: "To", "be", "or"]
 
-  a is-not=~ [array: "To", "be", "or", "not", "to", "be"]
+  a is-not=~ [A.array: "To", "be", "or", "not", "to", "be"]
 end
 
 }
@@ -464,12 +491,13 @@ end
 
 Similar to @pyret-id["raw-array-duplicate" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
 
 data Person: p(ref name :: String, ref age :: Number) end
 
 check:
-  ps1 = [array: p("Alice", 30), p("Bob", 40)]
+  ps1 = [A.array: p("Alice", 30), p("Bob", 40)]
 
   ps2 = ps1.duplicate()
   
@@ -492,16 +520,18 @@ end
 
 Similar to @pyret-id["raw-array-sort-nums" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = [array: 3, 1, 4, 1, 5, 9, 2]
+  a = [A.array: 3, 1, 4, 1, 5, 9, 2]
 
   asc = a.sort-nums(true)
   asc is<=> a
-  a is=~ [array: 1, 1, 2, 3, 4, 5, 9]
+  a is=~ [A.array: 1, 1, 2, 3, 4, 5, 9]
 
   a.sort-nums(false)
-  a is=~ [array: 9, 5, 4, 3, 2, 1, 1]
+  a is=~ [A.array: 9, 5, 4, 3, 2, 1, 1]
 end
 }
 
@@ -518,18 +548,20 @@ end
 
 Similar to @pyret-id["raw-array-sort-by" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = [array: "let", "us", "go", "then", "you", "and", "i"]
+  a = [A.array: "let", "us", "go", "then", "you", "and", "i"]
 
   asc = a.sort-by(string-length, true)
-  asc is=~ [array: "i", "us", "go", "let", "you", "and", "then"]
+  asc is=~ [A.array: "i", "us", "go", "let", "you", "and", "then"]
   asc is-not=~ a
 
   desc = a.sort-by(string-length, false)
-  desc is=~ [array: "then", "let", "you", "and", "us", "go", "i"]
+  desc is=~ [A.array: "then", "let", "you", "and", "us", "go", "i"]
 
-  a is=~ [array: "let", "us", "go", "then", "you", "and", "i"]
+  a is=~ [A.array: "let", "us", "go", "then", "you", "and", "i"]
 end
 }
 
@@ -550,17 +582,20 @@ for example, @a-ref["set-now"] is subsequently used.
 
 Similar to @pyret-id["raw-array-to-list" "raw-arrays"].
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+import lists as L
+
 check:
-  a = [array: 1, 2, 3]
-  a.to-list-now() is [list: 1, 2, 3]
+  a = [A.array: 1, 2, 3]
+  a.to-list-now() is [L.list: 1, 2, 3]
         
-  a2 = array-of([array:], 3)
-  a2.to-list-now() is=~ [list: [array:], [array:], [array:]]
-  a2.to-list-now() is-not=~ [list: [list:], [list:], [list:]]
+  a2 = array-of([A.array: ], 3)
+  a2.to-list-now() is=~ [L.list: [A.array: ], [A.array: ], [A.array: ]]
+  a2.to-list-now() is-not=~ [L.list: [L.list: ], [L.list: ], [L.list: ]]
 
   a.set-now(0, 5)
-  a.to-list-now() is [list: 5, 2, 3]
+  a.to-list-now() is [L.list: 5, 2, 3]
 end
 }
 
@@ -576,10 +611,12 @@ end
 
 Equivalent to @pyret{array}@a-ref["get-now"]@pyret{(index)}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = [array: 0, 1, 2]
-  array-get-now(a, 1) is 1
+  a = [A.array: 0, 1, 2]
+  A.array-get-now(a, 1) is 1
 end
 }
           
@@ -591,14 +628,15 @@ end
 
 Equivalent to @pyret{array}@a-ref["set-now"]@pyret{(index, value)}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
          
 check:
-  a = array-of("a", 3)
-  a is=~ [array: "a", "a", "a"]
+  a = A.array-of("a", 3)
+  a is=~ [A.array: "a", "a", "a"]
 
-  array-set-now(a, 1, "b")
-  a is=~ [array: "a", "b", "a"]
+  A.array-set-now(a, 1, "b")
+  a is=~ [A.array: "a", "b", "a"]
 end
 }
 
@@ -610,11 +648,13 @@ end
 
 Equivalent to @pyret{array}@a-ref["length"]@pyret{()}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+
 check:
-  a = array-of("a", 3)
-  a is=~ [array: "a", "a", "a"]
-  array-length(a) is 3
+  a = A.array-of("a", 3)
+  a is=~ [A.array: "a", "a", "a"]
+  A.array-length(a) is 3
 end
 }
 
@@ -670,18 +710,18 @@ Equivalent to @pyret{array}@a-ref["duplicate"]@pyret{()}.
 
 Equivalent to @pyret{array}@a-ref["sort-nums"]@pyret{(asc)}.
 
-@examples{
+@examples[#:show-try-it #t]{
 import arrays as A
 
 check:
-  a = [array: 3, 1, 4, 1, 5, 9, 2]
+  a = [A.array: 3, 1, 4, 1, 5, 9, 2]
 
   asc = A.array-sort-nums(a, true)
   asc is<=> a
-  a is=~ [array: 1, 1, 2, 3, 4, 5, 9]
+  a is=~ [A.array: 1, 1, 2, 3, 4, 5, 9]
 
   A.array-sort-nums(a, false)
-  a is=~ [array: 9, 5, 4, 3, 2, 1, 1]
+  a is=~ [A.array: 9, 5, 4, 3, 2, 1, 1]
 end
 }
 
@@ -693,20 +733,20 @@ end
 
 Equivalent to @pyret{array}@a-ref["sort-by"]@pyret{(key, asc)}.
 
-@examples{
+@examples[#:show-try-it #t]{
 import arrays as A
 
 check:
-  a = [array: "let", "us", "go", "then", "you", "and", "i"]
+  a = [A.array: "let", "us", "go", "then", "you", "and", "i"]
 
   asc = A.array-sort-by(a, string-length, true)
-  asc is=~ [array: "i", "us", "go", "let", "you", "and", "then"]
+  asc is=~ [A.array: "i", "us", "go", "let", "you", "and", "then"]
   asc is-not=~ a
 
   desc = A.array-sort-by(a, string-length, false)
-  desc is=~ [array: "then", "let", "you", "and", "us", "go", "i"]
+  desc is=~ [A.array: "then", "let", "you", "and", "us", "go", "i"]
 
-  a is=~ [array: "let", "us", "go", "then", "you", "and", "i"]
+  a is=~ [A.array: "let", "us", "go", "then", "you", "and", "i"]
 end
 }
 
@@ -718,16 +758,19 @@ end
 
 Equivalent to @pyret{array}@a-ref["to-list-now"]@pyret{()}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import arrays as A
+import lists as L
+
 check:
-  a = array-of("a", 3)
-  a is=~ [array: "a", "a", "a"]
+  a = A.array-of("a", 3)
+  a is=~ [A.array: "a", "a", "a"]
 
-  array-set-now(a, 1, "b")
-  a is=~ [array: "a", "b", "a"]
+  A.array-set-now(a, 1, "b")
+  a is=~ [A.array: "a", "b", "a"]
 
-  l = array-to-list-now(a)
-  l is [list: "a", "b", "a"]
+  l = A.array-to-list-now(a)
+  l is [L.list: "a", "b", "a"]
 end
 }
 
