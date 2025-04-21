@@ -348,8 +348,8 @@ import sets as S
 
 check:
   [S.set: 1, 2, 3].size() is 3
-  [tree-set: 1, 2, 3].size() is 3
-  [list-set: 1, 2, 3].size() is 3
+  [S.tree-set: 1, 2, 3].size() is 3
+  [S.list-set: 1, 2, 3].size() is 3
 end
 }
 
