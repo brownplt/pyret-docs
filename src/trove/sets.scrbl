@@ -205,7 +205,7 @@ check:
 end
 }
 
-@section{Set Constructors}
+@section{Constructing Sets}
 
 @collection-doc["list-set" #:contract `(a-arrow ("elt" "a") ,(S-of "a"))]
 
