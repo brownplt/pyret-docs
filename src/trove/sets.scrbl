@@ -198,9 +198,10 @@ use the names below through that prefix.
 
 @examples[#:show-try-it #t]{
 import sets as S
+import lists as L
 
 check:
-  S.list-to-list-set([list: 1, 2, 1, 2]) is [S.list-set: 2, 1]
+  S.list-to-list-set([L.list: 1, 2, 1, 2]) is [S.list-set: 2, 1]
 end
 }
 
@@ -213,12 +214,13 @@ if the elements don't support equality.
 
 @examples[#:show-try-it #t]{
 import sets as S
+import lists as L
 
 check:
   [S.list-set: 1, 2, 3] is [S.list-set: 1, 2, 3]
   [S.list-set: 1, 2, 2] is [S.list-set: 1, 2]
-  [S.list-set: [list: 1], [list: 1], [list: 2]] is
-    [S.list-set: [list: 2], [list: 1]]
+  [S.list-set: [L.list: 1], [L.list: 1], [L.list: 2]] is
+    [S.list-set: [L.list: 2], [L.list: 1]]
 end
 }
 
@@ -233,11 +235,12 @@ if the elements don't support the @pyret{<} operator via @pyret{_lessthan}.
 
 @examples[#:show-try-it #t]{
 import sets as S
+import lists as L
 
 check:
   [S.tree-set: 1, 2, 3] is [S.tree-set: 1, 2, 3]
   [S.tree-set: 1, 2, 2] is [S.tree-set: 1, 2]
-  [S.tree-set: [list: 1], [list: 1], [list: 2]] raises "binop-error"
+  [S.tree-set: [L.list: 1], [L.list: 1], [L.list: 2]] raises "binop-error"
 end
 }
 
@@ -259,9 +262,10 @@ Constructs a list-set out of the elements in the list.
 
 @examples[#:show-try-it #t]{
 import sets as S
+import lists as L
 
 check:
-  s1 = S.list-to-list-set([list: 1, 2, 3, 3, 3])
+  s1 = S.list-to-list-set([L.list: 1, 2, 3, 3, 3])
   s1 is [S.list-set: 1, 2, 3]
 end
 }
@@ -277,9 +281,10 @@ Constructs a tree-set out of the elements in the list.
 
 @examples[#:show-try-it #t]{
 import sets as S
+import lists as L
 
 check:
-  s1 = S.list-to-tree-set([list: 1, 2, 3, 3, 3])
+  s1 = S.list-to-tree-set([L.list: 1, 2, 3, 3, 3])
   s1 is [S.tree-set: 1, 2, 3]
 end
 }
@@ -414,14 +419,15 @@ following tests that will @emph{always} pass:
 
 @examples[#:show-try-it #t]{
 import sets as S
+import lists as L
 import pick as P
 
 check:
   fun one-of(e, l): l.member(e) end
 
-  [S.set: 1, 2].pick().elt is%(one-of) [list: 1, 2]
+  [S.set: 1, 2].pick().elt is%(one-of) [L.list: 1, 2]
   [S.set: 1, 2].pick().rest is%(one-of)
-  [list: [S.set: 1], [S.set: 2]]
+  [L.list: [S.set: 1], [S.set: 2]]
 end
 }
 
@@ -510,6 +516,7 @@ unspecified order.
 
 @examples[#:show-try-it #t]{
 import sets as S
+import lists as L
 
 check:
   fun one-of(e, l): l.member(e) end
@@ -517,7 +524,7 @@ check:
   s = [S.tree-set: "1", "2", "3"]
   result = s.fold(string-append, "")
 
-  result is%(one-of) [list: "123", "132", "213", "231", "312", "321"]
+  result is%(one-of) [L.list: "123", "132", "213", "231", "312", "321"]
 end
 }
 
