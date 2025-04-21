@@ -133,7 +133,6 @@ Learn more at @seclink["equality"].
 
 }
 
-@section{Array Creation Functions}
 
 @collection-doc["array" #:contract `(a-arrow ("value" "a") ,(A-of "a"))]
 
