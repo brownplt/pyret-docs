@@ -17,11 +17,11 @@
   Fetches the content at the given @pyret{url} with HTTP GET, expecting that
   the result is @tt{text/plain}.
 
-  If no errors occur, returns @pyret-id["either" "left"] with the returned
+  If no errors occur, returns @pyret-id["left" "either"] with the returned
   string body. The user is expected to decompose this string
-  using @pyret-id["String"] or other functions.
+  using @pyret-id["string" "String"] or other functions.
 
-  If any errors occur, returns @pyret-id["either" "right"] with that error as a string.
+  If any errors occur, returns @pyret-id["right" "either"] with that error as a string.
 
 @examples[#:show-try-it #t]{
 import fetch as F
