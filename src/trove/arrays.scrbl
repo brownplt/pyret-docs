@@ -226,7 +226,7 @@ end
 Constructs an array of length @pyret{size}, and fills it with the result of
 calling the function @pyret{f} with each index from @pyret{0} to @pyret{size - 1}.
 
-Similar to @pyret-id["raw-array-build" "raw-arrays"].
+Similar to @pyret-id["build-list" "lists"] and @pyret-id["raw-array-build" "raw-arrays"].
 
 @examples[#:show-try-it #t]{
 import arrays as A

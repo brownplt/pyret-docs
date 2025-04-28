@@ -404,6 +404,8 @@
     (with-members)
     )
   (fun-spec
+    (name "build-list"))
+  (fun-spec
     (name "is-empty")
     (arity 1)
     (params [list: ])
@@ -1230,6 +1232,42 @@ check:
   L.link(L.empty, L.empty) is [L.list: L.empty]
 end
 }
+
+@function["build-list"
+  #:contract (a-arrow (a-arrow N "a") N (L-of "a"))
+  #:args (list (list "f" #f) (list "size" #f))
+  #:return (L-of "a")
+]
+
+Constructs a list of length @pyret{size}, and fills it with the result of
+calling the function @pyret{f} with each index from @pyret{0} to @pyret{size - 1}.
+
+Similar to @pyret-id["build-array" "arrays"].
+
+@examples[#:show-try-it #t]{
+import lists as L
+
+check:
+  fun sq(x): x * x end
+  L.build-list(sq, 4) 
+    is [L.list: 0, 1, 4, 9]
+    because [L.list: sq(0), sq(1), sq(2), sq(3)]
+end
+
+check:
+  fun build(base :: Number) -> List<String>:
+    L.build-list({(n): base + n}, 3)
+  end
+
+  a = L.build-list(build, 3)
+  
+  a is [L.list:
+    [L.list: 0, 1, 2],
+    [L.list: 1, 2, 3],
+    [L.list: 2, 3, 4]]
+end
+}
+
 
 @section{List Methods}
 
