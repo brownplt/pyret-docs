@@ -1198,7 +1198,7 @@ end
 
   }
 
-@section{The @pyret{list} Constructor}
+@section{List Creation Functions}
 
 @collection-doc["list" #:contract `(a-arrow ("elt" "a") ,(L-of "a"))]
 
