@@ -4,6 +4,8 @@
 @(append-gen-docs
   '(module "booleans"
     (path "src/js/base/runtime-anf.js")
+    (form-spec (name "and"))
+    (form-spec (name "or"))
     (data-spec
       (name "Boolean")
       (variants)
@@ -32,6 +34,32 @@ check:
   not(2 < 1) is true
 end
 }
+  @section{Boolean Operators}
+
+@form["and" "<left> and <right>"]{
+  @margin-note{
+  The @pyret{and} operator has “short-circuiting” behavior: if @pyret{left}
+  evaluates to @pyret{false}, then @pyret{right} is not evaluated at all and the
+  result is @pyret{false}.
+  }
+  Expects @pyret{left} and @pyret{right} to be @pyret{Boolean}s.
+  If both are
+  @pyret{true}, the result is @pyret{true}, if either is @pyret{false}, the
+  result is @pyret{false}.
+}
+
+@form["or" "<left> or <right>"]{
+  @margin-note{
+  The @pyret{or} operator has “short-circuiting” behavior: if @pyret{left}
+  evaluates to @pyret{true}, then @pyret{right} is not evaluated at all and the
+  result is @pyret{true}.
+  }
+  Expects @pyret{left} and @pyret{right} to be @pyret{Boolean}s.
+  If either is
+  @pyret{true}, the result is @pyret{true}, if both are @pyret{false}, the
+  result is @pyret{false}.
+}
+
   
 }
 
