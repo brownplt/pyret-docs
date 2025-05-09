@@ -9,6 +9,10 @@
 @(append-gen-docs
   `(module "numbers"
     (path "src/js/base/runtime-anf.js")
+    (form-spec (name "num+"))
+    (form-spec (name "num-"))
+    (form-spec (name "num*"))
+    (form-spec (name "num/"))
     (data-spec
       (name "Number")
       (variants)
@@ -426,6 +430,67 @@ granularity of 5e-324 (JavaScript’s Number.MIN_VALUE).
 
 The mathematical constant π, approximated as a @pyret-id["Roughnum"], or
 @pyret{~3.141592653589793}.
+
+@section{Number Operators}
+
+@form["num+" "<left> + <right>"]{
+  @margin-note{If either of the values in an arithmetic operator is a
+  @pyret{Roughnum}, the result is a @pyret{Roughnum}}
+  When @pyret{left} and @pyret{right} evaluate to numbers, adds them and returns
+  the result.
+
+@examples[#:show-try-it #t]{
+check:
+  2 + 2 is 4
+  4/3 + 1/3 is 5/3
+  0.1 + 0.2 is 0.3
+end
+}
+}
+
+@form["num-" "<left> - <right>"]{
+  When @pyret{left} and @pyret{right} evaluate to numbers, subtracts
+  @pyret{right} from @pyret{left} and returns the result.
+
+@examples[#:show-try-it #t]{
+check:
+  6 - 2 is 4
+  4/3 - 1/3 is 1
+  0.3 - 0.2 is 0.1
+end
+}
+}
+
+@form["num*" "<left> * <right>"]{
+  When @pyret{left} and @pyret{right} evaluate to numbers, multiplies
+  them and returns the result.
+
+@examples[#:show-try-it #t]{
+check:
+  2 * 2 is 4
+  2 * 1/3 is 2/3
+  0.3 * 0.2 is 0.0.6
+end
+}
+}
+
+@form["num/" "<left> / <right>"]{
+  @margin-note{To be used as an operator, @pyret{/} has to have spaces around
+  it. This means you need to write @pyret{a / 3} rather than @pyret{a/3} to
+  divide the value stored in @pyret{a} by @pyret{3}. Things like @pyret{4/3} and
+  @pyret{1/2} are read by Pyret as single
+  numbers, and can't have names or other expressions in them.}
+  When @pyret{left} and @pyret{right} evaluate to numbers, divides @pyret{left}
+  by @pyret{right} and returns the result.
+
+@examples[#:show-try-it #t]{
+check:
+  8 / 2 is 4
+  8/3 / 2 is 4/3
+  0.3 * 0.2 is 0.06
+end
+}
+}
 
 @section{Number Functions}
 
