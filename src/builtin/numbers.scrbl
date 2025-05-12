@@ -13,6 +13,11 @@
     (form-spec (name "- (subtraction operator)"))
     (form-spec (name "* (multiplication operator)"))
     (form-spec (name "/ (division operator)"))
+    (form-spec (name "< (less)"))
+    (form-spec (name "> (greater)"))
+    (form-spec (name "<= (less or equal)"))
+    (form-spec (name ">= (greater or equal)"))
+    (form-spec (name "== (equal)"))
     (data-spec
       (name "Number")
       (variants)
@@ -491,6 +496,14 @@ check:
 end
 }
 }
+
+@form["< (less)" "left < right"]
+@form["> (greater)" "left < right"]
+@form["<= (less or equal)" "left < right"]
+@form[">= (greater or equal)" "left < right"]
+@form["== (equal)" "left < right"]
+
+Comparison operators. See @seclink["inequalities"].
 
 
 @section{Number Functions}

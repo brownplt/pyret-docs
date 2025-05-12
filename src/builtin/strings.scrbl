@@ -18,6 +18,7 @@
       (arity 2)
       (args ("string-to-search" "string-to-find"))
       (doc ""))
+    (form-spec (name "+ (concatenation)"))
     (fun-spec
       (name "string-append")
       (arity 2)
@@ -185,6 +186,9 @@ check:
 end
 }
 
+
+
+
   @function["string-append" #:contract (a-arrow S S S) #:return S]
 
 Returns a @pyret{String} where @pyret{back} is added to the right of
@@ -199,6 +203,11 @@ check:
   string-append("a", "") is "a"
 end
 }
+
+@form["+ (concatenation)" "front + back"]
+
+When @pyret{front} and @pyret{back} are strings, has the same meaning as
+@pyret-id{string-append}.
 
   @function["string-length" #:contract (a-arrow S N) #:return N]
 
