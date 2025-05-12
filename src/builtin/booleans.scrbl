@@ -36,7 +36,7 @@ end
 }
   @section{Boolean Operators}
 
-@form["and" "<left> and <right>"]{
+@form["and" "left and right"]{
   @margin-note{
   The @pyret{and} operator “short-circuits”: if @pyret{left}
   evaluates to @pyret{false}, then @pyret{right} is not evaluated at all and the
@@ -59,7 +59,7 @@ end
   }
 }
 
-@form["or" "<left> or <right>"]{
+@form["or" "left or right"]{
   @margin-note{
   The @pyret{or} operator “short-circuits”: if @pyret{left}
   evaluates to @pyret{true}, then @pyret{right} is not evaluated at all and the

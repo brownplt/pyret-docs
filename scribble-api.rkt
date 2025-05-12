@@ -856,7 +856,9 @@
    (let ([processing-module (curr-module-name)])
      (define part-tag (list 'part (tag-name (curr-module-name) name)))
      (define pyret-text (seclink (xref processing-module name) (pyret text)))
-     (define pyret-elt (toc-target-element code-style (list pyret-text) part-tag))
+     (define pyret-elt (toc-target2-element code-style (list pyret-text) part-tag (list name)))
+     (define part-tags (list 'part (curr-module-name) name))
+     (define index-tags (cons (pyret name) (filter (lambda(e) (not (or (equal? e name) (equal? e "")))) (rest part-tags))))
      (interleave-parbreaks/all
       (list
         (traverse-block ; use this to build xrefs on an early pass through docs
@@ -867,11 +869,20 @@
                (apply para #:style (div-style "boxed pyret-header")
                   (list pyret-elt)))
            (nested #:style (div-style "value")
-                   (cons
-                     header-part
+                   (append
+                     (list
+                      (let ((tag (make-generated-tag)))
+                                (make-index-element #f
+                                                    (list (make-target-element #f '() `(idx ,tag)))
+                                                    `(idx ,tag)
+                                                    (cons name (rest index-tags))
+                                                    index-tags
+                                                    #f))
+                      header-part)
                      (interleave-parbreaks/all
                       (append
-                        (list (nested #:style (div-style "description") contents))))))))))))
+                        (list 
+                          (nested #:style (div-style "description") contents))))))))))))
 
 (define (value name ann #:private (private #f) #:style (style "boxed pyret-header") . contents)
   (when (not private) (set-documented! (curr-module-name) name))

@@ -9,10 +9,10 @@
 @(append-gen-docs
   `(module "numbers"
     (path "src/js/base/runtime-anf.js")
-    (form-spec (name "num+"))
-    (form-spec (name "num-"))
-    (form-spec (name "num*"))
-    (form-spec (name "num/"))
+    (form-spec (name "+ (addition operator)"))
+    (form-spec (name "- (subtraction operator)"))
+    (form-spec (name "* (multiplication operator)"))
+    (form-spec (name "/ (division operator)"))
     (data-spec
       (name "Number")
       (variants)
@@ -433,7 +433,7 @@ The mathematical constant π, approximated as a @pyret-id["Roughnum"], or
 
 @section{Number Operators}
 
-@form["num+" "<left> + <right>"]{
+@form["+ (addition operator)" "left + right"]{
   @margin-note{If either of the values in an arithmetic operator is a
   @pyret{Roughnum}, the result is a @pyret{Roughnum}}
   When @pyret{left} and @pyret{right} evaluate to numbers, adds them and returns
@@ -448,7 +448,7 @@ end
 }
 }
 
-@form["num-" "<left> - <right>"]{
+@form["- (subtraction operator)" "left - right"]{
   When @pyret{left} and @pyret{right} evaluate to numbers, subtracts
   @pyret{right} from @pyret{left} and returns the result.
 
@@ -461,7 +461,7 @@ end
 }
 }
 
-@form["num*" "<left> * <right>"]{
+@form["* (multiplication operator)" "left * right"]{
   When @pyret{left} and @pyret{right} evaluate to numbers, multiplies
   them and returns the result.
 
@@ -474,7 +474,7 @@ end
 }
 }
 
-@form["num/" "<left> / <right>"]{
+@form["/ (division operator)" "left / right"]{
   @margin-note{To be used as an operator, @pyret{/} has to have spaces around
   it. This means you need to write @pyret{a / 3} rather than @pyret{a/3} to
   divide the value stored in @pyret{a} by @pyret{3}. Things like @pyret{4/3} and
@@ -491,6 +491,7 @@ check:
 end
 }
 }
+
 
 @section{Number Functions}
 
