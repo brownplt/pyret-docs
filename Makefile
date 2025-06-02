@@ -2,6 +2,7 @@ MANUAL_FONTS = "$(shell racket -e '(display (collection-file-path "manual-fonts.
 
 all: docs
 
+# annoying but true? no way to rename a ++extra. So pyret-embed comes in as pyret_2.js
 docs:
 	racket run.rkt \
     ++style $(MANUAL_FONTS) \
@@ -17,6 +18,7 @@ docs:
     ++extra src/trove/paint.svg \
     ++extra src/trove/checkers.svg \
     ++extra src/search.js \
+    ++extra node_modules/pyret-embed/dist/pyret.js \
     ++extra src/embed-api.js \
     \
     ++style src/styles.css \
