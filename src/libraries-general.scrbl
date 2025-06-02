@@ -40,3 +40,4 @@ These are libraries of general interest to Pyret programmers.
 @include-section["trove/timing.scrbl"]
 
 @include-section["trove/fetch.scrbl"]
+@include-section["trove/filesystem.scrbl"]
