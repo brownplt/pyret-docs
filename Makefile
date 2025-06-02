@@ -19,7 +19,9 @@ docs:
     ++extra src/trove/checkers.svg \
     ++extra src/search.js \
     ++extra node_modules/pyret-embed/dist/pyret.js \
+    ++extra node_modules/pyret-embed/dist/inmem-rpc.js \
     ++extra src/embed-api.js \
+    ++extra src/filesystem.js \
     \
     ++style src/styles.css \
     --prefix src/myprefix.html \
@@ -30,6 +32,7 @@ docs:
     --htmls-search src/index.scrbl
 	mkdir -p build/docs/search
 	cp src/search.html build/docs/search/index.html
+	cp -r node_modules/pyret-embed/dist/build build/docs/
 	patch build/docs/scribble-common.js src/scribble-common.patch
 
 release-docs: docs

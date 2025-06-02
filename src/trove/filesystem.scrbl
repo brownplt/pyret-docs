@@ -17,12 +17,32 @@
     (fun-spec (name "is-absolute") (arity 1))
     ))
 
+@nested[#:style (make-style "script" (list (make-alt-tag "script") (make-attributes '((type . "module") (src . "filesystem.js")))))]
+
+The @pyret{filesystem} library provides functions for reading and writing files,
+as well as working with paths.
+
+The examples on this page work against a small filesystem that is set up every
+time the page loads. The filesystem contains the contents below, and the working
+directory is @pyret{/}.
+
+@nested[#:style (pre-style "fixed-width")]{
+/hello.txt: "Hello, world!"
+}
+
 @docmodule["filesystem"]{
 
 @function["read-file-string"
   #:contract (a-arrow S S)
   #:args '(("path" ""))
   ]
+
+@examples[#:show-try-it #t]{
+import filesystem as FS
+check:
+  FS.read-file-string("hello.txt") is "Hello, world!"
+end
+}
 
 Reads the file at the given @pyret{path} and returns its contents as a
 @pyret{String}. Always assumes UTF-8 encoding.

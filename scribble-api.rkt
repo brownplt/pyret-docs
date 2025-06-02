@@ -40,6 +40,11 @@
 
          (all-from-out scribble/private/manual-tech)
 
+         make-style
+         make-alt-tag
+         make-attributes
+         pre-style
+
          docmodule
          function
          value

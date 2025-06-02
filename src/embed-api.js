@@ -1,7 +1,6 @@
-import { makeEmbed } from "./pyret_2.js";
-const CPO = "https://pyret-horizon.herokuapp.com/editor#controlled=true&footerStyle=hide&warnOnExit=false";
+import { makeEmbedConfig } from "./pyret_2.js";
+import { rpc } from "./inmem-rpc.js";
 
-let currentId = 0;
 async function embedFromPage(tryItLink, code) {
   const newlines = code.split("\n").length;
   let height = ((newlines * 2) + 6);
@@ -14,7 +13,11 @@ async function embedFromPage(tryItLink, code) {
       showing = true;
       container.style = `height: ${height}; display: block`;
       tryItLink.innerText = "(Close)";
-      const embed = await makeEmbed("editor" + (++currentId), container, CPO);
+      const embed = await makeEmbedConfig({
+        src: "build/web/editor.embed.html",
+        container,
+        rpc,
+      });
       embed.onChange((_) => {
         tryItLink.innerText = "(Close [changes will not be saved])";
       });
@@ -41,3 +44,5 @@ window.addEventListener('load', function() {
     embedFromPage(elts[i], elts[i].attributes.code.value);
   }
 });
+
+export const fs = rpc.fs;
