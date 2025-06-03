@@ -19,7 +19,7 @@ docs:
     ++extra src/trove/checkers.svg \
     ++extra src/search.js \
     ++extra node_modules/pyret-embed/dist/pyret.js \
-    ++extra node_modules/pyret-embed/dist/inmem-rpc.js \
+    ++extra node_modules/pyret-embed/dist/default-rpcs.js \
     ++extra src/embed-api.js \
     ++extra src/filesystem.js \
     \

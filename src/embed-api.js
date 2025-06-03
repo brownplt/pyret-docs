@@ -1,5 +1,6 @@
 import { makeEmbedConfig } from "./pyret_2.js";
-import { rpc } from "./inmem-rpc.js";
+import { rpc } from "./default-rpcs.js";
+console.log("Embed API loaded", rpc);
 
 async function embedFromPage(tryItLink, code) {
   const newlines = code.split("\n").length;
