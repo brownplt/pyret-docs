@@ -83,5 +83,35 @@ check:
 end
 }
 
+@function["stat"
+  #:contract (a-arrow S (a-record `((mtime ,N) (ctime ,N) (size ,N))))
+  #:args '(("path" ""))
+  ]
+
+@margin-note{There is also an optional field called @pyret{native} that may have
+additional information sometimes, depending on the platform. The three fields
+listed are guaranteed to be present across all platforms.}
+Returns an object with statistics about the file: its modified time
+(@pyret{mtime}), its creation time (@pyret{ctime}), and its size in bytes
+(@pyret{size}).
+
+@examples[#:show-try-it #t]{
+import filesystem as FS
+check:
+  test-start-time = time-now() # gives the current time in milliseconds
+  FS.write-file-string("fresh-file.txt", "Brand new!")
+  stats = FS.stat("fresh-file.txt")
+
+  spy: stats end
+
+  stats.size is string-length("Brand new!")
+
+  # these tests are just indicating that the file was created and modified after
+  # the test started
+  stats.mtime is%(_ >= _) test-start-time
+  stats.ctime is%(_ >= _) test-start-time
+end
+
+}
 
 }
