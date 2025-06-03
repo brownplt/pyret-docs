@@ -12,7 +12,10 @@ async function embedFromPage(tryItLink, code) {
   tryItLink.addEventListener('click', async function () {
     if(!showing) {
       showing = true;
-      container.style = `height: ${height}; display: block`;
+      // NOTE(joe): TIL that `vw` is the viewport width. 20rem is the width of
+      // the sidebar. This makes the editor take up the rest of the width of
+      // the page.
+      container.style = `height: ${height}; display: block; min-width: 100%; width: calc(100vw - 20rem);`;
       tryItLink.innerText = "(Close)";
       const embed = await makeEmbedConfig({
         src: "build/web/editor.embed.html",
