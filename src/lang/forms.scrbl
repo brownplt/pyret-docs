@@ -1731,6 +1731,8 @@ Pyret just does not provide syntactic sugar to help in this case
 
 @subsection[#:tag "s:cannonball-expr"]{Chaining Application}
 
+@index["^ (Chained Application)"]{}
+
 @bnf['Pyret]{
 CARET: "^"
 chain-app-expr: binop-expr CARET binop-expr
