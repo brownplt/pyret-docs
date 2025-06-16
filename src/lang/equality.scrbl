@@ -125,6 +125,12 @@
       (return ,boolean)
       (doc ""))
     (fun-spec
+      (name "<>")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
       (name "equal-always")
       (arity 2)
       (args ("val1" "val2"))
@@ -506,6 +512,11 @@ Checks if the two values will always be equal, and corresponds to the
 checks that the mutable values are @pyret-id{identical}.  Stopping at mutable
 boundaries ensures that if two values were @pyret-id{equal-always} at any
 point, they will still be @pyret-id{equal-always} later.
+
+@function["<>" #:contract (a-arrow A A B)]
+
+The negation of @pyret{==}: returns @pyret{true} if the values are not
+@pyret{equal-always} and @pyret{false} otherwise.
 
 @subsection[#:tag "s:always-equal-mutable"]{Always Equal and Mutable Data}
 
