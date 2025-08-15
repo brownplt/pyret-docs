@@ -186,8 +186,35 @@ check:
 end
 }
 
+  @function["string-find" #:contract (a-arrow S S) #:return N]
 
+Return the left-most index (starting from @pyret{0}) where the second argument is found in the first string.
 
+If the string is not found, this raises an exception. Therefore, use this function only when you expect the second argument to be found in the first one.
+If you aren't sure, use @pyret{string-find-opt}.
+  
+@examples{
+check:
+  string-find("Hello", "ello") is 1
+  string-find("Hello", "H") is 0
+  string-find("Hello", "World") raises ""
+end
+}
+
+  @function["string-find-opt" #:contract (a-arrow S) #:return N]
+
+Return the left-most index (starting from @pyret{0}) where the second argument is found in the first string.
+
+This always returns an @pyret{Option} value. Therefore, this is useful when you aren't sure whether the second argument will be found in the first or not.
+If you are confident it will be present, consider using @pyret{string-find}, which returns the number that you can directly use.
+
+@examples{
+check:
+  string-find("Hello", "ello") is some(1)
+  string-find("Hello", "H") is some(0)
+  string-find("Hello", "World") is none
+end
+}
 
   @function["string-append" #:contract (a-arrow S S S) #:return S]
 
