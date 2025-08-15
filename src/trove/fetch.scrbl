@@ -35,6 +35,7 @@ check:
   
   bad-fetch = F.fetch("https://raw.githubusercontent.com/NO-SUCH-URL")
   bad-fetch satisfies Ei.is-right
+  to-repr(bad-fetch) satisfies string-contains(_, "400")
 end
 }
 
