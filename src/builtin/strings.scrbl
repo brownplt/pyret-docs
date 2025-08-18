@@ -201,7 +201,7 @@ check:
 end
 }
 
-  @function["string-find-opt" #:contract (a-arrow S) #:return N]
+  @function["string-find-opt" #:contract (a-arrow S S) #:return N]
 
 Return the left-most index (starting from @pyret{0}) where the second argument is found in the first string.
 
