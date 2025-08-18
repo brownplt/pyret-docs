@@ -1255,11 +1255,11 @@ check:
 end
 
 check:
-  fun build(base :: Number) -> List<String>:
+  fun build-from(base :: Number) -> List<String>:
     L.build-list({(n): base + n}, 3)
   end
 
-  a = L.build-list(build, 3)
+  a = L.build-list(build-from, 3)
   
   a is [L.list:
     [L.list: 0, 1, 2],
