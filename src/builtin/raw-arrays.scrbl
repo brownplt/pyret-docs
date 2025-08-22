@@ -143,13 +143,17 @@ Tests should correspondingly use
 
 @examples{
 check:
-  [raw-array: 1, 2, 3] is-not== [raw-array: 1, 2, 3]
+  ra = [raw-array: 1, 2, 3]
+  
+  ra is ra
+  ra is== ra
+  
+  [raw-array: 1, 2, 3] is-not ra
   [raw-array: 1, 2, 3] is-not [raw-array: 1, 2, 3]
+  [raw-array: 1, 2, 3] is-not== ra
+  
+  [raw-array: 1, 2, 3] is=~ ra
   [raw-array: 1, 2, 3] is=~ [raw-array: 1, 2, 3]
-
-  a = [raw-array: 1, 2, 3]
-  a is a
-  a is== a
 end
 }
 

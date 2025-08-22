@@ -172,11 +172,16 @@ import arrays as A
 
 check:
   a = [A.array: 1, 2, 3]
+  
   a is a
   a is== a
-  [A.array: 1, 2, 3] is=~ [A.array: 1, 2, 3]
-  [A.array: 1, 2, 3] is-not== [A.array: 1, 2, 3]
+  
+  [A.array: 1, 2, 3] is-not a
   [A.array: 1, 2, 3] is-not [A.array: 1, 2, 3]
+  [A.array: 1, 2, 3] is-not== a
+  
+  [A.array: 1, 2, 3] is=~ a
+  [A.array: 1, 2, 3] is=~ [A.array: 1, 2, 3]
 end
 }
 
