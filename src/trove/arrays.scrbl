@@ -154,13 +154,18 @@ end
 
 @collection-doc["array" #:contract `(a-arrow ("value" "a") ,(A-of "a"))]
 
-Constructs an @pyret-id{Array} with the given elements.  Note that
-@pyret-id{Array}s are mutable, so comparisons using @pyret{==}
-(the operator for @pyret-id["equal-always" "equality"]) will only
+Constructs an @pyret-id{Array} with the given elements.
+
+Note that
+@pyret-id{Array}s are mutable, so comparisons using
+@secref["eq-fun-equal-always"]
+will only
 return @pyret{true} on @pyret-id{Array}s when they are also
-@pyret-id["identical" "equality"], regardless of their contents.  To compare
-the elements use @pyret-id["equal-now" "equality"]/@pyret{=~},
-and test using @pyret-id["is=~" "testing"].
+@secref["eq-fun-identical"], regardless of their contents.
+Usually, the most appropriate comparison is
+@secref["eq-fun-equal-now"].
+Tests should correspondingly use 
+@pyret-id["is=~" "testing"].
 
 @examples[#:show-try-it #t]{
 import arrays as A
