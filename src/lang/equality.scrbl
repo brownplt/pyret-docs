@@ -280,7 +280,7 @@ compare to some other languages' operators:
       @list{@code{equal?} (Racket) @code{==} (Python, Ruby)}
     )
     (list
-      @list{@emph{Always Equal}}
+      @list{@emph{Equal Always}}
       @list{@code{==}}
       @list{@code{equal-always}}
       @list{@code{equal-always3}}
@@ -512,7 +512,7 @@ end
 }
 }
 
-@section{Always Equal}
+@section[#:tag "eq-fun-equal-always"]{Equal Always}
 
 @function["equal-always" #:contract (a-arrow A A B)]
 @function["==" #:contract (a-arrow A A B)]
