@@ -618,7 +618,7 @@ end
 }
 }
 
-@section{Properties of Equality Functions}
+@section[#:tag "eq-func-relationship"]{Properties of Equality Functions}
 
 The discussion above hints at a relationship between the three functions.  In
 particular, if two values are Identical, they ought to be Always Equal, and if
