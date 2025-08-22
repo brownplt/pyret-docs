@@ -401,10 +401,23 @@ check:
 end
 }
 
-@section{Identical}
+@section[#:tag "eq-fun-identical"]{Identical}
 
 @function["identical" #:contract (a-arrow A A B)]
 @function["<=>" #:contract (a-arrow A A B)]
+
+Checks if two seemingly different values are in fact exactly the same
+value. When it returns @pyret{true}, it means the two values can
+always be used in place of one another (because they are in fact the
+same value). This is explained in detail below and its relationship to
+other equality functions is given in @secref["eq-func-relationship"].
+
+The function @pyret-id{identical} and infix operator @identical-op have
+the same behavior.
+While the infix operator may sometimes be more readable, the function
+name conveys meaning that may not be clear from the infix operator's
+symbolic form. In addition, the infix operator is not a function and
+hence cannot be passed as a parameter, etc.
 
 @subsection[#:tag "s:identical-primitives"]{Identical and Primitives}
 
