@@ -277,7 +277,7 @@ compare to some other languages' operators:
       @list{@code{=~}}
       @list{@code{equal-now}}
       @list{@code{equal-now3}}
-      @list{@code{equal?} (Racket) @code{==} (Python, Ruby)}
+      @list{@code{equal?} (Racket); @code{==} (Python, Ruby)}
     )
     (list
       @list{@emph{Equal Always}}
@@ -292,10 +292,10 @@ compare to some other languages' operators:
       @list{@code{identical}}
       @list{@code{identical3}}
       @list{
-        @code{eq?} (Scheme)
-        @code{==} (Ocaml)
-        @code{===} (JavaScript)
-        @code{is} (Python)
+        @code{eq?} (Scheme);
+        @code{==} (Ocaml);
+        @code{===} (JavaScript);
+        @code{is} (Python);
         @code{==} (Java)
       }
     )
