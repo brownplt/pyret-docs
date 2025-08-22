@@ -534,7 +534,7 @@ The negation of @pyret{==}: returns @pyret{true} if the values are not
 @subsection[#:tag "s:always-equal-mutable"]{Always Equal and Mutable Data}
 
 Here are some examples of @pyret-id{equal-always} stopping at mutable data, but
-checking immutable data, contrasted with @pyret-id{equal-now}
+checking immutable data, contrasted with @pyret-id{equal-now}.
 
 @pyret-block{
 data MyBox:
