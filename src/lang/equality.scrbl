@@ -273,18 +273,18 @@ compare to some other languages' operators:
       @list{@bold{Similar To}}
     )
     (list
-      @list{@emph{Equal Now}}
-      @list{@code{=~}}
-      @list{@code{equal-now}}
-      @list{@code{equal-now3}}
-      @list{@code{equal?} (Racket); @code{==} (Python, Ruby)}
-    )
-    (list
       @list{@emph{Equal Always}}
       @list{@code{==}}
       @list{@code{equal-always}}
       @list{@code{equal-always3}}
       @list{@code{=} (Ocaml)}
+    )
+    (list
+      @list{@emph{Equal Now}}
+      @list{@code{=~}}
+      @list{@code{equal-now}}
+      @list{@code{equal-now3}}
+      @list{@code{equal?} (Racket); @code{==} (Python, Ruby)}
     )
     (list
       @list{@emph{Identical}}
