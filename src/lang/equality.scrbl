@@ -308,13 +308,22 @@ data, you may want to consider the special behavior of @emph{equal now}.  For
 some optimizations, defensive code, and capability patterns, you may have a
 reason to use @emph{identical}.
 
-@section{Equal Now}
+@section[#:tag "eq-fun-equal-now"]{Equal Now}
 
 @function["equal-now" #:contract (a-arrow A A B)]
 @function["=~" #:contract (a-arrow A A B)]
 
-Checks if the two values are equal @emph{now} (they may not be later).
-Corresponds to the @equal-now-op operator.
+Checks if the two values are equal @emph{now}. They may not be equal
+later, so they can't be used in place of one another at all
+times. This is explained in detail below and its relationship to
+other equality functions is given in @secref["eq-func-relationship"].
+
+The function @pyret-id{equal-now} and infix operator @equal-now-op have
+the same behavior.
+While the infix operator may sometimes be more readable, the function
+name conveys meaning that may not be clear from the infix operator's
+symbolic form. In addition, the infix operator is not a function and
+hence cannot be passed as a parameter, etc.
 
 @subsection[#:tag "s:equal-now-primitives"]{Equal Now and Primitives}
 
