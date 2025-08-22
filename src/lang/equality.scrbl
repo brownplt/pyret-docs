@@ -859,7 +859,7 @@ end
 }
 
 
-@section[#:tag "s:undefined-equalities"]{Undefined Equalities}
+@section[#:tag "s:undefined-equalities"]{Partial and Total Equality Predicates}
 
 For some values, Pyret refuses to report @pyret{true} or @pyret{false} for any
 equality predicate, and raises an error instead.  For example:
