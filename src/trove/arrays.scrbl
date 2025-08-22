@@ -487,7 +487,7 @@ end
     #:return (A-of "a")]
 
   Returns a copy of the given array, such that corresponding elements in the
-  result are @seclink["Identical"] to those in the source array.
+  result are @secref["eq-fun-identical"] to those in the source array.
 
 Similar to @pyret-id["raw-array-duplicate" "raw-arrays"].
 

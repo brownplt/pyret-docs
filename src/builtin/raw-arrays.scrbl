@@ -426,7 +426,7 @@ end
   @function["raw-array-duplicate"]
 
   Returns a copy of the given array, such that corresponding elements in the
-  result are @seclink["Identical"] to those in the source array.
+  result are @seclink["eq-fun-identical"] to those in the source array.
   
   @examples{
 check:
