@@ -526,14 +526,24 @@ end
 @function["equal-always" #:contract (a-arrow A A B)]
 @function["==" #:contract (a-arrow A A B)]
 
-Checks if the two values will always be equal, and corresponds to the
-@equal-always-op operator.
+Checks if two values will be equal for all time. When it returns
+@pyret{true}, it means the two values can always be used in place of
+one another. This is explained in detail below and its relationship to
+other equality functions is given in @secref["eq-func-relationship"].
 
-@code{equal-always} checks for primitive and structural equality like
-@pyret-id{equal-now}, with the exception that it stops at mutable data and only
-checks that the mutable values are @pyret-id{identical}.  Stopping at mutable
-boundaries ensures that if two values were @pyret-id{equal-always} at any
-point, they will still be @pyret-id{equal-always} later.
+The function @pyret-id{equal-always} and infix operator @equal-always-op have
+the same behavior.
+While the infix operator may sometimes be more readable, the function
+name conveys meaning that may not be clear from the infix operator's
+symbolic form. In addition, the infix operator is not a function and
+hence cannot be passed as a parameter, etc.
+
+@pyret-id{equal-always} checks for primitive and structural equality
+like @pyret-id{equal-now}, with the exception that it stops at mutable
+data and only checks that the mutable values are @pyret-id{identical}.
+Checking that mutable values are @pyret-id{identical} is what ensures
+that if two values were @pyret-id{equal-always} at any point, they
+will still be @pyret-id{equal-always} later.
 
 @function["<>" #:contract (a-arrow A A B)]
 
