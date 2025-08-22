@@ -191,7 +191,7 @@ given as @pyret{value}.
 
 Note that @pyret{value} is not @emph{copied}, so,
 the elements of @pyret{Array}s created with @pyret-id{array-of} will always be
-@pyret-id["identical" "equality"].
+@secref["eq-fun-identical"].
 
 To create an array of arrays where each sub-array is independent of the other, use
 @pyret-id{build-array}.
