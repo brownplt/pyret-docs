@@ -302,11 +302,12 @@ compare to some other languages' operators:
     )
 ]
 
-In most programs, you should use @emph{always equal}, or @code{==}, to compare
+In most programs, you should use @secref["eq-fun-equal-always"] to compare
 values that you want to check for same-ness.  If you are working with mutable
-data, you may want to consider the special behavior of @emph{equal now}.  For
+data, you may want to consider the special behavior of
+@secref["eq-fun-equal-now"]. For
 some optimizations, defensive code, and capability patterns, you may have a
-reason to use @emph{identical}.
+reason to use @secref["eq-fun-identical"].
 
 @section[#:tag "eq-fun-equal-now"]{Equal Now}
 
