@@ -554,7 +554,7 @@ check:
 
   b3 = my-box(2)
 
-  # remember that b2 currently contains 2
+  # remember that b2 currently refers to 2
   l1 = [list: b1, b2]
   l2 = [list: b1, b2]
   l3 = [list: b1, b3]
