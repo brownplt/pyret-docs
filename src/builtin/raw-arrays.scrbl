@@ -128,16 +128,18 @@ continue to work.
 
 @collection-doc["raw-array" #:contract `(a-arrow ("value" "a") ,(RA-of "a"))]
 
-Constructs a @pyret{RawArray} array of length @tt{count}, whose elements are
-the values specified in the construction expression.
+Constructs a @pyret-id{RawArray} with the given elements.
 
 Note that
-@pyret-id{RawArray}s are mutable, so comparisons using @pyret{==}
-(the operator for @pyret-id["equal-always" "equality"]) will only
+@pyret-id{RawArray}s are mutable, so comparisons using
+@secref["eq-fun-equal-always"]
+will only
 return @pyret{true} on @pyret-id{RawArray}s when they are also
-@pyret-id["identical" "equality"], regardless of their contents.  To compare
-the elements, use @pyret-id["equal-now" "equality"]/@pyret{=~},
-and test with @pyret-id["is=~" "testing"].
+@secref["eq-fun-identical"], regardless of their contents.
+Usually, the most appropriate comparison is
+@secref["eq-fun-equal-now"].
+Tests should correspondingly use 
+@pyret-id["is=~" "testing"].
 
 @examples{
 check:
