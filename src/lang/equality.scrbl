@@ -257,7 +257,7 @@
 @section[#:tag "types-of-equality"]{Types of Equality}
 
 Pyret has three notions of equality.  Two values can be @emph{equal now},
-@emph{always equal}, and/or @emph{identical}.  The following table summarizes
+@emph{equal always}, and/or @emph{identical}.  The following table summarizes
 the functions and operators that test for these relationships, and how they
 compare to some other languages' operators:
 
@@ -338,7 +338,7 @@ will still be @pyret-id{equal-always} later.
 The negation of @pyret{==}: returns @pyret{true} if the values are not
 @pyret{equal-always} and @pyret{false} otherwise.
 
-@subsection[#:tag "s:always-equal-mutable"]{Always Equal and Mutable Data}
+@subsection[#:tag "s:always-equal-mutable"]{Equal Always and Mutable Data}
 
 Here are some examples of @pyret-id{equal-always} stopping at mutable data, but
 checking immutable data, contrasted with @pyret-id{equal-now}.
@@ -387,7 +387,7 @@ end
 }
 
 @;{
-@subsection[#:tag "s:always-equal-frozen"]{Always Equal and Frozen Mutable Data}
+@subsection[#:tag "s:always-equal-frozen"]{Equal Always and Frozen Mutable Data}
 
   Mutable references can be @emph{frozen}[REF] (as with @code{graph:}), which
   renders them immutable.  @code{equal-always} @emph{will} traverse frozen
@@ -641,8 +641,8 @@ end
 @section[#:tag "eq-func-relationship"]{Properties of Equality Functions}
 
 The discussion above hints at a relationship between the three functions.  In
-particular, if two values are Identical, they ought to be Always Equal, and if
-they are Always Equal, they ought to be Equal Now.  The following table
+particular, if two values are Identical, they ought to be Equal Always, and if
+they are Equal Always, they ought to be Equal Now.  The following table
 summarizes this relationship, which in fact does hold:
 
 @tabular[
