@@ -309,6 +309,122 @@ data, you may want to consider the special behavior of
 some optimizations, defensive code, and capability patterns, you may have a
 reason to use @secref["eq-fun-identical"].
 
+@section[#:tag "eq-fun-equal-always"]{Equal Always}
+
+@function["equal-always" #:contract (a-arrow A A B)]
+@function["==" #:contract (a-arrow A A B)]
+
+Checks if two values will be equal for all time. When it returns
+@pyret{true}, it means the two values can always be used in place of
+one another. This is explained in detail below and its relationship to
+other equality functions is given in @secref["eq-func-relationship"].
+
+The function @pyret-id{equal-always} and infix operator @equal-always-op have
+the same behavior.
+While the infix operator may sometimes be more readable, the function
+name conveys meaning that may not be clear from the infix operator's
+symbolic form. In addition, the infix operator is not a function and
+hence cannot be passed as a parameter, etc.
+
+@pyret-id{equal-always} checks for primitive and structural equality
+like @pyret-id{equal-now}, with the exception that it stops at mutable
+data and only checks that the mutable values are @pyret-id{identical}.
+Checking that mutable values are @pyret-id{identical} is what ensures
+that if two values were @pyret-id{equal-always} at any point, they
+will still be @pyret-id{equal-always} later.
+
+@function["<>" #:contract (a-arrow A A B)]
+
+The negation of @pyret{==}: returns @pyret{true} if the values are not
+@pyret{equal-always} and @pyret{false} otherwise.
+
+@subsection[#:tag "s:always-equal-mutable"]{Always Equal and Mutable Data}
+
+Here are some examples of @pyret-id{equal-always} stopping at mutable data, but
+checking immutable data, contrasted with @pyret-id{equal-now}.
+
+@pyret-block{
+data MyBox:
+  | my-box(ref x)
+end
+
+check:
+  b1 = my-box(1)
+  b2 = my-box(1)
+
+  b1 is-not%(equal-always) b2
+  b1 is%(equal-now) b2
+  b2!{x : 2}
+
+  b1 is-not%(equal-always) b2
+  b1 is-not%(equal-now) b2
+
+  b3 = my-box(2)
+
+  # remember that b2 currently refers to 2
+  l1 = [list: b1, b2]
+  l2 = [list: b1, b2]
+  l3 = [list: b1, b3]
+
+  l1 is%(equal-now) l2
+  l1 is%(equal-always) l2
+  l1 is-not%(identical) l2
+
+  l1 is%(equal-now) l3
+  l1 is-not%(equal-always) l3
+  l1 is-not%(identical) l3
+
+  b2!{x: 5}
+
+  l1 is%(equal-now) l2
+  l1 is%(equal-always) l2
+  l1 is-not%(identical) l2
+
+  l1 is-not%(equal-now) l3
+  l1 is-not%(equal-always) l3
+  l1 is-not%(identical) l3
+end
+}
+
+@;{
+@subsection[#:tag "s:always-equal-frozen"]{Always Equal and Frozen Mutable Data}
+
+  Mutable references can be @emph{frozen}[REF] (as with @code{graph:}), which
+  renders them immutable.  @code{equal-always} @emph{will} traverse frozen
+  mutable fields, and will check for same-shaped cycles.  So, for example, it
+  will succeed for cyclic graphs created with @code{graph:} that have the same
+  shape:
+
+@pyret-block{
+  data MList:
+    | mlink(ref first, ref rest)
+    | mempty
+  end
+  mlist = {
+    make: lam(arr):
+      # fold mlink over arr
+    end
+  }
+
+  graph:
+    BOS = [mlist: WOR, PROV]
+    PROV = [mlist: BOS]
+    WOR = [mlist: BOS]
+  end
+
+  graph:
+    SF = [mlist: OAK, MV]
+    MV = [mlist: SF]
+    OAK = [mlist: SF]
+  end
+
+  SF is%(equal-now) BOS
+  PROV is%(equal-now) WOR
+  PROV is%(equal-now) OAK
+  OAK is%(equal-now) PROV
+}
+}
+
 @section[#:tag "eq-fun-equal-now"]{Equal Now}
 
 @function["equal-now" #:contract (a-arrow A A B)]
@@ -519,122 +635,6 @@ end
 
   BOS!rest is%(identical) PROV
   BOS is%(identical) BOS
-}
-}
-
-@section[#:tag "eq-fun-equal-always"]{Equal Always}
-
-@function["equal-always" #:contract (a-arrow A A B)]
-@function["==" #:contract (a-arrow A A B)]
-
-Checks if two values will be equal for all time. When it returns
-@pyret{true}, it means the two values can always be used in place of
-one another. This is explained in detail below and its relationship to
-other equality functions is given in @secref["eq-func-relationship"].
-
-The function @pyret-id{equal-always} and infix operator @equal-always-op have
-the same behavior.
-While the infix operator may sometimes be more readable, the function
-name conveys meaning that may not be clear from the infix operator's
-symbolic form. In addition, the infix operator is not a function and
-hence cannot be passed as a parameter, etc.
-
-@pyret-id{equal-always} checks for primitive and structural equality
-like @pyret-id{equal-now}, with the exception that it stops at mutable
-data and only checks that the mutable values are @pyret-id{identical}.
-Checking that mutable values are @pyret-id{identical} is what ensures
-that if two values were @pyret-id{equal-always} at any point, they
-will still be @pyret-id{equal-always} later.
-
-@function["<>" #:contract (a-arrow A A B)]
-
-The negation of @pyret{==}: returns @pyret{true} if the values are not
-@pyret{equal-always} and @pyret{false} otherwise.
-
-@subsection[#:tag "s:always-equal-mutable"]{Always Equal and Mutable Data}
-
-Here are some examples of @pyret-id{equal-always} stopping at mutable data, but
-checking immutable data, contrasted with @pyret-id{equal-now}.
-
-@pyret-block{
-data MyBox:
-  | my-box(ref x)
-end
-
-check:
-  b1 = my-box(1)
-  b2 = my-box(1)
-
-  b1 is-not%(equal-always) b2
-  b1 is%(equal-now) b2
-  b2!{x : 2}
-
-  b1 is-not%(equal-always) b2
-  b1 is-not%(equal-now) b2
-
-  b3 = my-box(2)
-
-  # remember that b2 currently refers to 2
-  l1 = [list: b1, b2]
-  l2 = [list: b1, b2]
-  l3 = [list: b1, b3]
-
-  l1 is%(equal-now) l2
-  l1 is%(equal-always) l2
-  l1 is-not%(identical) l2
-
-  l1 is%(equal-now) l3
-  l1 is-not%(equal-always) l3
-  l1 is-not%(identical) l3
-
-  b2!{x: 5}
-
-  l1 is%(equal-now) l2
-  l1 is%(equal-always) l2
-  l1 is-not%(identical) l2
-
-  l1 is-not%(equal-now) l3
-  l1 is-not%(equal-always) l3
-  l1 is-not%(identical) l3
-end
-}
-
-@;{
-@subsection[#:tag "s:always-equal-frozen"]{Always Equal and Frozen Mutable Data}
-
-  Mutable references can be @emph{frozen}[REF] (as with @code{graph:}), which
-  renders them immutable.  @code{equal-always} @emph{will} traverse frozen
-  mutable fields, and will check for same-shaped cycles.  So, for example, it
-  will succeed for cyclic graphs created with @code{graph:} that have the same
-  shape:
-
-@pyret-block{
-  data MList:
-    | mlink(ref first, ref rest)
-    | mempty
-  end
-  mlist = {
-    make: lam(arr):
-      # fold mlink over arr
-    end
-  }
-
-  graph:
-    BOS = [mlist: WOR, PROV]
-    PROV = [mlist: BOS]
-    WOR = [mlist: BOS]
-  end
-
-  graph:
-    SF = [mlist: OAK, MV]
-    MV = [mlist: SF]
-    OAK = [mlist: SF]
-  end
-
-  SF is%(equal-now) BOS
-  PROV is%(equal-now) WOR
-  PROV is%(equal-now) OAK
-  OAK is%(equal-now) PROV
 }
 }
 
