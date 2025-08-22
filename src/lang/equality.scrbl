@@ -1106,7 +1106,7 @@ then an error is raised.  A few more examples:
 
 }
 
-@section[#:tag "s:total-equality-predicates"]{Total Equality Functions (Avoiding Incomparability Errors)}
+@section[#:tag "s:total-equality-predicates"]{Total Equality Predicates (Avoiding Incomparability Errors)}
 
 Most Pyret programs should be written using @code{equal-always},
 @code{equal-now}, and @code{identical}, which guarantee that an error will be
