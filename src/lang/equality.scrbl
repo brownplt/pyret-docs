@@ -309,6 +309,11 @@ data, you may want to consider the special behavior of
 some optimizations, defensive code, and capability patterns, you may have a
 reason to use @secref["eq-fun-identical"].
 
+The binary operators correspond to the partial predicates. After explaining
+the basics of these operations, we explain
+why these are partial [@secref["s:undefined-equalities"]], and
+how the total predicates work [@secref["s:total-equality-predicates"]].
+
 @section[#:tag "eq-fun-equal-always"]{Equal Always}
 
 @function["equal-always" #:contract (a-arrow A A B)]
