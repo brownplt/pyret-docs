@@ -33,6 +33,7 @@
          )
 
 (provide vscode-only
+         vscode-cli-only
          cli-only
          cpo-only)
 
@@ -45,6 +46,8 @@
 
 (define (vscode-only . t)
   (make-only "VSCode" "vscode-icon" "VS Code Only" t))
+(define (vscode-cli-only . t)
+  (make-only "VSCodeCLI" "vscode-cli-icon" "VS Code and Command Line Only" t))
 (define (cli-only . t)
   (make-only "CLI" "cli-icon" "Command Line Only" t))
 (define (cpo-only . t)

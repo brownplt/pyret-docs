@@ -15,6 +15,7 @@ docs:
     ++extra src/pyret-logo-small.png \
     ++extra src/GNOME_Terminal-small.png \
     ++extra src/code-stable-small.png \
+    ++extra src/terminal-vscode.png \
     ++extra src/hilite.js \
     ++extra src/Pyret-Tutorial/airplane-small.png \
     ++extra src/trove/brush.svg \

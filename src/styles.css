@@ -14,6 +14,22 @@
   height: 2em;
 }
 
+.VSCodeCLI {
+  position: relative;
+  border: 1px dashed #275278;
+  border-radius: 0.5em;
+}
+
+.VSCodeCLI .vscode-cli-icon::after {
+  content: url(terminal-vscode.png);
+  float: right;
+  margin-top: -1em;
+  margin-right: -1em;
+  position: relative;
+  width: 2em;
+  height: 2em;
+}
+
 .CLI {
   position: relative;
   border: 1px dashed #2b2737;
