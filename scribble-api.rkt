@@ -32,6 +32,24 @@
          "ebnf.rkt"
          )
 
+(provide vscode-only
+         cli-only
+         cpo-only)
+
+(define (make-only flow-class icon-class title-str content)
+  (nested-flow
+   (make-style flow-class null)
+   (cons
+    (para #:style (make-style icon-class (list (hover-property title-str))) "")
+    content)))
+
+(define (vscode-only . t)
+  (make-only "VSCode" "vscode-icon" "VS Code Only" t))
+(define (cli-only . t)
+  (make-only "CLI" "cli-icon" "Command Line Only" t))
+(define (cpo-only . t)
+  (make-only "CPO" "cpo-icon" "Online Only" t))
+
 (provide bnf
          py-prod
          prod-link

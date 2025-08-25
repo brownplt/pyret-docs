@@ -1,3 +1,51 @@
+.VSCode {
+  position: relative;
+  border: 1px dashed #54a4ec;
+  border-radius: 0.5em;
+}
+
+.VSCode .vscode-icon::after {
+  content: url(code-stable-small.png);
+  float: right;
+  margin-top: -1em;
+  margin-right: -1em;
+  position: relative;
+  width: 2em;
+  height: 2em;
+}
+
+.CLI {
+  position: relative;
+  border: 1px dashed #2b2737;
+  border-radius: 0.5em;
+}
+
+.CLI .cli-icon::after {
+  content: url(GNOME_Terminal-small.png);
+  float: right;
+  margin-top: -1em;
+  margin-right: -1em;
+  position: relative;
+  width: 2em;
+  height: 2em;
+}
+
+.CPO {
+  position: relative;
+  border: 1px dashed #ee1d0f;
+  border-radius: 0.5em;
+}
+
+.CPO .cpo-icon::after {
+  content: url(pyret-logo-small.png);
+  float: right;
+  margin-top: -1em;
+  margin-right: -1em;
+  position: relative;
+  width: 2em;
+  height: 2em;
+}
+
 /* New styles just for Pyret */
 
 .boxed .SIntrapara {
