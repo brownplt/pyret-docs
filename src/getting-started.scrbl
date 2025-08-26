@@ -11,8 +11,8 @@ There are a few other ways to run Pyret via the command-line and via Visual
 Studio Code, and all of these are summarized in @secref["environments"].
 
 If you're interested in a textbook, you can try out
-@link["http://papl.cs.brown.edu/2020/" "Programming and Programming Languages
-(PAPL)"], which has all its programs in Pyret.
+@link["https://dcic-world.org" "A Data-Centric Introduction to Computing"],
+which gives a structured introduction to programming in Pyret.
 
 @(table-of-contents)
 
