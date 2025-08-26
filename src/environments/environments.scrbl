@@ -98,9 +98,9 @@ visual editor), and open the interactions area in a new VScode pane to the side.
 
 @image["src/split-run.png"]
 
-
 @section{Command Line}
 
-
-
-
+Pyret can also be run from the command line. The command-line interface is
+distributed as a npm package @link["https://www.npmjs.com/package/pyret-npm"
+"pyret-npm"]. The options for using the command line are described in the tool
+itself. The @code{--help} option lists the available options.
