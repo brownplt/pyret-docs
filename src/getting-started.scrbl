@@ -16,5 +16,5 @@ which gives a structured introduction to programming in Pyret.
 
 @(table-of-contents)
 
-@include-section["environments/platforms.scrbl"]
+@include-section["platforms/platforms.scrbl"]
 @include-section["tour.scrbl"]
