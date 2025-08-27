@@ -674,7 +674,7 @@ This is code that exists solely to @emph{do} something; often, for example, to
 report an error. For example:
 
 @pyret-block{
-fun get-second<a>(l :: List<a>) -> a:
+fun get-second<a>(l :: List<a>) -> a block:
   when l.length() < 2:
     raise("List too short")
   end

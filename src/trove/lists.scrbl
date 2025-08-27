@@ -1,6 +1,9 @@
 #lang scribble/manual
 @(require "../../scribble-api.rkt" "../abbrevs.rkt")
 
+@(define (a-ref name)
+  (pyret-method "List" "shared methods" name "lists"))
+
 @; WARNING in report-undocumented: Undocumented export "join-str" from module "lists"
 @; WARNING in report-undocumented: Undocumented export "push" from module "lists"
 
@@ -401,6 +404,8 @@
     (with-members)
     )
   (fun-spec
+    (name "build-list"))
+  (fun-spec
     (name "is-empty")
     (arity 1)
     (params [list: ])
@@ -435,9 +440,7 @@
       (a-arrow
         (a-app (a-id "List" (xref "lists" "List")) "a")
         (a-id "Number" (xref "<global>" "Number"))
-        "a"))
-    (doc
-      "Returns the nth element of the given list, or raises an error if n is out of range"))
+        "a")))
   (fun-spec
     (name "set")
     (arity 3)
@@ -1158,17 +1161,16 @@ without understanding much, if anything, about how they are
 implemented internally in the language.  
 
 However, in functional languages such as Pyret a particular
-implementation of lists -- the linked list -- has a central
+implementation of lists — the linked list — has a central
 role for both historical and practical reasons, and a fuller
 understanding of linked lists goes hand in hand with a fuller
 understanding of Pyret.  If you have not encountered linked
-lists before and would like to know more, we recommend checking out
-@link["http://papl.cs.brown.edu/2017/processing-lists.html" "the section on
-lists in Programming and Programming Languages (PAPL)"].
+lists before and would like to know more, we recommend reading
+@link["http://dcic-world.org/" "the material on
+lists in DCIC"].
 
 In lieu of a full explanation on this page, here are a few quick points
 to help parse some of the following examples:
-
 @itemlist[@item{A @pyret{List} is made up of elements, usually
 referred to as @tt{elt}s in examples.}
 @item{Elements are of two types: @pyret{link} and @pyret{empty}.}
@@ -1177,11 +1179,26 @@ referred to as @tt{elt}s in examples.}
 @item{The rest of the @pyret{List} is itself a @pyret{link}, or if you
 have reached the end of the @pyret{List}, the rest will be @pyret{empty}.}
 ]
-
+and here are some illustrative examples:
+@examples[#:show-try-it #t]{
+check:
+  l0 = empty
+  l1 = link(1, l0)
+  l2 = link(2, l1)
+  is-empty(l0) is true
+  is-link(l0) is false
+  
+  is-empty(l1) is false
+  is-link(l1) is true
+  
+  is-empty(l2) is false
+  is-link(l2) is true
+end
+}
 
   }
 
-@section{The @pyret{list} Constructor}
+@section{List Creation Functions}
 
 @collection-doc["list" #:contract `(a-arrow ("elt" "a") ,(L-of "a"))]
 
@@ -1191,33 +1208,82 @@ you define a @pyret{List} with @pyret{[list: ...]}}
 Constructs a @pyret{List} out of @pyret{elt}s by chaining @pyret-id{link}s,
 ending in a single @pyret-id{empty}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: ] is empty
-  [list: 1] is link(1, empty)
-  [list: 1, 2] is link(1, link(2, empty))
+  [L.list: ] is L.empty
+  [L.list: 1] is L.link(1, L.empty)
+  [L.list: 1, 2] is L.link(1, link(2, L.empty))
 end
 }
 
-@bold{Note:} Explicitly writing the trailing @pyret-id{empty} is both
-unnecessary and wrong; the constructor notation needs only the
-@emph{elements} of the @pyret{List}.
+Though it is neither required nor enforced by the language,
+conventionally, when writing the empty list using the constructor
+notation, we write an extra spce between the @pyret{:} and @pyret{]}.
+
+@bold{Note}: You should @emph{not} write a trailing @pyret-id{empty}
+when using this constructor notation. Everything you write is an @emph{element} of the list. Thus,
+@examples[#:show-try-it #t]{
+import lists as L
+
+check:
+  [L.list: ] is-not [L.list: L.empty]
+  L.link(L.empty, L.empty) is [L.list: L.empty]
+end
+}
+
+@function["build-list"
+  #:contract (a-arrow (a-arrow N "a") N (L-of "a"))
+  #:args (list (list "f" #f) (list "size" #f))
+  #:return (L-of "a")
+]
+
+Constructs a list of length @pyret{size}, and fills it with the result of
+calling the function @pyret{f} with each index from @pyret{0} to @pyret{size - 1}.
+
+Similar to @pyret-id["build-array" "arrays"].
+
+@examples[#:show-try-it #t]{
+import lists as L
+
+check:
+  fun sq(x): x * x end
+  L.build-list(sq, 4) 
+    is [L.list: 0, 1, 4, 9]
+    because [L.list: sq(0), sq(1), sq(2), sq(3)]
+end
+
+check:
+  fun build-from(base :: Number) -> List<String>:
+    L.build-list({(n): base + n}, 3)
+  end
+
+  a = L.build-list(build-from, 3)
+  
+  a is [L.list:
+    [L.list: 0, 1, 2],
+    [L.list: 1, 2, 3],
+    [L.list: 2, 3, 4]]
+end
+}
+
 
 @section{List Methods}
 
-These methods are available on all @pyret{List}s, both @pyret{"link"} and @pyret{"empty"}
-instances and are accessed by dot operators.
-
+These methods are available on all @pyret{List}s whether empty or a link.
 
 @list-method["length"]
 
 Returns the number of elements in the @pyret{List}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 'a', 'b'].length() is 2
-  empty.length() is 0
-  link("a", empty).length() is 1
+  [L.list: 'a', 'b'].length() is 2
+  L.empty.length() is 0
+  L.link("a", L.empty).length() is 1
 end
 }
 
@@ -1226,15 +1292,17 @@ end
 Applies function @pyret{f} to each element of the list from left to right, and
 constructs a new @pyret{List} out of the return values in the corresponding order.
 
- @tt{a} represents the type of the elements in the original @pyret{List}, @tt{b} is
+@tt{a} represents the type of the elements in the original @pyret{List}, @tt{b} is
 the type of the elements in the new @pyret{List}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2].map(num-tostring) is [list: "1", "2"]
-  [list: 1, 2].map(lam(n): n + 1 end) is [list: 2, 3] 
-  [list: 1, 2].map(_ + 1) is [list: 2, 3]
-  empty.map(lam(x): raise("This never happens!") end) is empty
+  [L.list: 1, 2].map(num-tostring) is [L.list: "1", "2"]
+  [L.list: 1, 2].map(lam(n): n + 1 end) is [L.list: 2, 3] 
+  [L.list: 1, 2].map(_ + 1) is [L.list: 2, 3]
+  L.empty.map(lam(x): raise("This never happens!") end) is L.empty
 end
 }
 
@@ -1245,10 +1313,12 @@ returns @pyret{nothing}.  Because it returns @pyret{nothing},
 use @pyret-id{each} instead of @pyret-id{map} when the function
 @pyret{f} is needed only for its side-effects.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   var x = 1
-  [list: 1, 2].each(lam(n): x := x + n end) is nothing
+  [L.list: 1, 2].each(lam(n): x := x + n end) is nothing
   x is 4
 end
 }
@@ -1262,14 +1332,16 @@ returned @pyret{true}.
 The original @pyret{List} elements are of type @tt{a}
 and the function @pyret{f} must return a @pyret{Boolean}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   fun length-is-one(s :: String) -> Boolean:
     string-length(s) == 1
   end
-  [list: "ab", "a", "", "c"].filter(length-is-one) is [list: "a", "c"]
-  [list: empty, link(1, empty), empty].filter(is-link)
-    is [list: link(1, empty)]
+  [L.list: "ab", "a", "", "c"].filter(length-is-one) is [L.list: "a", "c"]
+  [L.list: L.empty, L.link(1, L.empty), L.empty].filter(L.is-link)
+    is [L.list: L.link(1, L.empty)]
 end
 }
 
@@ -1277,19 +1349,23 @@ end
 
 Returns @tt{link(elt, self)}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  empty.push("a") is link("a", empty)
-  link("a", empty).push("b") is link("b", link("a", empty))
+  L.empty.push("a") is L.link("a", L.empty)
+  L.link("a", L.empty).push("b") is L.link("b", L.link("a", L.empty))
 end
 }
 
 In other words, returns a @pyret{List} with @tt{elt} appended to the
 beginning of the original @pyret{List}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 'a', 'b'].push('c') is [list: 'c', 'a', 'b']
+  [L.list: 'a', 'b'].push('c') is [L.list: 'c', 'a', 'b']
 end
 }
   
@@ -1302,15 +1378,17 @@ splitting a @pyret{List} at index @math{n} will produce a prefix of length
 exactly @math{n}.  Moreover, @pyret-id{append}ing the two @pyret{List}s
 together will be equivalent to the original @pyret{List}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 'a', 'b', 'c', 'd'].split-at(2) is
-    {prefix: [list: "a", "b"], suffix: [list: "c", "d"]}
-  one-four = link(1, link(2, link(3, link(4, empty))))
-  one-four.split-at(0) is {prefix: empty, suffix: one-four}
-  one-four.split-at(4) is {prefix: one-four, suffix: empty}
+  [L.list: 'a', 'b', 'c', 'd'].split-at(2)
+    is {prefix: [L.list: "a", "b"], suffix: [L.list: "c", "d"]}
+  one-four = L.link(1, L.link(2, L.link(3, L.link(4, L.empty))))
+  one-four.split-at(0) is {prefix: L.empty, suffix: one-four}
+  one-four.split-at(4) is {prefix: one-four, suffix: L.empty}
   one-four.split-at(2) is
-    {prefix: link(1, link(2, empty)), suffix: link(3, link(4, empty))}
+  {prefix: [L.list: 1, 2], suffix: [L.list: 3, 4]}
   one-four.split-at(-1) raises "Invalid index"
   one-four.split-at(5) raises "Index too large"
 end
@@ -1321,30 +1399,41 @@ Given a length @tt{n}, returns a new @pyret{List} containing the first
 @tt{n} items of the @pyret{List}.
 
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2, 3, 4, 5, 6].take(3) is [list: 1, 2, 3]
-  [list: 1, 2, 3].take(6) raises "Index too large"
-  [list: 1, 2, 3].take(-1) raises "Invalid index"
+  [L.list: 1, 2, 3, 4, 5, 6].take(3) is [L.list: 1, 2, 3]
+  [L.list: 1, 2, 3].take(6) raises "Index too large"
+  [L.list: 1, 2, 3].take(-1) raises "Invalid index"
 end
 }
 
 @list-method["drop"]
 Given a length @tt{n}, returns a @pyret{List} containing all but the first @tt{n} items of the @pyret{List}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2, 3, 4, 5, 6].drop(3) is [list: 4, 5, 6]
+  [L.list: 1, 2, 3, 4, 5, 6].drop(3) is [L.list: 4, 5, 6]
 end
 }
 
 @list-method["get"]
-Returns the @tt{n}th element of the given @pyret{List}, or raises an error if @tt{n} is out of range.
-@examples{
+Returns the @tt{n}th element of the given @pyret{List}.
+
+Using an index too large, negative, or not a whole number raises an error.
+
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2, 3].get(0) is 1
-  [list: ].get(0) raises "too large"
-  [list: 1, 2, 3].get(-1) raises "invalid argument"
+  l = [L.list: 1, 2, 3]
+
+  l.get(0) is 1
+  l.get(4) raises "too large"
+  l.get(-1) raises "invalid argument"
 end
 }
 
@@ -1352,10 +1441,12 @@ end
 Returns a new @pyret{List} with the same values as the given @pyret{List} but with the @tt{n}th element set to the
 given value, or raises an error if @tt{n} is out of range.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2, 3].set(0, 5) is [list: 5, 2, 3]
-  [list: ].set(0, 5) raises "too large"
+  [L.list: 1, 2, 3].set(0, 5) is [L.list: 5, 2, 3]
+  [L.list: ].set(0, 5) raises "too large"
 end
 }
 
@@ -1368,15 +1459,17 @@ In other words, @pyret{.foldl} uses the function @tt{f}, starting with the @tt{b
 value, of type @tt{Base}, to calculate the return value of type @tt{Base} from each
 item in the @pyret{List}, of input type @tt{Elt}, starting the sequence from the @emph{left} (hence, fold@bold{l}).
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 3, 2, 1].foldl(lam(elt, acc): elt + acc end, 10) is 16
+  [L.list: 3, 2, 1].foldl(lam(elt, acc): elt + acc end, 10) is 16
   fun combine(elt, acc) -> String:
     tostring(elt) + " - " + acc
   end
-  [list: 3, 2, 1].foldl(combine, "END") is "1 - 2 - 3 - END"
-  empty.foldl(combine, "END") is "END"
-  [list: 3, 2, 1].foldl(link, empty) is link(1, link(2, link(3, empty)))
+  [L.list: 3, 2, 1].foldl(combine, "END") is "1 - 2 - 3 - END"
+  L.empty.foldl(combine, "END") is "END"
+  [L.list: 3, 2, 1].foldl(L.link, L.empty) is [L.list: 1, 2, 3]
 end
 }
 
@@ -1389,15 +1482,17 @@ In other words, @pyret{.foldr} uses the function @tt{f}, starting with the @tt{b
 value, of type @tt{Base}, to calculate the return value of type @tt{Base} from each
 item in the @pyret{List}, of input type @tt{Elt}, starting the sequence from the @emph{right} (hence, fold@bold{r}).
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 3, 2, 1].foldr(lam(elt, acc): elt + acc end, 10) is 16
+  [L.list: 3, 2, 1].foldr(lam(elt, acc): elt + acc end, 10) is 16
   fun combine(elt, acc) -> String: 
     tostring(elt) + " - " + acc 
   end
-  [list: 3, 2, 1].foldr(combine, "END") is "3 - 2 - 1 - END"
+  [L.list: 3, 2, 1].foldr(combine, "END") is "3 - 2 - 1 - END"
   empty.foldr(combine, "END") is "END"
-  [list: 3, 2, 1].foldr(link, empty) is link(3, link(2, link(1, empty)))
+  [L.list: 3, 2, 1].foldr(L.link, L.empty) is [L.list: 3, 2, 1]
 end
 }
 
@@ -1407,19 +1502,21 @@ an error.}
 Returns true if the current @pyret{List} contains the given value, as compared
 by @pyret{==}.
 
-@examples{
-check:
-  [list: 1, 2, 3].member(2) is true
-  [list: 2, 4, 6].member(3) is false
-  [list: ].member(empty) is false
-  [list: 1, 2, 3].member(~1) raises "Roughnums"
-  [list: ~1, 2, 3].member(1) raises "Roughnums"
-  [list: 1, 2, 3].member(4) is false
-  [list: 1, 2, 3].member(~4) raises "Roughnums"
+@examples[#:show-try-it #t]{
+import lists as L
 
-  [list: 'a'].member('a') is true
-  [list: false].member(false) is true
-  [list: nothing].member(nothing) is true
+check:
+  [L.list: 1, 2, 3].member(2) is true
+  [L.list: 2, 4, 6].member(3) is false
+  [L.list: ].member(L.empty) is false
+  [L.list: 1, 2, 3].member(~1) raises "Roughnums"
+  [L.list: ~1, 2, 3].member(1) raises "Roughnums"
+  [L.list: 1, 2, 3].member(4) is false
+  [L.list: 1, 2, 3].member(~4) raises "Roughnums"
+
+  [L.list: 'a'].member('a') is true
+  [L.list: false].member(false) is true
+  [L.list: nothing].member(nothing) is true
 end
 }
 
@@ -1427,29 +1524,35 @@ end
 Produces a new @pyret{List} with all the elements of the current @pyret{List},
 followed by all the elements of the @tt{other} @pyret{List}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2].append([list: 3, 4]) is [list: 1, 2, 3, 4]
-  empty.append([list: 1, 2]) is [list: 1, 2]
-  [list: 1, 2].append(empty) is [list: 1, 2]
+  [L.list: 1, 2].append([list: 3, 4]) is [L.list: 1, 2, 3, 4]
+  L.empty.append([L.list: 1, 2]) is [L.list: 1, 2]
+  [L.list: 1, 2].append(empty) is [L.list: 1, 2]
 end
 }
 
 @list-method["last"]
 Returns the last item of the @pyret{List}.
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2, 3].last() is 3
-  empty.last() raises "last of empty list"
+  [L.list: 1, 2, 3].last() is 3
+  L.empty.last() raises "last of empty list"
 end
 }
 
 @list-method["reverse"]
 Produces a new @pyret{List} with the items of the original @pyret{List} in reversed order.
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2, 3].reverse() is [list: 3, 2, 1]
-  empty.reverse() is empty
+  [L.list: 1, 2, 3].reverse() is [L.list: 3, 2, 1]
+  L.empty.reverse() is L.empty
 end
 }
 
@@ -1459,12 +1562,15 @@ current @pyret{List}, sorted by @pyret-id["<" "equality"] and
 @pyret-id["==" "equality"].  This requires that
 the items of the @pyret{List} be comparable by @pyret-id["<" "equality"] (see
 @secref["s:binop-expr"]).
-@examples{
+
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 5, 3, 2, 4].sort() is [list: 1, 2, 3, 4, 5]
-  [list: "aaaa", "B", "a"].sort() is [list: "B", "a", "aaaa"]
-  [list: 'a', 1].sort() raises "binop-error"
-  [list: true, false].sort() raises "binop-error"
+  [L.list: 1, 5, 3, 2, 4].sort() is [L.list: 1, 2, 3, 4, 5]
+  [L.list: "aaaa", "B", "a"].sort() is [L.list: "B", "a", "aaaa"]
+  [L.list: 'a', 1].sort() raises "binop-error"
+  [L.list: true, false].sort() raises "binop-error"
 end
 }
 
@@ -1474,7 +1580,9 @@ specified.  This allows for sorting @pyret{List}s whose contents are not
 comparable by @pyret{<}, or sorting by custom comparisons, for example,
 sorting by string length instead of alphabetically.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   fun length-comparison(s1 :: String, s2 :: String) -> Boolean:
     string-length(s1) > string-length(s2)
@@ -1482,19 +1590,21 @@ check:
   fun length-equality(s1 :: String, s2 :: String) -> Boolean:
     string-length(s1) == string-length(s2)
   end
-  [list: 'a', 'aa', 'aaa'].sort-by(length-comparison, length-equality) is
-    [list: 'aaa', 'aa', 'a']
+  [L.list: 'a', 'aa', 'aaa'].sort-by(length-comparison, length-equality) is
+    [L.list: 'aaa', 'aa', 'a']
 end
 }
 
 @list-method["join-str"]
 Combines the values of the current @pyret{List} by converting them to strings
 with @pyret{tostring} and joining them with the given separator @pyret{sep}.
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2, 3].join-str("; ") is "1; 2; 3"
-  [list: "a", true, ~5.3].join-str(" : ") is "a : true : ~5.3"
-  empty.join-str("nothing at all") is ""
+  [L.list: 1, 2, 3].join-str("; ") is "1; 2; 3"
+  [L.list: "a", true, ~5.3].join-str(" : ") is "a : true : ~5.3"
+  L.empty.join-str("nothing at all") is ""
 end
 }
 
@@ -1504,13 +1614,15 @@ Combines the values of the current @pyret{List} by converting them to strings
 with @pyret{tostring} and joining them with the given separator @pyret{sep}.
 If the list has more than one element, the function will use @pyret{last-sep}
 to join the last element instead of the regular @pyret{sep}.
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  [list: 1, 2, 3].join-str-last(", ", " and ") is "1, 2 and 3"
-  [list: "a", true, ~5.3].join-str-last(" : ", " # ") is "a : true # ~5.3"
-  empty.join-str-last("nothing at all", "really nothing") is ""
-  [list: 1, 2].join-str-last("a", "b") is "1b2"
-  [list: 1].join-str-last("a", "b") is "1"
+  [L.list: 1, 2, 3].join-str-last(", ", " and ") is "1, 2 and 3"
+  [L.list: "a", true, ~5.3].join-str-last(" : ", " # ") is "a : true # ~5.3"
+  L.empty.join-str-last("nothing at all", "really nothing") is ""
+  [L.list: 1, 2].join-str-last("a", "b") is "1b2"
+  [L.list: 1].join-str-last("a", "b") is "1"
 end
 }
 
@@ -1528,12 +1640,13 @@ end
 
   Returns the number of elements in the @pyret{List}.
 
-  @examples{
+  @examples[#:show-try-it #t]{
 import lists as L
+
 check:
   L.length([list: 'a', 'b']) is 2
-  L.length(empty) is 0
-  L.length(link("a", empty)) is 1
+  L.length(L.empty) is 0
+  L.length(L.link("a", L.empty)) is 1
 end
   }
 
@@ -1542,25 +1655,32 @@ end
   
   @function[
     "get"
-    #:examples
-    '@{
+  ]
+
+Equivalent to @pyret{list}@a-ref["get"]@pyret{(n)}.
+
+@examples[#:show-try-it #t]{
 import lists as L
+
 check:
-  L.get([list: 1, 2, 3], 0) is 1
-  L.get([list: ], 0) raises "too large"
-  L.get([list: 1, 2, 3], -1) raises "invalid argument"
+  l = [L.list: 1, 2, 3]
+
+  L.get(l, 0) is 1
+  L.get(l, 4) raises "too large"
+  L.get(l, -1) raises "invalid argument"
 end
     }
-  ]
+
   @function[
     "set"
     #:examples
     '@{
-    import lists as L
-    check:
-      L.set([list: 1, 2, 3], 0, 5) is [list: 5, 2, 3]
-      L.set([list: ], 0, 5) raises "too large"
-    end
+import lists as L
+
+check:
+  L.set([L.list: 1, 2, 3], 0, 5) is [L.list: 5, 2, 3]
+  L.set([L.list: ], 0, 5) raises "too large"
+end
     }
   ]
   
@@ -1572,13 +1692,14 @@ end
 Produces a new @pyret{List} whose contents are the same as those of the
 current @pyret{List}, sorted by @pyret-id["<" "equality"] and @pyret-id["==" "equality"].  This requires that
 the items of the @pyret{List} be comparable by @pyret-id["<" "equality"] (see @secref["s:binop-expr"]).
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
+
 check:
-  L.sort([list: 1, 5, 3, 2, 4]) is [list: 1, 2, 3, 4, 5]
-  L.sort([list: "aaaa", "B", "a"]) is [list: "B", "a", "aaaa"]
-  L.sort([list: 'a', 1]) raises "binop-error"
-  L.sort([list: true, false]) raises "binop-error"
+  L.sort([L.list: 1, 5, 3, 2, 4]) is [L.list: 1, 2, 3, 4, 5]
+  L.sort([L.list: "aaaa", "B", "a"]) is [L.list: "B", "a", "aaaa"]
+  L.sort([L.list: 'a', 1]) raises "binop-error"
+  L.sort([L.list: true, false]) raises "binop-error"
 end
 }
 }
@@ -1591,8 +1712,9 @@ Like @pyret-id{sort}, but the comparison and equality operators can be
 specified.  This allows for sorting @pyret{List}s whose contents are not
 comparable by @pyret-id["<" "equality"],  or sorting by custom comparisons, for example,
 sorting by string length instead of alphabetically.
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
+
 check:
   fun length-comparison(s1 :: String, s2 :: String) -> Boolean:
     string-length(s1) > string-length(s2)
@@ -1600,8 +1722,8 @@ check:
   fun length-equality(s1 :: String, s2 :: String) -> Boolean:
     string-length(s1) == string-length(s2)
   end
-  L.sort-by([list: 'a', 'aa', 'aaa'], length-comparison, length-equality) is
-    [list: 'aaa', 'aa', 'a']
+  L.sort-by([L.list: 'a', 'aa', 'aaa'], length-comparison, length-equality) is
+    [L.list: 'aaa', 'aa', 'a']
 end
 }
 }
@@ -1612,10 +1734,12 @@ end
           #:return S
 #:examples
 '@{
+import lists as L
+
 check:
-  [list: 1, 2, 3].join-str("; ") is "1; 2; 3"
-  [list: "a", true, ~5.3].join-str(" : ") is "a : true : ~5.3"
-  empty.join-str("nothing at all") is ""
+  [L.list: 1, 2, 3].join-str("; ") is "1; 2; 3"
+  [L.list: "a", true, ~5.3].join-str(" : ") is "a : true : ~5.3"
+  L.empty.join-str("nothing at all") is ""
 end
 }
 ]
@@ -1634,29 +1758,31 @@ end
     }
   ]
   @function["range-by"]{
-  @examples{
-  import lists as L
-  check:
-    L.range-by(1, 10, 4) is [list: 1, 5, 9]
-    L.range-by(10, 1, -4) is [list: 10, 6, 2]
-    L.range-by(3, 20, 9) is [list: 3, 12]
-    L.range-by(20, 3, 9) is empty
-    L.range-by(20, 3, -9) is [list: 20, 11]
-    L.range-by(2, 3, 0) raises "interval of 0"
-  end
+  @examples[#:show-try-it #t]{
+import lists as L
+
+check:
+  L.range-by(1, 10, 4) is [L.list: 1, 5, 9]
+  L.range-by(10, 1, -4) is [L.list: 10, 6, 2]
+  L.range-by(3, 20, 9) is [L.list: 3, 12]
+  L.range-by(20, 3, 9) is L.empty
+  L.range-by(20, 3, -9) is [L.list: 20, 11]
+  L.range-by(2, 3, 0) raises "interval of 0"
+end
   }
   }
   @function[
     "repeat"
     #:examples
     '@{
-    check:
-      repeat(0, 10) is empty
-      repeat(3, -1) is [list: -1, -1, -1]
-      repeat(1, "foo") is link("foo", empty)
-      repeat(3, empty) is [list: [list: ], [list: ], [list: ]]
+import lists as L
 
-    end
+check:
+  L.repeat(0, 10) is L.empty
+  L.repeat(3, -1) is [L.list: -1, -1, -1]
+  L.repeat(1, "foo") is L.link("foo", L.empty)
+  L.repeat(3, L.empty) is [L.list: [L.list: ], [L.list: ], [L.list: ]]
+end
     }
   ]
   @function["distinct"
@@ -1672,14 +1798,15 @@ end
   @pyret{Roughnums} are not compared for equality, and so will always appear in the
   output @pyret{List}.
 
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
+
 check:
-  L.distinct([list: 3, 1, 2, 2, 3, 2]) is [list: 1, 3, 2]
-  L.distinct([list: ~1, ~1]) is-roughly [list: ~1, ~1]
-  L.distinct([list: ~1, ~1, 1]) is-roughly [list: ~1, ~1, 1]
-  L.distinct([list: ~1, ~1, 1, 1]) is-roughly [list: ~1, ~1, 1]
-  L.distinct([list: ~1, ~2, ~3]) is-roughly [list: ~1, ~2, ~3]
+  L.distinct([L.list: 3, 1, 2, 2, 3, 2]) is [L.list: 1, 3, 2]
+  L.distinct([L.list: ~1, ~1]) is-roughly [L.list: ~1, ~1]
+  L.distinct([L.list: ~1, ~1, 1]) is-roughly [L.list: ~1, ~1, 1]
+  L.distinct([L.list: ~1, ~1, 1, 1]) is-roughly [L.list: ~1, ~1, 1]
+  L.distinct([L.list: ~1, ~2, ~3]) is-roughly [L.list: ~1, ~2, ~3]
 end
 }
 
@@ -1690,12 +1817,16 @@ end
     "filter"
     #:examples
     '@{
+import lists as L
+
 check:
   fun length-is-one(s :: String) -> Boolean:
     string-length(s) == 1
   end
-  filter(length-is-one, [list: "ab", "a", "", "c"]) is [list: "a", "c"]
-  filter(is-link, [list: empty, link(1, empty), empty]) is [list: link(1, empty)]
+  L.filter(length-is-one, [L.list: "ab", "a", "", "c"]) 
+    is [L.list: "a", "c"]
+  L.filter(is-link, [L.list: L.empty, L.link(1, L.empty), L.empty])
+    is [L.list: L.link(1, L.empty)]
 end
     }
   ]
@@ -1703,25 +1834,30 @@ end
     "partition"
     #:examples
     '@{
-    check:
-      partition(lam(e): e > 0 end, [list: -1, 1]) is
-        {is-true: [list: 1], is-false: [list: -1]}
-      partition(lam(e): e > 5 end, [list: -1, 1]) is
-        {is-true: [list: ], is-false: [list: -1, 1]}
-      partition(lam(e): e < 5 end, [list: -1, 1]) is
-        {is-true: [list: -1, 1], is-false: [list: ]}
-    end
+import lists as L
+
+check:
+  L.partition(lam(e): e > 0 end, [L.list: -1, 1])
+    is {is-true: [L.list: 1], is-false: [L.list: -1]}
+  L.partition(lam(e): e > 5 end, [L.list: -1, 1])
+    is {is-true: [L.list: ], is-false: [L.list: -1, 1]}
+  L.partition(lam(e): e < 5 end, [L.list: -1, 1])
+    is {is-true: [L.list: -1, 1], is-false: [L.list: ]}
+end
     }
   ]
 @function[
     "find"]
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+import option as O
+
 check:
-  find(num-is-integer,  [list: 2.5, 3.5, 100, 2, 4.5]) is some(100)
-  find(num-is-rational, [list: 2.5, 3.5, 100, 2, 4.5]) is some(2.5)
-  find(num-is-negative, [list: 2.5, 3.5, 100, 2, 4.5]) is none
-  find(lam(n): n <= 2 end, [list: 2.5, 3.5, 100, 2, 4.5]) is some(2)
-  find(lam(n): n < 1 end, [list: 2.5, 3.5, 100, 2, 4.5]) is none
+  L.find(num-is-integer,  [L.list: 2.5, 3.5, 100, 2, 4.5]) is O.some(100)
+  L.find(num-is-rational, [L.list: 2.5, 3.5, 100, 2, 4.5]) is O.some(2.5)
+  L.find(num-is-negative, [L.list: 2.5, 3.5, 100, 2, 4.5]) is O.none
+  L.find(lam(n): n <= 2 end, [L.list: 2.5, 3.5, 100, 2, 4.5]) is O.some(2)
+  L.find(lam(n): n < 1 end, [L.list: 2.5, 3.5, 100, 2, 4.5]) is O.none
 end
     }
 
@@ -1729,15 +1865,20 @@ end
     "split-at"
     #:examples
     '@{
+import lists as L
+
 check:
-  split-at(2, [list: 'a', 'b', 'c', 'd']) is {prefix: [list: "a", "b"], suffix: [list: "c", "d"]}
-  split-at(0, [list: 1, 2, 3, 4]) is {prefix: empty, suffix: [list: 1, 2, 3, 4]}
-  split-at(4, [list: 1, 2, 3, 4]) is {prefix: [list: 1, 2, 3, 4], suffix: empty}
-  split-at(2, [list: 1, 2, 3, 4]) is {prefix: [list: 1, 2], suffix: [list: 3, 4]}
-  split-at(-1, [list: 1, 2, 3, 4]) raises "Invalid index"
-  split-at(5, [list: 1, 2, 3, 4]) raises "Index too large"
+  L.split-at(2, [L.list: 'a', 'b', 'c', 'd']) 
+    is {prefix: [L.list: "a", "b"], suffix: [L.list: "c", "d"]}
+  L.split-at(0, [L.list: 1, 2, 3, 4]) 
+    is {prefix: L.empty, suffix: [L.list: 1, 2, 3, 4]}
+  L.split-at(4, [L.list: 1, 2, 3, 4])
+    is {prefix: [L.list: 1, 2, 3, 4], suffix: L.empty}
+  L.split-at(2, [L.list: 1, 2, 3, 4]) 
+    is {prefix: [L.list: 1, 2], suffix: [L.list: 3, 4]}
+  L.split-at(-1, [L.list: 1, 2, 3, 4]) raises "Invalid index"
+  L.split-at(5, [L.list: 1, 2, 3, 4]) raises "Index too large"
 end
-    end
     }
   ]
   @function["last"
@@ -1748,12 +1889,13 @@ end
   Returns the last element in @pyret{lst}.  Raises an error if the @pyret{List} is
   empty.
 
-  @examples{
+  @examples[#:show-try-it #t]{
 import lists as L
+
 check:
-  L.last([list: 1, 3, 5]) is 5
-  L.last([list: 1]) is 1
-  L.last([list: ]) raises "last of empty list"
+  L.last([L.list: 1, 3, 5]) is 5
+  L.last([L.list: 1]) is 1
+  L.last([L.list: ]) raises "last of empty list"
 end
   }
 
@@ -1765,10 +1907,12 @@ end
 #:return (L-of "A")]{
 Constructs a list with the given element prepended to the front of the given
 list.
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  push(empty, "a") is link("a", empty)
-  push(link("a", empty), "b") is link("b", link("a", empty))
+  L.push(L.empty, "a") is L.link("a", L.empty)
+  L.push(L.link("a", empty), "b") is L.link("b", L.link("a", L.empty))
 end
 }
 }
@@ -1783,20 +1927,24 @@ end
 
     @pyret-block[#:style "good-ex"]{
 import lists as L
+
 check:
-  L.append([list: 1, 2, 3], [list: 4, 5, 6]) is [list: 1, 2, 3, 4, 5, 6]
-  L.append([list:], [list:]) is [list:]
-  L.append([list: 1], [list: 2]) is [list: 1, 2]
+  L.append([L.list: 1, 2, 3], [L.list: 4, 5, 6])
+    is [L.list: 1, 2, 3, 4, 5, 6]
+  L.append([L.list: ], [L.list: ]) is [L.list: ]
+  L.append([L.list: 1], [L.list: 2]) is [L.list: 1, 2]
 end
     }
 
     Note that it does @emph{not} change either @pyret{List}:
 
     @pyret-block[#:style "bad-ex"]{
+import lists as L
+
 check:
-  l = [list: 1, 2, 3]
-  append(l, [list: 4])
-  l is [list: 1, 2, 3, 4] # this test fails
+  l = [L.list: 1, 2, 3]
+  L.append(l, [L.list: 4])
+  l is [L.list: 1, 2, 3, 4] # this test fails
 end
     }
 
@@ -1807,12 +1955,12 @@ end
     #:examples
     '@{
 import lists as L
-check:
-  L.any(is-number, [list: 1, 2, 3]) is true
-  L.any(is-string, [list: 1, 2, 3]) is false
-  L.any(lam(n): n > 1 end, [list: 1, 2, 3]) is true
-  L.any(lam(n): n > 3 end, [list: 1, 2, 3]) is false
 
+check:
+  L.any(is-number, [L.list: 1, 2, 3]) is true
+  L.any(is-string, [L.list: 1, 2, 3]) is false
+  L.any(lam(n): n > 1 end, [L.list: 1, 2, 3]) is true
+  L.any(lam(n): n > 3 end, [L.list: 1, 2, 3]) is false
 end
     }
   ]
@@ -1821,11 +1969,12 @@ end
     #:examples
     '@{
 import lists as L
+
 check:
-  L.all(is-number, [list: 1, 2, 3]) is true
-  L.all(is-string, [list: 1, 2, 'c']) is false
-  L.all(lam(n): n > 1 end, [list: 1, 2, 3]) is false
-  L.all(lam(n): n <= 3 end, [list: 1, 2, 3]) is true
+  L.all(is-number, [L.list: 1, 2, 3]) is true
+  L.all(is-string, [L.list: 1, 2, 'c']) is false
+  L.all(lam(n): n > 1 end, [L.list: 1, 2, 3]) is false
+  L.all(lam(n): n <= 3 end, [L.list: 1, 2, 3]) is true
 end
     }
   ]
@@ -1836,17 +1985,18 @@ When the @pyret{List}s are of different length, the function is only
 called when both @pyret{List}s have a value at a given index.  In other words,
 Pyret iterates over the shortest @pyret{List} and stops.
   
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
+
 check:
-  L.all2(lam(n, m): n > m end, [list: 1, 2, 3], [list: 0, 1, 2]) is true
-  L.all2(lam(n, m): (n + m) == 3 end, [list: 1, 2, 3], [list: 2, 1, 0]) is true
-  L.all2(lam(n, m): (n + m) == 3 end, [list: 1, 2], [list: 2, 1, 0]) is true
-  L.all2(lam(n, m): (n + m) == 3 end, [list: 1, 2, 6], [list: 2, 1]) is true
-  L.all2(lam(n, m): n > m end, [list: 1, 2, 3], [list: 0, 1, 2]) is true
-  L.all2(lam(n, m): n > m end, [list: 1, 2, 0], [list: 0, 1]) is true
-  L.all2(lam(n, m): n < m end, [list: 1], [list: 2, 0]) is true
-  L.all2(lam(n, m): n < m end, [list: 1, 2, 3], empty) is true
+  L.all2(lam(n, m): n > m end, [L.list: 1, 2, 3], [L.list: 0, 1, 2]) is true
+  L.all2(lam(n, m): (n + m) == 3 end, [L.list: 1, 2, 3], [L.list: 2, 1, 0]) is true
+  L.all2(lam(n, m): (n + m) == 3 end, [L.list: 1, 2], [L.list: 2, 1, 0]) is true
+  L.all2(lam(n, m): (n + m) == 3 end, [L.list: 1, 2, 6], [L.list: 2, 1]) is true
+  L.all2(lam(n, m): n > m end, [L.list: 1, 2, 3], [L.list: 0, 1, 2]) is true
+  L.all2(lam(n, m): n > m end, [L.list: 1, 2, 0], [L.list: 0, 1]) is true
+  L.all2(lam(n, m): n < m end, [L.list: 1], [L.list: 2, 0]) is true
+  L.all2(lam(n, m): n < m end, [L.list: 1, 2, 3], L.empty) is true
 end
     }
   
@@ -1854,11 +2004,14 @@ end
     "map"]
 
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  map(num-tostring, [list: 1, 2]) is [list: "1", "2"]
-  map(lam(x): x + 1 end, [list: 1, 2]) is [list: 2, 3]
-end}
+  L.map(num-tostring, [L.list: 1, 2]) is [L.list: "1", "2"]
+  L.map(lam(x): x + 1 end, [L.list: 1, 2]) is [L.list: 2, 3]
+end
+}
   @function[
     "map2"]
 
@@ -1866,16 +2019,18 @@ When the @pyret{List}s are of different length, the function is only
 called when both @pyret{List}s have a value at a given index.  In other words,
 Pyret iterates over the shortest @pyret{List} and stops.
   
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  map2(string-append, [list: "mis", "mal"], [list: "fortune", "practice"])
-    is [list: "misfortune", "malpractice"]
-  map2(_ + _, [list: "mis", "mal"], [list: "fortune", "practice"])
-    is [list: "misfortune", "malpractice"]
-  map2(string-append, [list: "mis", "mal"], [list: "fortune"])
-    is [list: "misfortune"]
-  map2(string-append, [list: "mis", "mal"], empty)
-    is empty
+  L.map2(string-append, [L.list: "mis", "mal"], [L.list: "fortune", "practice"])
+    is [L.list: "misfortune", "malpractice"]
+  L.map2(_ + _, [L.list: "mis", "mal"], [L.list: "fortune", "practice"])
+    is [L.list: "misfortune", "malpractice"]
+  L.map2(string-append, [L.list: "mis", "mal"], [L.list: "fortune"])
+    is [L.list: "misfortune"]
+  L.map2(string-append, [L.list: "mis", "mal"], L.empty)
+    is L.empty
 end
     }
  
@@ -1885,15 +2040,17 @@ When the @pyret{List}s are of different length, the function is only
 called when all @pyret{List}s have a value at a given index.  In other words,
 Pyret iterates over the shortest @pyret{List} and stops.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  fun full-name(first, middle, last) -> String:
-    first + " " + middle + " " + last
+  fun full-name(n1, n2, n3) -> String:
+    n1 + " " + n2 + " " + n3
   end
   full-name("Thomas", "Alva", "Edison") is "Thomas Alva Edison"
-  map3(full-name, [list: "Martin", "Mohandas", "Pelé"], 
-    [list: "Luther", "Karamchand"], [list: "King", "Gandhi"]) is
-  [list: "Martin Luther King", "Mohandas Karamchand Gandhi"]
+  L.map3(full-name, [L.list: "Martin", "Mohandas", "Pelé"], 
+    [L.list: "Luther", "Karamchand"], [L.list: "King", "Gandhi"]) is
+  [L.list: "Martin Luther King", "Mohandas Karamchand Gandhi"]
 end
 }
   @function["map4"]
@@ -1902,15 +2059,17 @@ When the @pyret{List}s are of different length, the function is only
 called when all @pyret{List}s have a value at a given index.  In other words,
 Pyret iterates over the shortest @pyret{List} and stops.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  fun title-name(title, first, middle, last) -> String:
-    title + " " + first + " " + middle + " " + last
+  fun title-name(title, n1, n2, n3) -> String:
+    title + " " + n1 + " " + n2 + " " + n3
   end
-  map4(title-name, [list: "Reverend", "Mahātmā"], 
-    [list: "Martin", "Mohandas", "Pele"], 
-    [list: "Luther", "Karamchand"], [list: "King", "Gandhi"]) is
-  [list: "Reverend Martin Luther King", "Mahātmā Mohandas Karamchand Gandhi"]
+  L.map4(title-name, [L.list: "Reverend", "Mahātmā"], 
+    [L.list: "Martin", "Mohandas", "Pele"], 
+    [L.list: "Luther", "Karamchand"], [list: "King", "Gandhi"]) is
+  [L.list: "Reverend Martin Luther King", "Mahātmā Mohandas Karamchand Gandhi"]
 end
 }
   @function["map_n"]
@@ -1918,13 +2077,15 @@ end
   Like map, but also includes a numeric argument for the position in the @pyret{List}
   that is currently being mapped over.
 
-  @examples{
+  @examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  map_n(num-expt, 0, [list: 2, 2, 2, 2]) is [list: 0, 1, 4, 9]
-  map_n(lam(n, elem): n * elem end, 0, [list: 2, 2, 2, 2]) is [list: 0, 2, 4, 6]
-  map_n(_ * _, 0, [list: 2, 2, 2, 2]) is [list: 0, 2, 4, 6]
-  map_n(_ * _, 1, [list: 2, 2, 2, 2]) is [list: 2, 4, 6, 8]
-  map_n(_ + _, 10, [list: 2, 2, 2, 2]) is [list: 12, 13, 14, 15]
+  L.map_n(num-expt, 0, [L.list: 2, 2, 2, 2]) is [L.list: 0, 1, 4, 9]
+  L.map_n(lam(n, elem): n * elem end, 0, [L.list: 2, 2, 2, 2]) is [L.list: 0, 2, 4, 6]
+  L.map_n(_ * _, 0, [L.list: 2, 2, 2, 2]) is [L.list: 0, 2, 4, 6]
+  L.map_n(_ * _, 1, [L.list: 2, 2, 2, 2]) is [L.list: 2, 4, 6, 8]
+  L.map_n(_ + _, 10, [L.list: 2, 2, 2, 2]) is [L.list: 12, 13, 14, 15]
 end
   }
 
@@ -1936,11 +2097,13 @@ When the @pyret{List}s are of different length, the function is only
 called when all @pyret{List}s have a value at a given index.  In other words,
 Pyret iterates over the shortest @pyret{List} and stops.
   
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  map2_n(lam(n, a, b): n * (a + b) end, 10,
-    [list: 2, 2, 2, 2], [list: 0, 3, 9, 12]) 
-    is [list: 20, 55, 132, 182]
+  L.map2_n(lam(n, a, b): n * (a + b) end, 10,
+    [L.list: 2, 2, 2, 2], [L.list: 0, 3, 9, 12]) 
+    is [L.list: 20, 55, 132, 182]
 end
  }
 
@@ -1951,29 +2114,33 @@ When the @pyret{List}s are of different length, the function is only
 called when all @pyret{List}s have a value at a given index.  In other words,
 Pyret iterates over the shortest @pyret{List} and stops.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   fun combine(n, l1, l2, l3) -> String:
     string-repeat(l1, n) + string-repeat(l2, n) +
     string-repeat(l3, n)
   end
   combine(2, 'a', 'b', 'c') is "aabbcc"
-  map3_n(combine, 1, [list: 'a', 'a'], [list: 'b', 'b'],
-    [list: 'c', 'c']) is [list: 'abc', 'aabbcc']
+  L.map3_n(combine, 1, [L.list: 'a', 'a'], [L.list: 'b', 'b'],
+    [L.list: 'c', 'c']) is [L.list: 'abc', 'aabbcc']
 end
 }
   @function["map4_n"]
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   fun combine(n, l1, l2, l3, l4) -> String:
     string-repeat(l1, n) + string-repeat(l2, n) +
     string-repeat(l3, n) + string-repeat(l4, n)
   end
   combine(2, 'a', 'b', 'c', 'd') is "aabbccdd"
-  map4_n(combine, 1, repeat(3, 'a'), repeat(3, 'b'),
-    repeat(3, 'c'), repeat(3, 'd')) is 
-  [list: 'abcd', 'aabbccdd', 'aaabbbcccddd']
+  L.map4_n(combine, 1, L.repeat(3, 'a'), L.repeat(3, 'b'),
+    L.repeat(3, 'c'), L.repeat(3, 'd')) is 
+  [L.list: 'abcd', 'aabbccdd', 'aaabbbcccddd']
 end
 }
 
@@ -1981,17 +2148,19 @@ end
     "each"
     #:examples
     '@{
+import lists as L
+
 check:
   one-four = [list: 1, 2, 3, 4]
   block:
     var counter = 0
-    each(lam(n): counter := counter + n end, one-four)
+    L.each(lam(n): counter := counter + n end, one-four)
     counter is 1 + 2 + 3 + 4
     counter is 10
   end
   block:
     var counter = 1
-    each(lam(n): counter := counter * n end, one-four)
+    L.each(lam(n): counter := counter * n end, one-four)
     counter is 1 * 2 * 3 * 4
     counter is 24
   end
@@ -2000,31 +2169,39 @@ end
   ]
 
   @function["each2"]
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   var counter = 0
-  each2(lam(x, y): counter := counter + x + y end, 
-    [list: 1, 1, 1], [list: 10, 10, 10, 10])
+  L.each2(lam(x, y): counter := counter + x + y end, 
+    [L.list: 1, 1, 1], [L.list: 10, 10, 10, 10])
   counter is 33
 end
 }
   
   @function["each3"]
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   var counter = 0
-  each3(lam(x, y, z): counter := counter + x + y + z end, 
-    [list: 1, 1, 1], [list: 10, 10, 10, 10], [list: 100, 100])
+  L.each3(lam(x, y, z): counter := counter + x + y + z end, 
+    [L.list: 1, 1, 1], [L.list: 10, 10, 10, 10], [L.list: 100, 100])
   counter is 222
 end
 }
   @function["each4"]
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   var counter = 0
-  each4(lam(w, x, y, z): counter := counter + w + x + y + z end, 
-    [list: 1, 1, 1], [list: 10, 10, 10, 10], [list: 100, 100], 
-    [list: 1000, 1000])
+  L.each4(lam(w, x, y, z): counter := counter + w + x + y + z end,
+    [L.list: 1, 1, 1], 
+    [L.list: 10, 10, 10, 10], 
+    [L.list: 100, 100], 
+    [L.list: 1000, 1000])
   counter is 2222
 end
 }
@@ -2034,48 +2211,67 @@ end
 Like @pyret-id{each}, but also includes a numeric argument for
 the current index in the @pyret{List}.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   var counter = 0
-  each_n(lam(i, w): counter := counter + (i * w) end, 1, [list: 1, 1, 1])
+  L.each_n(lam(i, w): counter := counter + (i * w) end, 
+    1, 
+    [L.list: 1, 1, 1])
   counter is 6
 end
 }
 
   @function["each2_n"]
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   var counter = 0
-  each2_n(lam(i, w, x): counter := counter + (i * (w + x)) end,
-    1, [list: 1, 1, 1], [list: 10, 10, 10, 10])
+  L.each2_n(lam(i, w, x): counter := counter + (i * (w + x)) end,
+    1,
+    [L.list: 1, 1, 1],
+    [L.list: 10, 10, 10, 10])
   counter is 66
 end
 }
 
   @function["each3_n"]
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   var counter = 0
-  each3_n(lam(i, w, x, y): counter := counter + (i * (w + x + y)) end,
-    1, [list: 1, 1, 1], [list: 10, 10, 10, 10], [list: 100, 100, 100])
+  L.each3_n(lam(i, w, x, y): counter := counter + (i * (w + x + y)) end,
+    1,
+    [L.list: 1, 1, 1],
+    [L.list: 10, 10, 10, 10],
+    [L.list: 100, 100, 100])
   counter is 666
 end
 }
   @function["each4_n"]
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   var counter = 0
-  each4_n(lam(i, w, x, y, z): counter := counter + (i * (w + x + y + z)) end,
-    1, [list: 1, 1, 1], [list: 10, 10, 10, 10], [list: 100, 100, 100],
-    [list: 1000, 1000, 1000])
+  L.each4_n(lam(i, w, x, y, z): counter := counter + (i * (w + x + y + z)) end,
+    1,
+    [L.list: 1, 1, 1],
+    [L.list: 10, 10, 10, 10],
+    [L.list: 100, 100, 100],
+    [L.list: 1000, 1000, 1000])
   counter is 6666
 end
 }
   @function["fold-while"]
 
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
 import either as EI
+
 check:
   fun stop-at-not-one(acc :: Number, n :: Number) -> EI.Either:
     if n == 1:  
@@ -2084,7 +2280,8 @@ check:
       EI.right(acc) 
     end
   end
-  L.fold-while(stop-at-not-one, 0, [list: 1, 1, 1, 0, 1, 1]) is 3
+
+  L.fold-while(stop-at-not-one, 0, [L.list: 1, 1, 1, 0, 1, 1]) is 3
 end
 }
 
@@ -2100,18 +2297,19 @@ In other words, @pyret{fold} uses the function @tt{f}, starting with the @tt{bas
 value, of type @tt{Base}, to calculate the return value of type @tt{Base} from each
 item in the @pyret{List}, of input type @tt{Elt}, starting the sequence from the left.
   }
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  fold((lam(acc, elt): acc + elt end), 0, [list: 3, 2, 1]) is 6
-  fold((lam(acc, elt): acc + elt end), 10, [list: 3, 2, 1]) is 16
-f
+  L.fold((lam(acc, elt): acc + elt end), 0, [L.list: 3, 2, 1]) is 6
+  L.fold((lam(acc, elt): acc + elt end), 10, [L.list: 3, 2, 1]) is 16
+
   fun combine(acc, elt) -> String:
     tostring(elt) + " - " + acc
   end
-  fold(combine, "END", [list: 3, 2, 1]) is "1 - 2 - 3 - END"
-  fold(combine, "END", empty) is "END"
+  L.fold(combine, "END", [L.list: 3, 2, 1]) is "1 - 2 - 3 - END"
+  L.fold(combine, "END", L.empty) is "END"
 end
-
  }
   @function["foldl"]
   Another name for @pyret-id["fold"].
@@ -2124,45 +2322,63 @@ In other words, @pyret{foldr} uses the function @tt{f}, starting with the @tt{ba
 value, of type @tt{Base}, to calculate the return value of type @tt{Base} from each
 item in the @pyret{List}, of input type @tt{Elt}, starting the sequence from the right.
 
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
+
 check:
-  L.foldr((lam(acc, elt): acc + elt end), 0, [list: 3, 2, 1]) is 6
-  L.foldr((lam(acc, elt): acc + elt end), 10, [list: 3, 2, 1]) is 16
+  L.foldr((lam(acc, elt): acc + elt end), 0, [L.list: 3, 2, 1]) is 6
+  L.foldr((lam(acc, elt): acc + elt end), 10, [L.list: 3, 2, 1]) is 16
+
   fun combine(acc, elt) -> String:
     tostring(elt) + " - " + acc
   end
-  L.foldr(combine, "END", [list: 3, 2, 1]) is "3 - 2 - 1 - END"
-  L.foldr(combine, "END", empty) is "END"
+  L.foldr(combine, "END", [L.list: 3, 2, 1]) is "3 - 2 - 1 - END"
+  L.foldr(combine, "END", L.empty) is "END"
 end
 }
 
   @function["fold2"]
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  fold2(lam(acc, elt1, elt2): acc + elt1 + elt2 end, 11,
-    [list: 1, 1, 1], [list: 10, 10, 10, 10]) is 44
+  L.fold2(lam(acc, elt1, elt2): acc + elt1 + elt2 end,
+    11,
+    [L.list: 1, 1, 1],
+    [L.list: 10, 10, 10, 10])
+    is 44
 end
 }
 
   @function["fold3"]
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
   fold3(lam(acc, elt1, elt2, elt3): acc + elt1 + elt2 + elt3 end, 
-    111, [list: 1, 1, 1], [list: 10, 10, 10, 10], 
-    [list: 100, 100, 100]) is 444
+    111,
+    [L.list: 1, 1, 1],
+    [L.list: 10, 10, 10, 10], 
+    [L.list: 100, 100, 100])
+    is 444
 end
 }
 
 
   @function["fold4"]
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  fold4(lam(acc, elt1, elt2, elt3, elt4): 
-    acc + elt1 + elt2 + elt3 + elt4 end, 1111, 
-    [list: 1, 1, 1], [list: 10, 10, 10, 10], [list: 100, 100, 100],
-    [list: 1000, 1000]) is 3333
+  L.fold4(lam(acc, elt1, elt2, elt3, elt4): 
+    acc + elt1 + elt2 + elt3 + elt4 end,
+    1111, 
+    [L.list: 1, 1, 1],
+    [L.list: 10, 10, 10, 10],
+    [L.list: 100, 100, 100],
+    [list: 1000, 1000])
+    is 3333
 end
 }
 
@@ -2171,17 +2387,21 @@ end
     #:examples
     '@{
 import lists as L
+
 check:
   # for comparison, here is a map_n example:
-  map_n(lam(index, elt): index * elt end, 0, [list: 2, 2, 2, 2]) 
-    is [list: 0, 2, 4, 6]
+  L.map_n(lam(index, elt): index * elt end, 0, [L.list: 2, 2, 2, 2]) 
+    is [L.list: 0, 2, 4, 6]
   # this fold_n version adds up the result
   L.fold_n(lam(index, acc, elt): acc + (index * elt) end, 0, 0,
-    [list: 2, 2, 2, 2]) is 12
+    [L.list: 2, 2, 2, 2])
+    is 12
   L.fold_n(lam(index, acc, elt): acc + (index * elt) end, 0, 10,
-    [list: 2, 2, 2, 2]) is 22
+    [L.list: 2, 2, 2, 2])
+    is 22
   L.fold_n(lam(index, acc, elt): acc + (index * elt) end, 10, 0,
-    [list: 2, 2, 2, 2]) is 92   # 20+22+24+26=92
+    [L.list: 2, 2, 2, 2])
+    is 92 because 20 + 22 + 24 + 26
 end
     }
   ]{
@@ -2195,37 +2415,75 @@ end
     "member"
   ]
 
-Returns @pyret{true} if @pyret{List} @tt{lst} contains the element @tt{elt}, as compared
+@function["member-always"]
+@function["member-identical"]
+@function["member-now"]
+
+@pyret{member}
+returns @pyret{true} if @pyret{List} @tt{lst} contains the element @tt{elt}, as compared
 by @pyret{==}.
+The other three functions are
+analogous to @pyret-id{member}, but use
+@pyret-id["equal-always" "equality"],
+@pyret-id["identical" "equality"], or
+@pyret-id["equal-now" "equality"]
+to perform the comparison.
+(Thus @pyret{member-always} is the same as @pyret{member}; the name is provided for completeness
+and in case the user wants to make their intent more explicit.)
 
-@margin-note{Passing a @pyret{Roughnum} as @tt{elt} will raise
-an error.}
+Note that if a @pyret{Roughnum} is present, these functions will raise exceptions. To avoid that, use
+@pyret-id["member3" "lists"] and the analogous related functions.
 
-@examples{
+@examples[#:show-try-it #t]{
+import lists as L
+
 check:
-  member([list: 1, 2, 3], 2) is true
-  member([list: 2, 4, 6], 3) is false
-  [list: ].member(empty) is false
-  [list: 1, 2, 3].member(~1) raises "Roughnums"
-  [list: ~1, 2, 3].member(1) is false
+  L.member([L.list: 1, 2, 3], 2) is true
+  L.member([L.list: 2, 4, 6], 3) is false
+  L.member([L.list: ], L.empty) is false
+  L.member([L.list: 1, 2, 3], ~1) raises "Roughnums"
+  L.member([L.list: ~1, 2, 3], 1) raises "Roughnums"
 
-  [list: 'a'].member('a') is true
-  [list: false].member(false) is true
-  [list: nothing].member(nothing) is true
+  L.member([L.list: 'a'], 'a') is true
+  L.member([L.list: false], false) is true
+  L.member([L.list: nothing], nothing) is true
 end
 }
 
-  @function[
+@function["member3"]
+@function["member-always3"]
+@function["member-identical3"]
+@function["member-now3"]
+
+These functions are analogous to @pyret-id{member}, but use
+@pyret-id["equal-always3" "equality"],
+@pyret-id["identical3" "equality"], or
+@pyret-id["equal-now3" "equality"]
+to perform the comparison. Thus, they do not raise an exception if a @pyret{Roughnum} is present.
+
+@examples[#:show-try-it #t]{
+import lists as L
+import equality as EQ
+
+check:
+  L.member3([L.list: 1, 2, 3], ~1) satisfies EQ.is-Unknown
+  L.member3([L.list: ~1, 2, 3], 1) satisfies EQ.is-Unknown
+end
+}
+
+@function[
     "member-with"
   ]
 
-@pyret{member} with a custom equality function.  Returns an @pyret{equality.Equal} if
-function @tt{eq} returns @pyret{equality.Equal} for @tt{elt} and any one
+@pyret{member-with} is @pyret{member} with a custom equality function.
+Returns an @pyret{equality.Equal} if
+the @tt{eq} parameter returns @pyret{equality.Equal} for @tt{elt} and any one
 element of @pyret{List} @tt{lst}.
 
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
 import equality as EQ
+
 check:
   fun equal-length(a :: String, b :: String) -> EQ.EqualityResult:
     if string-length(a) == string-length(b):
@@ -2236,31 +2494,14 @@ check:
   end
   equal-length('tom', 'dad') is EQ.Equal
   equal-length('tom', 'father') satisfies EQ.is-NotEqual
-  L.member-with([list: 'father', 'pater', 'dad'], 'tom', equal-length)
+
+  L.member-with([L.list: 'father', 'pater', 'dad'], 'tom', equal-length)
     is EQ.Equal
-  L.member-with([list: 'father', 'pater'], 'tom', equal-length) 
+  L.member-with([L.list: 'father', 'pater'], 'tom', equal-length) 
     satisfies EQ.is-NotEqual 
 end
 }
 
-@function["member-always"]
-@function["member-identical"]
-@function["member-now"]
-Analogous to @pyret-id{member}, but uses @pyret-id["equal-always" "equality"]
-or @pyret-id["identical" "equality"] to perform the comparison.
-
-@function["member3"]
-@function["member-always3"]
-Analogous to @pyret-id{member-with}, but uses @pyret-id["equal-always3" "equality"]
-to perform the comparison.
-
-@function["member-identical3"]
-Analogous to @pyret-id{member-with}, but uses @pyret-id["identical3" "equality"] to perform the comparison.
-
-@function["member-now3"]
-Analogous to @pyret-id{member-with}, but uses @pyret-id["equal-now3"
-"equality"] to perform the comparison.
-  
   @function[
     "reverse"
   ]
@@ -2268,11 +2509,12 @@ Analogous to @pyret-id{member-with}, but uses @pyret-id["equal-now3"
 Returns a new @pyret{List} with all the elements of the original @pyret{List} in
 reverse order.
 
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
+
 check:
-  l = [list: 1, 2, 3, 4]
-  L.reverse(l) is [list: 4, 3, 2, 1]
+  l = [L.list: 1, 2, 3, 4]
+  L.reverse(l) is [L.list: 4, 3, 2, 1]
 end
 }
 
@@ -2280,11 +2522,12 @@ end
 Returns a new @pyret{List} with all the elements of the original that are not
 equal to the specified element (using @pyret-id["==" "equality"] as the comparison).
 
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
+
 check:
-  l = [list: 1, 2, 3, 4, 3, 2, 1]
-  L.remove(l, 2) is [list: 1, 3, 4, 3, 1]
+  l = [L.list: 1, 2, 3, 4, 3, 2, 1]
+  L.remove(l, 2) is [L.list: 1, 3, 4, 3, 1]
 end
 }
 
@@ -2296,11 +2539,12 @@ end
   Returns a new @pyret{List} with all the elements of the original @pyret{List} in random
   order.
 
-@examples{
+@examples[#:show-try-it #t]{
 import lists as L
 import sets as S
+
 check:
-  l = [list: 1, 2, 3, 4]                                  
+  l = [L.list: 1, 2, 3, 4]                                  
   l-mixed = L.shuffle(l)
   S.list-to-set(l-mixed) is S.list-to-set(l)                   
   l-mixed.length() is l.length()  

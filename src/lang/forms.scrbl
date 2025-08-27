@@ -1731,6 +1731,8 @@ Pyret just does not provide syntactic sugar to help in this case
 
 @subsection[#:tag "s:cannonball-expr"]{Chaining Application}
 
+@index["^ (Chained Application)"]{}
+
 @bnf['Pyret]{
 CARET: "^"
 chain-app-expr: binop-expr CARET binop-expr
@@ -2521,7 +2523,7 @@ type Constructor<A> = {
   make2 :: (Any, Any -> A),
   make3 :: (Any, Any, Any -> A),
   make4 :: (Any, Any, Any, Any -> A),
-  make5 :: (Any, Any, Any, Any, Any -> A)
+  make5 :: (Any, Any, Any, Any, Any -> A),
   make  :: (RawArray<Any> -> A),
 }
 }
@@ -2542,7 +2544,7 @@ weird :: Constructor<String> = {
 check:
   [weird: ] is "nothing at all"
   [weird: true] is "just true"
-  [weird: 5, 6.24] is "5 and 6.24"
+  [weird: 5, 6.24] is "5 and 156/25"
   [weird: true, false, 5] is "several things"
   [weird: 1, 2, 3, 4] is "four things"
   [weird: 1, 1, 1, 1, 1] is "five things"

@@ -632,6 +632,10 @@
     ;; ~color13(0, 0, 0, 1)
     )
   (unknown-item
+    (name "rebecca-purple")
+    ;; ~color13(102, 51, 153, 1)
+    )
+  (unknown-item
     (name "transparent")
     ;; ~color13(0, 0, 0, 1)
     )))
@@ -659,6 +663,11 @@
 @docmodule["color"]{
   @; Ignored type testers
   @ignore[(list "is-color")]
+  @emph{@bold{Note:}} it is discouraged to use the @pyret{include} form of importing this library,
+  since this library defines many names, some of which will likely conflict with existing names.
+  (For instance, @pyret{tan} is both a color and a mathematical function.)  Use the @pyret{import}
+  form instead. See @secref["s:modules:import"] for more detail.
+  
   @section[#:tag "color_DataTypes"]{Data types}
   @data-spec2["Color" (list) (list
     @constructor-spec["Color" "color" color-args]
@@ -667,6 +676,8 @@
     @constructor-doc["Color" "color" color-args (a-id "Color" (xref "color" "Color"))]{
       The values for red, green, and blue should be in the range 0--255, inclusive.
       The values for alpha should be in the range 0--1, and indicates how transparent the color is, with 0 as fully transparent and 1 as fully opaque.
+
+      Note that the library does not @emph{enforce} these range restrictions when constructing custom colors, so that you can manipulate colors arithmetically (e.g. modeling ``additive color'' by literally adding components together).  The @emph{rendering} of these colors will clamp the values into those ranges, so e.g. @pyret{color(500, 255, 0, 1)} will look the same as @pyret{yellow} itself, but the values will not be equal.
     }
   }
 
@@ -808,6 +819,7 @@
     @render-color["violet" 238 130 238 1]
     @render-color["plum" 221 160 221 1]
     @render-color["lavender" 230 230 250 1]
+    @render-color["rebecca-purple" 102 51 153 1]
     @render-color["thistle" 216 191 216 1]
     @render-color["ghost-white" 248 248 255 1]
     @render-color["white" 255 255 255 1]

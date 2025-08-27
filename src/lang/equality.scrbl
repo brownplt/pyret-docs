@@ -125,6 +125,12 @@
       (return ,boolean)
       (doc ""))
     (fun-spec
+      (name "<>")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
       (name "equal-always")
       (arity 2)
       (args ("val1" "val2"))
@@ -156,6 +162,12 @@
       (doc ""))
     (fun-spec
       (name "within")
+      (arity 1)
+      (args ("tol"))
+      (return ,eqfun)
+      (doc ""))
+    (fun-spec
+      (name "within-now")
       (arity 1)
       (args ("tol"))
       (return ,eqfun)
@@ -220,7 +232,19 @@
       (args ("val1" "val2"))
       (return ,eq)
       (doc ""))
-  ))
+    (fun-spec
+      (name "roughly-equal")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc ""))
+    (fun-spec
+      (name "roughly-equal-now")
+      (arity 2)
+      (args ("val1" "val2"))
+      (return ,boolean)
+      (doc "")))
+  )
 
 @(define code pyret)
 
@@ -233,7 +257,7 @@
 @section[#:tag "types-of-equality"]{Types of Equality}
 
 Pyret has three notions of equality.  Two values can be @emph{equal now},
-@emph{always equal}, and/or @emph{identical}.  The following table summarizes
+@emph{equal always}, and/or @emph{identical}.  The following table summarizes
 the functions and operators that test for these relationships, and how they
 compare to some other languages' operators:
 
@@ -249,18 +273,18 @@ compare to some other languages' operators:
       @list{@bold{Similar To}}
     )
     (list
-      @list{@emph{Equal Now}}
-      @list{@code{=~}}
-      @list{@code{equal-now}}
-      @list{@code{equal-now3}}
-      @list{@code{equal?} (Racket) @code{==} (Python, Ruby)}
-    )
-    (list
-      @list{@emph{Always Equal}}
+      @list{@emph{Equal Always}}
       @list{@code{==}}
       @list{@code{equal-always}}
       @list{@code{equal-always3}}
       @list{@code{=} (Ocaml)}
+    )
+    (list
+      @list{@emph{Equal Now}}
+      @list{@code{=~}}
+      @list{@code{equal-now}}
+      @list{@code{equal-now3}}
+      @list{@code{equal?} (Racket); @code{==} (Python, Ruby)}
     )
     (list
       @list{@emph{Identical}}
@@ -268,29 +292,160 @@ compare to some other languages' operators:
       @list{@code{identical}}
       @list{@code{identical3}}
       @list{
-        @code{eq?} (Scheme)
-        @code{==} (Ocaml)
-        @code{===} (JavaScript)
-        @code{is} (Python)
+        @code{eq?} (Scheme);
+        @code{==} (Ocaml);
+        @code{===} (JavaScript);
+        @code{is} (Python);
         @code{==} (Java)
       }
     )
     )
 ]
 
-In most programs, you should use @emph{always equal}, or @code{==}, to compare
+In most programs, you should use @secref["eq-fun-equal-always"] to compare
 values that you want to check for same-ness.  If you are working with mutable
-data, you may want to consider the special behavior of @emph{equal now}.  For
+data, you may want to consider the special behavior of
+@secref["eq-fun-equal-now"]. For
 some optimizations, defensive code, and capability patterns, you may have a
-reason to use @emph{identical}.
+reason to use @secref["eq-fun-identical"].
 
-@section{Equal Now}
+The binary operators correspond to the partial predicates. After explaining
+the basics of these operations, we explain
+why these are partial [@secref["s:undefined-equalities"]], and
+how the total predicates work [@secref["s:total-equality-predicates"]].
+
+@section[#:tag "eq-fun-equal-always"]{Equal Always}
+
+@function["equal-always" #:contract (a-arrow A A B)]
+@function["==" #:contract (a-arrow A A B)]
+
+Checks if two values will be equal for all time. When it returns
+@pyret{true}, it means the two values can always be used in place of
+one another. This is explained in detail below and its relationship to
+other equality functions is given in @secref["eq-func-relationship"].
+
+The function @pyret-id{equal-always} and infix operator @equal-always-op have
+the same behavior.
+While the infix operator may sometimes be more readable, the function
+name conveys meaning that may not be clear from the infix operator's
+symbolic form. In addition, the infix operator is not a function and
+hence cannot be passed as a parameter, etc.
+
+@pyret-id{equal-always} checks for primitive and structural equality
+like @pyret-id{equal-now}, with the exception that it stops at mutable
+data and only checks that the mutable values are @pyret-id{identical}.
+Checking that mutable values are @pyret-id{identical} is what ensures
+that if two values were @pyret-id{equal-always} at any point, they
+will still be @pyret-id{equal-always} later.
+
+@function["<>" #:contract (a-arrow A A B)]
+
+The negation of @pyret{==}: returns @pyret{true} if the values are not
+@pyret{equal-always} and @pyret{false} otherwise.
+
+@subsection[#:tag "s:always-equal-mutable"]{Equal Always and Mutable Data}
+
+Here are some examples of @pyret-id{equal-always} stopping at mutable data, but
+checking immutable data, contrasted with @pyret-id{equal-now}.
+
+@pyret-block{
+data MyBox:
+  | my-box(ref x)
+end
+
+check:
+  b1 = my-box(1)
+  b2 = my-box(1)
+
+  b1 is-not%(equal-always) b2
+  b1 is%(equal-now) b2
+  b2!{x : 2}
+
+  b1 is-not%(equal-always) b2
+  b1 is-not%(equal-now) b2
+
+  b3 = my-box(2)
+
+  # remember that b2 currently refers to 2
+  l1 = [list: b1, b2]
+  l2 = [list: b1, b2]
+  l3 = [list: b1, b3]
+
+  l1 is%(equal-now) l2
+  l1 is%(equal-always) l2
+  l1 is-not%(identical) l2
+
+  l1 is%(equal-now) l3
+  l1 is-not%(equal-always) l3
+  l1 is-not%(identical) l3
+
+  b2!{x: 5}
+
+  l1 is%(equal-now) l2
+  l1 is%(equal-always) l2
+  l1 is-not%(identical) l2
+
+  l1 is-not%(equal-now) l3
+  l1 is-not%(equal-always) l3
+  l1 is-not%(identical) l3
+end
+}
+
+@;{
+@subsection[#:tag "s:always-equal-frozen"]{Equal Always and Frozen Mutable Data}
+
+  Mutable references can be @emph{frozen}[REF] (as with @code{graph:}), which
+  renders them immutable.  @code{equal-always} @emph{will} traverse frozen
+  mutable fields, and will check for same-shaped cycles.  So, for example, it
+  will succeed for cyclic graphs created with @code{graph:} that have the same
+  shape:
+
+@pyret-block{
+  data MList:
+    | mlink(ref first, ref rest)
+    | mempty
+  end
+  mlist = {
+    make: lam(arr):
+      # fold mlink over arr
+    end
+  }
+
+  graph:
+    BOS = [mlist: WOR, PROV]
+    PROV = [mlist: BOS]
+    WOR = [mlist: BOS]
+  end
+
+  graph:
+    SF = [mlist: OAK, MV]
+    MV = [mlist: SF]
+    OAK = [mlist: SF]
+  end
+
+  SF is%(equal-now) BOS
+  PROV is%(equal-now) WOR
+  PROV is%(equal-now) OAK
+  OAK is%(equal-now) PROV
+}
+}
+
+@section[#:tag "eq-fun-equal-now"]{Equal Now}
 
 @function["equal-now" #:contract (a-arrow A A B)]
 @function["=~" #:contract (a-arrow A A B)]
 
-Checks if the two values are equal @emph{now} (they may not be later).
-Corresponds to the @equal-now-op operator.
+Checks if the two values are equal @emph{now}. They may not be equal
+later, so they can't be used in place of one another at all
+times. This is explained in detail below and its relationship to
+other equality functions is given in @secref["eq-func-relationship"].
+
+The function @pyret-id{equal-now} and infix operator @equal-now-op have
+the same behavior.
+While the infix operator may sometimes be more readable, the function
+name conveys meaning that may not be clear from the infix operator's
+symbolic form. In addition, the infix operator is not a function and
+hence cannot be passed as a parameter, etc.
 
 @subsection[#:tag "s:equal-now-primitives"]{Equal Now and Primitives}
 
@@ -377,10 +532,23 @@ check:
 end
 }
 
-@section{Identical}
+@section[#:tag "eq-fun-identical"]{Identical}
 
 @function["identical" #:contract (a-arrow A A B)]
 @function["<=>" #:contract (a-arrow A A B)]
+
+Checks if two seemingly different values are in fact exactly the same
+value. When it returns @pyret{true}, it means the two values can
+always be used in place of one another (because they are in fact the
+same value). This is explained in detail below and its relationship to
+other equality functions is given in @secref["eq-func-relationship"].
+
+The function @pyret-id{identical} and infix operator @identical-op have
+the same behavior.
+While the infix operator may sometimes be more readable, the function
+name conveys meaning that may not be clear from the infix operator's
+symbolic form. In addition, the infix operator is not a function and
+hence cannot be passed as a parameter, etc.
 
 @subsection[#:tag "s:identical-primitives"]{Identical and Primitives}
 
@@ -475,112 +643,11 @@ end
 }
 }
 
-@section{Always Equal}
-
-@function["equal-always" #:contract (a-arrow A A B)]
-@function["==" #:contract (a-arrow A A B)]
-
-Checks if the two values will always be equal, and corresponds to the
-@equal-always-op operator.
-
-@code{equal-always} checks for primitive and structural equality like
-@pyret-id{equal-now}, with the exception that it stops at mutable data and only
-checks that the mutable values are @pyret-id{identical}.  Stopping at mutable
-boundaries ensures that if two values were @pyret-id{equal-always} at any
-point, they will still be @pyret-id{equal-always} later.
-
-@subsection[#:tag "s:always-equal-mutable"]{Always Equal and Mutable Data}
-
-Here are some examples of @pyret-id{equal-always} stopping at mutable data, but
-checking immutable data, contrasted with @pyret-id{equal-now}
-
-@pyret-block{
-data MyBox:
-  | my-box(ref x)
-end
-
-check:
-  b1 = my-box(1)
-  b2 = my-box(1)
-
-  b1 is-not%(equal-always) b2
-  b1 is%(equal-now) b2
-  b2!{x : 2}
-
-  b1 is-not%(equal-always) b2
-  b1 is-not%(equal-now) b2
-
-  b3 = my-box(2)
-
-  # remember that b2 currently contains 2
-  l1 = [list: b1, b2]
-  l2 = [list: b1, b2]
-  l3 = [list: b1, b3]
-
-  l1 is%(equal-now) l2
-  l1 is%(equal-always) l2
-  l1 is-not%(identical) l2
-
-  l1 is%(equal-now) l3
-  l1 is-not%(equal-always) l3
-  l1 is-not%(identical) l3
-
-  b2!{x: 5}
-
-  l1 is%(equal-now) l2
-  l1 is%(equal-always) l2
-  l1 is-not%(identical) l2
-
-  l1 is-not%(equal-now) l3
-  l1 is-not%(equal-always) l3
-  l1 is-not%(identical) l3
-end
-}
-
-@;{
-@subsection[#:tag "s:always-equal-frozen"]{Always Equal and Frozen Mutable Data}
-
-  Mutable references can be @emph{frozen}[REF] (as with @code{graph:}), which
-  renders them immutable.  @code{equal-always} @emph{will} traverse frozen
-  mutable fields, and will check for same-shaped cycles.  So, for example, it
-  will succeed for cyclic graphs created with @code{graph:} that have the same
-  shape:
-
-@pyret-block{
-  data MList:
-    | mlink(ref first, ref rest)
-    | mempty
-  end
-  mlist = {
-    make: lam(arr):
-      # fold mlink over arr
-    end
-  }
-
-  graph:
-    BOS = [mlist: WOR, PROV]
-    PROV = [mlist: BOS]
-    WOR = [mlist: BOS]
-  end
-
-  graph:
-    SF = [mlist: OAK, MV]
-    MV = [mlist: SF]
-    OAK = [mlist: SF]
-  end
-
-  SF is%(equal-now) BOS
-  PROV is%(equal-now) WOR
-  PROV is%(equal-now) OAK
-  OAK is%(equal-now) PROV
-}
-}
-
-@section{Properties of Equality Functions}
+@section[#:tag "eq-func-relationship"]{Properties of Equality Functions}
 
 The discussion above hints at a relationship between the three functions.  In
-particular, if two values are Identical, they ought to be Always Equal, and if
-they are Always Equal, they ought to be Equal Now.  The following table
+particular, if two values are Identical, they ought to be Equal Always, and if
+they are Equal Always, they ought to be Equal Now.  The following table
 summarizes this relationship, which in fact does hold:
 
 @tabular[
@@ -637,9 +704,10 @@ end
 }
 
 Pyret has a family of built-in functions for cases like this, and the default
-is @pyret{within}:
+is @pyret-id{within}.  To explain it precisely, it is clearer to first explain the
+other two functions, @pyret-id{within-rel} and @pyret-id{within-abs}:
 
-@function["within" #:contract (a-arrow N A)]
+@function["within-rel" #:contract (a-arrow N A)]
 
 It takes an argument representing the @emph{relative error}, and returns a
 function that can be used to check equality up to that relative error.  For
@@ -652,13 +720,13 @@ check:
 end
 }
 
-Relative difference is defined by multiplying the @emph{mean} of the two
+Relative difference is defined by multiplying the @emph{smaller} of the two
 numbers by @pyret{tol}, and checking that the result is less than the
 difference between them.  That is, in the expression above, @pyret-id{within}
 checks:
 
 @pyret-block{
-(((9.5 + 10.5) / 2) * 0.1) < (10.5 - 9.5)
+num-abs(9.5 - 10.5) <= (0.1 * num-min(9.5, 10.5))
 }
 
 @note{Converting to exact numbers first avoids overflows on computing the
@@ -669,36 +737,15 @@ errors, we could implement the numeric comparison of @pyret-id{within} as:
 @pyret-block{
 fun my-within(tol):
   lam(left, right):
-    (((num-exact(left) + num-exact(right)) / 2) * num-exact(tol))
-      < num-abs(num-exact(left) - num-exact(right))
+    num-abs(num-exact(left) - num-exact(right))
+      <= num-exact(tol) * num-min(num-abs(left), num-abs(right))
   end
 end
 }
 
 The @pyret{tol} argument must be between @pyret{0} and @pyret{1}.
 
-It's common to use @pyret{within} along with @pyret-id["is%" "testing"] to
-define the binary predicate inline with the test:
-
-@examples{
-check:
-  num-sqrt(10) is%(within(0.1)) 3.2
-  num-sqrt(10) is-not%(within(0.1)) 5
-end
-}
-
-As a convenient shorthand, @pyret{is-roughly} is defined as a shorthand for
-@pyret-id["is%" "testing"](@pyret-id{within}(0.000001)), that is, an error
-tolerance of one-millionth, or six digits of accuracy:
-
-@examples{
-check:
-  num-acos(-1) is-roughly ~3.14159
-  num-acos(-1) is%(within(0.000001)) ~3.14159
-end
-}
-
-Finally, @pyret-id{within} accepts @emph{any} two values, not just numbers.
+Finally, @pyret-id{within-rel} accepts @emph{any} two values, not just numbers.
 On non-numeric arguments, @pyret-id{within} traverses the structures just as
 in @pyret-id{equal-always}, but deferring to the bounds-checking equality when
 a pair of numbers is encountered.  All other values are compared with
@@ -715,10 +762,6 @@ check:
 end
 }
 
-@function["within-rel" #:contract (a-arrow N A)]
-
-An alias for @pyret-id{within}.
-
 @function["within-abs" #:contract (a-arrow N A)]
 
 Like @pyret-id{within-rel}, but compares with @emph{absolute} tolerance rather
@@ -732,6 +775,10 @@ fun my-within-abs(tol):
 end
 }
 
+(Note that the right-hand side of the inequality here is @emph{not} multiplied
+by the magnitude of the values being compared: the tolerance is therefore
+@emph{absolute}, rather than relative to the magnitudes of the values.)
+
 @examples{
 check:
   la = [list: 10]
@@ -743,11 +790,67 @@ check:
 end
 }
 
+@function["within" #:contract (a-arrow N A)]
+@function["roughly-equal" #:contract (a-arrow A A B)]
+
+The definitions above work smoothly, but provide unintuitive behavior when both
+values are tiny.  In particular, there are @emph{no values at all} that are
+relatively close to zero except zero itself, since the magnitude used to scale
+the relative tolerance...is zero.  For many purposes, especially with testing
+(see below) and especially when first developing code, it is common to want to
+specify a rough tolerance and not especially care whether that tolerance is
+relative or absolute.  Accordingly, @pyret-id{within} is a function defined to
+``smoothe'' the behavior of @pyret-id{within-rel} and @pyret-id{within-abs},
+such that the tolerance is treated as @emph{relative} when the numbers are
+large in magnitude, and as @emph{absolute} as they approach zero:
+
+@examples{
+check:
+  # For large numbers, within behaves like within-rel
+  1000 is%(within(0.1)) 1010
+  1000 is-not%(within-abs(0.1)) 1010
+  1000 is%(within-rel(0.1)) 1010
+  # For small numbers, wtihin behaves like within-abs
+  0 is%(within(0.1)) 0.0000001
+  0 is-not%(within-rel(0.1)) 0.000001
+  0 is%(within-abs(0.1)) 0.000001
+end
+}
+
+For even simpler ergonomics, @pyret-id{roughly-equal} is defined to be
+@pyret{within(0.000001)}, that is, an error tolerance of one-millionth, or six
+digits of accuracy.  This tolerance works well in many cases, and the more
+explicit forms are always available, when more precise control over tolerances
+is required.
+
+It's common to use @pyret-id{within} along with @pyret-id["is%" "testing"] to
+define the binary predicate inline with the test:
+
+@examples{
+check:
+  num-sqrt(10) is%(within(0.1)) 3.2
+  num-sqrt(10) is-not%(within(0.1)) 5
+end
+}
+
+As a convenient shorthand, @pyret{is-roughly} is defined as a shorthand for
+@pyret-id["is%" "testing"](@pyret-id{roughly-equal}):
+
+@examples{
+check:
+  num-acos(-1) is-roughly ~3.14159
+  num-acos(-1) is%(roughly-equal) ~3.14159
+  num-acos(-1) is%(within(0.000001)) ~3.14159
+end
+}
+
+@function["within-now" #:contract (a-arrow N A)]
 @function["within-rel-now" #:contract (a-arrow N A)]
 @function["within-abs-now" #:contract (a-arrow N A)]
+@function["roughly-equal-now" #:contract (a-arrow A A B)]
 
-Like @pyret-id{within-rel} and @pyret-id{within-abs}, but they traverse
-mutable structures as in @pyret{equal-now}.
+Like @pyret-id{within}, @pyret-id{within-rel}, @pyret-id{within-abs} and @pyret-id{roughly-equal}, but
+they traverse mutable structures as in @pyret{equal-now}.
 
 @examples{
 check:
@@ -761,9 +864,7 @@ end
 }
 
 
-
-
-@section[#:tag "s:undefined-equalities"]{Undefined Equalities}
+@section[#:tag "s:undefined-equalities"]{Partial and Total Equality Predicates}
 
 For some values, Pyret refuses to report @pyret{true} or @pyret{false} for any
 equality predicate, and raises an error instead.  For example:
@@ -1010,7 +1111,7 @@ then an error is raised.  A few more examples:
 
 }
 
-@section[#:tag "s:total-equality-predicates"]{Total Equality Functions (Avoiding Incomparability Errors)}
+@section[#:tag "s:total-equality-predicates"]{Total Equality Predicates (Avoiding Incomparability Errors)}
 
 Most Pyret programs should be written using @code{equal-always},
 @code{equal-now}, and @code{identical}, which guarantee that an error will be

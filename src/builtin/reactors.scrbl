@@ -47,26 +47,19 @@
 
 @docmodule["reactors"]{
 
-Pyret's @secref["world"] and @secref["reactors"] modules both facilitate
-creating animated time-based simulation and interactive programs.
-Using the @pyret{world} module and the @pyret{big-bang} function is
-the quickest way to get a basic simulation or game running.  @pyret{reactors}
-provide more advanced features for exploring, testing and debugging
-reactive programs.
+Pyret's reactors help create reactive programs: ones that respond to
+the passage of time, user interactions, or other stimuli. Reactors also
+update any visual output. Combining these lets us write games, animations,
+simulations, and more. They are also designed well to support various
+forms of testing. Reactors are inspired by the
+@hyperlink["https://docs.racket-lang.org/teachpack/2htdpuniverse.html"]{universe}
+package in Racket. For more on their design,
+@hyperlink["https://cs.brown.edu/~sk/Publications/Papers/Published/plpk-reactor-design/"]{read
+this paper}.
 
-Handler functions written for @pyret{big-bang} are compatible with
-@pyret{reactors}, so it is easy to start with @pyret{big-bang} and
-move to @pyret{reactors} if you need their advanced features.
-                       
-  @margin-note{The world/reactor model is based on the universe teachpack in HtDP. You
-  can find documentation for the teachpack here:
-
-  @url["http://docs.racket-lang.org/teachpack/2htdpuniverse.html"]}
-
-                       
 @section[#:tag "s:reactors"]{Creating Reactors}
 
-@type-spec["Reactor" (list "a")]{Reactors are values enabling the creation of time-based animations, simulations, and interactive programs.}
+@type-spec["Reactor" (list "a")]{Reactors are values enabling the creation of games, animations, simulations, and other interactive programs.}
 
 @pyret{reactor}s are created with special syntax:
 

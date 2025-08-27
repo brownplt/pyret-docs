@@ -2,8 +2,9 @@
   "name": "pyret-docs",
   "version": "0.0.0",
   "dependencies": {
-    "codemirror": "^5.48.4",
-    "pyret-codemirror-mode": "git+https://github.com/brownplt/pyret-codemirror-mode.git#horizon"
+    "codemirror": "^5.65.19",
+    "pyret-codemirror-mode": "github:brownplt/pyret-codemirror-mode#horizon",
+    "pyret-embed": "~0.0.7"
   },
   "scripts": {
     "build": "make"

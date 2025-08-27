@@ -1445,8 +1445,8 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
   @section{Placing Images & Scenes}
   @function[
     "empty-scene"
-            #:contract (a-arrow N N Image)
-            #:return Image
+            #:contract (a-arrow N N Scene)
+            #:return Scene
             #:args (list '("width" "") 
                          '("height" ""))]{
     Construct an empty scene of given width and height.  The background is transparent,
@@ -1457,8 +1457,8 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
   ]
   @function[
     "empty-color-scene"
-            #:contract (a-arrow N N ImageColor Image)
-            #:return Image
+            #:contract (a-arrow N N ImageColor Scene)
+            #:return Scene
             #:args (list '("width" "") 
                          '("height" "")
                          '("color" ""))]{
@@ -1554,17 +1554,17 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
   ]
   @function[
     "scene-line"
-            #:contract (a-arrow Image N N N N Image)
-            #:return Image
-            #:args (list '("img" "") 
+            #:contract (a-arrow Image N N N N Scene)
+            #:return Scene
+            #:args (list '("background" "") 
                          '("x1" "") 
                          '("y1" "") 
                          '("x2" "") 
                          '("y2" "") 
-                         '("background" ""))]{
+                         '("color" ""))]{
     Draws a line from (x1,y1) to (x2,y2) on the scene
-    @pyret{background}. Unlike @pyret-id{add-line},
-    this function crops the resulting image to be the same size as
+    @pyret{background} in the given @pyret{color}. Unlike @pyret-id{add-line},
+    this function crops the resulting scene to be the same size as
     @pyret{background}.
   }
   @repl-examples[

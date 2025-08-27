@@ -18,6 +18,7 @@
       (arity 2)
       (args ("string-to-search" "string-to-find"))
       (doc ""))
+    (form-spec (name "+ (concatenation)"))
     (fun-spec
       (name "string-append")
       (arity 2)
@@ -90,6 +91,16 @@
       (doc ""))
     (fun-spec
       (name "string-index-of")
+      (arity 2)
+      (args ("original-string" "string-to-find"))
+      (doc ""))
+    (fun-spec
+      (name "string-find")
+      (arity 2)
+      (args ("original-string" "string-to-find"))
+      (doc ""))
+    (fun-spec
+      (name "string-find-opt")
       (arity 2)
       (args ("original-string" "string-to-find"))
       (doc ""))
@@ -175,6 +186,36 @@ check:
 end
 }
 
+  @function["string-find" #:contract (a-arrow S S) #:return N]
+
+Return the left-most index (starting from @pyret{0}) where the second argument is found in the first string.
+
+If the string is not found, this raises an exception. Therefore, use this function only when you expect the second argument to be found in the first one.
+If you aren't sure, use @pyret{string-find-opt}.
+  
+@examples{
+check:
+  string-find("Hello", "ello") is 1
+  string-find("Hello", "H") is 0
+  string-find("Hello", "World") raises ""
+end
+}
+
+  @function["string-find-opt" #:contract (a-arrow S S) #:return N]
+
+Return the left-most index (starting from @pyret{0}) where the second argument is found in the first string.
+
+This always returns an @pyret{Option} value. Therefore, this is useful when you aren't sure whether the second argument will be found in the first or not.
+If you are confident it will be present, consider using @pyret{string-find}, which returns the number that you can directly use.
+
+@examples{
+check:
+  string-find("Hello", "ello") is some(1)
+  string-find("Hello", "H") is some(0)
+  string-find("Hello", "World") is none
+end
+}
+
   @function["string-append" #:contract (a-arrow S S S) #:return S]
 
 Returns a @pyret{String} where @pyret{back} is added to the right of
@@ -189,6 +230,11 @@ check:
   string-append("a", "") is "a"
 end
 }
+
+@form["+ (concatenation)" "front + back"]
+
+When @pyret{front} and @pyret{back} are strings, has the same meaning as
+@pyret-id{string-append}.
 
   @function["string-length" #:contract (a-arrow S N) #:return N]
 
@@ -362,6 +408,9 @@ end
 }
 
   @function["string-toupper" #:contract (a-arrow S S) #:return S]
+
+  The same as @pyret{string-to-upper}.
+
   @function["string-to-upper" #:contract (a-arrow S S) #:return S]
 
 @margin-note{Pyret uses JavaScript's built-in string operations, and so will
@@ -394,6 +443,9 @@ end
 
 
   @function["string-tolower" #:contract (a-arrow S S) #:return S]
+
+  The same as @pyret{string-to-lower}.
+
   @function["string-to-lower" #:contract (a-arrow S S) #:return S]
 
 Converts a @pyret{String} to all lower case.

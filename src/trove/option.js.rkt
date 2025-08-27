@@ -98,13 +98,13 @@
 
 @pyret{Option} implements a functional programming idiom that is often used
 when a function may or may not return a valid or meaningful value.  If there
-is no return value, then @pyret{none} is returned.  If there is a meaningful
-return value, the value is wrapped in the @pyret{some} variant.
+is no return value, the function returns @pyret{none}.  If there is a meaningful
+return value, it returns that value wrapped in the @pyret{some} variant.
 
 Some Pyret library functions return @pyret{Option} values, such as
-@pyret{string-to-number}.  In this case, if the string is not a
-valid numeric value, @pyret{none} is returned; otherwise, the
-numeric value is wrapped in @pyret{some}.  A @pyret{cases} expression
+@pyret{string-to-number}.  When the string is not a
+valid numeric value, it returns @pyret{none}; otherwise, it
+returns the numeric value wrapped in @pyret{some}.  A @pyret{cases} expression
 can be used to evaluate both @pyret{Option} response variants.
 
 
@@ -122,10 +122,10 @@ where:
 end
 }
 
-In an contrasting example, the @pyret{string-index-of} function does
-@italic{not} provide an @pyret{Option} return value, but instead returns a
-@pyret{Number} which is either a valid index @pyret{Number} or
-@tt{-1} if the string is not found.
+In contrast, @pyret{string-index-of} does
+@italic{not} return an @pyret{Option} return value.Instead , it returns a
+@pyret{Number} that is either a valid index @pyret{Number} or
+@tt{-1} if the string is not found:
 
 @examples{
 fun find-smiley(s :: String) -> String:
@@ -140,11 +140,11 @@ where:
 end
 }
 
-If you wanted to create a version of @tt{find-smiley} that returned an
-@pyret{Option} value, it might look like this:
+We can create a version of @tt{find-smiley} that returns an
+@pyret{Option} value, such as this:
 
 @examples{
-fun option-smiley(s :: String) -> Option:
+fun option-smiley(s :: String) -> Option<Number>:
   i = string-index-of(s, "😊")
   ask:
     | i == -1 then: none
@@ -188,13 +188,17 @@ check:
 end
 }
 
-Our example above of @tt{set-angle}, which defaults to @tt{0}, could be
-replaced with:
+Therefore, our example above of @tt{set-angle}, which defaults to @tt{0}, could be
+writen this way:
 
 @examples{
-check: 
-  string-to-number("90").or-else(0) is 90
-  string-to-number("x").or-else(0) is 0
+fun set-angle(s :: String) -> Number:
+  doc: "If s is not a numeric string, default to 0."
+  string-to-number(s).or-else(0)
+where:
+  set-angle("90") is 90
+  set-angle("") is 0
+  set-angle("x") is 0
 end
 }
   }

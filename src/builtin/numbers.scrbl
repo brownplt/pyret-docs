@@ -9,6 +9,15 @@
 @(append-gen-docs
   `(module "numbers"
     (path "src/js/base/runtime-anf.js")
+    (form-spec (name "+ (addition operator)"))
+    (form-spec (name "- (subtraction operator)"))
+    (form-spec (name "* (multiplication operator)"))
+    (form-spec (name "/ (division operator)"))
+    (form-spec (name "< (less)"))
+    (form-spec (name "> (greater)"))
+    (form-spec (name "<= (less or equal)"))
+    (form-spec (name ">= (greater or equal)"))
+    (form-spec (name "== (equal)"))
     (data-spec
       (name "Number")
       (variants)
@@ -426,6 +435,76 @@ granularity of 5e-324 (JavaScript’s Number.MIN_VALUE).
 
 The mathematical constant π, approximated as a @pyret-id["Roughnum"], or
 @pyret{~3.141592653589793}.
+
+@section{Number Operators}
+
+@form["+ (addition operator)" "left + right"]{
+  @margin-note{If either of the values in an arithmetic operator is a
+  @pyret{Roughnum}, the result is a @pyret{Roughnum}}
+  When @pyret{left} and @pyret{right} evaluate to numbers, adds them and returns
+  the result.
+
+@examples[#:show-try-it #t]{
+check:
+  2 + 2 is 4
+  4/3 + 1/3 is 5/3
+  0.1 + 0.2 is 0.3
+end
+}
+}
+
+@form["- (subtraction operator)" "left - right"]{
+  When @pyret{left} and @pyret{right} evaluate to numbers, subtracts
+  @pyret{right} from @pyret{left} and returns the result.
+
+@examples[#:show-try-it #t]{
+check:
+  6 - 2 is 4
+  4/3 - 1/3 is 1
+  0.3 - 0.2 is 0.1
+end
+}
+}
+
+@form["* (multiplication operator)" "left * right"]{
+  When @pyret{left} and @pyret{right} evaluate to numbers, multiplies
+  them and returns the result.
+
+@examples[#:show-try-it #t]{
+check:
+  2 * 2 is 4
+  2 * 1/3 is 2/3
+  0.3 * 0.2 is 0.06
+end
+}
+}
+
+@form["/ (division operator)" "left / right"]{
+  @margin-note{To be used as an operator, @pyret{/} has to have spaces around
+  it. This means you need to write @pyret{a / 3} rather than @pyret{a/3} to
+  divide the value stored in @pyret{a} by @pyret{3}. Things like @pyret{4/3} and
+  @pyret{1/2} are read by Pyret as single
+  numbers, and can't have names or other expressions in them.}
+  When @pyret{left} and @pyret{right} evaluate to numbers, divides @pyret{left}
+  by @pyret{right} and returns the result.
+
+@examples[#:show-try-it #t]{
+check:
+  8 / 2 is 4
+  8/3 / 2 is 4/3
+  0.3 / 10 is 0.03
+end
+}
+}
+
+@form["< (less)" "left < right"]
+@form["> (greater)" "left < right"]
+@form["<= (less or equal)" "left < right"]
+@form[">= (greater or equal)" "left < right"]
+@form["== (equal)" "left < right"]
+
+Comparison operators. See @seclink["inequalities"].
+
 
 @section{Number Functions}
 

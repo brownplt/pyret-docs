@@ -49,10 +49,47 @@
       (args ("f" "size"))
       (doc ""))
     (fun-spec
+      (name "raw-array-build-opt")
+      (arity 2)
+      (args ("f" "size"))
+      (doc ""))
+    (fun-spec
+      (name "raw-array-map")
+      (arity 2)
+      (args ("f" "array"))
+      (doc ""))
+    (fun-spec
+      (name "raw-array-filter")
+      (arity 2)
+      (args ("f" "array"))
+      (doc ""))
+    (fun-spec
+      (name "raw-array-sort-nums")
+      (arity 2)
+      (args ("array" "asc"))
+      (doc ""))
+    (fun-spec
+      (name "raw-array-sort-by")
+      (arity 3)
+      (args ("array" "key" "asc"))
+      (doc ""))
+    (fun-spec
       (name "raw-array-fold")
       (arity 4)
       (args ("f" "init" "array" "start-index"))
       (doc ""))
+    (fun-spec
+      (name "raw-array-duplicate")
+      (arity 1)
+      (args ("array"))
+      (return ,ra-of-a)
+      (contract (a-arrow ,ra-of-a ,ra-of-a)))
+    (fun-spec
+      (name "raw-array-concat")
+      (arity 2)
+      (args ("array1" "array2"))
+      (return ,ra-of-a)
+      (contract (a-arrow ,ra-of-a ,ra-of-a ,ra-of-a)))
     (unknown-item
       (name "raw-array")
       ;; { maker of raw-arrays ... }
@@ -63,47 +100,67 @@
 @docmodule["raw-arrays" #:noimport #t #:friendly-title "RawArray"]{
    @type-spec["RawArray" (list "a")]{
 
-   A @pyret{RawArray} is a mutable, fixed-length collection indexed
-   by non-negative intgers.  They are a very thin wrapper around native
-   JavaScript arrays, and are manipulated entirely via functions.  They are the
-   implementation mechanism for Pyret @seclink{arrays}, which provide a nicer
-   API for interacting with them.
+@centered{
 
-   @pyret{RawArray}s are widely used internally in Pyret
-   language development.
+@bold{This is an internal library.}
+
+@emph{The @seclink{arrays} library provides the user-facing version of
+this library.}
+
+By default, Pyret users should use @seclink{arrays} instead. It is
+primarily designed to be user-facing. This library provides higher
+performance, but is instead primarily meant for internal use and for
+building other libaries. Only use this if @pyret{Array}s are not
+sufficiently performant for your needs. This library may not provide
+all the same functionality as @seclink{arrays}, so you may need to
+modify your code to use it: i.e., you can't simply replace
+an @pyret{array} with a @pyret{RawArray} and expect the program to
+continue to work.
+
+}
+
+   A @pyret{RawArray} is a mutable, fixed-length collection indexed
+   by non-negative intgers. Accessing and mutating a @pyret{RawArray} takes
+   constant time in the size of the array.
  }
 
      @section{RawArray Functions}
 
-@collection-doc["raw-array" #:contract `(a-arrow ("elt" "a") ,(RA-of "a"))]
+@collection-doc["raw-array" #:contract `(a-arrow ("value" "a") ,(RA-of "a"))]
 
-Constructs a @pyret{RawArray} array of length @tt{count}, whose elements are
-the values specified in the construction expression.
+Constructs a @pyret-id{RawArray} with the given elements.
 
 Note that
-@pyret-id{RawArray}s are mutable, so comparisons using @pyret{==}
-(the operator for @pyret-id["equal-always" "equality"]) will only
+@pyret-id{RawArray}s are mutable, so comparisons using
+@secref["eq-fun-equal-always"]
+will only
 return @pyret{true} on @pyret-id{RawArray}s when they are also
-@pyret-id["identical" "equality"], regardless of their contents.  To compare
-the elements, use @pyret-id["equal-now" "equality"]/@pyret{=~},
-and test with @pyret-id["is=~" "testing"].
+@secref["eq-fun-identical"], regardless of their contents.
+Usually, the most appropriate comparison is
+@secref["eq-fun-equal-now"].
+Tests should correspondingly use 
+@pyret-id["is=~" "testing"].
 
 @examples{
 check:
-  [raw-array: 1, 2, 3] is-not== [raw-array: 1, 2, 3]
+  ra = [raw-array: 1, 2, 3]
+  
+  ra is ra
+  ra is== ra
+  
+  [raw-array: 1, 2, 3] is-not ra
   [raw-array: 1, 2, 3] is-not [raw-array: 1, 2, 3]
+  [raw-array: 1, 2, 3] is-not== ra
+  
+  [raw-array: 1, 2, 3] is=~ ra
   [raw-array: 1, 2, 3] is=~ [raw-array: 1, 2, 3]
-
-  a = [raw-array: 1, 2, 3]
-  a is a
-  a is== a
 end
 }
 
   @function["raw-array-of" #:contract (a-arrow "a" N (RA-of "a"))]
 
 Constructs an @pyret{RawArray} of length @tt{count}, where every element is the value
-given as @pyret{elt}.
+given as @pyret{value}.
 
 Note that @pyret{value} is not @emph{copied}, so,
 the elements of @pyret{RawArray}s created with @pyret-id{raw-array-of} will always be
@@ -133,8 +190,9 @@ end
 
   @function["raw-array-get" #:contract (a-arrow (RA-of "a") N "a") #:return "a"]
 
-Returns the value at the given @tt{index}.  If the index is too large, is
-negative, or isn't a whole number, an error is raised.
+Returns the value at the given @tt{index}.
+
+Using an index too large, negative, or not a whole number raises an error.
   
 @examples{
 check:
@@ -150,6 +208,8 @@ end
 Updates the value at the given @tt{index}, returning the new value.  The update is stateful,
 so all references to the @pyret{RawArray} see the update.  
 
+Using an index too large, negative, or not a whole number raises an error.
+  
 @examples{
 check:
   a = [raw-array: "a", "b", "c"]
@@ -200,6 +260,17 @@ end
     Converts a @pyret-id["List" "lists"] to a @pyret-id{RawArray} containing
     the same elements in the same order.
 
+@examples{
+check:
+  raw-array-from-list(empty) is=~ [raw-array: ]
+  raw-array-from-list(empty) is-not [raw-array: ]
+  
+  raw-array-from-list([list: 1, 2, 3]) is=~ [raw-array: 1, 2, 3]
+  raw-array-from-list([list: 1, 2, 3]) is-not [raw-array: 1, 2, 3]
+end
+}
+
+
   @function["raw-array-build" #:contract (a-arrow (a-arrow N "a") N (RA-of "a")) #:return (RA-of "a")]
 
     Constructs an array of length @pyret{size}, and fills it with the result of
@@ -213,12 +284,116 @@ end
   }
 
 
+  @function["raw-array-build-opt" #:contract (a-arrow (a-arrow N (O-of A)) N) #:return (RA-of A)]
+  
+    Constructs an array based on the results of
+    calling the function @pyret{f} with each index from @pyret{0} to @pyret{size
+    - 1}. For each index, if the result of @pyret{f} is @pyret{some(value)},
+    then @pyret{value} is included in the resulting array (it is not included
+    for @pyret{none}). The size of the resulting array is equal to the number of
+    @pyret{some} results.
+    
+    @examples{
+check:
+  fun even(n):
+    if num-modulo(n, 2) == 0: some(n)
+    else: none
+    end
+  end
+  raw-array-build-opt(even, 10) is=~ [raw-array: 0, 2, 4, 6, 8]
+end    
+   } 
+  
+  @function["raw-array-map" #:contract (a-arrow (a-arrow "a" "b") (RA-of "a")) #:return (RA-of "b")]
+
+  Creates a new array by applying @pyret{f} to each element of the array.
+  Similar to @pyret-id["map" "lists"]. Has an argument order that works with
+  @pyret{for}.
+
+  @examples{
+check:
+  a = [raw-array: "apple", "banana", "plum"]
+  lengths = for raw-array-map(s from a):
+    string-length(s)
+  end
+  lengths is=~ [raw-array: 5, 6, 4]
+end
+  }
+  
+  Note that the test uses @pyret-id["is=~" "testing"], because raw arrays are
+  mutable and so the two values in the shown test are not
+  @pyret-id["equal-always" "equality"], they are @pyret-id["equal-now"
+  "equality"].
+  
+  @function["raw-array-filter" #:contract (a-arrow (a-arrow "a" B) (RA-of "a")) #:return (RA-of "a")]
+
+  Applies function @pyret{f} to each element of @pyret{array} from left to right,
+  constructing a new @pyret{RawArray} out of the elements for which @pyret{f}
+  returned @pyret{true}.
+  Similar to @pyret-id["filter" "lists"]. Has an argument order that works with
+  @pyret{for}.
+
+  @examples{
+check:
+  a = [raw-array: "apple", "banana", "plum"]
+  p-words = for raw-array-filter(s from a):
+    string-contains(s, "p")
+  end
+  p-words is=~ [raw-array: "apple", "plum"]
+end
+  }
+  
+  @function["raw-array-sort-nums" #:contract (a-arrow (RA-of N) B) #:return (RA-of N)]
+
+  Sorts the given array @emph{in-place} in ascending or descending order
+  according to the @pyret{asc} parameter. Returns a reference to the
+  original array, which will have its contents mutably updated.
+
+  @examples{
+check:
+  a = [raw-array: 3, 1, 4, 1, 5, 9, 2]
+
+  asc = raw-array-sort-nums(a, true)
+  asc is<=> a
+  a is=~ [raw-array: 1, 1, 2, 3, 4, 5, 9]
+
+  raw-array-sort-nums(a, false)
+  a is=~ [raw-array: 9, 5, 4, 3, 2, 1, 1]
+end
+}
+
+  @function["raw-array-sort-by" #:contract (a-arrow (RA-of "a") (a-arrow "a" N) B) #:return (RA-of "a")]
+
+  Creates a new array containing the sorted contents of the given array. The sort
+  order is determined by calling the @pyret{key} function on each element to
+  get a number, and sorting the elements by their key value (in increasing key
+  order if @pyret{asc} is @pyret{true}, decreasing if @pyret{false}). Ties are
+  broken by the order in which the element is present in the initial array.
+  
+  @examples{
+check:
+  a = [raw-array: "let", "us", "go", "then", "you", "and", "i"]
+
+  asc = raw-array-sort-by(a, string-length, true)
+  asc is=~ [raw-array: "i", "us", "go", "let", "you", "and", "then"]
+  asc is-not=~ a
+
+  desc = raw-array-sort-by(a, string-length, false)
+  desc is=~ [raw-array: "then", "let", "you", "and", "us", "go", "i"]
+
+  a is=~ [raw-array: "let", "us", "go", "then", "you", "and", "i"]
+end
+}
+  
+
   @function["raw-array-fold" #:contract (a-arrow (a-arrow "b" "a" N "b") "b" (RA-of "a") N "b") #:return "b"]
 
   Combines the elements in the array with a function that accumulates each
-  element with an intermediate result.  Similar to @pyret-id["fold_n" "lists"].
-  Has an argument order that works with @pyret{for}.  The numeric argument to
+  element with an intermediate result.
+  The numeric argument to
   the accumulator is the index of the current element.
+
+  Similar to @pyret-id["fold_n" "lists"].
 
   @examples{
 check:
@@ -231,6 +406,57 @@ check:
     end
   end
   str is "a: 0, b: 1, c: 2"
+end
+  }
+  
+  @function["raw-array-concat" #:contract (a-arrow (RA-of "a") (RA-of "a" )) #:return (RA-of "a")]
+  
+  Creates a new array with all the elements of @pyret{array1} followed by all
+  the elements of @pyret{array2}.
+  
+@examples{
+check:
+  a1 = [raw-array: 5, 6, 7]
+  a2 = [raw-array: 0, 3, 99, -1, 7]
+
+  c = raw-array-concat(a1, a2)
+  c is=~ [raw-array: 5, 6, 7, 0, 3, 99, -1, 7]
+  
+  a1 is=~ [raw-array: 5, 6, 7]
+  a2 is=~ [raw-array: 0, 3, 99, -1, 7]
+end
+}
+
+  
+
+  @function["raw-array-duplicate"]
+
+  Returns a copy of the given array, such that corresponding elements in the
+  result are @seclink["eq-fun-identical"] to those in the source array.
+  
+  @examples{
+check:
+  a = [raw-array: 1, 2, 3]
+  b = raw-array-duplicate(a)
+  a is=~ b
+  b is=~ a
+
+  a is<=> a
+  a is-not<=> b
+  b is-not<=> a
+  b is<=> b
+
+  raw-array-set(a, 1, 1)
+
+  raw-array-get(a, 1) is 1
+  raw-array-get(b, 1) is 2
+
+  c = [raw-array: {1; 2}, {3; 4}]
+  d = raw-array-duplicate(c)
+
+  c is-not<=> d
+  raw-array-get(c, 0) is<=> raw-array-get(d, 0)
+  raw-array-get(c, 1) is<=> raw-array-get(d, 1)
 end
   }
 

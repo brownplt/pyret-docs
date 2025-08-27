@@ -2,6 +2,7 @@ MANUAL_FONTS = "$(shell racket -e '(display (collection-file-path "manual-fonts.
 
 all: docs
 
+# annoying but true? no way to rename a ++extra. So pyret-embed comes in as pyret_2.js
 docs:
 	racket run.rkt \
     ++style $(MANUAL_FONTS) \
@@ -11,12 +12,25 @@ docs:
     \
     ++extra ./node_modules/pyret-codemirror-mode/mode/pyret.js \
     ++style ./node_modules/pyret-codemirror-mode/css/pyret.css \
+    ++extra src/pyret-logo-small.png \
+    ++extra src/GNOME_Terminal-small.png \
+    ++extra src/code-stable-small.png \
+    ++extra src/terminal-vscode.png \
     ++extra src/hilite.js \
     ++extra src/Pyret-Tutorial/airplane-small.png \
+    ++extra src/vscode-open.png \
+    ++extra src/open-with.png \
+    ++extra src/open-with-default.png \
+    ++extra src/play-button.png \
+    ++extra src/split-run.png \
     ++extra src/trove/brush.svg \
     ++extra src/trove/paint.svg \
     ++extra src/trove/checkers.svg \
     ++extra src/search.js \
+    ++extra node_modules/pyret-embed/dist/pyret.js \
+    ++extra node_modules/pyret-embed/dist/default-rpcs.js \
+    ++extra src/embed-api.js \
+    ++extra src/filesystem.js \
     \
     ++style src/styles.css \
     --prefix src/myprefix.html \
@@ -27,6 +41,7 @@ docs:
     --htmls-search src/index.scrbl
 	mkdir -p build/docs/search
 	cp src/search.html build/docs/search/index.html
+	cp -r node_modules/pyret-embed/dist/build build/docs/
 	patch build/docs/scribble-common.js src/scribble-common.patch
 
 release-docs: docs
