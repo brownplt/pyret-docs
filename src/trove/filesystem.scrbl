@@ -23,7 +23,6 @@
 The @pyret{filesystem} library provides functions for reading and writing files,
 as well as working with paths.
 
-@margin-note{These are selections from @link["https://www.cs.yale.edu/homes/perlis-alan/quotes.html" "Alan Perlis's Epigrams on Programming"]}
 The examples on this page work against a small filesystem that is set up every
 time the page loads. The filesystem contains the contents below, and the working
 directory is @pyret{/}.

@@ -2,10 +2,10 @@
 
 @(require "../../scribble-api.rkt")
 
-@title[#:tag "environments"]{Environments}
+@title[#:tag "platforms"]{Platforms}
 
-This section summarizes the different @emph{environments} in which Pyret can
-run.  Most features are available across all environments, there are some that
+This section summarizes the different @emph{platforms} in which Pyret can
+run.  Most features are available across all platforms, there are some that
 only work in particular settings.
 
 Elsewhere in the documentation you may see features flagged with
@@ -35,13 +35,13 @@ your browser, and connect to Google Drive to save and share programs you write.
 The
 @link["https://marketplace.visualstudio.com/items?itemName=PyretProgrammingLanguage.pyret-parley"
 "Pyret VScode Extension"] provides a way to run Pyret code within Visual Studio
-Code in an environment similar to code.pyret.org, with a definitions and interactions area.
+Code in an interface similar to code.pyret.org, with a definitions and interactions area.
 
 @subsection{Installing the VScode Extension}
 
 From Visual Studio Code, choose the extensions sidebar options (looks like four
 squares with the top right square at an angle). Search for “Pyret” and click on
-the extension called “Pyret Interactive Editor for VScode”. You should see a
+the extension called “Pyret Interactive Editor for VScode” by the author “Pyret Programming Language”. You should see a
 screen like this, with an option to install, which you can click to add the extension:
 
 @image["src/vscode-install.png"]
