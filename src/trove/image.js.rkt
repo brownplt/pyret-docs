@@ -33,6 +33,8 @@
   (fun-spec (name "is-step-count") (arity 1))
   (fun-spec (name "is-image") (arity 1))
   (fun-spec (name "image-url") (arity 1))
+  (fun-spec (name "image-file") (arity 1))
+  (fun-spec (name "save-image") (arity 2))
   (fun-spec (name "images-equal") (arity 2))
   (fun-spec (name "images-difference") (arity 2))
   (fun-spec (name "text") (arity 3))
@@ -1716,6 +1718,32 @@ spaces, or can be dropped altogether.  Unknown color names produce an error.
   }
   @repl-examples[
     `(@{image-url("https://www.pyret.org/img/pyret-banner.png")}
+      ,(html:image "https://www.pyret.org/img/pyret-banner.png"))
+  ]
+  @function[
+    "image-file"
+            #:contract (a-arrow S Image)
+            #:return Image
+            #:args (list '("path" ""))]{
+    @vscode-cli-only{@para{Loads the image specified by @pyret{path}, which should be a relative path
+    to a file.}}
+  }
+  @repl-examples[
+    `(@{image-file("./pyret-banner.png")}
+      ,(html:image "https://www.pyret.org/img/pyret-banner.png"))
+  ]
+  @function[
+    "save-image"
+            #:contract (a-arrow Image S Image)
+            #:return Image
+            #:args (list '("image" "") '("path" ""))]{
+    @vscode-cli-only{@para{Saves the the @code{image} into the file @pyret{path}, which should be a relative path
+    to a file. Returns the original image.}}
+  }
+  @repl-examples[
+    `(@{i = image-file("./pyret-banner.png")
+        save-image(i, "./pyret-banner-copy.png")
+        image-file("./pyret-banner-copy.png")}
       ,(html:image "https://www.pyret.org/img/pyret-banner.png"))
   ]
   @function[
