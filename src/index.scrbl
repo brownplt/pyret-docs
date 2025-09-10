@@ -37,6 +37,7 @@ Pyret.}
 updates over time.
 
 @itemlist[
+  @item{@hyperlink["https://www.pyret.org/release-notes/2025.html"]{Summer 2025}}
   @item{@hyperlink["https://www.pyret.org/release-notes/summer-2021.html"]{Summer 2021}}
   @item{@hyperlink["https://www.pyret.org/release-notes/summer-2020.html"]{Summer 2020}}
   @item{@hyperlink["https://groups.google.com/g/pyret-discuss/c/kUr3iIYsheE/m/Z7FTW9ZcEwAJ"]{Fall 2017}}
