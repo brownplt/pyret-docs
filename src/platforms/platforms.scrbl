@@ -66,7 +66,7 @@ may or may not be turned on (it is
 "automatically enabled on github.dev and in Codespaces"] and
 @link["https://code.visualstudio.com/docs/editing/codebasics#_save-auto-save"
 "not enabled by default in desktop VScode"]). Look for a dot next to the
-filename (e.g. @tt{•my-program.arr}) indicating unsaved changes if you're not sure.
+filename (e.g. @tt{my-program.arr •}) indicating unsaved changes if you're not sure.
 
 @subsection{Use with github.dev}
 
