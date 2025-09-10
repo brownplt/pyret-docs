@@ -256,9 +256,9 @@ definition they will find in their textbooks.
   
   @examples{
     check:  
-      stdev([list: ]) raises "list is empty"
-      stdev([list: 2]) raises "division by zero"
-      stdev([list: 2, 4, 4, 4, 5, 5, 7, 9]) is-roughly 2.1380899
+      stdev-sample([list: ]) raises "list is empty"
+      stdev-sample([list: 2]) raises "division by zero"
+      stdev-sample([list: 2, 4, 4, 4, 5, 5, 7, 9]) is-roughly 2.1380899
     end 
   }
   }

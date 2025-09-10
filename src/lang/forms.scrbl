@@ -1844,7 +1844,7 @@ end
 
 @margin-note{There are additional equality operators in Pyret, which also call methods, but are
 somewhat more complex.  They are documented in detail in @seclink["equality"].}
-The arithmetic and comparison operators examine their arguments.  For primtive
+The arithmetic and comparison operators examine their arguments.  For primitive
 numbers and strings, the operation happens internally to Pyret.  If the
 arguments are objects, however, the operators are syntactic sugar for a particular
 method call, as follows:

@@ -136,6 +136,17 @@ check:
 end
 }
 
+Setting a value is not restricted to existing keys.
+
+@examples{
+check:
+  s1 = [string-dict: ]
+  s2 = s1.set("Hello", "World")
+  s1.get("Hello") is none
+  s2.get("Hello") is some("World")
+end
+}
+
 @sd-method["has-key"
   #:contract (a-arrow (SD-of "a") S B)
   #:args (list (list "self" #f) (list "key" #f))

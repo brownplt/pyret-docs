@@ -1083,7 +1083,7 @@ An alias for @pyret-id["num-within-rel" "numbers"], much as @pyret-id["within"
 
   @function["num-random" #:contract (a-arrow N N) #:return N]{
 
-  Returns a pseudo-random positive integer from @pyret{0} to @pyret{max - 1}.
+  Returns a pseudo-random integer from @pyret{0} to @pyret{max - 1}.
 
 @examples{
 check:
