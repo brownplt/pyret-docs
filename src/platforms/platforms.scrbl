@@ -58,10 +58,15 @@ Then you can use the Run button and other editor features as usual.
 
 @image["src/vscode-open.png"]
 
-Pyret programs in open editors will always automatically save on each edit,
-there is no need to separately save them. This is independent of the “autosave”
-setting in Visual Studio Code, though this behavior may change in a future
-release.
+Pyret programs in open editors save and synchronize to the filesystem like
+other open text files, respecting keyboard shortcuts like Ctrl/Cmd-s or
+“Save” in the “File” menu. Depending on how VScode is configured autosave
+may or may not be turned on (it is
+@link["https://docs.github.com/en/codespaces/about-codespaces/understanding-the-codespace-lifecycle#saving-changes-in-a-codespace"
+"automatically enabled on github.dev and in Codespaces"] and
+@link["https://code.visualstudio.com/docs/editing/codebasics#_save-auto-save"
+"not enabled by default in desktop VScode"]). Look for a dot next to the
+filename (e.g. @tt{•my-program.arr}) indicating unsaved changes if you're not sure.
 
 @subsection{Use with github.dev}
 
