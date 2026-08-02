@@ -288,7 +288,8 @@ end
 Returns a new string created from the characters of the input string, starting
 from @pyret{start-index} (inclusive) and ending at @pyret{end-index} (exclusive).
 Raises an exception if @pyret{start-index} is greater than @pyret{end-index}, if @pyret{start-index}
-is greater than the length of the string, or if @pyret{end-index} is less than 0.
+is less than 0 or greater than the length of the string, or if @pyret{end-index} is less than 0 or
+greater than the length of the string.
 
 The returned string always has length @pyret{end-index} - @pyret{start-index}.
 
