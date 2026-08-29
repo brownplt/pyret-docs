@@ -19,7 +19,7 @@
 
   If no errors occur, returns @pyret-id["left" "either"] with the returned
   string body. The user is expected to decompose this string
-  using @pyret-id["string" "String"] or other functions.
+  using @pyret-id["String" "<global>"] or other functions.
 
   If any errors occur, returns @pyret-id["right" "either"] with that error as a string.
 
