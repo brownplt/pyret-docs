@@ -829,7 +829,9 @@ operations.
 
 This library defines both the @pyret-id["Vector"] datatype and the
 @pyret-id["Matrix"] datatype.  All functionality in this library is defined
-both as methods on the data values and as analogous functions.
+both as methods on the data values and as analogous functions.  In parallel
+with the @pyret-id["List" "lists"] and @pyret-id["Table" "tables"] libraries, all indices in
+this library are zero-based.
 
 @section{The Vector Datatype}
 
@@ -860,7 +862,9 @@ Vector constructor which only creates three-dimensional vector instances.
 Vectors are defined to permit using addition and subtraction operators on them,
 whenever the lengths of the vectors are the same:
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [vector: 1, 2, 3] + [vector: 4, 5, 6] is [vector: 5, 7, 9]
   [vector: 1] + [vector: 1, 2] raises "vectors of different lengths"
@@ -875,11 +879,13 @@ Two vectors are considered equal when their lengths are the same and their
 corresponding elements are equal, and obeys the same restrictions on comparing
 exact and rough numbers for equality:
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   ([vector: 1] == [vector: 1, 2]) is false
   ([vector: 1, 2] == [vector: 1, 2]) is true
-  ([vector: ~1, ~2] == [vector: 1, 2]) raises "not allowed"
+  ([vector: ~1, ~2] == [vector: 1, 2]) raises "Roughnums"
   roughly-equal([vector: ~1, ~2], [vector: 1, 2]) is true
 end
 }
@@ -888,9 +894,11 @@ end
 
 @vector-method["get"]
 
-Returns the item at the given index in this vector.
+Returns the item at the given (0-based) index in this vector.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [vector: 3, 5].get(1) is 5
 end
@@ -900,7 +908,9 @@ end
 
 Returns the length of this vector.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [vector: 1, 2, 3, 4].length() is 4
 end
@@ -910,7 +920,9 @@ end
 
 Returns the dot product of this vector with the given vector.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [vector: 1, 2, 3].dot([vector: 3, 2, 1]) is 10
 end
@@ -920,21 +932,26 @@ end
 
 Returns the magnitude of this vector.
 
-@examples{
-  check:
-    [vector: 3, 4].magnitude() is 5
-    [vector: 4, 0].magnitude() is 4
-  end
-  }
+@examples[#:show-try-it #t]{
+include matrices
+
+check:
+  [vector: 3, 4].magnitude() is 5
+  [vector: 4, 0].magnitude() is 4
+end
+}
 
 @vector-method["cross"]
 
 Returns the cross product of this 3D vector and the given 3D vector.
 (Raises an error if either this or that vector are not 3-dimensional)
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [vector: 2, -3, 1].cross([vector: -2, 1, 1]) is [vector: -4, -4, -4]
+  [vector: 2, -3, 1, 4].cross([vector: -2, 1]) raises "3-d vectors"
 end
 }
 
@@ -942,10 +959,12 @@ end
 
 Normalizes this vector into a unit vector.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [vector: 1, 2, 3].normalize()
-    is [vector: (1 / num-sqrt(14)), (2 / num-sqrt(14)), (3 / num-sqrt(14))]
+    is-roughly [vector: (1 / num-sqrt(14)), (2 / num-sqrt(14)), (3 / num-sqrt(14))]
 end
 }
 
@@ -954,7 +973,9 @@ end
 
 Scales this vector by the given constant.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [vector: 1, 2, 3].scale(2) is [vector: 2, 4, 6]
 end
@@ -964,7 +985,9 @@ end
 
 Converts this vector to a one-row matrix.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [vector: 4, 5, 6].to-row-matrix() is [matrix(1, 3): 4, 5, 6]
 end
@@ -974,9 +997,11 @@ end
 
 Converts this vector to a one-column matrix.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
-  [vector: 4, 5, 6].to-row-matrix() is [matrix(3, 1): 4, 5, 6]
+  [vector: 4, 5, 6].to-col-matrix() is [matrix(3, 1): 4, 5, 6]
 end
 }
 
@@ -984,9 +1009,11 @@ end
 
 @function["vec-get"]
 
-Returns the item at the given index in the given vector.
+Returns the item at the given (0-based) index in the given vector.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   vec-get([vector: 3, 5], 1) is 5
 end
@@ -998,7 +1025,9 @@ See @pyret-method["Vector" "get"].
 
 Returns the length of the given vector.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   vec-length([vector: 1, 2, 3, 4]) is 4
 end
@@ -1010,9 +1039,11 @@ See @pyret-method["Vector" "length"].
 
 Returns the dot product of the first vector with the second vector.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
-  vec-dot[vector: 1, 2, 3], ([vector: 3, 2, 1]) is 10
+  vec-dot([vector: 1, 2, 3], [vector: 3, 2, 1]) is 10
 end
 }
 
@@ -1022,11 +1053,13 @@ See @pyret-method["Vector" "dot"].
 
 Returns the magnitude of the given vector.
 
-@examples{
-  check:
-    vec-magnitude([vector: 3, 4]) is 5
-    vec-magnitude([vector: 4, 0]) is 4
-  end
+@examples[#:show-try-it #t]{
+include matrices
+
+check:
+  vec-magnitude([vector: 3, 4]) is 5
+  vec-magnitude([vector: 4, 0]) is 4
+end
 }
 
 See @pyret-method["Vector" "magnitude"].
@@ -1036,9 +1069,12 @@ See @pyret-method["Vector" "magnitude"].
 Returns the cross product of the two given 3D vectors.
 (Raises an error if either vector is not 3-dimensional)
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   vec-cross([vector: 2, -3, 1], [vector: -2, 1, 1]) is [vector: -4, -4, -4]
+  vec-cross([vector: 2, -3, 1, 4], [vector: -2, 1]) raises "length3"
 end
 }
 
@@ -1048,10 +1084,12 @@ See @pyret-method["Vector" "cross"].
 
 Normalizes the given vector into a unit vector.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   vec-normalize([vector: 1, 2, 3])
-    is [vector: (1 / num-sqrt(14)), (2 / num-sqrt(14)), (3 / num-sqrt(14))]
+    is-roughly [vector: (1 / num-sqrt(14)), (2 / num-sqrt(14)), (3 / num-sqrt(14))]
 end
 }
 
@@ -1062,7 +1100,9 @@ See @pyret-method["Vector" "normalize"].
 
 Scales the given vector by the given constant.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   vec-scale([vector: 1, 2, 3], 2) is [vector: 2, 4, 6]
 end
@@ -1075,7 +1115,9 @@ See @pyret-method["Vector" "scale"].
 
 Adds the second vector to first one.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   vec-add([vector: 1, 2, 3], [vector: 4, 5, 6]) is [vector: 5, 7, 9]
   vec-add([vector: 1], [vector: 1, 2]) raises "vectors of different lengths"
@@ -1087,7 +1129,9 @@ end
 
 Subtracts the second vector from first one.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   vec-sub([vector: 1, 2, 3], [vector: 4, 5, 6]) is [vector: -3, -3, -3]
   vec-sub([vector: 1], [vector: 1, 2]) raises "vectors of different lengths"
@@ -1108,7 +1152,9 @@ The @pyret{Matrix} type represents mathematical matrices.
 Every matrix has a @pyret{rows} field and a @pyret{cols} field, which are the
 dimensions of the matrix.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2, 3): 10, 20, 30, 40, 50, 60].rows is 2
   [matrix(2, 3): 10, 20, 30, 40, 50, 60].cols is 3
@@ -1125,16 +1171,20 @@ Publicly exposed constructor which constructs a matrix of size
 
 The following example represents the matrix @math-imtx{1 & 2 & 3 \\ 4 & 5 & 6}:
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 [matrix(2,3): 1, 2, 3, 4, 5, 6]
 }
 
 Supplying an inconsistent quantity of elements for a given matrix dimension
 will produce an error:
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
-  [matrix(4, 2): 100] raises "Invalid 1x2 Matrix"
+  [matrix(4, 2): 100] raises "Invalid 4x2 Matrix"
 end
 }
 
@@ -1144,7 +1194,9 @@ Constructor which returns a one-row matrix containing the given entries.
 
 The following will construct the matrix @math-imtx{1 & 2 & 3}:
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [row-matrix: 1, 2, 3] is [matrix(1,3): 1, 2, 3]
 end
@@ -1156,7 +1208,9 @@ Constructor which returns a one-column matrix containing the given entries.
 
 The following will construct the matrix @math-imtx{1 \\ 2 \\ 3}:
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [col-matrix: 1, 2, 3] is [matrix(3,1): 1, 2, 3]
 end
@@ -1166,7 +1220,9 @@ end
 
 Constructs an @math-in{n \times n} identity matrix.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   identity-matrix(2) is [matrix(2,2): 1, 0,
                                       0, 1]
@@ -1180,7 +1236,9 @@ end
 
 Constructs a matrix of the given size using only the given element.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   make-matrix(2, 3, 1) is [matrix(2,3): 1, 1, 1,
                                         1, 1, 1]
@@ -1194,7 +1252,9 @@ end
 
 Constructs a matrix of the given size containing only zeroes.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   zero-matrix(2, 3) is [matrix(2,3): 0, 0, 0,
                                      0, 0, 0]
@@ -1206,9 +1266,11 @@ end
 
 Constructs a matrix of the given size, where entry @math{(i,j)} is the result of @pyret{proc(i,j)}.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
-  build-matrix(2, 3, lam(i,j): i + j end) is [matrix(3,2): 0, 1, 1, 2, 2, 3]
+  build-matrix(3, 2, lam(i,j): i + j end) is [matrix(3,2): 0, 1, 1, 2, 2, 3]
 end
 }
 
@@ -1218,9 +1280,11 @@ These methods are available on all matrices.
 
 @matrix-method["get"]
 
-Returns the matrix's entry in the @math{i^th} row and the @math{j^th} column.
+Returns the matrix's entry in the (0-based) @math{i^th} row and the @math{j^th} column.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(3,2): 1, 2, 3, 4, 5, 6].get(1,1) is 4
   [matrix(3,2): 1, 2, 3, 4, 5, 6].get(2,0) is 5
@@ -1234,7 +1298,9 @@ Returns the matrix as a list of numbers in row-major order.
 
 For example, given the matrix @math-imtx{2 & 4 & 6 \\ 8 & 10 & 12 \\ 14 & 16 & 18}:
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(3,3): 2, 4, 6,
                 8, 10, 12,
@@ -1247,7 +1313,9 @@ end
 
 Returns a one-row/one-column matrix as a vector.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,1): 4, 5].to-vector() is [vector: 4, 5]
   [matrix(1,2): 4, 5].to-vector() is [matrix(2,1): 4, 5].to-vector()
@@ -1261,7 +1329,9 @@ end
 Returns the matrix as a list of lists of numbers, with each list
 corresponding to one row.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,3): 1, 2, 3, 4, 5, 6].to-lists()
     is [list: [list: 1, 2, 3],
@@ -1278,7 +1348,9 @@ with each list corresponding to one column.
 For example, the matrix @math-imtx{1 & 2 & 3 \\ 4 & 5 & 6} corresponds to the
 vectors @math-imtx{1 \\ 4}, @math-imtx{2 \\ 5}, and @math-imtx{3 \\ 6}: 
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,3): 1, 2, 3, 4, 5, 6].to-vectors()
     is [list: [vector: 1, 4],
@@ -1289,59 +1361,74 @@ end
 
 @matrix-method["row"]
 
-Returns a one-row matrix with the matrix's given row.
+Returns a one-row matrix with the matrix's given row (0-based index).
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
-  [matrix(2,3): 1, 2, 3, 4, 5, 6].row(2)
+  [matrix(2,3): 1, 2, 3, 4, 5, 6].row(1)
     is [matrix(1,3): 4, 5, 6]
 
-  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].row(3)
+  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].row(2)
     is [matrix(1,3): 7, 8, 9]
+
+  [matrix(1,1): 1].row(2) raises "index"
 end
 }
 
 @matrix-method["col"]
 
-Returns a one-column matrix with the matrix's given column.
+Returns a one-column matrix with the matrix's given column (0-based index).
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
-  [matrix(2,3): 1, 2, 3, 4, 5, 6].col(2)
+  [matrix(2,3): 1, 2, 3, 4, 5, 6].col(1)
     is [matrix(2,1): 2, 5]
 
-  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].col(3)
+  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].col(2)
     is [matrix(3,1): 3, 6, 9]
+
+  [matrix(1,1): 1].col(2) raises "index"
 end
 }
 
 @matrix-method["submatrix"]
 
 Returns the submatrix of the matrix comprised of the intersection
-of the given list of rows and the given list of columns.
+of the given list of (0-based) row indices and the given list of (0-based)
+column indices.
 
-For example, if our list of rows is @math-in{\{1, 2\}} and our
-list of columns is @math-in{\{2, 3\}}, then the positions in the
+For example, if our list of rows is @math-in{\{0, 1\}} and our
+list of columns is @math-in{\{1, 2\}}, then the positions in the
 resulting submatrix will be the elements with @math-in{(row,col)} positions
-@math-in{\{(1, 2), (1, 3), (2, 2), (2, 3)\}}.
+@math-in{\{(0, 1), (0, 2), (1, 1), (1, 2)\}}.
 
 @math-in{
 \left[\begin{matrix} 
-            a_{11} & a_{12} & a_{13} \\
-            a_{21} & a_{22} & a_{23} \\
-            a_{31} & a_{32} & a_{33}
-            \end{matrix}\right]}@pyret{.submatrix([list: 1, 2], [list: 2, 3])}
+            a_{00} & a_{01} & a_{02} \\
+            a_{10} & a_{11} & a_{12} \\
+            a_{20} & a_{21} & a_{22}
+            \end{matrix}\right]}@pyret{.submatrix([list: 0, 1], [list: 1, 2])}
                                      @math-in{=
 \left[\begin{matrix}
-a_{12} & a_{13} \\
-a_{22} & a_{23}\end{matrix}\right]}
+a_{01} & a_{02} \\
+a_{11} & a_{12}\end{matrix}\right]}
 
 This is shown in the below example:
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
-  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].submatrix([list: 1, 2], [list: 2, 3])
-    is [matrix(2,2): 2, 3, 4, 5]
+  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].submatrix([list: 0, 1], [list: 1, 2])
+    is [matrix(2,2): 2, 3, 5, 6]
+  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].submatrix([list: 0, 3], [list: 1, 2])
+    raises "Invalid row index"
+  [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].submatrix([list: 0, 1], [list: 1, 3])
+    raises "Invalid column index"
 end
 }
 
@@ -1352,7 +1439,9 @@ Returns the transposition of the matrix. For example,
                  \overrightarrow{Transpose}
                  \begin{bmatrix}1 & 4 \\ 2 & 5 \\ 3 & 6\end{bmatrix}}
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,3): 1, 2, 3, 4, 5, 6].transpose()
     is [matrix(3,2): 1, 4, 2, 5, 3, 6]
@@ -1368,12 +1457,14 @@ complex numbers, this is synonymous with @pyret-method["Matrix" "transpose"].
 
 Returns a one-row matrix containing the matrix's diagonal entries.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(3,3): 1, 2, 3, 4, 5, 6, 7, 8, 9].diagonal()
     is [matrix(1,3): 1, 5, 9]
 
-  [matrix(3,2): 1, 2, 3, 4, 5, 6].diagonal()
+  [matrix(2,3): 1, 2, 3, 4, 5, 6].diagonal()
     is [matrix(1,2): 1, 5]
 end
 }
@@ -1385,7 +1476,9 @@ consists of all the values on or above the main diagonal, and zeroes below it.
 For example, the upper triangle of @math-imtx{1 & 2 & 3\\ 4 & 5 & 6\\ 7 & 8 & 9}
 would be @math-imtx{1 & 2 & 3\\ 0 & 5 & 6 \\ 0 & 0 & 9}.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,2): 1, 2,
                 3, 4].upper-triangle()
@@ -1408,7 +1501,9 @@ consists of all the values on or below the main diagonal, and zeroes above it.
 For example, the upper triangle of @math-imtx{1 & 2 & 3\\ 4 & 5 & 6\\ 7 & 8 & 9}
 would be @math-imtx{1 & 0 & 0\\ 4 & 5 & 0\\ 7 & 8 & 9}.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,2): 1, 2,
                 3, 4].lower-triangle()
@@ -1430,7 +1525,9 @@ Returns the matrix as a list of one-row matrices.
 (Very similar to @pyret-method["Matrix" "to-lists"], except this method
 returns a list of matrices instead.)
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,3): 1, 2, 3, 4, 5, 6].row-list()
     is [list: [matrix(1,3): 1, 2, 3],
@@ -1444,7 +1541,9 @@ Returns the matrix as a list of one-column matrices.
 (Very similar to @pyret-method["Matrix" "to-vectors"], except this method
 returns a list of matrices instead.)
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,3): 1, 2, 3, 4, 5, 6].col-list()
     is [list: [matrix(2,1): 1, 4],
@@ -1457,10 +1556,12 @@ end
 
 Maps the given function entrywise over the matrix.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
-  multTwo = lam(x): x * 2 end
-  [matrix(2,2): 1, 2, 3, 4].map(multTwo)
+  mult-two = lam(x): x * 2 end
+  [matrix(2,2): 1, 2, 3, 4].map(mult-two)
     is [matrix(2,2): 2, 4, 6, 8]
 end
 }
@@ -1469,7 +1570,9 @@ end
 Maps the given function entrywise over corresponding elements of this and the
 given matrix.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   m1 = [matrix(2,2): 10, 20, 30, 40]
   m2 = [matrix(2,2): 4, 3, 2, 1]
@@ -1483,12 +1586,21 @@ end
 
 Maps the given function over each row in the matrix.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
+fun sum-row(r):
+  for fold(sum from 0, item from r.to-list()):
+    sum + item
+  end
+end
+
 check:
-  # sumRow :: 1*n matrix
-  # Computes the total sum of all entries in the given row
-  sumRow = lam(row): [matrix(1,1): row.to-vector().foldr(_ + _)] end
-  [matrix(2,3): 1, 2, 3, 4, 5, 6].row-map(sumRow) is [matrix(2,1): 6, 15]
+  fun sum-row-once(row): [matrix(1,1): sum-row(row)] end
+  fun sum-row-block(row): make-matrix(2, 2, sum-row(row)) end
+  [matrix(2,3): 1, 2, 3, 4, 5, 6].row-map(sum-row-once) is [matrix(2,1): 6, 15]
+  [matrix(2,2): 1, 2, 3, 4].row-map(sum-row-block) 
+    is [matrix(4,2): 3, 3, 3, 3, 7, 7, 7, 7]
 end
 }
 
@@ -1496,12 +1608,21 @@ end
 
 Maps the given function over each column in the matrix.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
+fun sum-col(c):
+  for fold(sum from 0, item from c.to-list()):
+    sum + item
+  end
+end
+
 check:
-  # sumCol :: m*1 matrix
-  # Computes the total sum of all entries in the given column
-  sumCol = lam(col): [matrix(1,1): col.to-vector().foldr(_ + _)] end
-  [matrix(2,3): 1, 2, 3, 4, 5, 6].col-map(sumCol) is [matrix(1,3): 5, 7, 9]
+  fun sum-col-once(col): [matrix(1,1): sum-col(col)] end
+  fun sum-col-block(col): make-matrix(2, 2, sum-col(col)) end
+  [matrix(2,3): 1, 2, 3, 4, 5, 6].col-map(sum-col-once) is [matrix(1,3): 5, 7, 9]
+  [matrix(2,3): 1, 2, 3, 4, 5, 6].col-map(sum-col-block) 
+    is [matrix(2,6): 5,5,7,7,9,9, 5,5,7,7,9,9]
 end
 }
 
@@ -1512,7 +1633,9 @@ example, augmenting the matrix @math-imtx{1 & 2\\4 & 5} with
 the matrix @math-imtx{3\\ 6} yields the matrix
 @math-imtx{1 & 2 & 3\\ 4 & 5 & 6}.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,2): 1, 2,
                 4, 5].augment([matrix(2,1): 3,
@@ -1529,7 +1652,9 @@ example, stacking the matrix @math-imtx{1 & 2 & 3} on top of
 the matrix @math-imtx{4 & 5 & 6} gives the matrix
 @math-imtx{1 & 2 & 3\\ 4 & 5 & 6}.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(1,3): 1, 2, 3].stack([matrix(1,3): 4, 5, 6])
     is [matrix(2,3): 1, 2, 3,
@@ -1541,7 +1666,9 @@ end
 
 Returns the trace of the matrix (i.e. the sum of its diagonal values).
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(3,3): 1, 2, 3,
                 4, 5, 6,
@@ -1555,7 +1682,9 @@ end
 
 Multiplies each entry in the matrix by the given value.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,2): 1, 2, 3, 4].scale(2) is [matrix(2,2): 2, 4, 6, 8]
 
@@ -1577,7 +1706,9 @@ denotes matrix multiplication):
 \underbrace{\left[\begin{smallmatrix}(1\cdot 4)+(2\cdot 2)+(3\cdot \frac{4}{3})\end{smallmatrix}\right]}_{
 1\times 1 \text{ matrix}}}@pyret{.trace()}@math-in{=12}
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(1,3): 1, 2, 3].dot([matrix(1,3): 4, 2, 4/3]) is 12
   [matrix(1,3): 1, 2, 3].dot([matrix(1,3): 1, 1, 1]) is 6
@@ -1588,7 +1719,9 @@ end
 
 Multiplies the matrix by itself the given number of times.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   a = [matrix(2,2): 1, 2, 3, 4]
   a.expt(1) is a
@@ -1602,13 +1735,15 @@ end
 Returns the determinant of the matrix, calculated via a recursive
 implementation of Laplace expansion.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(5,5): 1, 2, 1, 2, 3,
                 2, 3, 1, 0, 1,
                 2, 2, 1, 0, 0,
                 1, 1, 1, 1, 1,
-                0,-2, 0,-2,-2].determinant() is -2
+                0,-2, 0,-2,-2].determinant() is 2
 end
 }
 
@@ -1632,7 +1767,9 @@ Returns the Reduced Row Echelon Form of the matrix. For example:
                  \overrightarrow{RREF}
                  \begin{bmatrix}1 & 0 & -1\\ 0 & 1 & 2\end{bmatrix}}
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,3): 1, 2, 3, 4, 5, 6].rref() is [matrix(2,3): 1, 0,-1, 0, 1, 2]
 end
@@ -1646,7 +1783,9 @@ echelon form). For example:
 @math-disp{\begin{bmatrix}1 & 0 & 4\\ 1 & 1 & 6\\ -3 & 0 & -10\end{bmatrix}^{-1}
                  = \begin{bmatrix}-5 & 0 & -2\\ -4 & 1 & -1\\ ^3/_2 & 0 & ^1/_2\end{bmatrix}}
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(3,3): 1, 0, 4, 1, 1, 6, -3, 0, -10].inverse()
     is [matrix(3,3): -5, 0, -2, -4, 1, -1, 3/2, 0, 1/2]
@@ -1700,12 +1839,14 @@ Computes the @math{L^p} norm of the matrix using the given number.
 
 Computes the @math{L^1}, @math{L^2}, and @math{L}@superscript{∞} norms of the matrix, respectively.
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   a = [matrix(3,1): 1, 2, 3]
   b = [matrix(3,3): 1, 0, 0, 2, 0, 0, 3, 0, 0]
 
-  a.lp-norm(3) is-roughly num-expt(35, 1/3)
+  a.lp-norm(3) is-roughly num-expt(1 + 8 + 27, 1/3)
   b.lp-norm(3) is-roughly (b * a).lp-norm(3)
 
   a.l1-norm()  is-roughly 6
@@ -1732,27 +1873,33 @@ Returns an orthogonal matrix whose image is the same as the span of the matrix's
 Matrices are defined to permit using addition, subtraction, and multiplication
 operators on them, whenever the dimensions are compatible:
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,2): 1, 2, 3, 4] + [matrix(2,2): 1, 2, 3, 4]
     is [matrix(2,2): 2, 4, 6, 8]
 
   [matrix(2,2): 1, 2, 3, 4] + [matrix(4, 1): 1, 2, 3, 4]
-    raises "different sized matrices"
+    raises "different sized"
 end
 }
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,2): 1, 2, 3, 4] - [matrix(2,2): 0, 2, 3, 3]
     is [matrix(2,2): 1, 0, 0, 1]
 
   [matrix(2,2): 1, 2, 3, 4] - [matrix(4, 1): 1, 2, 3, 4]
-    raises "different sized matrices"
+    raises "different sized"
 end
 }
 
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   [matrix(2,2): 1, 2, 3, 4] * [matrix(2,2): 3, 0, 0, 3]
     is [matrix(2,2): 3, 6, 9, 12]
@@ -1877,8 +2024,7 @@ Multiplies each entry in the matrix by the given value.  See
 
 @function["mtx-dot"]
 
-Returns the Frobenius Product of the two matrices.  See @pyret-method["Matrix"
-"dot"].
+Returns the Frobenius Product of the two matrices.  See @pyret-method["Matrix" "dot"].
 
 @function["mtx-expt"]
 
@@ -1948,7 +2094,9 @@ Adds, subtracts, or multiplies the two matrices.  See @secref{s:matrix-binary-op
 
 @function["is-row-matrix"]
 Returns whether the matrix has exactly one row:
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   is-row-matrix([matrix(1, 3): 10, 20, 10]) is true
   is-row-matrix([matrix(3, 1): 10, 20, 10]) is false
@@ -1958,14 +2106,19 @@ end
 
 @function["is-col-matrix"]
 Returns whether the matrix has exactly one column:
-@examples{
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
-  is-row-matrix([matrix(1, 3): 10, 20, 10]) is false
-  is-row-matrix([matrix(3, 1): 10, 20, 10]) is true
+  is-col-matrix([matrix(1, 3): 10, 20, 10]) is false
+  is-col-matrix([matrix(3, 1): 10, 20, 10]) is true
 end
 }
-@function["is-square-matrix"]{Returns true if the given matrix has the same number of rows and columns.}
-@examples{
+@function["is-square-matrix"]
+Returns true if the given matrix has the same number of rows and columns.
+@examples[#:show-try-it #t]{
+include matrices
+
 check:
   is-square-matrix([matrix(2, 2): 10, 20, 30, 40]) is true
   is-square-matrix([matrix(4, 1): 10, 20, 30, 40]) is false
@@ -1973,74 +2126,81 @@ end
 }
 
 
-@function[
-  "vector-to-matrix"
-  #:examples
-  '@{
-  check:
-    vector-to-matrix([vector: 1, 2, 3]) is [matrix(1,3): 1, 2, 3]
-  end
-  }
-]{Converts the given vector into a one-row matrix.}
+@function["vector-to-matrix"]
+Converts the given vector into a one-row matrix.
 
-@function[
-  "list-to-matrix"
-  #:examples
-  '@{
-  check:
-    list-to-matrix(2, 2, [list: 1, 2, 3, 4])
-      is [matrix(2,2): 1, 2, 3, 4]
-    
-    list-to-matrix(2, 3, [list: 1, 2, 3, 4, 5, 6])
-      is [matrix(2,3): 1, 2, 3, 4, 5, 6]
-  end
-  }
-]{Converts the given list of numbers into a matrix of the given size.}
+@examples[#:show-try-it #t]{
+include matrices
 
-@function[
-  "list-to-row-matrix"
-  #:examples
-  '@{
-  check:
-    list-to-row-matrix([list: 1, 2, 3, 4]) is [matrix(1,4): 1, 2, 3, 4]
-  end
-  }
-]{Converts the given list of numbers into a one-row matrix.}
+check:
+  vector-to-matrix([vector: 1, 2, 3]) is [matrix(1,3): 1, 2, 3]
+end
+}
 
-@function[
-  "list-to-col-matrix"
-  #:examples
-  '@{
-  check:
-    list-to-col-matrix([list: 1, 2, 3, 4]) is [matrix(4,1): 1, 2, 3, 4]
-  end
-  }
-]{Converts the given list of numbers into a one-column matrix.}
 
-@function[
-  "lists-to-matrix"
-  #:examples
-  '@{
-  check:
-    lists-to-matrix([list: [list: 1, 2, 3, 4]]) is [matrix(1,4): 1, 2, 3, 4]
-    lists-to-matrix([list: [list: 1, 2, 3],
-                           [list: 4, 5, 6]]) is [matrix(2,3): 1, 2, 3, 4, 5, 6]
-  end
-  }
-]{Converts the given list of lists into a matrix, with each list as a row.}
+@function["list-to-matrix"]
+Converts the given list of numbers into a matrix of the given size.
+@examples[#:show-try-it #t]{
+include matrices
 
-@function[
-  "vectors-to-matrix"
-  #:examples
-  '@{
-  check:
-    vectors-to-matrix([list: [vector: 1, 2, 3]]) is [matrix(3,1): 1, 2, 3]
-    vectors-to-matrix([list: [vector: 1, 3, 5], [vector: 2, 4, 6]])
-      is [matrix(3,2): 1, 2, 3, 4, 5, 6]
-  end
-  }
-]{Converts the given list of vectors into a matrix, with each vector as a column.}
+check:
+  list-to-matrix(2, 2, [list: 1, 2, 3, 4])
+    is [matrix(2,2): 1, 2, 3, 4]
 
-@function["matrix-within"]{Returns a comparison predicate which returns true if each entry in both matrices is within @pyret{delta} of each other.}
+  list-to-matrix(2, 3, [list: 1, 2, 3, 4, 5, 6])
+    is [matrix(2,3): 1, 2, 3, 4, 5, 6]
+end
+}
+
+@function["list-to-row-matrix"]
+Converts the given list of numbers into a one-row matrix.
+@examples[#:show-try-it #t]{
+include matrices
+
+check:
+  list-to-row-matrix([list: 1, 2, 3, 4]) is [matrix(1,4): 1, 2, 3, 4]
+end
+}
+
+@function["list-to-col-matrix"]
+Converts the given list of numbers into a one-column matrix.
+@examples[#:show-try-it #t]{
+include matrices
+
+check:
+  list-to-col-matrix([list: 1, 2, 3, 4]) is [matrix(4,1): 1, 2, 3, 4]
+end
+}
+
+
+@function["lists-to-matrix"]
+Converts the given list of lists into a matrix, with each list as a row.
+@examples[#:show-try-it #t]{
+include matrices
+
+check:
+  lists-to-matrix([list: [list: 1, 2, 3, 4]]) is [matrix(1,4): 1, 2, 3, 4]
+  lists-to-matrix([list: [list: 1, 2, 3],
+                         [list: 4, 5, 6]]) is [matrix(2,3): 1, 2, 3, 4, 5, 6]
+end
+}
+
+
+@function["vectors-to-matrix"]
+Converts the given list of vectors into a matrix, with each vector as a column.
+@examples[#:show-try-it #t]{
+include matrices
+
+check:
+  vectors-to-matrix([list: [vector: 1, 2, 3]]) is [matrix(3,1): 1, 2, 3]
+  vectors-to-matrix([list: [vector: 1, 3, 5], [vector: 2, 4, 6]])
+    is [matrix(3,2): 1, 2, 3, 4, 5, 6]
+end
+}
+
+
+@function["matrix-within"]
+Returns a comparison predicate which returns true if each entry in both
+matrices is within @pyret{delta} of each other.
   
 }
